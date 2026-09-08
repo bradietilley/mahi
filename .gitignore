@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+.env
+.env.local
+.turbo/
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+.DS_Store
+coverage/
+.plan/
+.tmp-tests/
+.tmp-scaffold/

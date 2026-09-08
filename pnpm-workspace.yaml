@@ -1,0 +1,17 @@
+packages:
+  - "framework/*"
+  # Scratch space for verifying `create-mahi --link-workspace` end to end:
+  # an app scaffolded here resolves `workspace:*` against the local
+  # framework packages. Gitignored; safe to delete.
+  #
+  # It has to be a workspace member for `workspace:*` to resolve at all,
+  # which is the whole point — but that also means `pnpm install` with a
+  # scaffold present WRITES A `.tmp-scaffold/smoke` IMPORTER INTO
+  # `pnpm-lock.yaml`. If you run the CI scaffold steps locally, delete
+  # the scaffold and restore the lockfile when you are done:
+  #
+  #   rm -rf .tmp-scaffold && git checkout -- pnpm-lock.yaml
+  #
+  # CI is unaffected (it never commits), so this is a local-hygiene trap
+  # rather than a correctness one.
+  - ".tmp-scaffold/*"
