@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+
+    // Stricter than the workspace baseline, on purpose (plan §28). A date
+    // library is exactly the kind of code where an `undefined` slipping into
+    // an optional field, or a missing `case` in a unit switch, produces a
+    // plausible-looking wrong answer rather than a crash. The package already
+    // satisfied all of these; pinning them here keeps that true.
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": ["src"]
+}

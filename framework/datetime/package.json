@@ -1,0 +1,62 @@
+{
+  "name": "@mahi/datetime",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -b && node ../../scripts/prune-dist.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "test:zones": "for tz in UTC Australia/Perth America/New_York Pacific/Chatham; do TZ=$tz vitest run || exit 1; done",
+    "bench": "vitest bench --run"
+  },
+  "dependencies": {
+    "@date-fns/utc": "^2.1.1",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11"
+  },
+  "license": "MIT",
+  "author": "Bradie Tilley",
+  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradietilley/mahi.git",
+    "directory": "framework/datetime"
+  },
+  "bugs": {
+    "url": "https://github.com/bradietilley/mahi/issues"
+  },
+  "description": "Dates & times — an immutable, timezone-aware date/time value type for Mahi.",
+  "keywords": [
+    "mahi",
+    "datetime",
+    "date",
+    "time",
+    "timezone"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
