@@ -1,0 +1,37 @@
+import { ServiceProvider, STORAGE_TOKEN } from "@mahi/core";
+import { StorageManager, isLocalDiskConfig, type StorageConfig } from "./storage-manager.js";
+import { LocalStorageDriver } from "./drivers/local-storage-driver.js";
+
+// Canonical definition in `@mahi/core`'s `well-known-tokens`;
+// re-exported so this package's public API is unchanged.
+export { STORAGE_TOKEN };
+
+/**
+ * Registers the `StorageManager` singleton and a `LocalStorageDriver`
+ * factory for every configured disk whose `driver` is `"local"` (or
+ * omitted — local is the default). Same `extend()` mechanism a plugin
+ * would use to add e.g. an "s3" disk later; those disks are skipped
+ * here so the plugin's own `extend(name, ...)` can own them. No
+ * `boot()` needed — `LocalStorageDriver` has no async warm-up
+ * (`mkdir`/`writeFile` happen lazily per-call, same "sync driver
+ * construction, lazy I/O" philosophy already established for
+ * `DatabaseManager`/`CacheManager`).
+ */
+export class StorageServiceProvider extends ServiceProvider {
+  register(): void {
+    this.app.singleton(STORAGE_TOKEN, (app) => {
+      const config = app.config.require<StorageConfig>("storage");
+      const manager = new StorageManager(app, config);
+
+      for (const [name, disk] of Object.entries(config.disks)) {
+        if (!isLocalDiskConfig(disk)) {
+          continue;
+        }
+
+        manager.extend(name, () => new LocalStorageDriver(disk.root, disk.url));
+      }
+
+      return manager;
+    });
+  }
+}
