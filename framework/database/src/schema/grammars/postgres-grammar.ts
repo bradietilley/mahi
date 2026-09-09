@@ -1,0 +1,107 @@
+import { sql, type Kysely } from "kysely";
+import type { ColumnDefinition } from "../column-definition.js";
+import type { SchemaGrammar } from "../dialect.js";
+import { compileColumnType } from "./column-types.js";
+import { makeNativeAlterGrammar } from "./native-alter-grammar.js";
+import { quoteDoubleQuoted } from "../quote-identifier.js";
+
+const { compileCreate, compileAlter } = makeNativeAlterGrammar({
+  dialect: "postgres",
+
+  autoIncrement(col) {
+    // Postgres uses serial/bigserial pseudo-types (resolved by
+    // compileColumnType) — no separate modifier. The column is still the
+    // primary key, which the caller applies via primaryKey().
+    return col;
+  },
+
+  async dropIndex(db, _table, name) {
+    // Postgres indexes live in the schema namespace, not under the table.
+    await db.schema.dropIndex(name).ifExists().execute();
+  },
+
+  async dropPrimary(db, table, name) {
+    const constraint = name ?? `${table}_pkey`;
+    await db.schema.alterTable(table).dropConstraint(constraint).execute();
+  },
+
+  async dropForeign(db, table, name) {
+    // Postgres models a foreign key as an ordinary named constraint.
+    await db.schema.alterTable(table).dropConstraint(name).execute();
+  },
+
+  async changeColumn(db, table, def: ColumnDefinition) {
+    // Postgres alterations are one-per-statement; issue each independently.
+    await db.schema
+      .alterTable(table)
+      .alterColumn(def.name, (ac: any) => ac.setDataType(compileColumnType(def, "postgres")))
+      .execute();
+
+    await db.schema
+      .alterTable(table)
+      .alterColumn(def.name, (ac: any) => (def.nullableFlag ? ac.dropNotNull() : ac.setNotNull()))
+      .execute();
+
+    if (def.useCurrentFlag) {
+      await db.schema
+        .alterTable(table)
+        .alterColumn(def.name, (ac: any) => ac.setDefault(sql`CURRENT_TIMESTAMP`))
+        .execute();
+    } else if (def.hasDefault) {
+      await db.schema
+        .alterTable(table)
+        .alterColumn(def.name, (ac: any) =>
+          ac.setDefault(
+            typeof def.defaultValue === "boolean" ? def.defaultValue : def.defaultValue,
+          ),
+        )
+        .execute();
+    }
+  },
+
+  supportsFullText: false,
+});
+
+/**
+ * Drop every user (base) table in the **current schema**. `CASCADE`
+ * clears any dependent foreign keys so drop order doesn't matter.
+ *
+ * The `search_path` filter is not cosmetic: Kysely's
+ * `introspection.getTables()` returns every non-system table in the
+ * database, across all schemas. Dropping that list unqualified would
+ * reach into schemas the connection was never pointed at — so a
+ * `migrate:fresh` against an app's own schema could destroy a
+ * neighbouring one sharing the database. Restricting to
+ * `current_schema()` (which `PostgresDriver` sets from `searchPath`)
+ * confines it to the schema this connection actually works in, and the
+ * drop is qualified with that schema so it cannot resolve elsewhere.
+ */
+async function dropAllTables(db: Kysely<any>): Promise<void> {
+  const { rows } = await sql<{ schema: string }>`select current_schema() as schema`.execute(db);
+  const current = rows[0]?.schema ?? "public";
+
+  const tables = await db.introspection.getTables();
+
+  for (const table of tables) {
+    if (table.isView) {
+      continue;
+    }
+
+    if (table.schema !== undefined && table.schema !== current) {
+      continue;
+    }
+
+    await sql
+      .raw(
+        `DROP TABLE IF EXISTS ${quoteDoubleQuoted(current)}.${quoteDoubleQuoted(table.name)} CASCADE`,
+      )
+      .execute(db);
+  }
+}
+
+export const postgresGrammar: SchemaGrammar = {
+  dialect: "postgres",
+  compileCreate,
+  compileAlter,
+  dropAllTables,
+};
