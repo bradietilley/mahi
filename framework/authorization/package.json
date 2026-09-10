@@ -1,0 +1,62 @@
+{
+  "name": "@mahi/authorization",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && node ../../scripts/prune-dist.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mahi/core": "workspace:*",
+    "@mahi/database": "workspace:*",
+    "@mahi/facades": "workspace:*",
+    "@mahi/http": "workspace:*",
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11"
+  },
+  "license": "MIT",
+  "author": "Bradie Tilley",
+  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradietilley/mahi.git",
+    "directory": "framework/authorization"
+  },
+  "bugs": {
+    "url": "https://github.com/bradietilley/mahi/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "description": "Authorization — gates, policies, and ability checks for Mahi.",
+  "keywords": [
+    "mahi",
+    "authorization",
+    "gate",
+    "policy",
+    "abilities"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
