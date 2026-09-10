@@ -1,0 +1,231 @@
+import { Hono } from "hono";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { Model } from "@mahi/database";
+import { HttpError } from "../src/http-error.js";
+import { Request, requestFromContext } from "../src/request.js";
+import { toHonoMiddleware } from "../src/middleware/pipeline-middleware.js";
+
+interface PostAttributes {
+  id: string;
+  body: string;
+}
+
+class Post extends Model<PostAttributes>()({
+  table: "posts",
+  primaryKey: "id",
+  timestamps: false,
+}) {}
+
+describe("Request.create()", () => {
+  it("exposes method, input, only, merge, boolean, and keeps files out of input", () => {
+    const file = new File(["hi"], "a.png", { type: "image/png" });
+    const request = Request.create(
+      "/posts",
+      "POST",
+      { body: "hello", published: "1" },
+      {
+        query: { page: "2" },
+        files: { image: file },
+        ip: "1.2.3.4",
+      },
+    );
+
+    expect(request.method()).toBe("POST");
+    expect(request.isMethod("post")).toBe(true);
+    expect(request.path()).toBe("/posts");
+    expect(request.input("body")).toBe("hello");
+    expect(request.input("page")).toBe("2");
+    expect(request.only("body")).toEqual({ body: "hello" });
+    expect(request.boolean("published")).toBe(true);
+    expect(request.hasFile("image")).toBe(true);
+    expect(request.file("image")).toBe(file);
+    expect(request.input("image")).toBeUndefined();
+    expect(request.ip()).toBe("1.2.3.4");
+
+    request.merge({ extra: true });
+    expect(request.input("extra")).toBe(true);
+  });
+
+  it("ignores x-forwarded-for — ip() is the socket peer unless trustProxies() says otherwise", () => {
+    const request = Request.create(
+      "/posts",
+      "GET",
+      {},
+      {
+        ip: "203.0.113.9",
+        headers: { "x-forwarded-for": "1.2.3.4" },
+      },
+    );
+
+    // The header is present and is NOT what ip() returns. That is the
+    // whole point: it's client-supplied, so honouring it by default let
+    // an attacker pick their own rate-limit bucket.
+    expect(request.ip()).toBe("203.0.113.9");
+    expect(request.peerAddress()).toBe("203.0.113.9");
+    // ips() still exposes the unvalidated chain for diagnostics, closest
+    // hop last.
+    expect(request.ips()).toEqual(["1.2.3.4", "203.0.113.9"]);
+  });
+
+  it("integer() coerces query-like values", () => {
+    const request = Request.create("/posts", "GET", {}, { query: { per_page: "20" } });
+    expect(request.integer("per_page")).toBe(20);
+  });
+});
+
+describe("Request.from()", () => {
+  it("parses a JSON body, query, and route params into the merged input bag", async () => {
+    const hono = new Hono();
+    hono.post("/posts/:id", async (c) => {
+      const request = await Request.from(c);
+
+      return Response.json({
+        method: request.method(),
+        id: request.route("id"),
+        q: request.query("q"),
+        body: request.input("body"),
+        all: request.all(),
+      });
+    });
+
+    const res = await hono.request("/posts/abc?q=search", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: "hello" }),
+    });
+
+    expect(await res.json()).toEqual({
+      method: "POST",
+      id: "abc",
+      q: "search",
+      body: "hello",
+      all: { id: "abc", q: "search", body: "hello" },
+    });
+  });
+
+  it("parses multipart into input + files", async () => {
+    const hono = new Hono();
+    hono.post("/upload", async (c) => {
+      const request = await Request.from(c);
+
+      return Response.json({
+        body: request.input("body"),
+        hasFile: request.hasFile("image"),
+        fileName: request.file("image")?.name,
+      });
+    });
+
+    const form = new FormData();
+    form.set("body", "hello");
+    form.set("image", new File(["abc"], "photo.png", { type: "image/png" }));
+
+    const res = await hono.request("/upload", { method: "POST", body: form });
+    expect(await res.json()).toEqual({ body: "hello", hasFile: true, fileName: "photo.png" });
+  });
+
+  it("picks up route params after Request was constructed in earlier middleware", async () => {
+    const hono = new Hono();
+    hono.use("*", toHonoMiddleware([]));
+    hono.get("/items/:id", async (c) => {
+      const request = await requestFromContext(c);
+
+      return Response.json({ id: request.parameter("id"), all: request.all() });
+    });
+
+    const res = await hono.request("/items/abc");
+    expect(await res.json()).toEqual({ id: "abc", all: { id: "abc" } });
+  });
+
+  it("treats empty GET as an empty input bag", async () => {
+    const hono = new Hono();
+    hono.get("/ping", async (c) => {
+      const request = await Request.from(c);
+
+      return Response.json(request.all());
+    });
+
+    const res = await hono.request("/ping");
+    expect(await res.json()).toEqual({});
+  });
+
+  it("does not throw on empty/invalid JSON — validation decides", async () => {
+    const hono = new Hono();
+    hono.post("/x", async (c) => {
+      const request = await Request.from(c);
+
+      return Response.json(request.all());
+    });
+
+    const res = await hono.request("/x", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "not-json",
+    });
+    expect(await res.json()).toEqual({});
+  });
+});
+
+describe("Request validation", () => {
+  it("validate() returns false and stashes errors; validateOrFail() throws", async () => {
+    const { rule, numberRule, ValidationException } = await import("@mahi/validation");
+
+    class CreateUserRequest extends Request {
+      rules() {
+        return {
+          name: rule().string().required(),
+          age: numberRule().integer().optional(),
+        } as const;
+      }
+    }
+
+    const failing = new CreateUserRequest({});
+    expect(await failing.validate()).toBe(false);
+    expect(failing.errors().name).toBeTruthy();
+    expect(() => failing.validated()).toThrow(/before a successful validate/);
+    await expect(new CreateUserRequest({}).validateOrFail()).rejects.toBeInstanceOf(
+      ValidationException,
+    );
+
+    const ok = new CreateUserRequest({ name: "Ada" });
+    expect(await ok.validate()).toBe(true);
+    expect(ok.validated().name).toBe("Ada");
+    expect(ok.validated().age).toBeUndefined();
+  });
+});
+
+describe("request.model()", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("404s when the route param is missing", async () => {
+    const request = Request.create("/posts", "GET");
+    await expect(request.model(Post)).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("404s when the row does not exist", async () => {
+    vi.spyOn(Post, "find").mockResolvedValue(undefined);
+    const request = Request.create("/posts/missing", "GET", {}, { params: { post: "missing" } });
+    await expect(request.model(Post)).rejects.toBeInstanceOf(HttpError);
+    await expect(request.model(Post)).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("returns the row and caches it on the instance", async () => {
+    const row = { id: "abc", body: "hello" };
+    const find = vi.spyOn(Post, "find").mockResolvedValue(row as never);
+
+    // The param name is derived from the model (Post → "post").
+    const request = Request.create("/posts/abc", "GET", {}, { params: { post: "abc" } });
+    expect(await request.model(Post)).toEqual(row);
+    expect(await request.model(Post)).toEqual(row);
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(find).toHaveBeenCalledWith("abc");
+  });
+
+  it("honors an explicit param name override", async () => {
+    const row = { id: "abc" };
+    vi.spyOn(Post, "find").mockResolvedValue(row as never);
+    const request = Request.create("/posts/abc", "GET", {}, { params: { id: "abc" } });
+    expect(await request.model(Post, "id")).toEqual(row);
+  });
+});

@@ -1,0 +1,73 @@
+{
+  "name": "@mahi/http",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && node ../../scripts/prune-dist.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mahi/cache": "workspace:*",
+    "@mahi/cli": "workspace:*",
+    "@mahi/core": "workspace:*",
+    "@mahi/database": "workspace:*",
+    "@mahi/encryption": "workspace:*",
+    "@mahi/facades": "workspace:*",
+    "@mahi/pipeline": "workspace:*",
+    "@mahi/tui": "workspace:*",
+    "@mahi/validation": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "@hono/node-ws": "^1.3.1",
+    "commander": "^12.1.0",
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11",
+    "ws": "^8.21.3"
+  },
+  "license": "MIT",
+  "author": "Bradie Tilley",
+  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradietilley/mahi.git",
+    "directory": "framework/http"
+  },
+  "bugs": {
+    "url": "https://github.com/bradietilley/mahi/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "description": "HTTP — the router, request/response, middleware, and kernel for Mahi.",
+  "keywords": [
+    "mahi",
+    "http",
+    "router",
+    "middleware",
+    "kernel"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
