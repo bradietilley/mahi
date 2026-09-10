@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../cli" },
+    { "path": "../database" },
+    { "path": "../datetime" },
+    { "path": "../encryption" },
+    { "path": "../facades" },
+    { "path": "../http" }
+  ]
+}
