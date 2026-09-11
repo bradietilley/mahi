@@ -1,0 +1,770 @@
+# Storage
+
+`@mahi/storage` is a named-disk abstraction over file storage. One
+interface — a core of six methods plus listing, streaming and metadata —
+resolved by name through a `Manager`, the same pattern as
+`DatabaseManager` and `CacheManager`.
+
+```ts
+import { Storage } from "@mahi/storage";
+
+await Storage.put("avatars/427185966743560456.png", buffer);
+const bytes = await Storage.get("avatars/427185966743560456.png");
+const url = Storage.url("avatars/427185966743560456.png");   // "/storage/avatars/427185966743560456.png"
+```
+
+One driver ships: `local`, backed by the filesystem. A "public" disk is
+not a special driver — it's a local disk that happens to have a `url`
+prefix configured.
+
+## The `StorageDriver` contract
+
+```ts
+interface StorageDriver {
+  // Core
+  put(path: string, contents: Buffer | string): Promise<void>;
+  get(path: string): Promise<Buffer>;
+  exists(path: string): Promise<boolean>;
+  delete(path: string): Promise<void>;
+  url(path: string): string;
+  path(path: string): string;
+
+  // Listing
+  files(directory?: string): Promise<string[]>;
+  allFiles(directory?: string): Promise<string[]>;
+  directories(directory?: string): Promise<string[]>;
+  allDirectories(directory?: string): Promise<string[]>;
+  list(directory?: string): Promise<{ files: string[]; directories: string[] }>;
+
+  // Streaming
+  readStream(path: string, options?: { start?: number; end?: number }): Promise<Readable>;
+  writeStream(path: string, options?: { flags?: "w" | "a" }): Promise<Writable>;
+  putStream(path: string, source: Readable | ReadableStream | AsyncIterable<Uint8Array>): Promise<void>;
+
+  // Metadata / manipulation
+  size(path: string): Promise<number>;
+  lastModified(path: string): Promise<Date>;
+  mimeType(path: string): Promise<string | undefined>;
+  copy(from: string, to: string): Promise<void>;
+  move(from: string, to: string): Promise<void>;
+  deleteDirectory(directory: string): Promise<void>;
+  makeDirectory(directory: string): Promise<void>;
+}
+```
+
+The **core** six (two of them synchronous string computations) cover the
+motivating use case — "write a file, read it back, hand a client a URL
+for it". The rest add directory listing, streaming and file metadata,
+grouped so a driver author can see exactly what a new backend has to
+implement.
+
+A word of warning to anyone writing an `s3` (or other remote) driver:
+every one of these is a thing you have to implement *correctly*, not
+merely implement. `copy()` on S3 is a server-side copy API call; on the
+filesystem it's a `copyFile`. `files(directory)` is cheap on a filesystem
+and a paginated, eventually-consistent, potentially enormous listing via
+`ListObjectsV2` on object storage. `readStream`/`putStream` map to
+`GetObject`'s body and a multipart upload. `path()` and `temporaryUrl()`
+don't exist for a local disk / a remote disk respectively. The interface
+is the same; the correctness bar per backend is not.
+
+If you're on the `local` disk and want something the interface doesn't
+expose, you still have the concrete driver as an escape hatch —
+`Storage.disk("local")` returns a `LocalStorageDriver`, and `path()`
+gives you a filesystem path you can hand to `node:fs` directly:
+
+```ts
+import { promises as fs } from "node:fs";
+
+const { birthtime } = await fs.stat(Storage.path("uploads/report.pdf"));
+```
+
+The framework doesn't pretend every `node:fs` call is portable across
+every backend, so it makes you write the non-portable thing explicitly.
+
+## Configuration
+
+`config/storage.ts`:
+
+```ts
+import { storage_path } from "@mahi/core";
+import type { StorageConfig } from "@mahi/storage";
+
+export function storageConfig(): StorageConfig {
+  return {
+    default: "public",
+    disks: {
+      local: { root: storage_path("app/private") },
+      public: { root: storage_path("app/public"), url: "/storage" },
+    },
+  };
+}
+```
+
+```ts
+interface StorageConfig {
+  default: string;
+  disks: Record<string, DiskConfig>;
+}
+
+interface LocalDiskConfig {
+  driver?: "local";
+  root: string;
+  url?: string;
+}
+
+type DiskConfig = LocalDiskConfig | { driver: string; [key: string]: unknown };
+```
+
+| Key | Meaning |
+|---|---|
+| `driver` | Optional for local disks — `"local"` is the default when omitted. |
+| `root` | The directory every path on this disk resolves inside. Required. |
+| `url` | The public HTTP prefix. Its presence is what makes a disk **public**. |
+
+`url` may be a path (`"/storage"`) or a full origin
+(`"https://cdn.example.com/media"`). Omit it entirely for a **private**
+disk — one whose files are never addressable by a client directly.
+
+`isLocalDiskConfig(value)` is the exported type guard the provider (and
+`servePublicDisk`) uses to decide whether a config entry describes a
+local disk:
+
+```ts
+function isLocalDiskConfig(value: unknown): value is LocalDiskConfig
+```
+
+It returns `true` when `value` is an object with a string `root` and a
+`driver` that is either absent or exactly `"local"`. That check is why
+`StorageServiceProvider` can register `LocalStorageDriver` factories for
+every local disk while leaving disks belonging to a plugin driver alone —
+the plugin's own `extend("s3", ...)` owns those.
+
+## `LocalStorageDriver`
+
+```ts
+new LocalStorageDriver(root: string, urlPrefix?: string)
+```
+
+Every method funnels through one private `resolve()`:
+
+```ts
+private resolve(path: string): string {
+  const rootResolved = pathModule.resolve(this.root);
+  const full = pathModule.resolve(rootResolved, path);
+  if (full !== rootResolved && !full.startsWith(rootResolved + pathModule.sep)) {
+    throw new Error(`Path [${path}] escapes the storage root.`);
+  }
+  return full;
+}
+```
+
+This is the path-traversal guard, and it is applied by **every** method —
+`put`, `get`, `exists`, `delete`, `path`, **and `url()`**. `url()`
+calling `resolve()` looks pointless (it throws away the result and builds
+a URL from the prefix instead), but it isn't: a `url()` that skipped the
+guard would happily emit `/storage/../../etc/passwd` for a caller who
+passed `"../../etc/passwd"`, and whatever serves that prefix would then
+have to re-validate. Validating once, in the driver, means every path
+that ever leaves this class has been through the same check.
+
+The comparison is on **resolved absolute** paths, not on string
+inspection of the input, so `"../"`, `"foo/../../bar"`, absolute paths,
+and encoded variants all collapse to the same normalized form before
+being compared. The `full !== rootResolved` clause permits addressing the
+root itself; the `startsWith(rootResolved + sep)` clause is what stops
+`/var/storage-other` from passing a `/var/storage` root check.
+
+`put()` creates intermediate directories (`mkdir` with `recursive: true`)
+before writing. `delete()` uses `force: true`, so deleting a file that
+isn't there is a no-op rather than an error — the contract has no
+`missing()` and no "did it exist" return value, and it doesn't need one.
+
+### `url()` throws on a private disk
+
+```ts
+url(path: string): string {
+  if (this.urlPrefix === undefined || this.urlPrefix === "") {
+    throw new Error(
+      "This disk does not support retrieving URLs — it has no `url` prefix configured (it is a private disk). " +
+        "Use `path()` for the on-disk filesystem location, or serve it through a route.",
+    );
+  }
+  this.resolve(path);
+  return joinPublicUrl(this.urlPrefix, path);
+}
+```
+
+Calling `url()` on a disk with no `url` configured is an error, not a
+fallback. This matches Laravel, whose `Storage::url()` raises *"This
+driver does not support retrieving URLs"* for the same situation.
+
+The alternative — returning the filesystem path — was tried and removed.
+It is a Laravel-muscle-memory footgun of the worst kind: it doesn't
+throw, it doesn't warn, and the failure mode is that
+`/Users/deploy/app/storage/app/private/invoices/2026-01.pdf` gets
+serialized into an API response and shipped to a client. That leaks your
+absolute server paths and your directory layout, and it does it silently.
+
+If you have a private disk and you want the filesystem location, ask for
+it by name:
+
+```ts
+Storage.path("invoices/2026-01.pdf", "local");   // absolute on-disk path
+Storage.url("invoices/2026-01.pdf", "local");    // throws
+```
+
+If you want a client to be able to fetch a private file, put a route in
+front of it that does its own authorization and returns the bytes — see
+[`serveStoredFile`](#servestoredfile) below.
+
+## Listing files
+
+Five methods list a disk. Every returned path is **disk-relative,
+POSIX-separated (`/`) and sorted**, so a test can assert on them
+deterministically. A directory argument is optional — omit it to list
+from the disk root.
+
+```ts
+await Storage.files();              // files directly under the root
+await Storage.files("avatars");     // files directly under avatars/
+await Storage.allFiles("avatars");  // …recursively
+await Storage.directories();        // immediate subdirectories
+await Storage.allDirectories();     // …recursively
+await Storage.list("avatars");      // { files, directories } — one level
+```
+
+```ts
+const { files, directories } = await Storage.list("uploads");
+// files:       ["uploads/a.png", "uploads/b.png"]
+// directories: ["uploads/thumbs"]
+```
+
+**A directory that doesn't exist lists as empty** — `files("nope")`
+returns `[]`, not an error, matching Laravel. A path-traversal argument
+(`files("../..")`) still throws, like every other method.
+
+## Streaming
+
+Buffering a large file through `get()`/`put()` costs its whole size in
+heap. The stream methods never do — a multi-gigabyte upload or download
+flows through in chunks.
+
+### `readStream(path, { start?, end? })`
+
+A Node `Readable` over the file's bytes. Existence is checked up front, so
+a missing file rejects with a typed `FileNotFoundException` **before** any
+chunk — you never have to attach an error handler just to learn the file
+wasn't there. `start`/`end` are inclusive byte offsets (as
+`fs.createReadStream`), for serving a byte range.
+
+```ts
+import { FileNotFoundException } from "@mahi/storage";
+
+const stream = await Storage.readStream("videos/clip.mp4");
+stream.pipe(somewhere);
+
+const slice = await Storage.readStream("big.bin", { start: 0, end: 1023 }); // first 1 KiB
+```
+
+### `writeStream(path, { flags? })`
+
+A Node `Writable` to the file, with parent directories created first. The
+default `flags: "w"` truncates; `"a"` appends. A `"w"` write goes to a
+temp sibling and is `rename`d into place on `finish`, so **a crashed or
+aborted write never leaves a partial file at the final path** (the same
+atomic-write guarantee the file cache store wants).
+
+```ts
+const out = await Storage.writeStream("exports/report.csv");
+out.write("a,b,c\n");
+out.end("1,2,3\n");
+await new Promise((res, rej) => out.on("finish", res).on("error", rej));
+```
+
+### `putStream(path, source)`
+
+Drain any `Readable`, web `ReadableStream`, or `AsyncIterable<Uint8Array>`
+onto the disk — Laravel's `put($path, $resource)`. Atomic, like
+`writeStream`.
+
+```ts
+// From a fetch/Response body:
+await Storage.putStream("cache/remote.json", (await fetch(url)).body!);
+// From a request body in a handler:
+await Storage.putStream(`uploads/${name}`, request.raw.body!);
+```
+
+## File metadata & manipulation
+
+```ts
+await Storage.size("a.pdf");          // number of bytes  (throws if missing)
+await Storage.lastModified("a.pdf");  // Date             (throws if missing)
+await Storage.mimeType("a.png");      // "image/png" | undefined (guessed from extension)
+await Storage.copy("a.pdf", "backup/a.pdf");
+await Storage.move("a.pdf", "archive/a.pdf");
+await Storage.makeDirectory("thumbs");
+await Storage.deleteDirectory("thumbs");   // recursive; no error if absent
+```
+
+`size()`/`lastModified()`/`copy()`/`move()` throw `FileNotFoundException`
+when the (source) file is missing. `mimeType()` is a best-effort guess
+from the extension — the disk has no real content-type concept — and
+returns `undefined` for an unknown extension.
+
+## `StorageManager`
+
+```ts
+class StorageManager extends Manager<StorageDriver>
+```
+
+| Method | Returns | Notes |
+|---|---|---|
+| `disk(name?)` | `StorageDriver` | Alias for `driver()`. Default disk when `name` is omitted. |
+| `url(path, disk?)` | `string` | `disk(disk).url(path)`. Throws for a private disk. |
+| `path(path, disk?)` | `string` | `disk(disk).path(path)`. |
+| `diskConfig<T>(name)` | `T` | The raw `disks[name]` config entry. |
+| `getDefaultDriver()` | `string` | `config.default`. |
+| `extend(name, factory)` | `this` | Register a driver. Inherited from `Manager`. |
+
+`url()` and `path()` take the disk name as their **second** argument, so
+the first argument always matches the driver method it forwards to.
+
+Resolution is synchronous and cached per name, like every other
+`Manager`. Constructing a `LocalStorageDriver` does no I/O at all — the
+`mkdir`/`writeFile` happen lazily inside `put()`. `StorageServiceProvider`
+therefore has no `boot()`.
+
+```ts
+export class StorageServiceProvider extends ServiceProvider {
+  register(): void {
+    this.app.singleton(STORAGE_TOKEN, (app) => {
+      const config = app.config.get<StorageConfig>("storage");
+      const manager = new StorageManager(app, config);
+
+      for (const [name, disk] of Object.entries(config.disks)) {
+        if (!isLocalDiskConfig(disk)) continue;
+        manager.extend(name, () => new LocalStorageDriver(disk.root, disk.url));
+      }
+
+      return manager;
+    });
+  }
+}
+```
+
+Note what this does: it registers **one factory per configured local
+disk**, keyed by the disk's own name. Disk names *are* driver names in
+this manager — there is no `createLocalDriver()` indirection layer
+mapping a `driver` string onto a method. That's the same choice every
+`Manager` in the framework makes.
+
+Resolve it directly where you have the app:
+
+```ts
+import { app } from "@mahi/core";
+import { StorageManager, STORAGE_TOKEN } from "@mahi/storage";
+
+const storage = app().make<StorageManager>(STORAGE_TOKEN);
+await storage.disk().put(path, image.buffer);
+```
+
+## The `Storage` facade
+
+```ts
+class Storage extends Facade<StorageManager>(() => STORAGE_TOKEN)
+```
+
+| Forwarded to the **default disk** | Forwarded to the **manager** |
+|---|---|
+| `put`, `get`, `exists`, `delete` | `disk`, `url`, `path` |
+
+```ts
+await Storage.put("avatars/1.png", buffer);          // default disk
+await Storage.disk("local").put("backup.db", bytes); // a specific disk
+Storage.url("avatars/1.png");                        // default disk
+Storage.url("invoices/x.pdf", "local");              // named disk — throws (private)
+```
+
+There is no `Storage.put(..., disk)` overload. For a non-default disk, go
+through `Storage.disk(name)`, which hands back a plain `StorageDriver`
+with the identical methods.
+
+Prefer injecting `StorageManager` via `STORAGE_TOKEN` where you already
+have `app` — inside a `ServiceProvider`, a `Command`, a controller that
+received it. The facade is for call sites where threading it through is
+genuinely inconvenient. Same guidance as `app()` itself, and the same
+test caveat: the facade resolves off the *current global* app, so a test
+that builds its own isolated `Application` should resolve `STORAGE_TOKEN`
+off that instance.
+
+## Public URL helpers
+
+Three exported functions handle the prefix arithmetic. They're pure
+string functions with no dependency on the container, which is what lets
+`servePublicDisk` live in this package without pulling in `@mahi/http`.
+
+### `joinPublicUrl(prefix, path)`
+
+```ts
+joinPublicUrl("/storage", "avatars/1.png")
+// "/storage/avatars/1.png"
+
+joinPublicUrl("https://cdn.example.com/media/", "/posts/a.webp")
+// "https://cdn.example.com/media/posts/a.webp"
+```
+
+Strips trailing slashes from the prefix, normalizes backslashes to
+forward slashes in the path, strips leading slashes from the path, joins
+with one `/`. This is what `LocalStorageDriver.url()` calls.
+
+### `publicUrlPathname(prefix)`
+
+The **path portion** of a prefix — what an incoming request path has to
+start with for that prefix to match.
+
+```ts
+publicUrlPathname("/storage")                          // "/storage"
+publicUrlPathname("storage")                           // "/storage"
+publicUrlPathname("http://localhost:8000/storage")     // "/storage"
+publicUrlPathname("https://cdn.example.com")           // "/"
+```
+
+An absolute-URL prefix contributes only its pathname. That's the point:
+a disk configured with `url: "https://cdn.example.com/media"` is served
+by your app at `/media` in development and by the CDN in production,
+without a second config key for "the local path".
+
+### `pathFromPublicUrl(requestPath, prefix)`
+
+The inverse. Strips the prefix off an incoming request path and returns
+the disk-relative path, or `null` when the request isn't under that
+prefix or names no file.
+
+```ts
+pathFromPublicUrl("/storage/avatars/1.png", "/storage")   // "avatars/1.png"
+pathFromPublicUrl("/storage", "/storage")                 // null  — the prefix itself
+pathFromPublicUrl("/storage/", "/storage")                // null
+pathFromPublicUrl("/other/x.png", "/storage")             // null  — not under the prefix
+pathFromPublicUrl("/storage/a%20b.png", "/storage")       // "a b.png"
+```
+
+It `decodeURIComponent`s the result and returns `null` if that throws (a
+malformed percent-escape) or yields an empty string. A `null` return is
+the caller's cue to 404 — which is exactly what `servePublicDisk` does
+with it.
+
+## Serving files
+
+### `serveStoredFile`
+
+```ts
+serveStoredFile(
+  driver: StorageDriver,
+  path: string,
+  options?: {
+    cacheControl?: string;
+    contentType?: string;
+    request?: { headers?: Headers; signal?: AbortSignal };
+  },
+): Promise<Response>
+```
+
+Streams `path` off `driver` and returns a web-standard `Response`. It
+takes a `StorageDriver`, not a disk name, so it works with any disk you've
+already resolved — including a private one behind your own authorization
+check. The body is a streamed `Readable`, so a large file is never
+buffered into memory.
+
+Pass `options.request` (the incoming request's `headers` and abort
+`signal`) to get **resumable, cache-aware** downloads:
+
+- `Content-Length`, `Last-Modified`, a weak `ETag` (size+mtime) and
+  `Accept-Ranges: bytes` are always set.
+- A `Range: bytes=…` request returns **206** with `Content-Range` (and a
+  **416** for an unsatisfiable range). Suffix (`bytes=-500`) and
+  open-ended (`bytes=500-`) forms are supported; multipart ranges are not.
+- `If-None-Match` / `If-Modified-Since` return a bodyless **304** when the
+  client's copy is still fresh.
+- When the client aborts (`signal`), the underlying read stream is
+  destroyed instead of being drained to nowhere.
+
+Omit `options.request` and you get a plain 200 with the whole body
+(still streamed, still with the validators set).
+
+```ts
+import { Auth } from "@mahi/auth";
+import { Controller, HttpResponse, type Request } from "@mahi/http";
+import { Storage, serveStoredFile } from "@mahi/storage";
+
+export class DownloadInvoiceController extends Controller {
+  async handle(request: Request) {
+    const invoice = await request.model(Invoice);
+    if (invoice.user_id !== Auth.id()) {
+      return HttpResponse.json({ message: "Forbidden" }, 403);
+    }
+
+    return serveStoredFile(Storage.disk("local"), invoice.path, {
+      contentType: "application/pdf",
+    });
+  }
+}
+```
+
+**A missing file and a path-traversal attempt both produce the same plain
+404.** The traversal case throws out of `driver.exists()`; the handler
+catches it and returns the identical response:
+
+```ts
+let exists: boolean;
+try {
+  exists = await driver.exists(path);
+} catch {
+  return new Response("Not Found", { status: 404 });
+}
+if (!exists) {
+  return new Response("Not Found", { status: 404 });
+}
+```
+
+That symmetry is the security property. If traversal produced a 400 with
+`"Path [...] escapes the storage root."` and a missing file produced a
+404, an attacker would have a working oracle: probe a path, read the
+status, and learn whether their traversal reached a real directory. Same
+status, same body, no leak. The error is still thrown by the driver — it
+just never becomes a response.
+
+`Content-Type` comes from `options.contentType` when given, otherwise
+from a small extension→MIME table covering `jpg`/`jpeg`/`png`/`gif`/
+`webp`/`svg`/`json`/`txt`/`pdf`. Anything else is
+`application/octet-stream`. The disk itself has no content-type concept —
+`get()` returns a bare `Buffer` — so this map is a property of the
+*serving* helper, not of storage. `Content-Length` is set from the file's
+size; `Cache-Control` is set only when you pass `cacheControl`.
+
+The body is streamed, not buffered — a large download costs no heap. For
+gigabytes of media in production you may still want a CDN in front of the
+prefix (see below), but the process no longer OOMs on a big file.
+
+### `servePublicDisk`
+
+```ts
+servePublicDisk(
+  diskName: string,
+  options?: ServeStoredFileOptions,
+): (request: { path(): string }) => Promise<Response>
+```
+
+A route handler that serves a whole public disk under its configured
+`url` prefix. Wire it with a **catch-all** route whose path matches that
+prefix:
+
+```ts
+// src/routes/media.routes.ts
+import type { Router } from "@mahi/http";
+import { servePublicDisk } from "@mahi/storage";
+
+export function registerMediaRoutes(router: Router): void {
+  router.get(
+    "/storage/*",
+    servePublicDisk("public", { cacheControl: "public, max-age=31536000, immutable" }),
+  );
+}
+```
+
+```ts
+// src/providers/media.provider.ts
+export class MediaServiceProvider extends ServiceProvider {
+  routes(router: Router): void {
+    registerMediaRoutes(router);
+  }
+}
+```
+
+The `/storage/*` wildcard must line up with the disk's `url: "/storage"`.
+The handler resolves the disk's config at request time, derives the
+prefix pathname, and strips it — so if you change `url` you change the
+route pattern to match, and nothing else.
+
+Two failure modes, deliberately different:
+
+- **The disk has no `url` configured** — `servePublicDisk` *throws*:
+  `Disk [name] has no url configured — cannot serve it publicly.` This is
+  a wiring bug in your app, not a client error, and surfacing it as a 500
+  in development is the point.
+- **The request path isn't under the prefix, or names no file** —
+  `pathFromPublicUrl` returns `null` and the handler 404s.
+
+The handler's parameter type is structural — `{ path(): string }`, not
+`@mahi/http`'s `Request`. That's what keeps `@mahi/storage` free of a
+dependency on the HTTP package while still being usable directly as a
+route handler.
+
+### There is no `storage:link`
+
+Laravel ships `php artisan storage:link` because PHP web servers serve
+files out of a fixed document root, and `storage/app/public` is not in
+it — the symlink exists purely to drag those files into a directory the
+web server will look at.
+
+Node has no document root. Your application process *is* the server, and
+a route is all it takes to serve any path on disk. `servePublicDisk` is
+that route. There is no symlink, no artisan command, and no
+"did you remember to run storage:link" deployment step.
+
+The trade-off is that every public file is served by your Node process,
+which is fine for avatars and post images and wrong for gigabytes of
+video. When it stops being fine, point the disk's `url` at a CDN origin
+that reads from the same bucket — `url()` starts emitting CDN URLs, the
+catch-all route stops being hit, and no application code changes.
+
+## Writing a custom driver
+
+Implement the `StorageDriver` methods and register a factory with
+`extend()`. On object storage the mapping is: listing →
+paginated `ListObjectsV2`; `readStream` → `GetObject`'s body;
+`putStream`/`writeStream` → a multipart upload; `copy` → the server-side
+copy API; `path()` → throw (there is no on-disk path). Only the core six
+are shown below for brevity.
+
+```ts
+import { ServiceProvider } from "@mahi/core";
+import { StorageManager, STORAGE_TOKEN, joinPublicUrl, type StorageDriver } from "@mahi/storage";
+
+export class S3StorageDriver implements StorageDriver {
+  constructor(private config: { bucket: string; region: string; url?: string }) {}
+
+  async put(path: string, contents: Buffer | string): Promise<void> { /* ... */ }
+  async get(path: string): Promise<Buffer> { /* ... */ }
+  async exists(path: string): Promise<boolean> { /* ... */ }
+  async delete(path: string): Promise<void> { /* ... */ }
+  // …plus files/allFiles/directories/allDirectories/list,
+  //    readStream/writeStream/putStream,
+  //    size/lastModified/mimeType/copy/move/makeDirectory/deleteDirectory.
+
+  url(path: string): string {
+    if (!this.config.url) {
+      throw new Error("This disk does not support retrieving URLs.");
+    }
+    return joinPublicUrl(this.config.url, path);
+  }
+
+  path(): string {
+    throw new Error("The s3 driver has no on-disk path.");
+  }
+}
+
+export class S3ServiceProvider extends ServiceProvider {
+  boot(): void {
+    const storage = this.app.make<StorageManager>(STORAGE_TOKEN);
+    storage.extend("media", (app) =>
+      new S3StorageDriver(storage.diskConfig("media")),
+    );
+  }
+}
+```
+
+Three things to get right:
+
+**Register in `boot()`, not `register()`**, if you're extending a manager
+another provider owns — `STORAGE_TOKEN` has to be bound first. (Or
+register in your own `register()` and accept the ordering constraint in
+`config/app.ts`; `RedisServiceProvider` does exactly that for cache,
+queue and broadcasting.)
+
+**Name the factory after the disk, not the driver.** `extend("media",
+...)` registers the disk called `media`. `StorageServiceProvider` skips
+any disk whose config isn't `isLocalDiskConfig()`, precisely so a
+non-local disk name is left free for your `extend()` to claim.
+
+**`path()` should throw for a remote driver.** It is documented as "only
+meaningful for filesystem-backed disks". A driver that returns a
+plausible-looking-but-fake path is worse than one that refuses.
+
+If your driver needs async warm-up, implement `Connectable`
+(`connect()`/`disconnect()`) and call `connect()` from your provider's
+`boot()`. `Manager.driver()` is always synchronous and will never await
+for you — see [Providers](../providers/).
+
+## Testing
+
+There is no storage fake, and there doesn't need to be one: point a disk
+at a temp directory.
+
+```ts
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { LocalStorageDriver } from "@mahi/storage";
+
+const root = mkdtempSync(join(tmpdir(), "mahi-storage-"));
+const disk = new LocalStorageDriver(root, "/storage");
+
+await disk.put("a/b.txt", "hello");
+expect(await disk.exists("a/b.txt")).toBe(true);
+expect((await disk.get("a/b.txt")).toString()).toBe("hello");
+expect(disk.url("a/b.txt")).toBe("/storage/a/b.txt");
+
+rmSync(root, { recursive: true, force: true });
+```
+
+`LocalStorageDriver` has no container dependency at all, so it's
+constructible standalone. For a full-application test, set
+`storage.disks.*.root` to a temp directory in the test's config.
+
+## Gotchas
+
+**`url()` throws on a private disk.** It does not fall back to a
+filesystem path. Use `path()` for that, or serve the file through a route.
+
+**Path traversal throws, it doesn't return `false`.** `exists("../x")`
+raises rather than reporting "no". Anything calling `exists()` on
+untrusted input needs a `try`/`catch` — `serveStoredFile` has one.
+
+**`delete()` is silent on a missing file.** `force: true`. There is no
+return value telling you whether anything was removed.
+
+**The default disk in a generated app is `public`.** `Storage.put(...)`
+with no disk writes somewhere world-readable via `/storage/*`. Private
+uploads go to `Storage.disk("local")` explicitly.
+
+**`servePublicDisk`'s route pattern and the disk's `url` must agree.**
+Nothing validates that they do. A `url: "/files"` disk behind a
+`/storage/*` route 404s every request, because `pathFromPublicUrl`
+returns `null` for a path that isn't under `/files`.
+
+**`serveStoredFile` needs `options.request` for ranges and conditional
+GETs.** It always streams and sets `ETag`/`Last-Modified`, but without the
+request's headers it can't honour `Range` or `If-None-Match` — pass
+`{ request: { headers, signal } }` to get 206/304 and client-abort
+handling.
+
+**A non-existent directory lists as `[]`.** `files("nope")` returns an
+empty array, not an error — but a *traversal* argument (`files("../..")`)
+still throws, like every other method.
+
+**Stream/metadata methods throw `FileNotFoundException` on a missing
+file.** `readStream`, `size`, `lastModified`, and the source of
+`copy`/`move` reject with the typed exception (importable from
+`@mahi/storage`), distinct from the plain `Error` a traversal raises.
+
+**`writeStream`/`putStream` are atomic for `"w"`, not `"a"`.** A truncating
+write goes through a temp file + `rename`, so a crash leaves no partial
+file; an append (`flags: "a"`) writes in place and has no such guarantee.
+
+**`get()` returns a `Buffer`, never a string.** Call `.toString()`
+yourself, with whatever encoding is actually right.
+
+**Disk names are driver names.** `extend("public", ...)` replaces the
+public disk's factory entirely. There's no separate driver-type layer to
+override instead.
+
+## Related
+
+- [Configuration](../configuration/) — `config/storage.ts`, `storage_path()`
+- [Providers](../providers/) — registering a custom driver via `extend()`, boot ordering
+- [Routing](../routing/) — mounting the catch-all that `servePublicDisk` handles
+- [Requests](../requests/) — reading uploaded files out of a multipart body
+- [Responses](../responses/) — what else you can return from a route handler
+- [Container](../container/) — `STORAGE_TOKEN`
+- [Mail](../mail/) — attaching a stored file to a message
