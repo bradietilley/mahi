@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The database and Redis suites fail (instead of self-skipping) when a
+  # service is unreachable under CI=true, so a broken service can't report
+  # green by testing nothing.
+  CI: "true"
+
+jobs:
+  # Fast, service-free checks: build, lint, typecheck, metadata hygiene, and
+  # the SQLite test suites. This gates the heavier integration job.
+  check:
+    name: build / lint / typecheck / unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ github.sha }}
+          restore-keys: turbo-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Package metadata and versions are in sync
+        run: |
+          pnpm metadata:check
+          pnpm version:check
+
+      - run: pnpm build
+
+      - name: Tarballs contain only dist, README, LICENSE
+        run: pnpm pack:check
+
+      - name: Formatting is clean
+        run: pnpm format:check
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      # Without services the integration suites self-skip; this exercises the
+      # SQLite-backed majority of the tree.
+      - name: Test (SQLite)
+        run: pnpm test
+
+  # Full suite against real MySQL 8, Postgres 16, and Redis 7. CI=true turns an
+  # unreachable engine into a failure.
+  integration:
+    name: integration (mysql / postgres / redis)
+    runs-on: ubuntu-latest
+    needs: check
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: mahi_test
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pmysql"
+          --health-interval=3s
+          --health-timeout=5s
+          --health-retries=20
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: mahi_test
+        options: >-
+          --health-cmd="pg_isready -U postgres -d mahi_test"
+          --health-interval=3s
+          --health-timeout=5s
+          --health-retries=20
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=3s
+          --health-timeout=5s
+          --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ github.sha }}
+          restore-keys: turbo-
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Test (with services)
+        run: pnpm test
+
+  # Scaffold an app from the built create-mahi and prove it installs, builds,
+  # and boots against the published dist — the thing consumers actually get.
+  scaffold-smoke:
+    name: create-mahi dist smoke
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      # Scaffold into `.tmp-scaffold/*`, which is in the pnpm workspace glob,
+      # so `--link-workspace`'s `workspace:*` deps resolve against the local
+      # framework packages. Install from the repo root, then build the app.
+      #
+      # NOTE: because this installs into the workspace, an `@mahi/*` the
+      # template imports but does not DECLARE still resolves here by
+      # hoisting — so this step cannot catch a missing dependency, which
+      # is a `TS2307` on a real `npm create mahi`. That case is covered
+      # statically by create-mahi's "template dependency completeness"
+      # test instead. This step's job is that the template compiles.
+      - name: Scaffold and build a fresh app
+        run: |
+          set -euo pipefail
+          rm -rf .tmp-scaffold/smoke
+          node framework/create-mahi/dist/index.js .tmp-scaffold/smoke --link-workspace --no-install --no-git --yes
+          pnpm install
+          pnpm --dir .tmp-scaffold/smoke build

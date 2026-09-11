@@ -1,0 +1,71 @@
+name: Release
+
+# Publishes every workspace package whose version is not yet on npm when a
+# `v<version>` tag is pushed. The tag must equal the lockstep framework
+# version (`node scripts/set-version.mjs --print`); `@mahi/datetime` is
+# versioned independently and is published whenever its own version is new.
+#
+# Requires an `NPM_TOKEN` repository secret with publish rights to the
+# `@mahi` scope (an automation token, so 2FA does not block CI).
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+env:
+  CI: "true"
+
+jobs:
+  publish:
+    name: publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Tag matches the lockstep version
+        run: |
+          set -euo pipefail
+          expected="v$(node scripts/set-version.mjs --print)"
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match the lockstep version (${expected})" >&2
+            exit 1
+          fi
+
+      - name: Package metadata and versions are in sync
+        run: |
+          pnpm metadata:check
+          pnpm version:check
+
+      - run: pnpm build
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      - name: Test (SQLite)
+        run: pnpm test
+
+      - name: Tarballs contain only dist, README, LICENSE
+        run: pnpm pack:check
+
+      # `pnpm publish -r` skips packages whose version is already on the
+      # registry, so re-running a release (or a datetime-only bump) is safe.
+      - name: Publish
+        run: pnpm -r publish --access public --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

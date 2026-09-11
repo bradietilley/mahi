@@ -1,0 +1,249 @@
+#!/usr/bin/env node
+// Stamps the shared publishing fields into every workspace package so that
+// `npm pack` ships a consistent, minimal, legally-usable tarball. Run with
+// `--check` in CI to fail (instead of write) when anything drifts.
+//
+//   node scripts/sync-package-metadata.mjs          # write
+//   node scripts/sync-package-metadata.mjs --check  # verify only
+//
+// Per-package `description`/`keywords` live in DESCRIPTIONS below; everything
+// else (license, repository, engines, publishConfig, files, sideEffects) is
+// identical across the workspace and derived here.
+
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const frameworkDir = join(root, "framework");
+const rootLicense = readFileSync(join(root, "LICENSE"), "utf8");
+
+const REPO_URL = "https://github.com/bradietilley/mahi";
+const HOMEPAGE = "https://github.com/bradietilley/mahi#readme";
+const LICENSE = "MIT";
+const AUTHOR = "Bradie Tilley";
+const ENGINES = { node: ">=22" };
+// `tsc -b` never deletes outputs for removed sources; prune them after every
+// build so `files: ["dist"]` can't ship a stale module.
+const BUILD_SCRIPT = "tsc -b && node ../../scripts/prune-dist.mjs";
+
+// Per-package description + keywords. `create-mahi` keeps its own description.
+const DESCRIPTIONS = {
+  "@mahi/auth": {
+    description:
+      "Authentication — session and token guards, password brokers, and user providers for Mahi.",
+    keywords: ["mahi", "auth", "authentication", "session", "token"],
+  },
+  "@mahi/authorization": {
+    description: "Authorization — gates, policies, and ability checks for Mahi.",
+    keywords: ["mahi", "authorization", "gate", "policy", "abilities"],
+  },
+  "@mahi/broadcasting": {
+    description: "Broadcasting — event broadcasting over WebSocket and pub/sub channels for Mahi.",
+    keywords: ["mahi", "broadcasting", "websocket", "pubsub", "realtime"],
+  },
+  "@mahi/cache": {
+    description:
+      "Cache — a unified cache API over array, file, and Redis stores, with atomic locks, for Mahi.",
+    keywords: ["mahi", "cache", "store", "lock", "redis"],
+  },
+  "@mahi/cli": {
+    description: "Console — the artisan-style command kernel and code generators for Mahi.",
+    keywords: ["mahi", "cli", "console", "commands", "artisan"],
+  },
+  "@mahi/core": {
+    description:
+      "Core — the application container, service providers, lifecycle, config, and logging for Mahi.",
+    keywords: ["mahi", "core", "container", "ioc", "framework"],
+  },
+  "@mahi/database": {
+    description: "Database — the query builder, migrations, and Eloquent-style ORM for Mahi.",
+    keywords: ["mahi", "database", "orm", "query-builder", "migrations"],
+  },
+  "@mahi/datetime": {
+    description: "Dates & times — an immutable, timezone-aware date/time value type for Mahi.",
+    keywords: ["mahi", "datetime", "date", "time", "timezone"],
+  },
+  "@mahi/encryption": {
+    description: "Encryption — authenticated AES-GCM encryption and keyed signing for Mahi.",
+    keywords: ["mahi", "encryption", "aes-gcm", "signing", "crypto"],
+  },
+  "@mahi/events": {
+    description: "Events — a synchronous event dispatcher and listener registry for Mahi.",
+    keywords: ["mahi", "events", "dispatcher", "listeners", "pubsub"],
+  },
+  "@mahi/facades": {
+    description: "Facades — static proxies over container-resolved services for Mahi.",
+    keywords: ["mahi", "facades", "container", "proxy"],
+  },
+  "@mahi/health": {
+    description: "Health — application health checks and readiness reporting for Mahi.",
+    keywords: ["mahi", "health", "healthcheck", "readiness"],
+  },
+  "@mahi/http-client": {
+    description: "HTTP client — a fluent, retryable HTTP client with fakes for Mahi.",
+    keywords: ["mahi", "http-client", "fetch", "retry", "request"],
+  },
+  "@mahi/http": {
+    description: "HTTP — the router, request/response, middleware, and kernel for Mahi.",
+    keywords: ["mahi", "http", "router", "middleware", "kernel"],
+  },
+  "@mahi/mail": {
+    description: "Mail — mailables and transports for sending email from Mahi.",
+    keywords: ["mahi", "mail", "email", "mailable", "smtp"],
+  },
+  "@mahi/notifications": {
+    description: "Notifications — multi-channel notifications for Mahi.",
+    keywords: ["mahi", "notifications", "notify", "channels"],
+  },
+  "@mahi/pipeline": {
+    description: "Pipeline — pass an object through a series of stages, for Mahi.",
+    keywords: ["mahi", "pipeline", "middleware", "stages"],
+  },
+  "@mahi/process": {
+    description: "Process — a fluent wrapper for spawning and managing child processes, for Mahi.",
+    keywords: ["mahi", "process", "child-process", "exec", "spawn"],
+  },
+  "@mahi/queue": {
+    description:
+      "Queues — background job dispatch and workers over sync, database, and Redis drivers, for Mahi.",
+    keywords: ["mahi", "queue", "jobs", "worker", "background"],
+  },
+  "@mahi/redis": {
+    description:
+      "Redis — a shared Redis connection with cache, queue, and broadcast adapters, for Mahi.",
+    keywords: ["mahi", "redis", "cache", "queue", "pubsub"],
+  },
+  "@mahi/schedule": {
+    description: "Scheduling — a cron-style task scheduler with overlap protection, for Mahi.",
+    keywords: ["mahi", "schedule", "cron", "scheduler", "tasks"],
+  },
+  "@mahi/snowflake": {
+    description: "Snowflake — distributed, time-sortable unique ID generation for Mahi.",
+    keywords: ["mahi", "snowflake", "id", "unique", "distributed"],
+  },
+  "@mahi/storage": {
+    description: "Storage — a filesystem abstraction over local and cloud disks for Mahi.",
+    keywords: ["mahi", "storage", "filesystem", "disk", "files"],
+  },
+  "@mahi/testing": {
+    description: "Testing — test helpers, fakes, and assertions for Mahi applications.",
+    keywords: ["mahi", "testing", "fakes", "assertions", "test"],
+  },
+  "@mahi/tui": {
+    description: "TUI — interactive terminal prompts, spinners, and progress bars for Mahi.",
+    keywords: ["mahi", "tui", "terminal", "prompts", "cli"],
+  },
+  "@mahi/validation": {
+    description: "Validation — a rule-based validator for Mahi.",
+    keywords: ["mahi", "validation", "validator", "rules"],
+  },
+};
+
+// Package → docs/<slug> for the README "documentation" link, where one exists.
+const DOC_SLUGS = {
+  "@mahi/auth": "authentication",
+  "@mahi/authorization": "authorization",
+  "@mahi/broadcasting": "broadcasting",
+  "@mahi/cache": "cache",
+  "@mahi/cli": "console",
+  "@mahi/database": "database",
+  "@mahi/datetime": "datetime",
+  "@mahi/encryption": "encryption",
+  "@mahi/events": "events",
+  "@mahi/health": "health",
+  "@mahi/http-client": "http-client",
+  "@mahi/http": "routing",
+  "@mahi/mail": "mail",
+  "@mahi/notifications": "notifications",
+  "@mahi/queue": "queues",
+  "@mahi/redis": "redis",
+  "@mahi/schedule": "scheduling",
+  "@mahi/storage": "storage",
+  "@mahi/testing": "testing",
+  "@mahi/validation": "validation",
+};
+
+let hadDrift = false;
+const check = process.argv.includes("--check");
+
+for (const entry of readdirSync(frameworkDir, { withFileTypes: true })) {
+  if (!entry.isDirectory()) continue;
+  const pkgPath = join(frameworkDir, entry.name, "package.json");
+  if (!existsSync(pkgPath)) continue;
+
+  const original = readFileSync(pkgPath, "utf8");
+  const pkg = JSON.parse(original);
+
+  const isPrivate = pkg.private === true;
+
+  // Fields shared by every publishable package.
+  pkg.license ??= LICENSE;
+  pkg.author ??= AUTHOR;
+  pkg.homepage ??= HOMEPAGE;
+  pkg.repository ??= {
+    type: "git",
+    url: `git+${REPO_URL}.git`,
+    directory: `framework/${entry.name}`,
+  };
+  pkg.bugs ??= { url: `${REPO_URL}/issues` };
+  pkg.engines = { ...ENGINES, ...pkg.engines };
+  pkg.engines.node = ENGINES.node;
+  pkg.sideEffects ??= false;
+  pkg.scripts ??= {};
+  pkg.scripts.build = BUILD_SCRIPT;
+
+  // create-mahi ships a template dir and its own files/description; leave those.
+  if (entry.name !== "create-mahi") {
+    const meta = DESCRIPTIONS[pkg.name];
+    if (meta) {
+      pkg.description ??= meta.description;
+      if (!pkg.keywords) pkg.keywords = meta.keywords;
+    }
+    pkg.files = ["dist", "README.md", "LICENSE"];
+  }
+
+  if (!isPrivate) {
+    pkg.publishConfig ??= { access: "public" };
+  }
+
+  const next = JSON.stringify(pkg, null, 2) + "\n";
+  if (next !== original) {
+    hadDrift = true;
+    if (check) {
+      console.error(`drift: ${pkg.name} (package.json)`);
+    } else {
+      writeFileSync(pkgPath, next);
+      console.log(`stamped: ${pkg.name}`);
+    }
+  }
+
+  // Every published tarball declares README.md + LICENSE in `files`; make sure
+  // both actually exist so the pack doesn't ship a broken manifest.
+  const pkgDir = join(frameworkDir, entry.name);
+  const licensePath = join(pkgDir, "LICENSE");
+  if (!existsSync(licensePath) || readFileSync(licensePath, "utf8") !== rootLicense) {
+    hadDrift = true;
+    if (check) console.error(`drift: ${pkg.name} (LICENSE)`);
+    else writeFileSync(licensePath, rootLicense);
+  }
+
+  const readmePath = join(pkgDir, "README.md");
+  if (!existsSync(readmePath)) {
+    hadDrift = true;
+    const desc = pkg.description ?? "";
+    const docSlug = DOC_SLUGS[pkg.name];
+    const docLink = docSlug
+      ? `\n\nSee the [documentation](${REPO_URL}/tree/main/docs/${docSlug}).\n`
+      : "\n";
+    const body = `# ${pkg.name}\n\n${desc}\n\nPart of the [Mahi](${REPO_URL}) framework.${docLink}`;
+    if (check) console.error(`drift: ${pkg.name} (README.md missing)`);
+    else writeFileSync(readmePath, body);
+  }
+}
+
+if (check && hadDrift) {
+  console.error("\npackage metadata is out of sync — run `node scripts/sync-package-metadata.mjs`");
+  process.exit(1);
+}
+if (!hadDrift) console.log("package metadata already in sync");
