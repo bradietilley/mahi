@@ -1,0 +1,73 @@
+{
+  "name": "@mahi/testing",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && node ../../scripts/prune-dist.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mahi/auth": "workspace:*",
+    "@mahi/cache": "workspace:*",
+    "@mahi/cli": "workspace:*",
+    "@mahi/core": "workspace:*",
+    "@mahi/database": "workspace:*",
+    "@mahi/events": "workspace:*",
+    "@mahi/http": "workspace:*",
+    "@mahi/http-client": "workspace:*",
+    "@mahi/mail": "workspace:*",
+    "@mahi/notifications": "workspace:*",
+    "@mahi/process": "workspace:*",
+    "@mahi/queue": "workspace:*",
+    "@mahi/storage": "workspace:*"
+  },
+  "devDependencies": {
+    "@mahi/encryption": "workspace:*",
+    "hono": "^4.6.14",
+    "kysely": "^0.29.5",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11"
+  },
+  "license": "MIT",
+  "author": "Bradie Tilley",
+  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradietilley/mahi.git",
+    "directory": "framework/testing"
+  },
+  "bugs": {
+    "url": "https://github.com/bradietilley/mahi/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "description": "Testing — test helpers, fakes, and assertions for Mahi applications.",
+  "keywords": [
+    "mahi",
+    "testing",
+    "fakes",
+    "assertions",
+    "test"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

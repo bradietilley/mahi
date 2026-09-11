@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../auth" },
+    { "path": "../cache" },
+    { "path": "../cli" },
+    { "path": "../core" },
+    { "path": "../database" },
+    { "path": "../events" },
+    { "path": "../http" },
+    { "path": "../http-client" },
+    { "path": "../process" },
+    { "path": "../mail" },
+    { "path": "../notifications" },
+    { "path": "../queue" },
+    { "path": "../storage" }
+  ]
+}
