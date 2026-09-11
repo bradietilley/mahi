@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../cache" },
+    { "path": "../database" },
+    { "path": "../datetime" },
+    { "path": "../cli" },
+    { "path": "../events" },
+    { "path": "../facades" },
+    { "path": "../mail" },
+    { "path": "../pipeline" },
+    { "path": "../tui" }
+  ]
+}

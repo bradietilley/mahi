@@ -1,0 +1,244 @@
+import { Collection } from "@mahi/core";
+import { BaseModel, ModelNotFoundError, type Model, type ModelRegistry } from "@mahi/database";
+
+/**
+ * The on-the-wire shape a serialized model reference takes inside a job
+ * payload. Deliberately verbose keys (`__model`/`__id`) so a plain data
+ * object a user happens to put in a payload is very unlikely to collide.
+ */
+export interface ModelReference {
+  __model: string;
+  __id: string | number;
+}
+
+/**
+ * Thrown by `decodeModels()` when a referenced model no longer resolves
+ * *and* that model opted into `static deleteWhenMissingModels = true`.
+ * Caught by `runJobThroughMiddleware()`, which treats it as "skip this
+ * job successfully" — the job is removed from the queue without running
+ * and without being marked failed. Not exported from the package: it's an
+ * internal control-flow signal, never something a job author handles.
+ */
+export class SkipJobMissingModelError extends Error {
+  constructor(
+    public readonly morphName: string,
+    public readonly id: string | number,
+  ) {
+    super(
+      `Skipping job: model [${morphName}] with id [${String(id)}] no longer ` +
+        `exists and deleteWhenMissingModels is enabled.`,
+    );
+    this.name = "SkipJobMissingModelError";
+  }
+}
+
+function isModelReference(value: unknown): value is ModelReference {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as ModelReference).__model === "string" &&
+    "__id" in value
+  );
+}
+
+/**
+ * Walks a job payload and replaces every live `Model` instance (and any
+ * `Model` inside a `Collection` or array) with a `{ __model, __id }`
+ * reference, leaving all other data untouched. Runs synchronously at
+ * dispatch time — *before* the payload reaches a driver's `JSON.stringify`,
+ * so a durable driver persists the small reference, not the model's full
+ * `toJSON()` attribute dump.
+ *
+ * A model whose class has no `static morphName` throws here (loudly, at
+ * dispatch) rather than being silently serialized as opaque data — you
+ * can't accidentally enqueue an unserializable model.
+ *
+ * Only `Model`/`Collection` instances are transformed; other class
+ * instances pass through untouched (predictable — no surprising deep
+ * traversal of arbitrary objects). Plain objects and arrays are recursed.
+ */
+export function encodeModels(payload: unknown, registry: ModelRegistry): unknown {
+  return encodeValue(payload, registry, new WeakSet());
+}
+
+function encodeValue(value: unknown, registry: ModelRegistry, seen: WeakSet<object>): unknown {
+  if (value instanceof BaseModel) {
+    const morphName = registry.nameFor(value);
+
+    if (morphName === undefined) {
+      throw new Error(
+        `Cannot serialize model [${value.constructor.name}] into a job payload: ` +
+          `it has no static morphName. Add \`static override morphName = "..."\` ` +
+          `and register it via a provider's models() hook.`,
+      );
+    }
+
+    const id = value.getKey();
+
+    if (id === null || id === undefined) {
+      throw new Error(
+        `Cannot serialize model [${value.constructor.name}] into a job payload: ` +
+          `it has no primary-key value (has it been saved?).`,
+      );
+    }
+
+    return { __model: morphName, __id: id as string | number } satisfies ModelReference;
+  }
+
+  if (value instanceof Collection) {
+    return value.all().map((item) => encodeValue(item, registry, seen));
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => encodeValue(item, registry, seen));
+  }
+
+  if (isPlainObject(value)) {
+    if (seen.has(value)) {
+      return value;
+    }
+
+    seen.add(value);
+    const out: Record<string, unknown> = {};
+
+    for (const [key, v] of Object.entries(value)) {
+      out[key] = encodeValue(v, registry, seen);
+    }
+
+    return out;
+  }
+
+  return value;
+}
+
+/**
+ * Walks a (decoded-from-JSON or in-memory) job payload and replaces every
+ * `{ __model, __id }` reference with the live model instance it names,
+ * loading each via its registered class. Runs just before `handle()`, for
+ * both the sync driver and the worker, so a job always sees rehydrated
+ * models regardless of which driver ran it.
+ *
+ * Lookups are batched per model type (all ids for one `morphName` load in
+ * a single `findMany()`), so a payload carrying an array/`Collection` of
+ * the same model doesn't cause an N+1.
+ *
+ * Missing rows: if a referenced id has no row, behaviour depends on that
+ * model's `static deleteWhenMissingModels`.
+ *
+ *   - `false` (the default) throws `ModelNotFoundError`, and the worker
+ *     treats that as a **failure of this job**: it goes to `failed_jobs`
+ *     with the error, and the worker carries on. It is not retried —
+ *     the row will still be missing next time.
+ *   - `true` throws `SkipJobMissingModelError` and the worker deletes the
+ *     job without running or failing it: "this work no longer applies".
+ *
+ * (Under `sync` there is no queue, so `ModelNotFoundError` simply
+ * surfaces to the dispatch site.)
+ */
+export async function decodeModels(payload: unknown, registry: ModelRegistry): Promise<unknown> {
+  // Pass 1: collect every referenced id, grouped by morphName.
+  const idsByModel = new Map<string, Set<string | number>>();
+  collectReferences(payload, idsByModel);
+
+  if (idsByModel.size === 0) {
+    return payload;
+  }
+
+  // Pass 2: batch-load each model type, keyed by stringified id.
+  const loaded = new Map<string, Map<string, Model>>();
+
+  for (const [morphName, ids] of idsByModel) {
+    const modelClass = registry.resolve(morphName);
+    const collection = await modelClass.findMany([...ids]);
+    const byId = new Map<string, Model>();
+
+    for (const instance of collection.all()) {
+      byId.set(String(instance.getKey()), instance);
+    }
+
+    // Fail fast on any missing id, honoring deleteWhenMissingModels.
+    for (const id of ids) {
+      if (!byId.has(String(id))) {
+        if (modelClass.deleteWhenMissingModels) {
+          throw new SkipJobMissingModelError(morphName, id);
+        }
+
+        throw new ModelNotFoundError(modelClass.name, id);
+      }
+    }
+
+    loaded.set(morphName, byId);
+  }
+
+  // Pass 3: rebuild the payload, swapping references for instances.
+  return rehydrateValue(payload, loaded);
+}
+
+function collectReferences(value: unknown, into: Map<string, Set<string | number>>): void {
+  if (isModelReference(value)) {
+    let set = into.get(value.__model);
+
+    if (set === undefined) {
+      set = new Set();
+      into.set(value.__model, set);
+    }
+
+    set.add(value.__id);
+
+    return;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectReferences(item, into);
+    }
+
+    return;
+  }
+
+  if (isPlainObject(value)) {
+    for (const v of Object.values(value)) {
+      collectReferences(v, into);
+    }
+  }
+}
+
+function rehydrateValue(value: unknown, loaded: Map<string, Map<string, Model>>): unknown {
+  if (isModelReference(value)) {
+    // Presence already validated in decodeModels; non-null assertion is safe.
+    return loaded.get(value.__model)!.get(String(value.__id))!;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => rehydrateValue(item, loaded));
+  }
+
+  if (isPlainObject(value)) {
+    const out: Record<string, unknown> = {};
+
+    for (const [key, v] of Object.entries(value)) {
+      out[key] = rehydrateValue(v, loaded);
+    }
+
+    return out;
+  }
+
+  return value;
+}
+
+/**
+ * A "plain" data object — one worth recursing into. Excludes class
+ * instances (whose prototype isn't `Object.prototype`/`null`), so a
+ * `Model` proxy, `DateTime`, `Collection`, etc. are never walked as if
+ * they were anonymous data bags. `Model`/`Collection` are handled by
+ * their own branches before this is ever reached.
+ */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const proto = Object.getPrototypeOf(value);
+
+  return proto === Object.prototype || proto === null;
+}
