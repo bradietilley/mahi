@@ -1,0 +1,61 @@
+{
+  "name": "@mahi/snowflake",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b && node ../../scripts/prune-dist.mjs",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "lint": "eslint src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mahi/cache": "workspace:*",
+    "@mahi/core": "workspace:*",
+    "@mahi/database": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11"
+  },
+  "license": "MIT",
+  "author": "Bradie Tilley",
+  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradietilley/mahi.git",
+    "directory": "framework/snowflake"
+  },
+  "bugs": {
+    "url": "https://github.com/bradietilley/mahi/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "sideEffects": false,
+  "description": "Snowflake — distributed, time-sortable unique ID generation for Mahi.",
+  "keywords": [
+    "mahi",
+    "snowflake",
+    "id",
+    "unique",
+    "distributed"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
