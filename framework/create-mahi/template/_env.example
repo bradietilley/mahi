@@ -1,0 +1,98 @@
+NODE_ENV=development
+PORT=8000
+APP_URL=http://localhost:8000
+
+# Set by `./artisan key:generate`.
+APP_KEY=
+# APP_PREVIOUS_KEYS=base64:...,base64:...   # set after rotating APP_KEY (see `key:generate --force`)
+
+# --- Database -------------------------------------------------------------
+# Which configured connection to use: sqlite (default) | mysql | pgsql.
+DB_CONNECTION=sqlite
+
+# SQLite: path relative to the application root.
+DB_FILENAME=database/database.sqlite
+
+# MySQL / PostgreSQL — used only when DB_CONNECTION is mysql or pgsql.
+# DB_HOST=127.0.0.1
+# DB_PORT=          # defaults to 3306 (mysql) / 5432 (pgsql)
+# DB_DATABASE=mahi
+# DB_USERNAME=
+# DB_PASSWORD=
+
+# Default cache store: array (in-process) | file | redis.
+CACHE_STORE=array
+
+# Default queue connection: sync (inline) | database | redis.
+QUEUE_CONNECTION=sync
+
+# Comma-separated list of origins allowed to call this API.
+CORS_ORIGIN=http://localhost:3000
+
+# --- Behind a proxy? ------------------------------------------------------
+# Comma-separated proxy IPs/CIDRs whose X-Forwarded-* headers this app will
+# believe. LEAVE EMPTY when nothing sits in front of the app.
+#
+# Set it when you deploy behind a load balancer / ingress / CDN, or:
+#   - every client looks like the proxy, so per-IP rate limits become one
+#     shared global limit; and
+#   - X-Forwarded-Proto is ignored, so password-reset and verification
+#     links are generated as http:// instead of https://.
+#
+# Use the real range where you know it (e.g. 10.0.0.0/8). "*" trusts
+# whatever opened the socket and is only safe when the app cannot be
+# reached except through a proxy that overwrites X-Forwarded-For.
+# TRUSTED_PROXIES=10.0.0.0/8
+
+# Hostnames this app answers on. Empty derives them from APP_URL; "*"
+# disables the check. Guards against a spoofed Host header poisoning the
+# links in password-reset emails.
+# TRUSTED_HOSTS=example.com,www.example.com
+
+# Request body ceilings, in bytes. Defaults: 1 MiB, and 10 MiB multipart.
+# BODY_LIMIT_BYTES=1048576
+# BODY_LIMIT_MULTIPART_BYTES=10485760
+
+# Send as the `X-Health-Secret` header to see real failure messages from
+# `GET /health` in production. Without it they're redacted to "Check failed".
+# HEALTH_SECRET=
+
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS=hello@example.com
+MAIL_FROM_NAME=Mahi
+
+# --- Optional -------------------------------------------------------------
+# Everything below has a working default; uncomment only what you change.
+
+# SMTP (used when MAIL_MAILER=smtp)
+# SMTP_HOST=127.0.0.1
+# SMTP_PORT=1025
+# SMTP_USER=
+# SMTP_PASSWORD=
+# Fail rather than send in the clear if the server offers no STARTTLS.
+# Leave off for a local MailHog/Mailpit; turn on for a real relay.
+# SMTP_REQUIRE_TLS=true
+
+# Whether the scaffolded auth controllers send their emails. Set either to
+# `false` to keep the flow but deliver the link yourself — from an event
+# listener, over SMS, through an ESP's API. The broker still mints the
+# token/link and the endpoint still responds normally; only the send stops.
+# AUTH_SEND_RESET_EMAIL=true
+# AUTH_SEND_VERIFY_EMAIL=true
+
+# Redis — needed only when a cache store, queue connection, or the
+# broadcast driver is pointed at "redis" (see config/*.ts).
+# REDIS_URL=
+# REDIS_HOST=127.0.0.1
+# REDIS_PORT=6379
+# REDIS_PASSWORD=
+
+# Snowflake IDs. The epoch and bit signature must not change once IDs exist.
+# SNOWFLAKE_EPOCH=2025-01-01 00:00:00
+# SNOWFLAKE_CLUSTER=1
+# SNOWFLAKE_WORKER=1
+# SNOWFLAKE_TESTING=false
+# SNOWFLAKE_SEQUENCE_RESOLVER=          # memory (default) | file | cache
+# SNOWFLAKE_CACHE_STORE=
+# SNOWFLAKE_CACHE_PREFIX=
+# SNOWFLAKE_SEQUENCE_FILE=

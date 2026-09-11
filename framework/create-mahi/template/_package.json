@@ -1,0 +1,52 @@
+{
+  "name": "mahi-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "dev": "tsx watch --include .env bin/console.ts serve --no-reload",
+    "start": "node dist/bin/server.js",
+    "console": "tsx bin/console.ts"
+  },
+  "dependencies": {
+    "@mahi/auth": "^0.1.0",
+    "@mahi/authorization": "^0.1.0",
+    "@mahi/broadcasting": "^0.1.0",
+    "@mahi/cache": "^0.1.0",
+    "@mahi/cli": "^0.1.0",
+    "@mahi/core": "^0.1.0",
+    "@mahi/database": "^0.1.0",
+    "@mahi/datetime": "^0.1.0",
+    "@mahi/encryption": "^0.1.0",
+    "@mahi/events": "^0.1.0",
+    "@mahi/health": "^0.1.0",
+    "@mahi/http": "^0.1.0",
+    "@mahi/mail": "^0.1.0",
+    "@mahi/notifications": "^0.1.0",
+    "@mahi/queue": "^0.1.0",
+    "@mahi/redis": "^0.1.0",
+    "@mahi/schedule": "^0.1.0",
+    "@mahi/snowflake": "^0.1.0",
+    "@mahi/storage": "^0.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@mahi/testing": "^0.1.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^8.0.0",
+    "vitest": "^4.1.11"
+  }
+}

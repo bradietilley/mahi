@@ -1,0 +1,14 @@
+{
+  // The build (`tsconfig.json`) compiles only what ships — `bin`, `config`,
+  // `src`, `database` — so `tests/` and `vitest.config.ts` never get
+  // typechecked by `tsc -b`. This project picks up the rest for a
+  // type-only pass (`tsc -p tsconfig.test.json --noEmit`, wired into
+  // `npm run typecheck`), so a broken test fails the check instead of only
+  // surfacing when the suite runs.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["bin", "config", "src", "database", "tests", "vitest.config.ts"]
+}

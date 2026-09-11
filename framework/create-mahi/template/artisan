@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Laravel-artisan-equivalent entrypoint. Thin wrapper around `bin/console.ts`
+# so you can run `./artisan migrate`, `./artisan serve`, etc. from anywhere
+# — equivalent to `pnpm console <command>` / `tsx bin/console.ts <command>`.
+#
+# A plain Node/tsx shebang (`#!/usr/bin/env -S npx tsx`) doesn't work here:
+# tsx's loader only activates based on the `.ts` file extension, not the
+# shebang alone, so an extensionless TS file executed directly fails to
+# transpile. We exec the locally installed `tsx` binary rather than `npx
+# tsx`: npx may download a copy into ~/.npm/_npx whose module resolver
+# does not see this project's `node_modules/@mahi/*` packages.
+#
+# The `../node_modules` fallback is for the case where this app lives
+# inside a monorepo that hoists dependencies to the workspace root.
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIR"
+
+if [[ -x "$DIR/node_modules/.bin/tsx" ]]; then
+  TSX="$DIR/node_modules/.bin/tsx"
+elif [[ -x "$DIR/../node_modules/.bin/tsx" ]]; then
+  TSX="$DIR/../node_modules/.bin/tsx"
+else
+  echo "tsx not found (looked in node_modules/.bin). Run: npm install" >&2
+  exit 1
+fi
+
+exec "$TSX" bin/console.ts "$@"

@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.tsbuildinfo
+*.log
+.env
+.env.local
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+.DS_Store
+coverage/
+/storage/app/
+/storage/logs/
+/storage/cache/
+/storage/schedule-locks/
