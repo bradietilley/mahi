@@ -48,8 +48,8 @@ export class CacheServiceProvider extends ServiceProvider {
 }
 ```
 
-That is how `@mahiframework/cache` registers itself, and it shows the two things
-worth noting: a factory resolves its own
+That is how `@mahiframework/cache` registers itself, and it shows two
+things: a factory resolves its own
 dependencies by calling `app.make()`, and re-binding a token drops any
 cached instance — `bind()` and `singleton()` both call
 `instances.delete(token)` before storing the new binding.

@@ -125,7 +125,7 @@ export function createErrorHandler(
     }
 
     // Hono's own error type, thrown by its built-in middleware — most
-    // importantly `bodyLimit()`, which raises a 413. Without this branch
+    // often `bodyLimit()`, which raises a 413. Without this branch
     // an oversize body is reported to the client as a 500 "Internal
     // Server Error", i.e. as our bug rather than their request, and is
     // logged as an unhandled error on every occurrence.

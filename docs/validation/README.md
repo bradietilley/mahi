@@ -281,7 +281,7 @@ anything more exotic, validate with a custom rule.
 > `in(["1"])` and vice versa, so the coercion now has to be asked for.
 
 > **`enum()` matches values, not keys.** Invisible for a string enum,
-> load-bearing for a numeric one, because TypeScript compiles the latter
+> significant for a numeric one, because TypeScript compiles the latter
 > with a reverse mapping:
 >
 > ```ts

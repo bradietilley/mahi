@@ -191,7 +191,7 @@ export interface UserProvider<TUser = unknown> {
 ```
 
 The split between `retrieveByCredentials()` (look up, don't check the
-secret) and `validateCredentials()` (check the secret) is load-bearing.
+secret) and `validateCredentials()` (check the secret) is intentional.
 Do not "simplify" it into one `findByCredentials` that checks the password
 too — keeping lookup and verification separate is what lets
 [`attempt()`](#attempt) perform constant work when no user was found, so
@@ -606,7 +606,7 @@ The id is `randomUUID()`; the secret is `randomBytes(32)` encoded
 base64url. The plaintext is returned exactly once from `createToken()`
 and is never recoverable afterwards — only the digest is stored.
 
-**The id prefix is not cosmetic.** The stored column is a digest, so it
+**The id prefix exists for lookup.** The stored column is a digest, so it
 can't be looked up by equality. Without an id, verifying a token would
 mean loading every token row and comparing each — O(n) work per request,
 trivially DoS-able. The id turns it into one indexed primary-key lookup
@@ -762,7 +762,7 @@ development.
 `request.queueCookie(...)`; the HTTP boundary writes the queued cookies
 onto whatever response the handler returns.
 
-This is load-bearing, not stylistic. Mahi handlers return **platform
+This is a correctness requirement. Mahi handlers return **platform
 `Response` objects**, and Hono only merges its context-queued headers
 (`c.header()`, and therefore `hono/cookie`'s `setCookie()`) into a
 response *it* built via `c.json()`/`c.body()`/`c.newResponse()`. Setting

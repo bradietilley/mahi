@@ -61,7 +61,7 @@ schedule
 schedule.job(() => new PruneStalePostsJob()).daily();
 ```
 
-**A factory, not an instance.** This is not stylistic.
+**A factory, not an instance.**
 
 A schedule is built **once**, during boot, and then lives for the life of
 the process (or, for `schedule:run`, is rebuilt every minute in a fresh

@@ -86,7 +86,7 @@ export class HttpKernel {
    * The global pipes, resolved at REQUEST time.
    *
    * Held in a mutable array rather than closed over at registration, because
-   * of a Hono property that is quiet and load-bearing: `use("*")` only applies
+   * of an easily-missed Hono property: `use("*")` only applies
    * to routes registered AFTER it. The pipes themselves are not known until
    * `collectFromProviders()` has walked every provider, but a provider that
    * mounts directly onto `raw()` — a websocket upgrade is the only practical
@@ -542,7 +542,7 @@ export class HttpKernel {
    *   hono.get("/b", upgradeWebSocket(() => ({ ... })));
    *
    * Lazily created so an app with no websocket routes never constructs a
-   * `WebSocketServer` — and, more importantly, so `listenHttpServer()` can
+   * `WebSocketServer`, and so `listenHttpServer()` can
    * tell "nobody asked for websockets" from "somebody did" and skip
    * attaching an `upgrade` listener in the first case.
    */

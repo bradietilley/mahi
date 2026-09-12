@@ -843,7 +843,7 @@ if (result instanceof Promise) {
 }
 ```
 
-The `instanceof Promise` check is worth noting: a thenable that isn't a
+The `instanceof Promise` check matters: a thenable that isn't a
 real `Promise` restores synchronously, i.e. too early.
 
 **Async `scope()` outside a request scope is not isolated.** Inside a

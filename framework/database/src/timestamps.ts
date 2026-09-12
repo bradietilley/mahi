@@ -7,7 +7,7 @@ import type { Dialect } from "./schema/dialect.js";
  * The string written into a timestamp column for `now`, spelled the way
  * `dialect` will accept.
  *
- * There is one engine-specific rule here, and it is not cosmetic:
+ * There is one engine-specific rule here:
  * **MySQL rejects the ISO-8601 `Z` suffix.** In the strict SQL mode that
  * has been the default since 5.7, `'2026-09-02T07:31:37.499Z'` is not a
  * valid `DATETIME`/`TIMESTAMP` literal and the write fails outright:

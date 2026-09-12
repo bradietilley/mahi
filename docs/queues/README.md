@@ -137,7 +137,7 @@ consequence.
 `encodeJob()` serializes a job with `{ ...job }` — **own enumerable
 fields only**. A prototype property is not an own field, so the default
 `3` is never written into the payload. A rebuilt job inherits it from the
-prototype instead. The payload stays small and, more importantly, a job
+prototype instead. The payload stays small, and a job
 enqueued before you changed the default picks up the new default on its
 next attempt rather than carrying the old one forever.
 

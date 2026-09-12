@@ -3,7 +3,7 @@
  * touch.
  *
  * **`@mahiframework/core` is this package's only dependency, and that is
- * load-bearing.** The checks reach `CacheManager`/`DatabaseManager`/
+ * intentional.** The checks reach `CacheManager`/`DatabaseManager`/
  * `StorageManager` through `CACHE_TOKEN`/`DATABASE_TOKEN`/`STORAGE_TOKEN`,
  * which live in core's `well-known-tokens.ts` precisely so a package can
  * resolve a service across a boundary without a compile-time edge to it.

@@ -51,7 +51,7 @@ function hasKey(value: unknown): value is { getKey(): SqlBinding } {
  *
  * - **`DateTime` → text, always in UTC.** Delegating to
  *   `formatTimestamp()` buys both halves of the problem at once. It
- *   calls `setTimezone("UTC")` first, which is load-bearing:
+ *   calls `setTimezone("UTC")` first, which matters:
  *   `DateTime.toISOString()` renders in *the instance's own zone*, so a
  *   `DateTime.now()` created in Perth stringifies as
  *   `...T14:30:00.000+08:00`. Postgres `timestamptz` understands that,

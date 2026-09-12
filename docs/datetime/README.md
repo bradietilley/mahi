@@ -4,7 +4,7 @@
 Carbon-inspired API. It is the type every framework timestamp flows
 through: model `created_at`/`updated_at` columns, token expiries, queue
 `available_at` stamps, session TTLs, and soft-delete markers are all
-`DateTime` values under the hood.
+`DateTime` values.
 
 ```ts
 import { DateTime, Duration, Interval, Period } from "@mahiframework/datetime";
@@ -214,7 +214,7 @@ perth.keepLocalTime("Australia/Sydney").isEqual(perth); // false — different i
 shorthands for `inTimezone("UTC")` and the host's zone.
 
 Timezone identifiers are validated at runtime against the host's IANA
-database. Unknown zones — and, importantly, **blank** ones — throw
+database. Unknown zones — including **blank** ones — throw
 `InvalidTimezoneError` rather than falling back to the host's zone, which
 is what `Intl` would silently do.
 

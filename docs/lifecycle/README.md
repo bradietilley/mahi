@@ -418,7 +418,7 @@ The framework's own providers implement it:
 | `DatabaseServiceProvider` | `disconnect()` every **resolved** connection — closes MySQL/Postgres pools and the sqlite handle |
 | `RedisServiceProvider` | Stop the broadcast subscriber, then `quit()` every resolved connection |
 
-"Resolved" is load-bearing. Shutdown walks the drivers a manager actually
+"Resolved" matters here. Shutdown walks the drivers a manager actually
 built, never the *configured* list — resolving a connection in order to
 close it would construct a pool during shutdown, opening connections in
 order to close them.

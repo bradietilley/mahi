@@ -20,7 +20,7 @@ describe("auth context", () => {
     });
 
     it("userOrNull() also throws rather than returning null", () => {
-      // The load-bearing assertion of this whole module. Softening this to
+      // The most important assertion in this module. Softening this to
       // `return null` would make a route that forgot authenticate() behave
       // as a silently-anonymous request, which is how authorization checks
       // get bypassed. If this test is ever "fixed" by relaxing the

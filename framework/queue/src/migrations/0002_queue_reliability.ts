@@ -13,7 +13,7 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
  * exactly what pre-existing rows should be treated as.
  *
  * **`jobs (queue, available_at, id)`** — the index `pop()` lives on, and
- * its column order is load-bearing twice over.
+ * its column order matters twice over.
  *
  * It keeps the hottest query in the system (every poll of every worker)
  * off a full table scan. But it also has to **match `pop()`'s ORDER BY**

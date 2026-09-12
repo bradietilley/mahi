@@ -346,7 +346,7 @@ export class ScheduledTask {
 
   /**
    * Name the task. The name identifies it in `schedule:list`, in log
-   * lines, and — crucially — as the `withoutOverlapping()` lock key, so it
+   * lines, and as the `withoutOverlapping()` lock key, so it
    * must be unique across the schedule.
    */
   name(text: string): this {

@@ -174,7 +174,7 @@ export class ConsoleKernel {
    * Name the program after the argv being parsed, not after the argv this
    * process happened to start with.
    *
-   * They differ whenever argv is passed explicitly — most importantly in
+   * They differ whenever argv is passed explicitly — most often in
    * tests, where deriving from `process.argv` yields the test runner's name
    * (`Usage: forks`) rather than the app's, and the derivation therefore goes
    * untested. An explicit `name` always wins.

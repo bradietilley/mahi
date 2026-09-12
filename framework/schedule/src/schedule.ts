@@ -49,8 +49,8 @@ export class Schedule {
    *   schedule.job(() => new PruneStaleRecordsJob()).daily();
    *
    * The task defaults to being named after the job class the factory
-   * produces. That default is what makes `schedule:list` readable and,
-   * more importantly, gives each job task a distinct
+   * produces. That default is what makes `schedule:list` readable and
+   * gives each job task a distinct
    * `withoutOverlapping()` lock — a generic `"job"` name would share a
    * single lock with every other scheduled job in the app. `name()`
    * overrides it, and skips deriving it at all.

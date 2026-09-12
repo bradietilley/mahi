@@ -151,7 +151,7 @@ export function user<TUser>(): TUser {
 /**
  * The authenticated user, or null if this request is anonymous. Still
  * throws `MissingAuthContextError` outside a scope — see the module
- * docblock for why that distinction is load-bearing.
+ * docblock for why that distinction matters.
  */
 export function userOrNull<TUser>(): TUser | null {
   return requireAuthState().user as TUser | null;

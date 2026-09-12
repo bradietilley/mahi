@@ -1230,7 +1230,7 @@ export class UserFactory extends Factory<typeof User> {
 }
 ```
 
-Two reasons, both load-bearing:
+Two reasons:
 
 1. **`definition()` is synchronous.** `Hash.make()` is async. You cannot
    await it here.

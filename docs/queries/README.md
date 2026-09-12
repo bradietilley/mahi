@@ -527,7 +527,7 @@ await DB.table("articles as child")
 ```
 
 Both `table("posts as parent")` and `.alias("parent")` work; the explicit
-method exists for call sites where the alias is load-bearing rather than
+method exists for call sites where the alias is meaningful rather than
 cosmetic. Column references made after aliasing must use the alias.
 
 ### Projection on a joined query
@@ -702,7 +702,7 @@ for await (const post of Post.query().orderBy("id").lazy()) {
 ```
 
 **These are not true streaming.** All four use `LIMIT size OFFSET n`
-paging under the hood, issuing one query per page until a short page comes
+paging internally, issuing one query per page until a short page comes
 back. `cursor()` is a plain alias for `lazy()` — better-sqlite3 has no
 incremental cursor API through Kysely — and exists so call sites stay
 portable if a streaming driver ever lands.

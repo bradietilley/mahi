@@ -150,7 +150,7 @@ async function runTask(
   }
 
   // Claimed before the overlap lock so a host that loses the race does
-  // no further work, and — importantly — never takes the overlap lock it
+  // no further work, and never takes the overlap lock it
   // would then have to release.
   const oneServerKey = task.getOneServerKey(at);
 

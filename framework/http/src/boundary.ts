@@ -41,7 +41,7 @@ export async function finalizeResponse(
 
   // Publish the finished response onto the context, clearing it first.
   //
-  // The clear is load-bearing, not defensive. Hono's `set res` merges the
+  // The clear is required. Hono's `set res` merges the
   // PREVIOUS response's headers into the incoming one, and for
   // `Set-Cookie` that merge is a *replacement*: it deletes the incoming
   // cookies and re-appends the old bag's. Assigning directly would

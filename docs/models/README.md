@@ -80,7 +80,7 @@ same type, cast types included.
 
 ### Why `Model<A>()(config)` is curried
 
-The empty `()` in the middle is not decoration. TypeScript has no partial
+The empty `()` in the middle is required. TypeScript has no partial
 type-argument inference: you cannot write `Model<PostAttributes>(config)`
 and still have `config` inferred `const` (which is what preserves the
 literal `"id"` in `primaryKey: "id"` so the primary key's *type* is

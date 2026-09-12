@@ -11,7 +11,7 @@ import { Relation } from "../src/morph-map.js";
 /**
  * Nested (dot-path) eager loading, constraining closures, and `morphWith`.
  *
- * The load-bearing assertions here are the **query counts**. Correct
+ * The important assertions here are the **query counts**. Correct
  * values prove nothing on their own: a naive per-instance implementation
  * returns exactly the same data as a batched one and differs only in how
  * many statements it took to get there. Since the whole promise of the

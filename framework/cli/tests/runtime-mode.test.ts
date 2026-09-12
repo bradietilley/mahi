@@ -51,7 +51,7 @@ describe("resolveRuntimeMode", () => {
 
 describe("deriveProgramName", () => {
   /**
-   * The name is not cosmetic: it is what Commander prints in `Usage:` and in
+   * The name matters: it is what Commander prints in `Usage:` and in
    * "unknown command" errors, i.e. the text a confused user will retype.
    */
   it("names itself after the executable, so a shipped binary self-labels", () => {

@@ -534,7 +534,7 @@ select * from tags where id in (
   where taggable_id = ? and taggable_type = 'post')
 ```
 
-That predicate is load-bearing: a post and a video with the *same id* both
+That predicate is required: a post and a video with the *same id* both
 have rows in `taggables`, and only `taggable_type` separates them.
 
 ### Pivot columns

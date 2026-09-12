@@ -334,7 +334,7 @@ Status `422`:
 
 ### 4. Hono's `HTTPException`
 
-Raised by Hono's own built-in middleware — most importantly the request
+Raised by Hono's own built-in middleware — most often the request
 body limit, which raises a `413`. Rendered into the same envelope with
 its own status, rather than being swallowed into a generic 500 that
 blames the server for the client's oversize upload.

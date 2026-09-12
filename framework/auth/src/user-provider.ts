@@ -16,7 +16,7 @@ export interface UserProvider<TUser = unknown> {
    * Look a user up by their identifying credential (email, username, ...)
    * WITHOUT checking the secret.
    *
-   * The split between this and `validateCredentials` is load-bearing and
+   * The split between this and `validateCredentials` is intentional and
    * should not be "simplified" into a single `findByCredentials` that
    * checks the password too: keeping lookup and verification separate is
    * what lets `AuthManager.attempt()` perform a constant-work password

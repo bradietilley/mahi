@@ -40,7 +40,7 @@ interface CacheStore {
 ```
 
 That's the whole surface. It is deliberately narrower than Laravel's
-`Repository` + `LockProvider`, and the omissions are load-bearing rather
+`Repository` + `LockProvider`, and the omissions are intentional rather
 than accidental:
 
 **There is no `forever()` or `rememberForever()`.** "Forever" is what you
@@ -312,7 +312,7 @@ async add<T>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
 }
 ```
 
-That's not stylistic. JavaScript is single-threaded with run-to-completion
+JavaScript is single-threaded with run-to-completion
 semantics: a synchronous block cannot be interrupted by another `async`
 caller's continuation. The moment a function `await`s, its entire
 synchronous prefix has already committed.

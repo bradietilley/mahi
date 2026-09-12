@@ -251,7 +251,7 @@ void dotPaths;
 
 // A `morphTo` whose targets BOTH declare a relation named `owner`. Without
 // an explicit stop the union's shared keys look walkable, so this is the
-// fixture that makes the assertion below load-bearing.
+// fixture that makes the assertion below meaningful.
 interface MOwnerAttributes {
   id: number;
   name: string;

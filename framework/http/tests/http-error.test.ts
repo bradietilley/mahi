@@ -58,7 +58,7 @@ describe("HttpError", () => {
 
   it("distinguishes unauthorized (401) from forbidden (403)", () => {
     // Not a tautology worth deleting: conflating these is the single most
-    // common auth-status mistake, and the distinction is load-bearing for
+    // common auth-status mistake, and the distinction matters for
     // clients deciding whether to prompt for re-authentication.
     expect(HttpError.unauthorized().status).not.toBe(HttpError.forbidden().status);
   });

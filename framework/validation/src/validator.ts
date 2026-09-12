@@ -10,7 +10,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]
  * 26 Crockford base32 characters (I, L, O and U excluded), with the first
  * constrained to `0-7`.
  *
- * That leading constraint is not cosmetic. A ULID's first 10 characters
+ * That leading constraint matters. A ULID's first 10 characters
  * encode a 48-bit millisecond timestamp, and base32 char 1 carries its
  * high bits — so anything above `7` describes a timestamp larger than
  * 2^48-1, which cannot be decoded. `ZZZZZZZZZZZZZZZZZZZZZZZZZZ` is 26

@@ -308,7 +308,7 @@ export class EloquentBuilder<
     TCasts,
     LoadedBy<TInstance, K>
   >;
-  // The `& object` is load-bearing: `Partial<Record<K, …>>` collapses to
+  // The `& object` is required: `Partial<Record<K, …>>` collapses to
   // `{}` when `K` is `never` (a model declaring no relations), and every
   // non-nullish value — including a string — is assignable to `{}`. That
   // silently re-admits `Bare.query().with("anything")` through the object

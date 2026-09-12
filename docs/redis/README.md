@@ -216,7 +216,7 @@ mahi:                  cache:        feed:global
 | **Connection** `keyPrefix` | `config/redis.ts` | none — **set one** | Another *application* on the same Redis |
 | **Store** `prefix` | `config/cache.ts`, `stores.redis.prefix` | `"cache:"` | The *queue* (and anything else) on the same connection |
 
-Both matter, and the second one is not cosmetic.
+Both matter.
 
 `RedisCacheStore.flush()` is deliberately **not** `FLUSHDB`, which would
 nuke every other application sharing that instance or logical DB. It scans
@@ -439,7 +439,7 @@ rather than a fire-and-forget `RPOP`. Four keys per named queue:
 | `queues:{q}:reserved` | sorted set | In-flight jobs, scored by **reservation expiry** (ms). |
 | `queues:{q}:failed` | hash | Failed jobs, by id. |
 
-The `{q}` braces are a Redis Cluster **hash tag**, not decoration. Every
+The `{q}` braces are a Redis Cluster **hash tag**. Every
 Lua script here touches two keys at once, and Cluster rejects a multi-key
 command whose keys hash to different slots — without the tag these
 scripts work against a single node in development and fail on the first
@@ -535,7 +535,7 @@ The subscriber is a `duplicate()` (subscriber mode, see above), connected
 and subscribed in `connect()`, which is idempotent. Incoming messages are
 delivered fire-and-forget (`void this.deliverLocally(message).catch(log)`)
 so a slow or dead socket can't stall the message pump for everyone else.
-The `.catch()` is not decoration: an unhandled promise rejection
+The `.catch()` is required: an unhandled promise rejection
 terminates the process on Node by default, so one throwing socket would
 have taken the whole server down rather than dropping one message.
 Malformed JSON, or a message missing `channel`/`event`, is dropped

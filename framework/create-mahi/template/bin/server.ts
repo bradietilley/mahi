@@ -23,7 +23,7 @@ app.logger.info(`Server listening on ${formatServeUrl(listening.hostname, listen
  *
  * SIGTERM is what an orchestrator (Docker, Kubernetes, systemd) sends
  * first, then it waits a grace period and sends SIGKILL. A process that
- * ignores SIGTERM therefore always dies the hard way: in-flight requests
+ * ignores SIGTERM therefore always dies abruptly: in-flight requests
  * are cut mid-response, and database pools / Redis clients are dropped
  * without closing.
  *

@@ -54,7 +54,7 @@ import { transaction } from "./transaction.js";
  *
  * Every pivot statement here is built as a bare `QueryBuilder` over the
  * pivot table, never through the related model's builder. That is
- * deliberate and load-bearing for correctness: the related model's
+ * required for correctness: the related model's
  * global scopes describe which *related rows are readable*, and have no
  * business filtering which *pivot rows exist*. Reading the current ids
  * for a `sync()` diff through a scoped builder would omit the pivot rows

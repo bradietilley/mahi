@@ -66,7 +66,7 @@ const { compileCreate, compileAlter } = makeNativeAlterGrammar({
  * Drop every user (base) table in the **current schema**. `CASCADE`
  * clears any dependent foreign keys so drop order doesn't matter.
  *
- * The `search_path` filter is not cosmetic: Kysely's
+ * The `search_path` filter is required: Kysely's
  * `introspection.getTables()` returns every non-system table in the
  * database, across all schemas. Dropping that list unqualified would
  * reach into schemas the connection was never pointed at — so a

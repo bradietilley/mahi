@@ -188,8 +188,8 @@ describe("SessionGuard", () => {
   it("refuses to mint a session for a user the provider can't find", async () => {
     // A deleted account (or a made-up id) must not get a live session
     // cookie whose every request then resolves to null. The route throws
-    // LoginUserNotFoundError; Hono surfaces it as a 500, and crucially no
-    // session cookie is set.
+    // LoginUserNotFoundError; Hono surfaces it as a 500, and no session
+    // cookie is set.
     const res = await hono.request("/login-ghost", { method: "POST" });
 
     expect(res.status).toBe(500);

@@ -5,9 +5,8 @@ import type { RedisConnection } from "../redis-connection.js";
 
 /**
  * The namespace every key this store writes lives under, *within* the
- * connection's own `keyPrefix`. It is not cosmetic and it is not
- * configurable away to `""`: it is the boundary that makes `flush()`
- * safe.
+ * connection's own `keyPrefix`. It cannot be configured away to `""`:
+ * it is the boundary that makes `flush()` safe.
  *
  * `RedisQueueDriver` writes `queues:<name>`, `queues:<name>:reserved`,
  * `queues:<name>:delayed` and `queues:<name>:failed` on the *same*
@@ -111,7 +110,7 @@ export class RedisCacheStore implements CacheStore {
    * Deletes every key under this store's namespace, and nothing else.
    *
    * Deliberately NOT `FLUSHDB`, which would nuke every other app sharing
-   * the Redis instance/logical DB — and, just as importantly, not a scan
+   * the Redis instance/logical DB — and not a scan
    * of the connection prefix either, which would take the queue with it
    * (see `DEFAULT_CACHE_PREFIX`). The pattern is
    * `<connection prefix><store prefix>*`, so `queues:*` is out of reach

@@ -65,7 +65,7 @@ export function resolveRuntimeMode(
  * Laravel has it easy here: `artisan` is always `artisan`. A Mahi app is run as
  * `./artisan` in development and as whatever the user named the binary once it
  * ships, so a hardcoded name is wrong in one of the two modes — and the name
- * is not cosmetic. It is what appears in `Usage:` and in Commander's "unknown
+ * matters. It is what appears in `Usage:` and in Commander's "unknown
  * command" output, i.e. exactly the text a confused user will retype.
  *
  * Derived from `argv[1]`'s basename, with extensions stripped, falling back to

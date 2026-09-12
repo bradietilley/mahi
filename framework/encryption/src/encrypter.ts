@@ -10,7 +10,7 @@
  *
  * Wire format is `base64url(version[1] || iv[12] || authTag[16] || ct)`,
  * minimum 29 bytes. The auth tag length is pinned on both cipher and
- * decipher (see `decrypt()` — this is security-critical, not cosmetic),
+ * decipher (see `decrypt()` — this is security-critical),
  * and callers can optionally bind a ciphertext to a context via `aad`.
  *
  * Supports key rotation, Laravel-style: `encrypt()` always uses the
@@ -149,7 +149,7 @@ export class Encrypter {
 
     for (const candidateKey of [this.key, ...this.previousKeys]) {
       try {
-        // `authTagLength` is load-bearing, not decoration: without it Node
+        // `authTagLength` is required: without it Node
         // accepts 4/8/12-byte tags here, letting an attacker with a
         // decrypt oracle forge a payload at 2^-32 per attempt instead of
         // 2^-128 (and recover the GHASH key from a few successes via

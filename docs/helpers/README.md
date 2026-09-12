@@ -1468,7 +1468,7 @@ storage_path("logs", "mahi.log");
 ```
 
 **These resolve against `process.cwd()`, not against an `Application`
-instance.** That's deliberate and load-bearing: config files call these
+instance.** That's deliberate: config files call these
 helpers while building the object that's handed to `app.config.set(...)`,
 which happens before `app.bootstrap()` and long before the `app()` global
 singleton is populated. Tying them to cwd keeps them usable at any point

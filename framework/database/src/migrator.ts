@@ -217,7 +217,7 @@ export class MigrationRunner {
    * one is open, exactly as `SchemaBuilder` and `QueryBuilder` resolve
    * theirs.
    *
-   * Load-bearing for `runOne()`: a migration's `migrations` row is
+   * This matters for `runOne()`: a migration's `migrations` row is
    * written inside that migration's transaction, so reaching for the
    * root connection here would (a) leave the row outside the atomic
    * unit it exists to pair with, and (b) on SQLite block outright —

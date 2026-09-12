@@ -49,7 +49,7 @@ export function verifyTokenHash(secret: string, storedDigest: string): boolean {
 /**
  * Split a `"<id>|<secret>"` token into its parts.
  *
- * The id prefix is NOT cosmetic. The stored column is a digest, so it
+ * The id prefix exists for lookup. The stored column is a digest, so it
  * can't be looked up by equality; without an id, verifying a token would
  * mean loading every token row and comparing each — O(n) work per
  * request, trivially DoS-able. The id turns it into one indexed

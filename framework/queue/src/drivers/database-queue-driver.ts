@@ -468,7 +468,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
    * A timestamp string every dialect can both store and *compare* —
    * always **truncated to whole seconds**, and space-separated for MySQL.
    *
-   * Both halves are load-bearing, and both were learned the hard way:
+   * Both halves matter:
    *
    * **The `Z` suffix.** MySQL's `DATETIME` rejects an ISO-8601 UTC string
    * outright ("Incorrect datetime value"), so an insert throws and a
