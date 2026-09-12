@@ -39,7 +39,7 @@ describe("onOneServer()", () => {
 
   /** A minute-granularity `* * * * *` task that records each run. */
   function countingSchedule(runs: string[], host: string, configure?: (t: ScheduledTask) => void) {
-    const schedule = new Schedule();
+    const schedule = new Schedule(new Application());
     const task = schedule
       .call(() => {
         runs.push(host);
@@ -148,14 +148,14 @@ describe("onOneServer()", () => {
   });
 
   it("requires a name, since the name is the lock key", () => {
-    const schedule = new Schedule();
+    const schedule = new Schedule(new Application());
     schedule.call(() => {}).onOneServer();
 
     expect(() => schedule.validate()).toThrow(/onOneServer\(\) but has no name/);
   });
 
   it("rejects two same-named tasks that would share the lock", () => {
-    const schedule = new Schedule();
+    const schedule = new Schedule(new Application());
     schedule
       .call(() => {})
       .name("dupe")
@@ -173,7 +173,7 @@ describe("onOneServer()", () => {
     // a host that skips would stop the host that would have run.
     const runs: string[] = [];
 
-    const skipping = new Schedule();
+    const skipping = new Schedule(new Application());
     skipping
       .call(() => {
         runs.push("skipped-host");

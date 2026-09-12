@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import type { EventEmitter } from "node:events";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -498,7 +499,10 @@ describe("SmtpTransport", () => {
       // mailer through `MailManager` must not open a socket or a pool.
       const { port, capture } = await startServer();
       let connections = 0;
-      server!.on("connect", () => {
+      // `smtp-server` emits `connect` (see `_onClientConnect`), but its
+      // `@types` package only declares the `close` and `error` overloads.
+      // `SMTPServer extends EventEmitter`, so widen to that to subscribe.
+      (server! as EventEmitter).on("connect", () => {
         connections++;
       });
 
