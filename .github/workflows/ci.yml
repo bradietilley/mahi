@@ -10,11 +10,12 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  # The database and Redis suites fail (instead of self-skipping) when a
-  # service is unreachable under CI=true, so a broken service can't report
-  # green by testing nothing.
-  CI: "true"
+# `CI: "true"` is deliberately NOT set workflow-wide. The database and Redis
+# suites turn an unreachable engine into a failure under CI=true so a broken
+# service cannot report green by testing nothing — but that is only correct
+# in the job that actually STARTS those services. Setting it globally made
+# the service-free `check` job fail on the integration suites it is meant to
+# skip, so it is scoped to `integration` below.
 
 jobs:
   # Fast, service-free checks: build, lint, typecheck, metadata hygiene, and
@@ -127,6 +128,10 @@ jobs:
 
       - name: Test (with services)
         run: pnpm test
+        env:
+          # Only here: every engine below is a declared service, so an
+          # unreachable one is a real failure rather than a skip.
+          CI: "true"
 
   # Scaffold an app from the built create-mahi and prove it installs, builds,
   # and boots against the published dist — the thing consumers actually get.
