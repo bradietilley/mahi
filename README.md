@@ -94,7 +94,7 @@ The MySQL, Postgres, and Redis suites skip themselves when no server is
 reachable. To run them locally against the same images CI uses:
 
 ```bash
-pnpm test:integration     # docker compose up, then the full suite with CI=true
+pnpm test:integration     # docker compose up, then the full suite with CI_STRICT_MODE=true
 pnpm services:down
 ```
 

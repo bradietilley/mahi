@@ -6,7 +6,7 @@ import { RedisConnection, type RedisConnectionConfig } from "../src/redis-connec
  * substitute for pub/sub across connections or blocking/atomic semantics).
  *
  * When no Redis is reachable they self-skip via `describe.skipIf` — except
- * under `CI=true`, where they **fail** instead. A suite that silently
+ * under `CI_STRICT_MODE=true`, where they **fail** instead. A suite that silently
  * skips is worse than no suite on CI: the pipeline stays green while the
  * only tests covering cross-process locking, `flush()` scoping and
  * broadcast fanout never run, so a regression in exactly the code Redis
@@ -55,10 +55,13 @@ export async function redisAvailable(): Promise<boolean> {
  */
 const available = await redisAvailable();
 
-if (!available && process.env.CI === "true") {
+// Keyed off `CI_STRICT_MODE` rather than `CI`, which GitHub Actions
+// sets on every runner — including the service-free job that is supposed to
+// skip these tests.
+if (!available && process.env.CI_STRICT_MODE === "true") {
   throw new Error(
-    `No Redis at ${REDIS_URL}. The @mahiframework/redis integration tests must run on CI — ` +
-      `start one with \`docker compose up -d redis\`, or set REDIS_URL.`,
+    `No Redis at ${REDIS_URL}. The @mahiframework/redis integration tests must run where ` +
+      `services are provisioned, or set REDIS_URL.`,
   );
 }
 

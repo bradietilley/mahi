@@ -10,12 +10,13 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# `CI: "true"` is deliberately NOT set workflow-wide. The database and Redis
-# suites turn an unreachable engine into a failure under CI=true so a broken
-# service cannot report green by testing nothing — but that is only correct
-# in the job that actually STARTS those services. Setting it globally made
-# the service-free `check` job fail on the integration suites it is meant to
-# skip, so it is scoped to `integration` below.
+# The database and Redis suites turn an unreachable engine into a failure
+# rather than a skip, so a broken service cannot report green by testing
+# nothing. That is keyed off `CI_STRICT_MODE`, NOT `CI`: GitHub Actions sets
+# `CI=true` on every runner, so keying off it made the service-free `check`
+# job fail on the very integration suites it is meant to skip. Only the
+# `integration` job below — the one that actually starts the services —
+# opts in.
 
 jobs:
   # Fast, service-free checks: build, lint, typecheck, metadata hygiene, and
@@ -64,7 +65,7 @@ jobs:
       - name: Test (SQLite)
         run: pnpm test
 
-  # Full suite against real MySQL 8, Postgres 16, and Redis 7. CI=true turns an
+  # Full suite against real MySQL 8, Postgres 16, and Redis 7. CI_STRICT_MODE=true turns an
   # unreachable engine into a failure.
   integration:
     name: integration (mysql / postgres / redis)
@@ -129,9 +130,9 @@ jobs:
       - name: Test (with services)
         run: pnpm test
         env:
-          # Only here: every engine below is a declared service, so an
+          # Only here: every engine above is a declared service, so an
           # unreachable one is a real failure rather than a skip.
-          CI: "true"
+          CI_STRICT_MODE: "true"
 
   # Scaffold an app from the built create-mahi and prove it installs, builds,
   # and boots against the published dist — the thing consumers actually get.

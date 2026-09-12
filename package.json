@@ -14,7 +14,7 @@
     "format:check": "prettier --check .",
     "services:up": "docker compose up -d --wait",
     "services:down": "docker compose down",
-    "test:integration": "docker compose up -d --wait && CI=true turbo run test",
+    "test:integration": "docker compose up -d --wait && CI_STRICT_MODE=true turbo run test --concurrency=4",
     "metadata": "node scripts/sync-package-metadata.mjs",
     "metadata:check": "node scripts/sync-package-metadata.mjs --check",
     "version:set": "node scripts/set-version.mjs",

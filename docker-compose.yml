@@ -12,7 +12,7 @@
 #
 # When these are NOT running, those suites skip themselves, so `pnpm
 # test` stays green on a machine without docker. `pnpm test:integration`
-# sets `CI=true`, which turns an unreachable database into a failure
+# sets `CI_STRICT_MODE=true`, which turns an unreachable database into a failure
 # instead — a silent skip in an automated run would report green while
 # testing nothing.
 #

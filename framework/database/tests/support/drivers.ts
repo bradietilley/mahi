@@ -149,11 +149,16 @@ function quoteIdentifier(engine: TestEngine, name: string): string {
  * connection and throws it away, so a developer without docker running
  * gets the suite skipped rather than a wall of connection errors.
  *
- * **Except under `CI=true`**, where the services are provisioned and an
- * unreachable database means the harness is misconfigured — silently
- * skipping there would turn the entire cross-dialect suite into a
- * no-op that still reports green, which is exactly the failure this
- * plan exists to prevent. So CI rethrows.
+ * **Except under `CI_STRICT_MODE=true`**, where the services are
+ * provisioned and an unreachable database means the harness is
+ * misconfigured — silently skipping there would turn the entire
+ * cross-dialect suite into a no-op that still reports green, which is
+ * exactly the failure this plan exists to prevent. So that job rethrows.
+ *
+ * Deliberately NOT keyed off `CI`: GitHub Actions sets `CI=true` on every
+ * runner, so the service-free job would fail on the very suites it is
+ * meant to skip. The opt-in has to be something only the job that starts
+ * the services sets.
  */
 export async function engineAvailable(engine: TestEngine): Promise<boolean> {
   if (!engine.external) {
@@ -167,10 +172,10 @@ export async function engineAvailable(engine: TestEngine): Promise<boolean> {
 
     return true;
   } catch (error) {
-    if (process.env.CI === "true") {
+    if (process.env.CI_STRICT_MODE === "true") {
       throw new Error(
-        `${engine.name} is unreachable and CI=true, so the integration suite cannot be skipped. ` +
-          `Start it with \`docker compose up -d --wait\`. Original error: ${(error as Error).message}`,
+        `${engine.name} is unreachable and CI_STRICT_MODE=true, so the integration suite ` +
+          `cannot be skipped. Original error: ${(error as Error).message}`,
       );
     }
 
