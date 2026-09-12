@@ -169,5 +169,8 @@ jobs:
           set -euo pipefail
           rm -rf .tmp-scaffold/smoke
           node framework/create-mahi/dist/index.js .tmp-scaffold/smoke --link-workspace --no-install --no-git --yes
-          pnpm install
+          # The scaffold is a NEW workspace member that by definition is not
+          # in the committed lockfile, and pnpm defaults `--frozen-lockfile`
+          # to true under CI — so this install has to opt out explicitly.
+          pnpm install --no-frozen-lockfile
           pnpm --dir .tmp-scaffold/smoke build
