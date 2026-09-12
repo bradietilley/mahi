@@ -187,7 +187,17 @@ export class ScheduleLock implements ScheduleLocker {
       return true;
     }
 
-    if (Number.isFinite(writtenAt) && Date.now() - writtenAt < RECLAIM_STALE_MS) {
+    // `createMarker` creates the file with `wx` and writes the timestamp as
+    // a SECOND operation, so a marker observed between the two reads as "".
+    // `Number("")` is 0, which would date the marker to 1970 and make it
+    // look stale — letting a second reclaimer delete a marker that a live
+    // one is still inside. Anything we cannot parse is therefore treated as
+    // a marker that was just created, i.e. live.
+    if (!Number.isFinite(writtenAt) || writtenAt === 0) {
+      return false;
+    }
+
+    if (Date.now() - writtenAt < RECLAIM_STALE_MS) {
       return false;
     }
 

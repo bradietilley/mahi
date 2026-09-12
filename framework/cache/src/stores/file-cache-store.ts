@@ -101,8 +101,18 @@ interface Entry {
 export class FileCacheStore implements CacheStore {
   /** Give up acquiring an entry's lock file after this long, and throw. */
   static readonly LOCK_TIMEOUT_MS = 5_000;
-  /** A lock file older than this is assumed abandoned by a dead process and is reclaimed. */
-  static readonly STALE_LOCK_MS = 5_000;
+  /**
+   * A lock file older than this is assumed abandoned by a dead process and
+   * is reclaimed.
+   *
+   * Must stay comfortably ABOVE `LOCK_TIMEOUT_MS`. When the two were equal,
+   * a waiter that had been descheduled for the whole timeout could decide a
+   * still-live holder was stale and unlink its lock — so both processes
+   * believed they held it and `add()` returned true twice. The critical
+   * section is microseconds of real work, so the gap only has to cover
+   * scheduler starvation, not legitimate slowness.
+   */
+  static readonly STALE_LOCK_MS = 30_000;
 
   /**
    * @param directory Where entry files live. A **directory**, not a file
