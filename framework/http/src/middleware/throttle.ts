@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import { RateLimiter, Limit, Unlimited, RATE_LIMITER_TOKEN } from "@mahi/cache";
+import { app } from "@mahiframework/core";
+import { RateLimiter, Limit, Unlimited, RATE_LIMITER_TOKEN } from "@mahiframework/cache";
 import type { Request } from "../request.js";
 import type { HttpPipeFn } from "./pipeline-middleware.js";
 import { HttpResponse } from "../response.js";
@@ -31,7 +31,7 @@ export interface ThrottleOptions {
 const defaultKey = (request: Request): string => request.ip() ?? "unknown";
 
 /**
- * Rate-limiting pipe, backed by `@mahi/cache`'s `RateLimiter`.
+ * Rate-limiting pipe, backed by `@mahiframework/cache`'s `RateLimiter`.
  * Two forms:
  *
  * 1. **Inline** — a plain `{ max, windowSeconds }` object:

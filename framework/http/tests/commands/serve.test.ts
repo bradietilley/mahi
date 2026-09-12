@@ -2,7 +2,7 @@ import { EventEmitter } from "node:events";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HttpResponse } from "../../src/response.js";
 import { HttpKernel } from "../../src/http-kernel.js";

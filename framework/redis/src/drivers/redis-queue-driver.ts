@@ -8,7 +8,7 @@ import type {
   JobState,
   FailedJobRepository,
   FailedJobRecord,
-} from "@mahi/queue";
+} from "@mahiframework/queue";
 import type { RedisConnection } from "../redis-connection.js";
 
 /**

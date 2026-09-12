@@ -3,11 +3,11 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
-import { CacheServiceProvider } from "@mahi/cache";
-import { DatabaseServiceProvider, DatabaseManager, DATABASE_TOKEN, Model } from "@mahi/database";
-import type { Router } from "@mahi/http";
-import { HttpResponse, HttpServiceProvider } from "@mahi/http";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
+import { CacheServiceProvider } from "@mahiframework/cache";
+import { DatabaseServiceProvider, DatabaseManager, DATABASE_TOKEN, Model } from "@mahiframework/database";
+import type { Router } from "@mahiframework/http";
+import { HttpResponse, HttpServiceProvider } from "@mahiframework/http";
 import { createTestApplication } from "../src/create-test-application.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

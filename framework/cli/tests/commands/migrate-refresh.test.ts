@@ -1,13 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahi/database";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahiframework/database";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { makeMigrationDir, removeMigrationDir } from "../helpers/migration-fixtures.js";
 import { MigrateRefreshCommand } from "../../src/commands/migrate-refresh.js";
 
 const MIGRATION_A = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -22,7 +22,7 @@ export default {
 `;
 
 const MIGRATION_B = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -70,7 +70,7 @@ describe("MigrateRefreshCommand", () => {
 
     // Seed two separate batches first, so refresh must loop rollback().
     await writeFile(path.join(dir, "0001_create_widgets.js"), MIGRATION_A);
-    const { MigrationRunner } = await import("@mahi/database");
+    const { MigrationRunner } = await import("@mahiframework/database");
     const runner = new MigrationRunner(driver.kysely);
     await runner.up([dir]);
     await writeFile(path.join(dir, "0002_create_gadgets.js"), MIGRATION_B);

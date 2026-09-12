@@ -1,5 +1,5 @@
-import { Collection } from "@mahi/core";
-import { BaseModel, ModelNotFoundError, type Model, type ModelRegistry } from "@mahi/database";
+import { Collection } from "@mahiframework/core";
+import { BaseModel, ModelNotFoundError, type Model, type ModelRegistry } from "@mahiframework/database";
 
 /**
  * The on-the-wire shape a serialized model reference takes inside a job

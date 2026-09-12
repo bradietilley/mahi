@@ -1,20 +1,20 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, CACHE_TOKEN } from "@mahi/core";
-import { DatabaseServiceProvider } from "@mahi/database";
-import { EventsServiceProvider } from "@mahi/events";
-import { Process, makeProcessResult } from "@mahi/process";
-import { Mail, MAIL_TOKEN, Mailable, MailServiceProvider, type MailManager } from "@mahi/mail";
+import { Application, ServiceProvider, CACHE_TOKEN } from "@mahiframework/core";
+import { DatabaseServiceProvider } from "@mahiframework/database";
+import { EventsServiceProvider } from "@mahiframework/events";
+import { Process, makeProcessResult } from "@mahiframework/process";
+import { Mail, MAIL_TOKEN, Mailable, MailServiceProvider, type MailManager } from "@mahiframework/mail";
 import {
   Notification,
   NOTIFICATIONS_TOKEN,
   NotificationsServiceProvider,
   type ChannelManager,
   type NotificationRoutable,
-} from "@mahi/notifications";
-import { Storage, STORAGE_TOKEN, StorageManager } from "@mahi/storage";
-import { CacheServiceProvider, Cache, type CacheManager } from "@mahi/cache";
+} from "@mahiframework/notifications";
+import { Storage, STORAGE_TOKEN, StorageManager } from "@mahiframework/storage";
+import { CacheServiceProvider, Cache, type CacheManager } from "@mahiframework/cache";
 import { createTestApplication } from "../src/create-test-application.js";
 import { assertDatabaseCount } from "../src/database-assertions.js";
 
@@ -86,7 +86,7 @@ async function bootstrapApp(): Promise<Application> {
   app.register(MailServiceProvider);
   app.register(NotificationsServiceProvider);
   app.register(CacheServiceProvider);
-  app.register(await import("@mahi/storage").then((m) => m.StorageServiceProvider));
+  app.register(await import("@mahiframework/storage").then((m) => m.StorageServiceProvider));
   app.register(FakesProvider);
 
   await app.bootstrap();

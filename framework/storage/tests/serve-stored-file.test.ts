@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { LocalStorageDriver } from "../src/drivers/local-storage-driver.js";
 import { pathFromPublicUrl, joinPublicUrl, publicUrlPathname } from "../src/public-url.js";

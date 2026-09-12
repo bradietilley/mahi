@@ -1,4 +1,4 @@
-import type { Mailable } from "@mahi/mail";
+import type { Mailable } from "@mahiframework/mail";
 import type { NotificationRoutable } from "./notifiable.js";
 
 /**
@@ -105,7 +105,7 @@ export abstract class Notification {
   /**
    * The payload broadcast over the `broadcast` channel by
    * `BroadcastChannel` (wrapped in a `NotificationBroadcast` event that
-   * `@mahi/broadcasting` forwards to websocket clients). Typed as
+   * `@mahiframework/broadcasting` forwards to websocket clients). Typed as
    * `object` for the same reason as `toDatabase()`. Omit if never using
    * `"broadcast"`.
    */

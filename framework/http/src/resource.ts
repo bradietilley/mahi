@@ -215,13 +215,13 @@ export abstract class Resource<TModel, TShape = unknown> {
   }
 }
 
-/** Duck-typed `Model` — carries `toJsonResource()`/`toJSON()` (see `@mahi/database`). */
+/** Duck-typed `Model` — carries `toJsonResource()`/`toJSON()` (see `@mahiframework/database`). */
 interface ModelInstance {
   toJsonResource(): { toJson(): unknown | Promise<unknown> } | undefined;
   toJSON(): unknown;
 }
 
-/** Duck-typed `Collection` — carries `toArray()` (see `@mahi/core`). */
+/** Duck-typed `Collection` — carries `toArray()` (see `@mahiframework/core`). */
 interface CollectionLike {
   toArray(): unknown[];
 }
@@ -274,8 +274,8 @@ function normalizeEach(items: unknown[]): unknown[] | Promise<unknown[]> {
  *   - anything else (primitives, `Date`, etc.) -> returned unchanged.
  *
  * Models and Collections are detected structurally (duck-typed) rather than
- * via `instanceof`, so `@mahi/http` needs no runtime import of
- * `@mahi/database`/`@mahi/core`. Sync-preserving: only
+ * via `instanceof`, so `@mahiframework/http` needs no runtime import of
+ * `@mahiframework/database`/`@mahiframework/core`. Sync-preserving: only
  * returns a `Promise` when a nested resource's `toJson()` (or an already-
  * present value) is asynchronous, so synchronous shapes stay synchronous.
  */

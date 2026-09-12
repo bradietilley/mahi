@@ -1,5 +1,5 @@
 import path from "node:path";
-import type { DatabaseConfig } from "@mahi/database";
+import type { DatabaseConfig } from "@mahiframework/database";
 import type { Env } from "./env.js";
 
 /**

@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/authorization",
+  "name": "@mahiframework/authorization",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,10 +17,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/facades": "workspace:*",
-    "@mahi/http": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/facades": "workspace:*",
+    "@mahiframework/http": "workspace:*",
     "hono": "^4.6.14"
   },
   "devDependencies": {

@@ -45,121 +45,27 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@22.20.1)(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
 
-  .tmp-scaffold/smoke:
-    dependencies:
-      '@mahi/auth':
-        specifier: workspace:*
-        version: link:../../framework/auth
-      '@mahi/authorization':
-        specifier: workspace:*
-        version: link:../../framework/authorization
-      '@mahi/broadcasting':
-        specifier: workspace:*
-        version: link:../../framework/broadcasting
-      '@mahi/cache':
-        specifier: workspace:*
-        version: link:../../framework/cache
-      '@mahi/cli':
-        specifier: workspace:*
-        version: link:../../framework/cli
-      '@mahi/core':
-        specifier: workspace:*
-        version: link:../../framework/core
-      '@mahi/database':
-        specifier: workspace:*
-        version: link:../../framework/database
-      '@mahi/datetime':
-        specifier: workspace:*
-        version: link:../../framework/datetime
-      '@mahi/encryption':
-        specifier: workspace:*
-        version: link:../../framework/encryption
-      '@mahi/events':
-        specifier: workspace:*
-        version: link:../../framework/events
-      '@mahi/health':
-        specifier: workspace:*
-        version: link:../../framework/health
-      '@mahi/http':
-        specifier: workspace:*
-        version: link:../../framework/http
-      '@mahi/mail':
-        specifier: workspace:*
-        version: link:../../framework/mail
-      '@mahi/notifications':
-        specifier: workspace:*
-        version: link:../../framework/notifications
-      '@mahi/queue':
-        specifier: workspace:*
-        version: link:../../framework/queue
-      '@mahi/redis':
-        specifier: workspace:*
-        version: link:../../framework/redis
-      '@mahi/schedule':
-        specifier: workspace:*
-        version: link:../../framework/schedule
-      '@mahi/snowflake':
-        specifier: workspace:*
-        version: link:../../framework/snowflake
-      '@mahi/storage':
-        specifier: workspace:*
-        version: link:../../framework/storage
-      zod:
-        specifier: ^3.24.1
-        version: 3.25.76
-    devDependencies:
-      '@mahi/testing':
-        specifier: workspace:*
-        version: link:../../framework/testing
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.20.1
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^8.19.0
-        version: 8.67.0(@typescript-eslint/parser@8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      '@typescript-eslint/parser':
-        specifier: ^8.19.0
-        version: 8.67.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      eslint:
-        specifier: ^9.17.0
-        version: 9.39.5(jiti@2.7.0)
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.2(eslint@9.39.5(jiti@2.7.0))
-      tsx:
-        specifier: ^4.19.2
-        version: 4.23.12
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.0
-        version: 8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12)
-      vitest:
-        specifier: ^4.1.11
-        version: 4.1.11(@types/node@22.20.1)(vite@8.2.2(@types/node@22.20.1)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.12))
-
   framework/auth:
     dependencies:
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/datetime':
+      '@mahiframework/datetime':
         specifier: workspace:*
         version: link:../datetime
-      '@mahi/encryption':
+      '@mahiframework/encryption':
         specifier: workspace:*
         version: link:../encryption
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/http':
+      '@mahiframework/http':
         specifier: workspace:*
         version: link:../http
       commander:
@@ -184,16 +90,16 @@ importers:
 
   framework/authorization:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/http':
+      '@mahiframework/http':
         specifier: workspace:*
         version: link:../http
       hono:
@@ -218,16 +124,16 @@ importers:
       '@hono/node-ws':
         specifier: ^1.3.1
         version: 1.3.1(@hono/node-server@1.19.17(hono@4.13.3))(hono@4.13.3)
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/events':
+      '@mahiframework/events':
         specifier: workspace:*
         version: link:../events
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/http':
+      '@mahiframework/http':
         specifier: workspace:*
         version: link:../http
       hono:
@@ -255,13 +161,13 @@ importers:
 
   framework/cache:
     dependencies:
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
       commander:
@@ -280,13 +186,13 @@ importers:
 
   framework/cli:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
       commander:
@@ -305,7 +211,7 @@ importers:
 
   framework/core:
     dependencies:
-      '@mahi/datetime':
+      '@mahiframework/datetime':
         specifier: workspace:*
         version: link:../datetime
       dotenv:
@@ -327,7 +233,7 @@ importers:
 
   framework/create-mahi:
     dependencies:
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
     devDependencies:
@@ -346,19 +252,19 @@ importers:
 
   framework/database:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/datetime':
+      '@mahiframework/datetime':
         specifier: workspace:*
         version: link:../datetime
-      '@mahi/events':
+      '@mahiframework/events':
         specifier: workspace:*
         version: link:../events
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/validation':
+      '@mahiframework/validation':
         specifier: workspace:*
         version: link:../validation
       better-sqlite3:
@@ -414,13 +320,13 @@ importers:
 
   framework/encryption:
     dependencies:
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
       argon2:
@@ -442,10 +348,10 @@ importers:
 
   framework/events:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
     devDependencies:
@@ -461,7 +367,7 @@ importers:
 
   framework/facades:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -477,29 +383,29 @@ importers:
 
   framework/health:
     dependencies:
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
       commander:
         specifier: ^12.1.0
         version: 12.1.0
     devDependencies:
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/http':
+      '@mahiframework/http':
         specifier: workspace:*
         version: link:../http
-      '@mahi/storage':
+      '@mahiframework/storage':
         specifier: workspace:*
         version: link:../storage
       '@types/node':
@@ -526,31 +432,31 @@ importers:
       '@hono/node-ws':
         specifier: ^1.3.1
         version: 1.3.1(@hono/node-server@1.19.17(hono@4.13.3))(hono@4.13.3)
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/encryption':
+      '@mahiframework/encryption':
         specifier: workspace:*
         version: link:../encryption
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/pipeline':
+      '@mahiframework/pipeline':
         specifier: workspace:*
         version: link:../pipeline
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
-      '@mahi/validation':
+      '@mahiframework/validation':
         specifier: workspace:*
         version: link:../validation
       commander:
@@ -581,10 +487,10 @@ importers:
 
   framework/http-client:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/pipeline':
+      '@mahiframework/pipeline':
         specifier: workspace:*
         version: link:../pipeline
     devDependencies:
@@ -603,10 +509,10 @@ importers:
 
   framework/mail:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
       nodemailer:
@@ -634,19 +540,19 @@ importers:
 
   framework/notifications:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/events':
+      '@mahiframework/events':
         specifier: workspace:*
         version: link:../events
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/mail':
+      '@mahiframework/mail':
         specifier: workspace:*
         version: link:../mail
     devDependencies:
@@ -689,34 +595,34 @@ importers:
 
   framework/queue:
     dependencies:
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/datetime':
+      '@mahiframework/datetime':
         specifier: workspace:*
         version: link:../datetime
-      '@mahi/events':
+      '@mahiframework/events':
         specifier: workspace:*
         version: link:../events
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
-      '@mahi/mail':
+      '@mahiframework/mail':
         specifier: workspace:*
         version: link:../mail
-      '@mahi/pipeline':
+      '@mahiframework/pipeline':
         specifier: workspace:*
         version: link:../pipeline
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
       commander:
@@ -738,16 +644,16 @@ importers:
 
   framework/redis:
     dependencies:
-      '@mahi/broadcasting':
+      '@mahiframework/broadcasting':
         specifier: workspace:*
         version: link:../broadcasting
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/queue':
+      '@mahiframework/queue':
         specifier: workspace:*
         version: link:../queue
       ioredis:
@@ -781,16 +687,16 @@ importers:
 
   framework/schedule:
     dependencies:
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/http-client':
+      '@mahiframework/http-client':
         specifier: workspace:*
         version: link:../http-client
-      '@mahi/tui':
+      '@mahiframework/tui':
         specifier: workspace:*
         version: link:../tui
       commander:
@@ -809,13 +715,13 @@ importers:
 
   framework/snowflake:
     dependencies:
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
     devDependencies:
@@ -834,10 +740,10 @@ importers:
 
   framework/storage:
     dependencies:
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/facades':
+      '@mahiframework/facades':
         specifier: workspace:*
         version: link:../facades
     devDependencies:
@@ -853,47 +759,47 @@ importers:
 
   framework/testing:
     dependencies:
-      '@mahi/auth':
+      '@mahiframework/auth':
         specifier: workspace:*
         version: link:../auth
-      '@mahi/cache':
+      '@mahiframework/cache':
         specifier: workspace:*
         version: link:../cache
-      '@mahi/cli':
+      '@mahiframework/cli':
         specifier: workspace:*
         version: link:../cli
-      '@mahi/core':
+      '@mahiframework/core':
         specifier: workspace:*
         version: link:../core
-      '@mahi/database':
+      '@mahiframework/database':
         specifier: workspace:*
         version: link:../database
-      '@mahi/events':
+      '@mahiframework/events':
         specifier: workspace:*
         version: link:../events
-      '@mahi/http':
+      '@mahiframework/http':
         specifier: workspace:*
         version: link:../http
-      '@mahi/http-client':
+      '@mahiframework/http-client':
         specifier: workspace:*
         version: link:../http-client
-      '@mahi/mail':
+      '@mahiframework/mail':
         specifier: workspace:*
         version: link:../mail
-      '@mahi/notifications':
+      '@mahiframework/notifications':
         specifier: workspace:*
         version: link:../notifications
-      '@mahi/process':
+      '@mahiframework/process':
         specifier: workspace:*
         version: link:../process
-      '@mahi/queue':
+      '@mahiframework/queue':
         specifier: workspace:*
         version: link:../queue
-      '@mahi/storage':
+      '@mahiframework/storage':
         specifier: workspace:*
         version: link:../storage
     devDependencies:
-      '@mahi/encryption':
+      '@mahiframework/encryption':
         specifier: workspace:*
         version: link:../encryption
       hono:
@@ -2758,6 +2664,7 @@ snapshots:
       '@esbuild/win32-arm64': 0.28.2
       '@esbuild/win32-ia32': 0.28.2
       '@esbuild/win32-x64': 0.28.2
+    optional: true
 
   escape-string-regexp@4.0.0: {}
 
@@ -3224,6 +3131,7 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
+    optional: true
 
   turbo@2.10.11:
     optionalDependencies:

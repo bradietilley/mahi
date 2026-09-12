@@ -1,4 +1,4 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import type { Router } from "../src/router.js";
 import { HttpKernel } from "../src/http-kernel.js";
@@ -146,7 +146,7 @@ describe("HttpKernel", () => {
   });
 
   it("maps ValidationException to 422 with a field → string[] bag", async () => {
-    const { ValidationException } = await import("@mahi/validation");
+    const { ValidationException } = await import("@mahiframework/validation");
 
     class FailingProvider {
       routes(router: Router) {
@@ -171,7 +171,7 @@ describe("HttpKernel", () => {
   });
 
   it("maps ModelNotFoundError to a 404, not the generic 500", async () => {
-    const { ModelNotFoundError } = await import("@mahi/database");
+    const { ModelNotFoundError } = await import("@mahiframework/database");
 
     class FailingProvider {
       routes(router: Router) {
@@ -194,7 +194,7 @@ describe("HttpKernel", () => {
   });
 
   it("does not leak the model name or id through the 404 body, even when local", async () => {
-    const { ModelNotFoundError } = await import("@mahi/database");
+    const { ModelNotFoundError } = await import("@mahiframework/database");
 
     class FailingProvider {
       routes(router: Router) {

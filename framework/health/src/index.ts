@@ -1,5 +1,5 @@
 /**
- * `@mahi/health` — a registry of named readiness probes, one runner, two
+ * `@mahiframework/health` — a registry of named readiness probes, one runner, two
  * frontends.
  *
  * An app declares "these are the things that must be working" via the
@@ -13,7 +13,7 @@
  *
  * ## Liveness vs readiness — do not collapse these
  *
- * `@mahi/http` registers an opt-in zero-I/O `GET /up` (`http.liveness`);
+ * `@mahiframework/http` registers an opt-in zero-I/O `GET /up` (`http.liveness`);
  * this package registers an opt-in `GET /health` (`http.healthCheck`)
  * that runs every check. They are the two halves of the standard split:
  * `/up` answers "is the process alive?" (k8s `livenessProbe`; failure

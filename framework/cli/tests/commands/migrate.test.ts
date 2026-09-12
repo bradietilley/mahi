@@ -1,14 +1,14 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahi/database";
-import { Tui } from "@mahi/tui";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahiframework/database";
+import { Tui } from "@mahiframework/tui";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { makeMigrationDir, removeMigrationDir } from "../helpers/migration-fixtures.js";
 import { MigrateCommand } from "../../src/commands/migrate.js";
 
 const MIGRATION_A = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -23,7 +23,7 @@ export default {
 `;
 
 const MIGRATION_B = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {

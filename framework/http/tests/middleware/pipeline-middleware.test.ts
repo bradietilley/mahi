@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { HttpResponse, type ResponseInput } from "../../src/response.js";
 import { toHonoMiddleware, type HttpPipe } from "../../src/middleware/pipeline-middleware.js";
 import type { Request } from "../../src/request.js";
-import type { Next } from "@mahi/pipeline";
+import type { Next } from "@mahiframework/pipeline";
 
 describe("toHonoMiddleware", () => {
   it("runs pipes in order ahead of the matched route handler", async () => {

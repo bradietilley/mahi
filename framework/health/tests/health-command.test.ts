@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application } from "@mahi/core";
-import { Tui, type FakeTuiHandle } from "@mahi/tui";
+import { Application } from "@mahiframework/core";
+import { Tui, type FakeTuiHandle } from "@mahiframework/tui";
 import { HealthCommand } from "../src/commands/health.js";
 import { HealthRegistry } from "../src/health-registry.js";
 import { HEALTH_TOKEN } from "../src/health-service-provider.js";

@@ -1,4 +1,4 @@
-import type { CacheStore } from "@mahi/cache";
+import type { CacheStore } from "@mahiframework/cache";
 import type { SequenceResolver } from "./sequence-resolver.js";
 
 /**

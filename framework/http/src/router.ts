@@ -1,5 +1,5 @@
 import { Hono, type Context, type MiddlewareHandler } from "hono";
-import { Pipeline } from "@mahi/pipeline";
+import { Pipeline } from "@mahiframework/pipeline";
 import { Request, requestFromContext } from "./request.js";
 import { toHonoMiddleware, type HttpPipe } from "./middleware/pipeline-middleware.js";
 import { toWebResponse, type ResponseInput } from "./response.js";

@@ -1,12 +1,12 @@
-import { app } from "@mahi/core";
-import { MAIL_TOKEN, type MailManager, type RenderedMail } from "@mahi/mail";
+import { app } from "@mahiframework/core";
+import { MAIL_TOKEN, type MailManager, type RenderedMail } from "@mahiframework/mail";
 import { Job } from "../job.js";
 
 /**
  * Built-in job that delivers a message rendered at dispatch time.
  *
  * Dispatched by the handler `QueueServiceProvider` installs on
- * `MailManager` when `@mahi/mail` is registered — not intended to be
+ * `MailManager` when `@mahiframework/mail` is registered — not intended to be
  * dispatched by application code directly; call `Mail.queue()` instead.
  *
  * The `RenderedMail` is carried as a constructor field, so it rides

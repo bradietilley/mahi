@@ -1,5 +1,5 @@
-import { Facade } from "@mahi/facades";
-import type { Request } from "@mahi/http";
+import { Facade } from "@mahiframework/facades";
+import type { Request } from "@mahiframework/http";
 import type { AuthManager } from "./auth-manager.js";
 import type { Guard, StatefulGuard } from "./guard.js";
 import type { Credentials } from "./user-provider.js";

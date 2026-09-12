@@ -1,5 +1,5 @@
-import { ServiceProvider } from "@mahi/core";
-import { DatabaseManager, DATABASE_TOKEN, type RegisteredMigration } from "@mahi/database";
+import { ServiceProvider } from "@mahiframework/core";
+import { DatabaseManager, DATABASE_TOKEN, type RegisteredMigration } from "@mahiframework/database";
 import createJobsTable from "./migrations/0001_create_jobs_table.js";
 import queueReliability from "./migrations/0002_queue_reliability.js";
 import { QueueManager, type QueueConfig } from "./queue-manager.js";
@@ -14,8 +14,8 @@ import { QueueForgetCommand } from "./commands/queue-forget.js";
 import { QueueFlushCommand } from "./commands/queue-flush.js";
 import { QueueRestartCommand } from "./commands/queue-restart.js";
 import { QueueClearCommand } from "./commands/queue-clear.js";
-import { EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
-import { MAIL_TOKEN, type MailManager } from "@mahi/mail";
+import { EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
+import { MAIL_TOKEN, type MailManager } from "@mahiframework/mail";
 import { HandleQueuedListener, QUEUED_LISTENER_JOB } from "./jobs/handle-queued-listener.js";
 import { SendQueuedMail, QUEUED_MAIL_JOB } from "./jobs/send-queued-mail.js";
 import { QUEUE_TOKEN, JOB_REGISTRY_TOKEN } from "./tokens.js";
@@ -88,7 +88,7 @@ export class QueueServiceProvider extends ServiceProvider {
       });
       // Recording driver for tests — records pushes instead of running
       // them (see FakeQueueDriver). Registered here (not only in
-      // @mahi/testing) so `QUEUE_CONNECTION=fake` works out of the
+      // @mahiframework/testing) so `QUEUE_CONNECTION=fake` works out of the
       // box, mirroring how "sync"/"database" are always available.
       manager.extend("fake", () => new FakeQueueDriver(this.registry));
 
@@ -117,7 +117,7 @@ export class QueueServiceProvider extends ServiceProvider {
       });
     }
 
-    // Same inversion as the events bridge above: `@mahi/mail` declares the
+    // Same inversion as the events bridge above: `@mahiframework/mail` declares the
     // handler slot, this package fills it. Guarded on the token so an app
     // without mail registered is unaffected, and so neither package has to
     // care about the other's boot order.

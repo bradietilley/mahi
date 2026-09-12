@@ -152,7 +152,7 @@ jobs:
       # so `--link-workspace`'s `workspace:*` deps resolve against the local
       # framework packages. Install from the repo root, then build the app.
       #
-      # NOTE: because this installs into the workspace, an `@mahi/*` the
+      # NOTE: because this installs into the workspace, an `@mahiframework/*` the
       # template imports but does not DECLARE still resolves here by
       # hoisting — so this step cannot catch a missing dependency, which
       # is a `TS2307` on a real `npm create mahi`. That case is covered

@@ -1,4 +1,4 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import { CacheManager } from "../src/cache-manager.js";
 import { ArrayCacheStore } from "../src/stores/array-cache-store.js";

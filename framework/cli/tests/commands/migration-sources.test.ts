@@ -1,5 +1,5 @@
-import { Application, ServiceProvider } from "@mahi/core";
-import type { RegisteredMigration } from "@mahi/database";
+import { Application, ServiceProvider } from "@mahiframework/core";
+import type { RegisteredMigration } from "@mahiframework/database";
 import { describe, expect, it } from "vitest";
 import { collectMigrationSources } from "../../src/commands/migration-directories.js";
 

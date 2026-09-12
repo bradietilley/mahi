@@ -66,7 +66,7 @@ function compilePattern(pattern: string): RegExp {
  * `subscribe` to a `private-`/`presence-` channel.
  *
  * Deliberately NOT a `Manager<T>`: there are no swappable drivers here,
- * just a pattern→callback table, exactly like `@mahi/authorization`'s
+ * just a pattern→callback table, exactly like `@mahiframework/authorization`'s
  * `GateRegistry`.
  */
 export class ChannelRegistry {

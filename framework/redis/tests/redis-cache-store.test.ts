@@ -1,5 +1,5 @@
 import { afterAll, afterEach, describe, expect, it } from "vitest";
-import { Lock } from "@mahi/cache";
+import { Lock } from "@mahiframework/cache";
 import { RedisQueueDriver } from "../src/drivers/redis-queue-driver.js";
 import { RedisCacheStore, DEFAULT_CACHE_PREFIX } from "../src/drivers/redis-cache-store.js";
 import type { RedisConnection } from "../src/redis-connection.js";

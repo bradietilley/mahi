@@ -1,6 +1,6 @@
 import type { GateRegistry } from "./gate.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Register abilities (`gate.define(...)`) and policies

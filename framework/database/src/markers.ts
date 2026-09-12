@@ -17,7 +17,7 @@
  * be depended on from anywhere in the package without a cycle.
  */
 
-import type { Collection } from "@mahi/core";
+import type { Collection } from "@mahiframework/core";
 
 declare const RELATION_BRAND: unique symbol;
 declare const COMPUTED_BRAND: unique symbol;

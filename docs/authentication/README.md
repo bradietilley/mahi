@@ -1,12 +1,12 @@
 # Authentication
 
-`@mahi/auth` answers *"who is making this request"*. It has two built-in
+`@mahiframework/auth` answers *"who is making this request"*. It has two built-in
 guards (bearer tokens, cookie sessions), one built-in user provider
 (database-backed), and a per-request identity scope built on
 `AsyncLocalStorage` rather than a request-scoped container.
 
 ```ts
-import { Auth } from "@mahi/auth";
+import { Auth } from "@mahiframework/auth";
 
 const user = Auth.user<UserTable>();       // throws for guests
 const maybe = Auth.userOrNull<UserTable>();// null for guests
@@ -37,7 +37,7 @@ The base app ships this:
 
 ```ts
 // config/auth.ts
-import type { AuthConfig } from "@mahi/auth";
+import type { AuthConfig } from "@mahiframework/auth";
 import { User } from "../src/models/user.model.js";
 import type { Env } from "./env.js";
 
@@ -377,7 +377,7 @@ await Auth.runAs(user, async () => {
 `Auth.currentGuard()` reports `null` even though `Auth.check()` is `true`.
 
 `Request.user<TUser>()` is a thin delegate to `Auth.userOrNull()` that
-returns `undefined` when `@mahi/auth` isn't bound at all. It exists so
+returns `undefined` when `@mahiframework/auth` isn't bound at all. It exists so
 framework code (a rate-limiter key callback, for instance) can ask
 without a hard dependency on the auth package — prefer `Auth.user()` /
 `Auth.id()` in your own controllers. See
@@ -386,7 +386,7 @@ without a hard dependency on the auth package — prefer `Auth.user()` /
 ### Low-level exports
 
 For code that needs the primitives rather than the facade,
-`@mahi/auth` exports them directly: `runWithAuth`, `currentAuthState`,
+`@mahiframework/auth` exports them directly: `runWithAuth`, `currentAuthState`,
 `requireAuthState`, `user`, `userOrNull`, `check`, `currentGuard`,
 `MissingAuthContextError`, `UnauthenticatedError`.
 
@@ -451,7 +451,7 @@ user is a flat 403.
 Signed double-submit-cookie CSRF protection.
 
 ```ts
-import { csrf } from "@mahi/auth";
+import { csrf } from "@mahiframework/auth";
 
 router.group("/app", (routes) => {
   routes.middleware(csrf(), authenticate("session"));
@@ -940,7 +940,7 @@ themselves. Throwing loudly is better than silently revoking nothing on a
 "sign out everywhere" button.
 
 The store is resolved through `CACHE_TOKEN` at runtime rather than by
-importing `@mahi/cache`, so `@mahi/auth` doesn't take a package
+importing `@mahiframework/cache`, so `@mahiframework/auth` doesn't take a package
 dependency for one optional store. It only needs `get`/`put`/`forget`.
 
 ### `ArraySessionStore`
@@ -1002,7 +1002,7 @@ what `PasswordBroker.reset()` calls.
 
 ### The `users` table is app-owned
 
-`@mahi/auth` ships no `users` migration and no `User` model. Every real
+`@mahiframework/auth` ships no `users` migration and no `User` model. Every real
 app wants its own columns there (tenant, avatar, role), and a
 framework-owned users table would mean either a publish-and-edit step or
 apps fighting the framework's schema forever. The package only ships the
@@ -1169,7 +1169,7 @@ send mail". Wrap the call in
 [`timebox()`](../encryption/#timebox):
 
 ```ts
-import { timebox } from "@mahi/encryption";
+import { timebox } from "@mahiframework/encryption";
 
 const result = await timebox(() => broker.sendResetLink(body.email), 250);
 ```
@@ -1308,7 +1308,7 @@ middleware on the route is the correct and sufficient control.
 
 ## What the framework sends, and what your app sends
 
-`@mahi/auth` **sends no email** and does not depend on `@mahi/mail`. Both
+`@mahiframework/auth` **sends no email** and does not depend on `@mahiframework/mail`. Both
 brokers hand back a token or URL and stop there:
 
 ```ts
@@ -1366,7 +1366,7 @@ a retry costs:
 
 ## Tables
 
-`@mahi/auth` contributes three migrations via its `migrations()` hook.
+`@mahiframework/auth` contributes three migrations via its `migrations()` hook.
 None of them has a foreign key to `users` — that table is app-owned and
 the framework can't assume its name.
 
@@ -1423,7 +1423,7 @@ than an auto `updated_at` would).
 
 They're framework-owned rather than app-owned because they're internal
 implementation details of the built-in guards — the same ownership
-rationale as `@mahi/queue` owning `jobs`.
+rationale as `@mahiframework/queue` owning `jobs`.
 
 ## `auth:gc`
 

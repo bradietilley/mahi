@@ -1,5 +1,5 @@
-import { pooled } from "@mahi/core";
-import type { PipeFn } from "@mahi/pipeline";
+import { pooled } from "@mahiframework/core";
+import type { PipeFn } from "@mahiframework/pipeline";
 import type { ClientRequest } from "./client-request.js";
 import type { ClientResponse } from "./client-response.js";
 import { HttpClientFactory, type RecordedPair } from "./http-client-factory.js";
@@ -15,14 +15,14 @@ export type RequestMatcher =
 
 /**
  * The module-level factory backing the static surface, so
- * `import { Http } from "@mahi/http-client"` works in a plain script with
+ * `import { Http } from "@mahiframework/http-client"` works in a plain script with
  * no container. `HttpClientServiceProvider` swaps it for a config-carrying
  * one where an application is present.
  */
 let factory = new HttpClientFactory();
 
 /**
- * `@mahi/http-client`'s entry point — a fluent, faketable outbound HTTP
+ * `@mahiframework/http-client`'s entry point — a fluent, faketable outbound HTTP
  * client, port of Laravel's `Illuminate\Http\Client\Factory` (`Http::get()`,
  * `Http::fake()`, `Http::assertSent()`).
  *
@@ -32,12 +32,12 @@ let factory = new HttpClientFactory();
  * no cookie jar, no digest auth, proxies via
  * `withFetchOptions({ dispatcher })` — is documented in the package guide.
  *
- * Static facade over module-level state, mirroring `@mahi/process`'s
+ * Static facade over module-level state, mirroring `@mahiframework/process`'s
  * `Process`: no container needed for the common case, and the fake state
  * lives somewhere a test's `afterEach` can reach.
  *
  * ```ts
- * import { Http } from "@mahi/http-client";
+ * import { Http } from "@mahiframework/http-client";
  *
  * const response = await Http.withToken(token).post("https://api.example.com/users", { name: "Ada" });
  * if (response.successful()) console.log(response.json<{ id: number }>().id);
@@ -50,7 +50,7 @@ let factory = new HttpClientFactory();
  * ```
  *
  * Every non-assertion method here forwards to a `PendingRequest`, by hand
- * — the house rule for facades (see `@mahi/facades`' `Facade()`
+ * — the house rule for facades (see `@mahiframework/facades`' `Facade()`
  * docstring): no `Proxy`, no macros, every method with a real signature.
  */
 export class Http {
@@ -239,7 +239,7 @@ export class Http {
   /**
    * Run several requests concurrently, keeping their keys and surfacing a
    * per-entry failure as an `Error` value rather than losing the other
-   * results. A thin typed wrapper over `@mahi/core`'s `pooled()`, which is
+   * results. A thin typed wrapper over `@mahiframework/core`'s `pooled()`, which is
    * where the mechanics live — pooling has nothing to do with HTTP.
    *
    *   const { user, repos } = await Http.pool((http) => ({

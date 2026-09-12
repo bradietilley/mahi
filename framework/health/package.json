@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/health",
+  "name": "@mahiframework/health",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,16 +17,16 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cli": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/tui": "workspace:*",
+    "@mahiframework/cli": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/tui": "workspace:*",
     "commander": "^12.1.0"
   },
   "devDependencies": {
-    "@mahi/cache": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/http": "workspace:*",
-    "@mahi/storage": "workspace:*",
+    "@mahiframework/cache": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/http": "workspace:*",
+    "@mahiframework/storage": "workspace:*",
     "@types/node": "^22.10.2",
     "kysely": "^0.29.5",
     "typescript": "^5.7.2",

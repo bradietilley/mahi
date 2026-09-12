@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createTestApplication, TestClient, type TestApplication } from "@mahi/testing";
+import { createTestApplication, TestClient, type TestApplication } from "@mahiframework/testing";
 import { bootstrap } from "../bin/bootstrap.js";
 import { clientFor, registerUser, resetRateLimits } from "./helpers/auth.js";
 

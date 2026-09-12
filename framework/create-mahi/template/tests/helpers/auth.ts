@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { CACHE_TOKEN, type CacheManager } from "@mahi/cache";
-import { TestClient, type TestApplication } from "@mahi/testing";
+import { CACHE_TOKEN, type CacheManager } from "@mahiframework/cache";
+import { TestClient, type TestApplication } from "@mahiframework/testing";
 
 export interface AuthenticatedUser {
   id: string;

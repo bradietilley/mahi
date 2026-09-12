@@ -1,5 +1,5 @@
 import type { Kysely } from "kysely";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import { dialectOf } from "./drivers/dialect-registry.js";
 import type { Dialect } from "./schema/dialect.js";
 

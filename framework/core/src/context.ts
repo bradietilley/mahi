@@ -22,7 +22,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
  *   - a **per-request overlay** — an `AsyncLocalStorage`-scoped store
  *     opened by `runScoped()` for the duration of each request (the HTTP
  *     kernel wraps request handling in it, the same mechanism
- *     `@mahi/auth`'s `auth-context.ts` and `@mahi/database`'s
+ *     `@mahiframework/auth`'s `auth-context.ts` and `@mahiframework/database`'s
  *     `transaction-context.ts` use). It starts as a shallow copy of the
  *     global store, so a request sees all global context immediately, and
  *     every subsequent read/write/forget inside the request targets the

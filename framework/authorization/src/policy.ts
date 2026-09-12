@@ -41,7 +41,7 @@ export type PolicyMethod<TUser = unknown, TRow = unknown> = (
  *
  * STATELESS BY CONTRACT: policies are instantiated once and cached, so
  * they must not hold per-request state — same contract as `Guard` in
- * `@mahi/auth`, and for the same reason (one long-lived
+ * `@mahiframework/auth`, and for the same reason (one long-lived
  * `Application` serves every concurrent request).
  *
  *   export class TodoPolicy extends Policy<UserRow, TodoTable> {

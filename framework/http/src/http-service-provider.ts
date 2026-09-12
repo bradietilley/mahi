@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { HttpKernel } from "./http-kernel.js";
 import { RouteListCommand } from "./commands/route-list.js";
 import { DownCommand } from "./commands/down.js";

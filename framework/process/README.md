@@ -1,4 +1,4 @@
-# @mahi/process
+# @mahiframework/process
 
 Process — a fluent wrapper for spawning and managing child processes, for Mahi.
 

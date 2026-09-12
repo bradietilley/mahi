@@ -2,25 +2,25 @@ import { randomBytes } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import type { Application } from "@mahi/core";
-import { AUTH_TOKEN, type AuthManager } from "@mahi/auth";
-import { CACHE_TOKEN, ArrayCacheStore, type CacheManager } from "@mahi/cache";
-import { collectMigrationSources } from "@mahi/cli";
-import { DATABASE_TOKEN, DatabaseManager, MigrationRunner } from "@mahi/database";
-import { EVENTS_TOKEN, RecordingEventDispatcher } from "@mahi/events";
-import { HTTP_KERNEL_TOKEN, HttpKernel } from "@mahi/http";
-import { Http } from "@mahi/http-client";
-import { Process } from "@mahi/process";
-import { MAIL_TOKEN, RecordingMailManager, type MailConfig } from "@mahi/mail";
-import { NOTIFICATIONS_TOKEN, RecordingChannelManager } from "@mahi/notifications";
+import type { Application } from "@mahiframework/core";
+import { AUTH_TOKEN, type AuthManager } from "@mahiframework/auth";
+import { CACHE_TOKEN, ArrayCacheStore, type CacheManager } from "@mahiframework/cache";
+import { collectMigrationSources } from "@mahiframework/cli";
+import { DATABASE_TOKEN, DatabaseManager, MigrationRunner } from "@mahiframework/database";
+import { EVENTS_TOKEN, RecordingEventDispatcher } from "@mahiframework/events";
+import { HTTP_KERNEL_TOKEN, HttpKernel } from "@mahiframework/http";
+import { Http } from "@mahiframework/http-client";
+import { Process } from "@mahiframework/process";
+import { MAIL_TOKEN, RecordingMailManager, type MailConfig } from "@mahiframework/mail";
+import { NOTIFICATIONS_TOKEN, RecordingChannelManager } from "@mahiframework/notifications";
 import {
   FakeQueueDriver,
   JOB_REGISTRY_TOKEN,
   QUEUE_TOKEN,
   QueueManager,
   type JobRegistry,
-} from "@mahi/queue";
-import { STORAGE_TOKEN, StorageManager, FakeStorageDriver } from "@mahi/storage";
+} from "@mahiframework/queue";
+import { STORAGE_TOKEN, StorageManager, FakeStorageDriver } from "@mahiframework/storage";
 
 /**
  * Snapshot the given `process.env` keys and return a function that puts
@@ -58,7 +58,7 @@ export interface TestApplicationOptions {
    * `Queue::fake()` equivalent) so `QueueManager.dispatch()` / `Bus`
    * records pushes instead of running them. The driver is returned as
    * `testApp.queue` for assertions (`assertPushed`/`pushed`/...).
-   * Requires `@mahi/queue`'s `QueueServiceProvider` to be
+   * Requires `@mahiframework/queue`'s `QueueServiceProvider` to be
    * registered; a no-op (leaving `testApp.queue` undefined) otherwise.
    */
   fakeQueue?: boolean;
@@ -69,13 +69,13 @@ export interface TestApplicationOptions {
    * runs no listeners/queued-listeners/afterDispatch callbacks. The
    * dispatcher is returned as `testApp.events` for assertions
    * (`assertDispatched`/`dispatched`/...). Requires
-   * `@mahi/events`' `EventsServiceProvider` to be registered; a
+   * `@mahiframework/events`' `EventsServiceProvider` to be registered; a
    * no-op (leaving `testApp.events` undefined) otherwise.
    */
   fakeEvents?: boolean;
 
   /**
-   * Call `Http.fake()` so `@mahi/http-client` intercepts every outbound
+   * Call `Http.fake()` so `@mahiframework/http-client` intercepts every outbound
    * request instead of reaching the network, and register `Http.restore()`
    * on `cleanup()`.
    *
@@ -91,7 +91,7 @@ export interface TestApplicationOptions {
   fakeHttp?: boolean;
 
   /**
-   * Call `Process.fake()` so `@mahi/process` intercepts every command
+   * Call `Process.fake()` so `@mahiframework/process` intercepts every command
    * instead of spawning one, and register `Process.restore()` on
    * `cleanup()`.
    *
@@ -114,7 +114,7 @@ export interface TestApplicationOptions {
    * `Mail::fake()` equivalent) so `Mail.send()` / `MailManager.send()`
    * records mailables instead of delivering them. Returned as
    * `testApp.mail` for assertions (`assertSent(WelcomeMailable)`).
-   * Requires `@mahi/mail`'s provider to be registered; a no-op otherwise.
+   * Requires `@mahiframework/mail`'s provider to be registered; a no-op otherwise.
    */
   fakeMail?: boolean;
 
@@ -124,7 +124,7 @@ export interface TestApplicationOptions {
    * `Notifications.send()` records `(notifiable, notification)` pairs
    * instead of fanning out to channels. Returned as
    * `testApp.notifications` for assertions (`assertSentTo(user, Foo)`).
-   * Requires `@mahi/notifications`' provider; a no-op otherwise.
+   * Requires `@mahiframework/notifications`' provider; a no-op otherwise.
    */
   fakeNotifications?: boolean;
 
@@ -133,7 +133,7 @@ export interface TestApplicationOptions {
    * `FakeStorageDriver`s rooted at fresh temp dirs (the
    * `Storage::fake($disk)` equivalent), so writes under test never touch
    * the app's real disk roots. Returned as `testApp.storage` keyed by disk
-   * name for `assertExists`/`assertMissing`. Requires `@mahi/storage`'s
+   * name for `assertExists`/`assertMissing`. Requires `@mahiframework/storage`'s
    * provider; a no-op otherwise.
    */
   fakeStorage?: boolean | string[];
@@ -142,7 +142,7 @@ export interface TestApplicationOptions {
    * Point the cache's default store at a fresh in-memory `ArrayCacheStore`
    * with its sweep timer disabled (the `Cache::fake()` equivalent), so
    * cache state is isolated per test and no interval keeps the event loop
-   * alive. Requires `@mahi/cache`'s provider; a no-op otherwise.
+   * alive. Requires `@mahiframework/cache`'s provider; a no-op otherwise.
    */
   fakeCache?: boolean;
 }
@@ -193,7 +193,7 @@ export interface TestApplication {
    * Set the acting (authenticated) user for requests driven through the
    * kernel — Laravel's `actingAs()`. Delegates to `AuthManager.actingAs()`,
    * so `authenticate()` resolves `user` for every subsequent request. Pass
-   * `null` to clear. Requires `@mahi/auth`'s provider to be registered.
+   * `null` to clear. Requires `@mahiframework/auth`'s provider to be registered.
    */
   actingAs: (user: unknown, guard?: string) => void;
 }
@@ -319,7 +319,7 @@ export async function createTestApplication(
   const actingAs = (user: unknown, guard?: string): void => {
     if (!app.has(AUTH_TOKEN)) {
       throw new Error(
-        "createTestApplication(): actingAs() requires @mahi/auth's AuthServiceProvider to be registered.",
+        "createTestApplication(): actingAs() requires @mahiframework/auth's AuthServiceProvider to be registered.",
       );
     }
 

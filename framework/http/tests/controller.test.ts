@@ -5,7 +5,7 @@ import { Controller } from "../src/controller.js";
 import { HttpResponse } from "../src/response.js";
 import { Router } from "../src/router.js";
 import { HttpError } from "../src/http-error.js";
-import { rule, numberRule } from "@mahi/validation";
+import { rule, numberRule } from "@mahiframework/validation";
 
 class CreateUserRequest extends Request {
   rules() {
@@ -91,7 +91,7 @@ describe("Controller", () => {
 
   it("returns 422 when validation fails, before the handler runs", async () => {
     const { HttpKernel } = await import("../src/http-kernel.js");
-    const { Application } = await import("@mahi/core");
+    const { Application } = await import("@mahiframework/core");
 
     class CreateUserController extends Controller<CreateUserRequest> {
       request = CreateUserRequest;
@@ -124,7 +124,7 @@ describe("Controller", () => {
 
   it("runs the request's authorize() BEFORE validation; false → 403 even when invalid", async () => {
     const { HttpKernel } = await import("../src/http-kernel.js");
-    const { Application } = await import("@mahi/core");
+    const { Application } = await import("@mahiframework/core");
     let authorizeRan = false;
     let handleRan = false;
 
@@ -180,7 +180,7 @@ describe("Controller", () => {
 
   it("authorize() throwing HttpError.forbidden also 403s", async () => {
     const { HttpKernel } = await import("../src/http-kernel.js");
-    const { Application } = await import("@mahi/core");
+    const { Application } = await import("@mahiframework/core");
 
     class ThrowingRequest extends CreateUserRequest {
       override authorize(): boolean {
@@ -216,7 +216,7 @@ describe("Controller", () => {
 
   it("runs prepareForValidation() BEFORE authorize(), so authorize sees prepared input", async () => {
     const { HttpKernel } = await import("../src/http-kernel.js");
-    const { Application } = await import("@mahi/core");
+    const { Application } = await import("@mahiframework/core");
     const order: string[] = [];
 
     class PreparedRequest extends Request {

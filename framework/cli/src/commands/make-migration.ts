@@ -83,7 +83,7 @@ function idLine(keyType: KeyType): string {
 
 function template(name: string, options: MakeMigrationOptions): string {
   const plan = planFor(name, options);
-  const header = `import { Schema, type Migration, type Blueprint } from "@mahi/database";\n`;
+  const header = `import { Schema, type Migration, type Blueprint } from "@mahiframework/database";\n`;
 
   if (plan.kind === "create") {
     return `${header}

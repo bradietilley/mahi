@@ -126,10 +126,10 @@ describe("patchPackageJson", () => {
     await patchPackageJson(target, { name: "my-app", linkWorkspace: false });
 
     const pkg = await readJson(target);
-    expect(pkg.dependencies["@mahi/core"]).toMatch(/^\^/);
+    expect(pkg.dependencies["@mahiframework/core"]).toMatch(/^\^/);
   });
 
-  it("rewrites every @mahi dependency to workspace:* when linking", async () => {
+  it("rewrites every @mahiframework dependency to workspace:* when linking", async () => {
     const target = path.join(tmp, "app");
     await copyTemplate(TEMPLATE_DIR, target);
     await patchPackageJson(target, { name: "my-app", linkWorkspace: true });
@@ -137,12 +137,12 @@ describe("patchPackageJson", () => {
     const pkg = await readJson(target);
 
     for (const [name, range] of Object.entries(pkg.dependencies)) {
-      if (name.startsWith("@mahi/")) {
+      if (name.startsWith("@mahiframework/")) {
         expect(range).toBe("workspace:*");
       }
     }
 
-    expect(pkg.devDependencies["@mahi/testing"]).toBe("workspace:*");
+    expect(pkg.devDependencies["@mahiframework/testing"]).toBe("workspace:*");
     // Third-party deps must not be touched.
     expect(pkg.dependencies["zod"]).toMatch(/^\^/);
   });
@@ -220,22 +220,22 @@ describe(".env.example parity with config/env.ts", () => {
 });
 
 /**
- * Every `@mahi/*` the template imports must be declared in
+ * Every `@mahiframework/*` the template imports must be declared in
  * `_package.json`, and vice versa.
  *
  * This is invisible to every local check and to the CI scaffold smoke
  * test: those install into the pnpm workspace, where an undeclared
- * `@mahi/*` still resolves by hoisting. A real `npm create mahi` gets
+ * `@mahiframework/*` still resolves by hoisting. A real `npm create mahi` gets
  * only the declared dependencies, so an undeclared import is a
  * `TS2307` on the user's very first `tsc -b` — which is exactly what
- * happened to `@mahi/datetime`, pruned as unused by one commit and
+ * happened to `@mahiframework/datetime`, pruned as unused by one commit and
  * re-imported by the next.
  *
  * A static check rather than an install: no network, runs in
  * milliseconds on every `pnpm test`, and fails at the precise cause.
  */
 describe("template dependency completeness", () => {
-  it("declares every @mahi/* package it imports, and imports every one it declares", async () => {
+  it("declares every @mahiframework/* package it imports, and imports every one it declares", async () => {
     const manifest = JSON.parse(await readFile(path.join(TEMPLATE_DIR, "_package.json"), "utf-8"));
     const declared = new Set([
       ...Object.keys(manifest.dependencies ?? {}),
@@ -247,9 +247,11 @@ describe("template dependency completeness", () => {
     for (const file of await sourceFiles(TEMPLATE_DIR)) {
       const source = await readFile(file, "utf-8");
 
-      // `from "@mahi/x"` and `import("@mahi/x")` — the two forms the
+      // `from "@mahiframework/x"` and `import("@mahiframework/x")` — the two forms the
       // template uses. Deliberately not matching prose in comments.
-      for (const match of source.matchAll(/(?:from|import\()\s*["'](@mahi\/[a-z-]+)["']/g)) {
+      for (const match of source.matchAll(
+        /(?:from|import\()\s*["'](@mahiframework\/[a-z-]+)["']/g,
+      )) {
         imported.add(match[1]!);
       }
     }
@@ -263,14 +265,14 @@ describe("template dependency completeness", () => {
     ).toEqual([]);
 
     const unused = [...declared]
-      .filter((dep) => dep.startsWith("@mahi/") && !imported.has(dep))
+      .filter((dep) => dep.startsWith("@mahiframework/") && !imported.has(dep))
       .sort();
     expect(unused, `declared but never imported: ${unused.join(", ")}`).toEqual([]);
   });
 
   // The pins themselves are checked by `scripts/set-version.mjs --check`,
   // which knows which packages are on the lockstep line and which
-  // (`@mahi/datetime`) version independently. Duplicating that here would
+  // (`@mahiframework/datetime`) version independently. Duplicating that here would
   // only encode a second, wronger copy of the rule.
 });
 

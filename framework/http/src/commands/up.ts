@@ -1,5 +1,5 @@
-import { Command } from "@mahi/cli";
-import { Tui } from "@mahi/tui";
+import { Command } from "@mahiframework/cli";
+import { Tui } from "@mahiframework/tui";
 import { maintenanceMode } from "../maintenance/maintenance-mode.js";
 
 /**

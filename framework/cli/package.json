@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/cli",
+  "name": "@mahiframework/cli",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,9 +17,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/tui": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/tui": "workspace:*",
     "commander": "^12.1.0"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
-import { Auth } from "@mahi/auth";
-import { app } from "@mahi/core";
-import { Controller, HttpResponse } from "@mahi/http";
-import { Mail } from "@mahi/mail";
+import { Auth } from "@mahiframework/auth";
+import { app } from "@mahiframework/core";
+import { Controller, HttpResponse } from "@mahiframework/http";
+import { Mail } from "@mahiframework/mail";
 import type { User } from "../../models/user.model.js";
 import { VerifyEmailMail } from "../../mail/verify-email.mail.js";
 

@@ -29,7 +29,7 @@ This is what the framework itself uses internally — `LogTransport` (the
 ### 2. `LOG_TOKEN` / `LogManager` — opt-in, configurable channels
 
 ```ts
-import { Log } from "@mahi/core";
+import { Log } from "@mahiframework/core";
 
 Log.info("using the default channel");
 Log.channel("daily").warning("only goes to the daily-rotated file");
@@ -46,7 +46,7 @@ lists the provider explicitly:
 
 ```ts
 // config/app.ts
-import { LoggingServiceProvider } from "@mahi/core";
+import { LoggingServiceProvider } from "@mahiframework/core";
 
 export const providers: ServiceProviderClass[] = [
   EventsServiceProvider,
@@ -151,7 +151,7 @@ to await and no way to know a write succeeded. `FileLogger` uses
 `appendFileSync` deliberately: making `Logger` async would push `await`
 into every call site in the framework and every app, for log writes,
 which is not a trade anyone wants. Same "synchronous is fine, I/O is not
-the bottleneck here" reasoning as `better-sqlite3` in `@mahi/database`.
+the bottleneck here" reasoning as `better-sqlite3` in `@mahiframework/database`.
 
 `log(level, ...)` is for when the level itself is a variable — mapping an
 HTTP status class to a severity, say:
@@ -178,7 +178,7 @@ shape as Laravel's `Illuminate\Log\Logger` routing everything through one
 `writeLog()`, and it's why adding a backend is a ten-line class:
 
 ```ts
-import { AbstractLogger, type LogLevel } from "@mahi/core";
+import { AbstractLogger, type LogLevel } from "@mahiframework/core";
 
 export class SentryLogger extends AbstractLogger {
   constructor(private client: SentryClient) {
@@ -278,7 +278,7 @@ Everything from here on requires `LoggingServiceProvider`.
 
 ```ts
 // config/logging.ts
-import { storage_path, type LogConfig } from "@mahi/core";
+import { storage_path, type LogConfig } from "@mahiframework/core";
 
 export function loggingConfig(): LogConfig {
   return {
@@ -602,8 +602,8 @@ non-default channel, go through `Log.channel(name)`, which returns a plain
 `Logger`.
 
 `Log` is hand-written directly against `app()` and `LOG_TOKEN` rather
-than built on `@mahi/facades`' `Facade<T>` mixin — because
-`@mahi/facades` depends on `@mahi/core` (for `app()`), and
+than built on `@mahiframework/facades`' `Facade<T>` mixin — because
+`@mahiframework/facades` depends on `@mahiframework/core` (for `app()`), and
 `LOG_TOKEN`/`LogManager` live in core, so importing `Facade` here would
 be a circular package dependency. `LogManager` is a concrete non-generic
 type anyway, so `Facade<T>`'s generic-static workaround buys nothing.
@@ -617,7 +617,7 @@ directly.
 ### Custom channels
 
 ```ts
-import { ServiceProvider, LogManager, LOG_TOKEN, AbstractLogger, type LogLevel } from "@mahi/core";
+import { ServiceProvider, LogManager, LOG_TOKEN, AbstractLogger, type LogLevel } from "@mahiframework/core";
 
 export class SentryLogger extends AbstractLogger {
   constructor(private dsn: string) { super(); }
@@ -669,7 +669,7 @@ wraps.
 ## Context
 
 ```ts
-import { Context } from "@mahi/core";
+import { Context } from "@mahiframework/core";
 
 Context.add("requestId", requestId);
 Log.info("cache warmed");    // ... cache warmed {"requestId":"a1b2c3"}
@@ -870,7 +870,7 @@ put it in the job's own fields.
 `ArrayLogger` is the fake, and it needs no container:
 
 ```ts
-import { ArrayLogger } from "@mahi/core";
+import { ArrayLogger } from "@mahiframework/core";
 
 const logger = new ArrayLogger();
 logger.warning("disk nearly full", { free: 512 });

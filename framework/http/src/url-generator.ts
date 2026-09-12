@@ -1,5 +1,5 @@
-import { app, type Application } from "@mahi/core";
-import type { Signer } from "@mahi/encryption";
+import { app, type Application } from "@mahiframework/core";
+import type { Signer } from "@mahiframework/encryption";
 import { RouteRegistry } from "./route-registry.js";
 import { REQUEST_ROOT_CONTEXT_KEY } from "./request.js";
 import type { HttpConfig } from "./http-config.js";

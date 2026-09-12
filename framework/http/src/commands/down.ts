@@ -1,6 +1,6 @@
-import { Command } from "@mahi/cli";
+import { Command } from "@mahiframework/cli";
 import type { Command as CommanderCommand } from "commander";
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 import { maintenanceMode, type MaintenanceData } from "../maintenance/maintenance-mode.js";
 
 interface DownOptions {

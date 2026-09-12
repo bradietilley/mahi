@@ -311,7 +311,7 @@ export function httpConfig(env: Env): HttpConfig {
 | `url` | Canonical root URL. Used by the URL generator when there's no in-flight request to borrow a host from — queue jobs, CLI, scheduled tasks. A live request's own scheme/host wins over this. |
 | `cors` | If set, `hono/cors` is installed on every route. **Omit it and there is no CORS at all** — it's opt-in. |
 | `liveness` | If set, registers a zero-I/O liveness route (default `GET /up`) returning `200 {"status":"ok"}`, exempt from maintenance mode. `{}` is enough. Formerly `health`, which is still read as a fallback. |
-| `healthCheck` | If set, registers a readiness route (default `GET /health`) that runs every registered check and returns `200`/`503`. Requires `@mahi/health`. Takes `path`, `failureStatus`, and `secret`. **Not** maintenance-exempt. |
+| `healthCheck` | If set, registers a readiness route (default `GET /health`) that runs every registered check and returns `200`/`503`. Requires `@mahiframework/health`. Takes `path`, `failureStatus`, and `secret`. **Not** maintenance-exempt. |
 
 `CORS_ORIGIN` is comma-separated, which is why the config splits it. The
 whole `http` namespace is optional; `HttpKernel` applies nothing it
@@ -603,7 +603,7 @@ export function scheduleConfig(): ScheduleConfig {
 | `pingTimeoutMs` | `5000` | Timeout for `pingBefore()`/`thenPing()`/… webhooks. |
 
 Every key is read with a default, so the whole namespace is optional. The
-interface is declared in the app rather than exported by `@mahi/schedule`.
+interface is declared in the app rather than exported by `@mahiframework/schedule`.
 See [Scheduling](../scheduling/).
 
 ### config/health.ts
@@ -659,7 +659,7 @@ in the model's config.
 
 ## Path helpers
 
-Four functions, exported from `@mahi/core`:
+Four functions, exported from `@mahiframework/core`:
 
 | Helper | Resolves to |
 |---|---|
@@ -733,7 +733,7 @@ creates a fresh, empty database rather than failing.
 Such an app pins its own root instead:
 
 ```ts
-import { setBasePath, base_path, loadEnv } from "@mahi/core";
+import { setBasePath, base_path, loadEnv } from "@mahiframework/core";
 
 export async function bootstrap(): Promise<Application> {
   setBasePath(resolveMyAppHome());        // e.g. ~/.config/myapp — FIRST statement

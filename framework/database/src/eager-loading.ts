@@ -1,4 +1,4 @@
-import { Collection } from "@mahi/core";
+import { Collection } from "@mahiframework/core";
 import {
   MorphToSpec,
   parseEagerLoad,

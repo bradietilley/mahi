@@ -1,6 +1,6 @@
-import { Auth } from "@mahi/auth";
-import { Controller, HttpError, HttpResponse } from "@mahi/http";
-import type { Request } from "@mahi/http";
+import { Auth } from "@mahiframework/auth";
+import { Controller, HttpError, HttpResponse } from "@mahiframework/http";
+import type { Request } from "@mahiframework/http";
 
 /**
  * GET /auth/verify-email?id=&hash=&expires=&signature=

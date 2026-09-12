@@ -1,15 +1,15 @@
 # HTTP client
 
-`@mahi/http-client` makes outbound HTTP requests — the port of Laravel's
+`@mahiframework/http-client` makes outbound HTTP requests — the port of Laravel's
 `Illuminate\Http\Client` (`Http::withToken()->post()`, `Http::fake()`,
 `Http::assertSent()`).
 
-It is independent of `@mahi/http`, which handles *inbound* requests.
+It is independent of `@mahiframework/http`, which handles *inbound* requests.
 Neither package imports the other; both just speak WHATWG
 `Request`/`Response`.
 
 ```ts
-import { Http } from "@mahi/http-client";
+import { Http } from "@mahiframework/http-client";
 
 const response = await Http.withToken(token).post("https://api.example.com/users", {
   name: "Ada",
@@ -301,7 +301,7 @@ String, `Uint8Array`, `FormData`, and JSON bodies are all replayable.
 
 ## Middleware
 
-Middleware is `@mahi/pipeline`'s `PipeFn` — one mechanism covering
+Middleware is `@mahiframework/pipeline`'s `PipeFn` — one mechanism covering
 Laravel's `withMiddleware` + `beforeSending` + `afterResponse`. A pipe sees
 the request on the way down and the response on the way back:
 
@@ -347,7 +347,7 @@ The callback returns **thunks**, not promises: a promise is already running
 by the time you hold one, so an array of them can't be concurrency-limited.
 That is why this needs none of Laravel's `LazyPromise` machinery.
 
-`Http.pool()` is a thin wrapper over `@mahi/core`'s
+`Http.pool()` is a thin wrapper over `@mahiframework/core`'s
 [`pooled()`](../helpers/), which is general — pooling has nothing to do
 with HTTP.
 
@@ -382,7 +382,7 @@ See [Testing → Faking HTTP requests](../testing/#faking-http-requests) for
 the full guide. In short:
 
 ```ts
-import { Http } from "@mahi/http-client";
+import { Http } from "@mahiframework/http-client";
 
 afterEach(() => Http.restore());
 
@@ -431,7 +431,7 @@ export default {
 await Http.client("github").get("/user");
 ```
 
-The provider also wires event dispatch when `@mahi/events` is registered:
+The provider also wires event dispatch when `@mahiframework/events` is registered:
 `RequestSending`, `ResponseReceived`, and `ConnectionFailed`. Without a
 dispatcher, events are silently skipped.
 

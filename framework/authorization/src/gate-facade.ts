@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { GateRegistry, UserGate } from "./gate.js";
 import type { ModelClass } from "./policy.js";
 import { GATE_TOKEN } from "./tokens.js";
@@ -14,7 +14,7 @@ import { GATE_TOKEN } from "./tokens.js";
  *   if (await Gate.allows("create", Todo)) { ... }
  *   await Gate.forUser(someUser).allows("update", Todo, todo);
  *
- * The user is implicit, read from `@mahi/auth`'s ALS scope. Use
+ * The user is implicit, read from `@mahiframework/auth`'s ALS scope. Use
  * `forUser()` where there is no request (queue jobs, CLI commands).
  */
 export class Gate extends Facade<GateRegistry>(() => GATE_TOKEN) {

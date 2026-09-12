@@ -1,12 +1,12 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { HealthRegistry } from "./health-registry.js";
 import type { HealthConfig } from "./health-config.js";
 import { cacheCheck, databaseCheck, filesystemCheck } from "./checks/index.js";
 import { HealthCommand } from "./commands/health.js";
 
 /**
- * Resolved only from inside `@mahi/health` (its own command, and the
- * route registered by `@mahi/http`'s kernel when this token is bound), so
+ * Resolved only from inside `@mahiframework/health` (its own command, and the
+ * route registered by `@mahiframework/http`'s kernel when this token is bound), so
  * it stays local rather than joining `well-known-tokens.ts` — that file's
  * own stated bar.
  */

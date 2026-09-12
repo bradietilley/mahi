@@ -1,4 +1,4 @@
-import { Manager, afterCommit } from "@mahi/core";
+import { Manager, afterCommit } from "@mahiframework/core";
 import type { NotificationChannel } from "./notification-channel.js";
 import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";

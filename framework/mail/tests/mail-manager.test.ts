@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahi/core";
+import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahiframework/core";
 import { MailManager } from "../src/mail-manager.js";
 import { ArrayTransport } from "../src/transports/array-transport.js";
 import { Mailable } from "../src/mailable.js";

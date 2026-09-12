@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { Hasher } from "./hasher.js";
 import { HASHER_TOKEN } from "./encryption-service-provider.js";
 

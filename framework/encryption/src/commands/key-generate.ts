@@ -22,7 +22,7 @@
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { Command as CommanderCommand } from "commander";
-import { Command } from "@mahi/cli";
+import { Command } from "@mahiframework/cli";
 
 function generateKey(): string {
   return `base64:${randomBytes(32).toString("base64")}`;

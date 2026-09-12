@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import type { CookieOptions, Request } from "@mahi/http";
-import type { Signer } from "@mahi/encryption";
+import type { CookieOptions, Request } from "@mahiframework/http";
+import type { Signer } from "@mahiframework/encryption";
 import type { StatefulGuard } from "../guard.js";
 import type { UserProvider } from "../user-provider.js";
 import type { SessionStore } from "../session/session-store.js";
@@ -87,7 +87,7 @@ export interface SessionGuardConfig {
  * through Hono. Hono only merges its context-queued headers into a
  * response it built itself, and Mahi handlers return platform `Response`
  * objects — so a cookie set via `hono/cookie` here was silently dropped
- * and login never reached the browser at all. See `@mahi/http`'s
+ * and login never reached the browser at all. See `@mahiframework/http`'s
  * `cookies.ts`.
  */
 

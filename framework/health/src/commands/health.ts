@@ -1,5 +1,5 @@
-import { Command } from "@mahi/cli";
-import { Tui, colors } from "@mahi/tui";
+import { Command } from "@mahiframework/cli";
+import { Tui, colors } from "@mahiframework/tui";
 import type { Command as CommanderCommand } from "commander";
 import type { HealthRegistry } from "../health-registry.js";
 import type { CheckOutcome, HealthReport } from "../health-check.js";

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { Request } from "../src/request.js";
 import { Router } from "../src/router.js";
 import { HttpResponse } from "../src/response.js";

@@ -1,6 +1,6 @@
 import type { Command as CommanderCommand } from "commander";
-import { Command } from "@mahi/cli";
-import { CACHE_TOKEN } from "@mahi/core";
+import { Command } from "@mahiframework/cli";
+import { CACHE_TOKEN } from "@mahiframework/core";
 import type { CacheManager } from "../cache-manager.js";
 
 /**

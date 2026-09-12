@@ -1,5 +1,5 @@
-import { Command } from "@mahi/cli";
-import { Tui, colors } from "@mahi/tui";
+import { Command } from "@mahiframework/cli";
+import { Tui, colors } from "@mahiframework/tui";
 import { HTTP_KERNEL_TOKEN } from "../http-service-provider.js";
 import type { HttpKernel } from "../http-kernel.js";
 

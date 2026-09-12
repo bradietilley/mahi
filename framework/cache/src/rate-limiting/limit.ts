@@ -10,7 +10,7 @@ export type AfterCallback = (result: unknown) => boolean | Promise<boolean>;
 /**
  * Callback building a custom response when a limit is exceeded, in place
  * of the default. Untyped here (this package has zero knowledge of HTTP)
- * — `@mahi/http`'s `throttle()` calls it with `(c: Context,
+ * — `@mahiframework/http`'s `throttle()` calls it with `(c: Context,
  * headers: Record<string, string>)` and expects a `Response` back; see
  * that package's `Limit.response()` usage.
  */

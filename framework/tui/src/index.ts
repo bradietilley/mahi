@@ -1,13 +1,13 @@
 /**
- * `@mahi/tui` — a from-scratch TypeScript/Node port of
+ * `@mahiframework/tui` — a from-scratch TypeScript/Node port of
  * `laravel/prompts`, scoped to `note`/`error`/`warning`/`info`/
  * `success`/`intro`/`outro`, `ask`, `select`, `progress`, `spinner`,
  * and `table`, exposed through the static `Tui` facade. No dependency
- * on `@mahi/core` or any other framework package — usable
+ * on `@mahiframework/core` or any other framework package — usable
  * standalone, and talks directly to `process.stdin`/`process.stdout`.
  *
  * ```ts
- * import { Tui } from "@mahi/tui";
+ * import { Tui } from "@mahiframework/tui";
  *
  * Tui.note("Deployed to production.");
  * const name = await Tui.ask("What's your name?", { default: "World" });
@@ -36,14 +36,14 @@ export type { TaskResult } from "./task.js";
  * Raw ANSI color wrappers (`colors.red("text")`, etc.) — exported for
  * consumers that want to color their own table cells/strings (e.g.
  * `route:list` coloring HTTP methods) without reaching into
- * `@mahi/tui`'s internal `src/ansi/colors.ts` module path.
+ * `@mahiframework/tui`'s internal `src/ansi/colors.ts` module path.
  */
 export * as colors from "./ansi/colors.js";
 
 /**
  * Whether ANSI colour is currently being emitted (respects `NO_COLOR`/
  * `FORCE_COLOR`/TTY), and a hook to force it on/off. Exported so consumers
- * (and their tests) can gate their own colouring the same way `@mahi/tui`
+ * (and their tests) can gate their own colouring the same way `@mahiframework/tui`
  * does.
  */
 export { colorsEnabled, setColorOverride } from "./context.js";

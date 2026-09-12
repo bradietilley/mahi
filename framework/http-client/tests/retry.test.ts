@@ -72,7 +72,7 @@ describe("attempt counts", () => {
     const { transport, attempts } = queued(500, 500, 500, 500);
     await new PendingRequest().withTransport(transport).retry(3).get("https://x.test/");
 
-    // The first call counts as an attempt, matching @mahi/core's retry().
+    // The first call counts as an attempt, matching @mahiframework/core's retry().
     expect(attempts()).toBe(3);
   });
 

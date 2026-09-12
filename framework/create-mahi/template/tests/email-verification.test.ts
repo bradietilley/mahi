@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createTestApplication, type TestApplication } from "@mahi/testing";
+import { createTestApplication, type TestApplication } from "@mahiframework/testing";
 import { bootstrap } from "../bin/bootstrap.js";
 import { User } from "../src/models/user.model.js";
 import { VerifyEmailMail } from "../src/mail/verify-email.mail.js";

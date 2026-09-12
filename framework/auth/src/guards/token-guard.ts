@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { DateTime } from "@mahi/datetime";
-import type { Request } from "@mahi/http";
+import { DateTime } from "@mahiframework/datetime";
+import type { Request } from "@mahiframework/http";
 import type { Guard } from "../guard.js";
 import type { UserProvider } from "../user-provider.js";
 import {

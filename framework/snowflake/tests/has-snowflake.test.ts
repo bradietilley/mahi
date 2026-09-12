@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DatabaseManager, DATABASE_TOKEN, Factory, Model, SqliteDriver } from "@mahi/database";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DatabaseManager, DATABASE_TOKEN, Factory, Model, SqliteDriver } from "@mahiframework/database";
 import { snowflake } from "../src/has-snowflake.js";
 import { Snowflake } from "../src/snowflake.js";
 import { SnowflakeServiceProvider } from "../src/snowflake-service-provider.js";

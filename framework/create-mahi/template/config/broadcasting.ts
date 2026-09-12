@@ -1,4 +1,4 @@
-import type { BroadcastConfig, BroadcastAuthConfig } from "@mahi/broadcasting";
+import type { BroadcastConfig, BroadcastAuthConfig } from "@mahiframework/broadcasting";
 import type { Env } from "./env.js";
 
 interface BroadcastingConfig extends BroadcastConfig {
@@ -24,7 +24,7 @@ export function broadcastingConfig(env: Env): BroadcastingConfig {
     default: "local",
     connections: {
       local: { path: "/broadcasting/socket" },
-      // Cross-process fanout via Redis pub/sub (requires @mahi/redis).
+      // Cross-process fanout via Redis pub/sub (requires @mahiframework/redis).
       // This is the fix for `local`'s silent single-process message loss —
       // point `default` here when scaling horizontally. Keeps the same
       // websocket endpoint (`path`); `channel` is the Redis pub/sub channel

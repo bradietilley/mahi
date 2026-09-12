@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { Rule, Validator, rule } from "@mahi/validation";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { Rule, Validator, rule } from "@mahiframework/validation";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN } from "../src/database-service-provider.js";

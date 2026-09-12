@@ -1,4 +1,4 @@
-# @mahi/http
+# @mahiframework/http
 
 HTTP — the router, request/response, middleware, and kernel for Mahi.
 

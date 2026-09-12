@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 import type { KeyType } from "../make-migration.js";
@@ -24,7 +24,7 @@ function template(className: string, keyType: KeyType): string {
   const modelFile = Str.kebab(model);
   void keyType;
 
-  return `import { Factory } from "@mahi/database";
+  return `import { Factory } from "@mahiframework/database";
 import { ${model} } from "../../src/models/${modelFile}.model.js";
 
 export class ${className} extends Factory<typeof ${model}> {

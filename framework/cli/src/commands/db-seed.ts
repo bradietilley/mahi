@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 import { Command } from "../command.js";
 
 export class DbSeedCommand extends Command {

@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/database",
+  "name": "@mahiframework/database",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,11 +17,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*",
-    "@mahi/datetime": "workspace:*",
-    "@mahi/events": "workspace:*",
-    "@mahi/facades": "workspace:*",
-    "@mahi/validation": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/datetime": "workspace:*",
+    "@mahiframework/events": "workspace:*",
+    "@mahiframework/facades": "workspace:*",
+    "@mahiframework/validation": "workspace:*",
     "better-sqlite3": "^13.0.3",
     "kysely": "^0.29.5",
     "mysql2": "^3.11.5",

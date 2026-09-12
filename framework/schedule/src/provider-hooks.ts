@@ -1,6 +1,6 @@
 import type { Schedule } from "./schedule.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Register recurring tasks onto the given Schedule. Collected during

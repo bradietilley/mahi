@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ArrayLogger } from "@mahi/core";
+import { ArrayLogger } from "@mahiframework/core";
 import { LogTransport } from "../src/transports/log-transport.js";
 import { Mailable } from "../src/mailable.js";
 

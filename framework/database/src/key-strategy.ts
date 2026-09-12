@@ -9,7 +9,7 @@
  *   on MySQL). Requires the primary-key column to be a `number`.
  * - `"uuid"` — a client-generated `randomUUID()` string, assigned before
  *   insert. Requires a `string` primary-key column.
- * - a `KeyStrategy` object — anything else, e.g. `@mahi/snowflake`'s
+ * - a `KeyStrategy` object — anything else, e.g. `@mahiframework/snowflake`'s
  *   `snowflake()`.
  *
  * A `KeyStrategy` runs after the `saving` hook (so that hook can still
@@ -21,7 +21,7 @@ import { randomUUID } from "node:crypto";
 
 /**
  * Context handed to a `KeyStrategy.generate()` call — the model class
- * name, which `@mahi/snowflake` uses as its per-model sequence group.
+ * name, which `@mahiframework/snowflake` uses as its per-model sequence group.
  */
 export interface KeyStrategyContext {
   modelName: string;

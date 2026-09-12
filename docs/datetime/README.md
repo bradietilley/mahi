@@ -1,13 +1,13 @@
 # Dates & times
 
-`@mahi/datetime` is an immutable, timezone-aware temporal model with a
+`@mahiframework/datetime` is an immutable, timezone-aware temporal model with a
 Carbon-inspired API. It is the type every framework timestamp flows
 through: model `created_at`/`updated_at` columns, token expiries, queue
 `available_at` stamps, session TTLs, and soft-delete markers are all
 `DateTime` values under the hood.
 
 ```ts
-import { DateTime, Duration, Interval, Period } from "@mahi/datetime";
+import { DateTime, Duration, Interval, Period } from "@mahiframework/datetime";
 
 const expires = DateTime.now().addDays(7).endOfDay();
 const perth = DateTime.now().inTimezone("Australia/Perth");
@@ -918,7 +918,7 @@ serialised, and go stale relative to the platform. The identifier string
 *is* the value.
 
 ```ts
-import { Timezone } from "@mahi/datetime";
+import { Timezone } from "@mahiframework/datetime";
 
 Timezone.system();                                  // the host's own zone
 Timezone.isValid("Australia/Perth");                // boolean
@@ -943,7 +943,7 @@ at runtime, against the host's own database.
 Locale data comes from `Intl`. **Nothing is bundled.**
 
 ```ts
-import { Locale } from "@mahi/datetime";
+import { Locale } from "@mahiframework/datetime";
 
 Locale.current();                        // the configured locale
 Locale.isSupported("fr-CA");
@@ -1015,7 +1015,7 @@ import {
   getDefaultLocale,
   resetDefaultTimezone,
   resetDefaultLocale,
-} from "@mahi/datetime";
+} from "@mahiframework/datetime";
 
 setDefaultTimezone("Australia/Perth");
 setDefaultWeekStartsOn(0);
@@ -1144,7 +1144,7 @@ Freeze the clock, and always release it:
 
 ```ts
 import { afterEach, expect, it } from "vitest";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 
 afterEach(() => DateTime.setTestNow(null));
 

@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import { Router, PendingRoute } from "./router.js";
 import type { RouteTarget } from "./router.js";
 import type { HttpPipe } from "./middleware/pipeline-middleware.js";

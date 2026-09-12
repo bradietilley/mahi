@@ -1,4 +1,4 @@
-import type { MailConfig } from "@mahi/mail";
+import type { MailConfig } from "@mahiframework/mail";
 import type { Env } from "./env.js";
 
 /**

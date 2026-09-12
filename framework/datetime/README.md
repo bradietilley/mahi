@@ -1,4 +1,4 @@
-# @mahi/datetime
+# @mahiframework/datetime
 
 Dates & times — an immutable, timezone-aware date/time value type for Mahi.
 

@@ -1,5 +1,5 @@
 /**
- * `@mahi/broadcasting` — push already-dispatched application events
+ * `@mahiframework/broadcasting` — push already-dispatched application events
  * to connected websocket clients, scoped to named channels.
  *
  * An event opts in by implementing `ShouldBroadcast`; no dispatch call

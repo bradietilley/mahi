@@ -1,4 +1,4 @@
-import { ServiceProvider, CACHE_TOKEN, storage_path } from "@mahi/core";
+import { ServiceProvider, CACHE_TOKEN, storage_path } from "@mahiframework/core";
 import { CacheManager, type CacheConfig } from "./cache-manager.js";
 import { ArrayCacheStore } from "./stores/array-cache-store.js";
 import { FileCacheStore } from "./stores/file-cache-store.js";
@@ -6,8 +6,8 @@ import { RateLimiter } from "./rate-limiting/rate-limiter.js";
 import { CacheClearCommand } from "./commands/cache-clear.js";
 import { CachePruneCommand } from "./commands/cache-prune.js";
 
-// `CACHE_TOKEN`'s canonical definition lives in `@mahi/core`'s
-// `well-known-tokens` (resolved cross-package by `@mahi/auth`'s
+// `CACHE_TOKEN`'s canonical definition lives in `@mahiframework/core`'s
+// `well-known-tokens` (resolved cross-package by `@mahiframework/auth`'s
 // "cache" session store); re-exported so this package's public API is
 // unchanged.
 export { CACHE_TOKEN };
@@ -16,7 +16,7 @@ export { CACHE_TOKEN };
  * The container token the `RateLimiter` singleton is bound at.
  *
  * **Public.** It is exported from `index.ts` and resolved from other
- * packages (`@mahi/http`'s `throttle()` middleware) plus every generated
+ * packages (`@mahiframework/http`'s `throttle()` middleware) plus every generated
  * app's `app.provider.ts`, which registers its named limiters through it.
  * A token that consumers outside this package must name is public by
  * definition.
@@ -48,7 +48,7 @@ interface ArrayCacheStoreConfig {
  * cache store — matches Laravel's own `Illuminate\Cache\
  * CacheServiceProvider`, which binds `RateLimiter::class` here rather
  * than in a separate provider (rate limiting is cache: counters with
- * TTLs). `@mahi/http`'s `throttle()` resolves this singleton via
+ * TTLs). `@mahiframework/http`'s `throttle()` resolves this singleton via
  * `app().make(RATE_LIMITER_TOKEN)` — register `CacheServiceProvider`
  * before `HttpServiceProvider` in `config/app.ts`'s `providers[]`.
  */

@@ -1,4 +1,4 @@
-import type { MailManager } from "@mahi/mail";
+import type { MailManager } from "@mahiframework/mail";
 import type { NotificationChannel } from "../notification-channel.js";
 import type { Notification } from "../notification.js";
 import type { NotificationRoutable } from "../notifiable.js";

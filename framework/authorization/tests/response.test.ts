@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { HttpError } from "@mahi/http";
+import { Application } from "@mahiframework/core";
+import { HttpError } from "@mahiframework/http";
 import { GateRegistry } from "../src/gate.js";
 import { Policy } from "../src/policy.js";
 import { AuthorizationResponse } from "../src/response.js";

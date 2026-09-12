@@ -1,5 +1,5 @@
 import { EventEmitter } from "node:events";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { TestCommand } from "../../src/commands/test.js";
 

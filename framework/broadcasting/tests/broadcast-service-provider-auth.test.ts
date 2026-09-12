@@ -1,9 +1,9 @@
 import { once } from "node:events";
 import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
-import { Application, type ServiceProvider } from "@mahi/core";
-import { EventsServiceProvider } from "@mahi/events";
-import { HttpServiceProvider, HttpKernel, HTTP_KERNEL_TOKEN } from "@mahi/http";
+import { Application, type ServiceProvider } from "@mahiframework/core";
+import { EventsServiceProvider } from "@mahiframework/events";
+import { HttpServiceProvider, HttpKernel, HTTP_KERNEL_TOKEN } from "@mahiframework/http";
 import { afterEach, describe, expect, it } from "vitest";
 import { BroadcastManager } from "../src/broadcast-manager.js";
 import {
@@ -34,7 +34,7 @@ async function bootApp(): Promise<Application> {
   app.register(BroadcastServiceProvider);
   // A stand-in "auth" manager: guards resolve a fixed user by the header the
   // test sends, so the auth endpoint has something to authenticate against
-  // without pulling in @mahi/auth.
+  // without pulling in @mahiframework/auth.
   class FakeAuthProvider {
     register(): void {
       app.instance("auth", {
@@ -138,7 +138,7 @@ describe("BroadcastServiceProvider channel authorization", () => {
 
 /**
  * A fresh app has no `APP_KEY` — that is the state `key:generate` exists
- * to leave. `@mahi/encryption` binds `"signer"` as a singleton whose
+ * to leave. `@mahiframework/encryption` binds `"signer"` as a singleton whose
  * FACTORY calls `parseAppKey()` and throws when the key is unset, so the
  * token is bound but not buildable until the key exists.
  *
@@ -153,7 +153,7 @@ describe("BroadcastServiceProvider channel authorization", () => {
  * not resolving it can.
  *
  * The signer here is bound to throw rather than pulling in
- * `@mahi/encryption` (which `@mahi/broadcasting` does not depend on) —
+ * `@mahiframework/encryption` (which `@mahiframework/broadcasting` does not depend on) —
  * the throw is the whole of the behaviour that matters.
  */
 describe("BroadcastServiceProvider boot without an APP_KEY", () => {

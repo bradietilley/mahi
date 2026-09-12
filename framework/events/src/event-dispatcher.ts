@@ -1,4 +1,4 @@
-import { afterCommit, type Application } from "@mahi/core";
+import { afterCommit, type Application } from "@mahiframework/core";
 import { AbstractEvent, dispatchesAfterCommit, eventClassName, type EventClass } from "./event.js";
 import type { Listener, ListenerClass, ListenerFn } from "./listener.js";
 import { matchesPattern } from "./event-suppression.js";
@@ -170,7 +170,7 @@ export class EventDispatcher {
   /**
    * Register a listener that is enqueued rather than run inline.
    * Requires a handler bound via `useQueuedListenerHandler()` — typically
-   * installed by `@mahi/queue`'s `QueueServiceProvider`. Explicit
+   * installed by `@mahiframework/queue`'s `QueueServiceProvider`. Explicit
    * method (not a `ShouldQueue` marker + reflection) so the queue
    * integration stays opt-in and magic-free.
    *
@@ -218,7 +218,7 @@ export class EventDispatcher {
   /**
    * Rehydrate a queued-listener payload and run the original listener.
    * Invoked by the `events.handle-queued-listener` job in
-   * `@mahi/queue`.
+   * `@mahiframework/queue`.
    */
   async runQueuedListener(payload: QueuedListenerPayload): Promise<void> {
     const entry = this.queuedById.get(payload.id);
@@ -243,7 +243,7 @@ export class EventDispatcher {
    * to any one consumer: it's "run this after every dispatch," which is
    * useful for cross-cutting concerns (auditing, metrics, broadcasting)
    * that don't want to enumerate every event class up front the way
-   * `listen()` requires. `@mahi/broadcasting` uses it to forward
+   * `listen()` requires. `@mahiframework/broadcasting` uses it to forward
    * events implementing its own `ShouldBroadcast` marker interface to
    * connected websocket clients, which is what keeps this package free of
    * any dependency on (or knowledge of) broadcasting.

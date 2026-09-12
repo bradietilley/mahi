@@ -1,7 +1,7 @@
 import { mkdtemp, readdir, rm, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MakeModelCommand } from "../../src/commands/make/make-model.js";
 import { MakeEventCommand } from "../../src/commands/make/make-event.js";
@@ -90,7 +90,7 @@ describe("make:* generators", () => {
     await new MakeModelCommand(app).handle("post", { dir, snowflake: true });
     const contents = await read("post.model.ts");
     expect(contents).toContain("id: string;");
-    expect(contents).toContain('import { snowflake } from "@mahi/snowflake";');
+    expect(contents).toContain('import { snowflake } from "@mahiframework/snowflake";');
     expect(contents).toContain("keyType: snowflake(),");
     expect(contents).not.toContain("incrementing");
   });
@@ -111,9 +111,9 @@ describe("make:* generators", () => {
     await new MakeListenerCommand(app).handle("log-post-created", { dir });
     const contents = await read("log-post-created.listener.ts");
     expect(contents).toContain("export class LogPostCreated implements Listener");
-    // @mahi/events exports `AbstractEvent`, not `Event`; importing the
+    // @mahiframework/events exports `AbstractEvent`, not `Event`; importing the
     // latter would not compile.
-    expect(contents).toContain('import type { AbstractEvent, Listener } from "@mahi/events";');
+    expect(contents).toContain('import type { AbstractEvent, Listener } from "@mahiframework/events";');
     expect(contents).not.toMatch(/import type \{ Event,/);
   });
 
@@ -204,7 +204,7 @@ describe("make:* generators", () => {
     expect(migration).toBeDefined();
     const contents = await read(migration!);
     expect(contents).toContain(
-      'import { Schema, type Migration, type Blueprint } from "@mahi/database"',
+      'import { Schema, type Migration, type Blueprint } from "@mahiframework/database"',
     );
     expect(contents).toContain("async up(): Promise<void>");
     expect(contents).toContain('await Schema.create("widgets"');

@@ -20,7 +20,7 @@ export type ListenerRegistration =
   | readonly [EventClass, ListenerClass | ListenerFn]
   | readonly [string, ListenerClass | WildcardListener];
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Return `[EventClass, ListenerClass]` pairs to wire into the

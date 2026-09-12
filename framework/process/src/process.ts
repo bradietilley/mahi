@@ -18,7 +18,7 @@ export type FakeProcessHandler =
   ProcessResult | ((command: string) => ProcessResult | Promise<ProcessResult>);
 
 /**
- * `@mahi/process` — a reusable process-execution wrapper, port
+ * `@mahiframework/process` — a reusable process-execution wrapper, port
  * of Laravel's `Illuminate\Process\Factory`/`PendingProcess`
  * (`Process::run()`/`Process::fake()`/`Process::assertRan()`). Thin
  * wrapper over Node's built-in `node:child_process` — no `execa`
@@ -26,18 +26,18 @@ export type FakeProcessHandler =
  * dependencies" pattern.
  *
  * Static facade over module-level state (fake handlers, call history),
- * mirroring `@mahi/tui`'s `Tui` class — no dependency on
- * `@mahi/core`/the container, since there's nothing here that
+ * mirroring `@mahiframework/tui`'s `Tui` class — no dependency on
+ * `@mahiframework/core`/the container, since there's nothing here that
  * needs DI (this is a pure utility, like `Tui`, not an app service).
  *
  * ```ts
- * import { Process } from "@mahi/process";
+ * import { Process } from "@mahiframework/process";
  *
  * const result = await Process.run(["git", "rev-parse", "HEAD"]);
  * if (result.successful()) console.log(result.stdout.trim());
  *
  * // In tests:
- * import { makeProcessResult } from "@mahi/process";
+ * import { makeProcessResult } from "@mahiframework/process";
  * Process.fake({ "git *": makeProcessResult("git rev-parse HEAD", 0, "abc123\n", "") });
  * await Process.run(["git", "rev-parse", "HEAD"]);
  * Process.assertRan("git *");
@@ -86,7 +86,7 @@ export class Process {
       // successful, empty-output result, matching Laravel's
       // `Process::fake()` default-unmatched behavior.
       //
-      // NOTE: `@mahi/http-client`'s `Http.fake()` deliberately does the
+      // NOTE: `@mahiframework/http-client`'s `Http.fake()` deliberately does the
       // opposite — an unmatched request raises `StrayRequestError` rather
       // than being quietly satisfied, because a typo'd pattern otherwise
       // looks like a passing test. The two packages having opposite

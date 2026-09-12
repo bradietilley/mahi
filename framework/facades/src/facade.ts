@@ -1,4 +1,4 @@
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 
 /**
  * `Facade<T>(getFacadeKey)` is a mixin factory: it returns an (anonymous,

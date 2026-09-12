@@ -3,8 +3,8 @@ import { existsSync, statSync } from "node:fs";
 import { once } from "node:events";
 import path from "node:path";
 import type { Command as CommanderCommand } from "commander";
-import { Command, isCompiledBinary, trap } from "@mahi/cli";
-import { base_path, type Application } from "@mahi/core";
+import { Command, isCompiledBinary, trap } from "@mahiframework/cli";
+import { base_path, type Application } from "@mahiframework/core";
 import { bindWithRetries, type ListeningServer } from "../listen.js";
 import {
   formatServeUrl,

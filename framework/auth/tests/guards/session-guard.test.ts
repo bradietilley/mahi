@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Hono } from "hono";
-import { Signer } from "@mahi/encryption";
-import { HttpResponse, Router } from "@mahi/http";
+import { Signer } from "@mahiframework/encryption";
+import { HttpResponse, Router } from "@mahiframework/http";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import { DatabaseSessionStore } from "../../src/session/database-session-store.js";
 import type { Credentials, UserProvider } from "../../src/user-provider.js";
 import { SessionGuard, LoginUserNotFoundError } from "../../src/guards/session-guard.js";
-import { Request } from "@mahi/http";
+import { Request } from "@mahiframework/http";
 
 interface TestUser {
   id: string;

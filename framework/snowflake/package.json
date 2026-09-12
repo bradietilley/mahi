@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/snowflake",
+  "name": "@mahiframework/snowflake",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,9 +17,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cache": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*"
+    "@mahiframework/cache": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

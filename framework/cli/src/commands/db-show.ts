@@ -1,5 +1,5 @@
-import { DatabaseManager, DATABASE_TOKEN } from "@mahi/database";
-import { Tui } from "@mahi/tui";
+import { DatabaseManager, DATABASE_TOKEN } from "@mahiframework/database";
+import { Tui } from "@mahiframework/tui";
 import { Command } from "../command.js";
 
 /**

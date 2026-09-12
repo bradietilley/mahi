@@ -10,9 +10,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Temp JS migration fixtures import `@mahi/database`; point
+      // Temp JS migration fixtures import `@mahiframework/database`; point
       // them at source so this package's tests don't depend on a stale dist.
-      "@mahi/database": path.resolve(root, "src/index.ts"),
+      "@mahiframework/database": path.resolve(root, "src/index.ts"),
     },
   },
 });

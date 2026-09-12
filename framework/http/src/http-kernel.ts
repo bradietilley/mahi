@@ -5,7 +5,7 @@ import { METHOD_NAME_ALL } from "hono/router";
 import { TrieRouter } from "hono/router/trie-router";
 import { createNodeWebSocket, type NodeWebSocket } from "@hono/node-ws";
 import type { ServerType } from "@hono/node-server";
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { WebSocketSupport } from "./websocket.js";
 import { Router } from "./router.js";
 import { RouteRegistry } from "./route-registry.js";
@@ -331,7 +331,7 @@ export class HttpKernel {
    * `middleware()` pipes are collected first and installed as a single
    * global Hono middleware (see `toHonoMiddleware`) ahead of route
    * dispatch, run in provider registration order via
-   * `@mahi/pipeline`'s `Pipeline` rather than Hono's own
+   * `@mahiframework/pipeline`'s `Pipeline` rather than Hono's own
    * middleware composition.
    */
   collectFromProviders(): void {
@@ -379,11 +379,11 @@ export class HttpKernel {
 
   /**
    * Register the opt-in readiness route (default `GET /health`) when
-   * `http.healthCheck` is configured **and** `@mahi/health` has bound its
+   * `http.healthCheck` is configured **and** `@mahiframework/health` has bound its
    * registry.
    *
-   * The dependency is inverted on purpose: `@mahi/health` depends on
-   * `@mahi/core` alone — so `./artisan health` works in an app with no
+   * The dependency is inverted on purpose: `@mahiframework/health` depends on
+   * `@mahiframework/core` alone — so `./artisan health` works in an app with no
    * HTTP package at all — and this package reaches it by string token,
    * exactly as it already does for `MAINTENANCE_MODE_TOKEN`. Both probes
    * are then configured in one namespace and mounted side by side, rather

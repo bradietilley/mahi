@@ -21,7 +21,7 @@ export const LOG_TOKEN = "log";
  * dated file each day, "array" collects entries in memory (tests), "null"
  * discards everything, and "stack" fans out to other named channels.
  *
- * Lives in `@mahi/core` (not a downstream package) since `Logger`
+ * Lives in `@mahiframework/core` (not a downstream package) since `Logger`
  * itself is core, and this is a natural extension of it — but, unlike
  * every other provider in this framework, is NOT registered implicitly:
  * an app must explicitly add `LoggingServiceProvider` to `providers[]`

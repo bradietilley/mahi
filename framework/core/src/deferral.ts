@@ -2,19 +2,19 @@
  * The cross-package seam for "run this after the enclosing database
  * transaction commits".
  *
- * The real implementation lives in `@mahi/database`'s
+ * The real implementation lives in `@mahiframework/database`'s
  * `transaction-context.ts` (`afterCommit()`/`inTransaction()`), which
  * knows about the AsyncLocalStorage transaction registry. But the
- * *producers* that want to defer work — `@mahi/events` (deferred event
- * dispatch), `@mahi/mail`, `@mahi/broadcasting` — sit BELOW `@mahi/database`
+ * *producers* that want to defer work — `@mahiframework/events` (deferred event
+ * dispatch), `@mahiframework/mail`, `@mahiframework/broadcasting` — sit BELOW `@mahiframework/database`
  * in the dependency graph (`database` depends on `events`), so they can't
  * import that primitive directly without creating a cycle.
  *
- * This module is the inversion: `@mahi/core` (which everything depends on)
- * holds a mutable resolver, `@mahi/database`'s service provider registers
+ * This module is the inversion: `@mahiframework/core` (which everything depends on)
+ * holds a mutable resolver, `@mahiframework/database`'s service provider registers
  * the real one on boot via `setAfterCommitResolver()`, and the producers
  * call `afterCommit()` here. Before the resolver is set — a unit test that
- * never bootstrapped the database, an app with no `@mahi/database` at all —
+ * never bootstrapped the database, an app with no `@mahiframework/database` at all —
  * the callback simply runs immediately, which is exactly the "no
  * transaction open" behaviour anyway.
  */
@@ -23,7 +23,7 @@
 export type DeferredCallback = () => void | Promise<void>;
 
 /**
- * The shape `@mahi/database` supplies: `run` is its `afterCommit()` (defer
+ * The shape `@mahiframework/database` supplies: `run` is its `afterCommit()` (defer
  * until commit, or run now outside a transaction), `active` is its
  * `inTransaction()` (is any transaction open right now).
  */
@@ -36,7 +36,7 @@ let resolver: AfterCommitResolver | undefined;
 
 /**
  * Install the after-commit implementation. Called once by
- * `@mahi/database`'s `DatabaseServiceProvider` on register/boot; a second
+ * `@mahiframework/database`'s `DatabaseServiceProvider` on register/boot; a second
  * call replaces the first (harmless — the implementation is stateless, the
  * per-transaction state lives in the database package's ALS).
  */
@@ -57,10 +57,10 @@ export function clearAfterCommitResolver(): void {
  * immediately (awaited) when there is no transaction open — or when no
  * database is wired up at all.
  *
- * This is the seam producers below `@mahi/database` use so they don't have
+ * This is the seam producers below `@mahiframework/database` use so they don't have
  * to depend on it. See the module docstring; the real deferral logic
  * (nesting, savepoint rollback discarding, registration-order draining)
- * lives in `@mahi/database`'s `afterCommit()`.
+ * lives in `@mahiframework/database`'s `afterCommit()`.
  */
 export async function afterCommit(callback: DeferredCallback): Promise<void> {
   if (!resolver) {

@@ -9,7 +9,7 @@ import { startTestServer, TestSocket, type TestServer } from "./websocket-test-h
 
 /**
  * A hand-rolled authorizer so the driver's own tests take no dependency on
- * `@mahi/auth`/`@mahi/encryption`. It authenticates a socket from a
+ * `@mahiframework/auth`/`@mahiframework/encryption`. It authenticates a socket from a
  * `?user=` query param and authorizes private/presence channels from a
  * small in-memory table.
  */

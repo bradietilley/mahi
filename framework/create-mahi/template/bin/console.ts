@@ -1,4 +1,4 @@
-import { ConsoleKernel, CONSOLE_KERNEL_TOKEN, renderConsoleError } from "@mahi/cli";
+import { ConsoleKernel, CONSOLE_KERNEL_TOKEN, renderConsoleError } from "@mahiframework/cli";
 import { bootstrap } from "./bootstrap.js";
 
 const app = await bootstrap();

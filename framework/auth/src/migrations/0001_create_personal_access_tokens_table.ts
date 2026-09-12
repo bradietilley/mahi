@@ -1,4 +1,4 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /**
  * `personal_access_tokens` backing `TokenGuard`.

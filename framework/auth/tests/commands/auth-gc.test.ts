@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { Hasher, Signer } from "@mahi/encryption";
-import { DateTime } from "@mahi/datetime";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { Hasher, Signer } from "@mahiframework/encryption";
+import { DateTime } from "@mahiframework/datetime";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import { User } from "../__fixtures__/user-model.js";
 import { AuthManager } from "../../src/auth-manager.js";

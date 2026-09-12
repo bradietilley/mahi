@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { Blueprint } from "./blueprint.js";
 import type { SchemaBuilder } from "./schema-builder.js";
 import { SCHEMA_TOKEN } from "../database-service-provider.js";

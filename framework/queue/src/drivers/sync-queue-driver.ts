@@ -1,5 +1,5 @@
-import type { Application } from "@mahi/core";
-import { afterCommit } from "@mahi/database";
+import type { Application } from "@mahiframework/core";
+import { afterCommit } from "@mahiframework/database";
 import type { JobRegistry } from "../job-registry.js";
 import type { QueueDriver, QueuedJob, PushOptions } from "../queue-driver.js";
 import type { JobState } from "../job-serialization.js";

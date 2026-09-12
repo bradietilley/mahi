@@ -47,7 +47,7 @@ export interface PushOptions {
 /**
  * The operations a worker loop (and `dispatch()`) needs. `SyncQueueDriver`
  * and `DatabaseQueueDriver` are the two built-in implementations;
- * `@mahi/redis` adds `RedisQueueDriver`. See `docs/queues/README.md`
+ * `@mahiframework/redis` adds `RedisQueueDriver`. See `docs/queues/README.md`
  * for the full design.
  */
 export interface QueueDriver {

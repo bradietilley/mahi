@@ -1,5 +1,5 @@
-import { Cast, Model } from "@mahi/database";
-import type { DateTime } from "@mahi/datetime";
+import { Cast, Model } from "@mahiframework/database";
+import type { DateTime } from "@mahiframework/datetime";
 
 /**
  * The framework-owned `password_reset_tokens` table backing

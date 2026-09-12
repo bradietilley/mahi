@@ -1,4 +1,4 @@
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 import type { GateRegistry } from "./gate.js";
 import { GATE_TOKEN } from "./tokens.js";
 

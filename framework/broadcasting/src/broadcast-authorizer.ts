@@ -13,13 +13,13 @@ export interface SubscribeAuthorization {
 
 /**
  * The auth seam the websocket driver talks to, so the driver itself takes
- * NO compile-time dependency on `@mahi/auth` or `@mahi/encryption`. The
+ * NO compile-time dependency on `@mahiframework/auth` or `@mahiframework/encryption`. The
  * `BroadcastServiceProvider` supplies the concrete implementation (backed
  * by the `AuthManager` at `AUTH_TOKEN`, the `ChannelRegistry`, and the
  * `Signer`); the driver's own tests can supply a trivial fake.
  *
- * Same soft-dependency shape `@mahi/authorization`'s Gate uses to read the
- * current user via the `"auth"` token without importing `@mahi/auth`.
+ * Same soft-dependency shape `@mahiframework/authorization`'s Gate uses to read the
+ * current user via the `"auth"` token without importing `@mahiframework/auth`.
  */
 export interface BroadcastAuthorizer {
   /**

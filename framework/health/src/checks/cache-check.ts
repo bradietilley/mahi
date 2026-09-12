@@ -1,4 +1,4 @@
-import { CACHE_TOKEN, Str } from "@mahi/core";
+import { CACHE_TOKEN, Str } from "@mahiframework/core";
 import type { HealthCheck } from "../health-check.js";
 import type { CacheManagerLike } from "./contracts.js";
 

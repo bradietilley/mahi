@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { Notification, type NotificationRoutable } from "@mahi/notifications";
+  return `import { Notification, type NotificationRoutable } from "@mahiframework/notifications";
 
 export class ${className} extends Notification {
   via(notifiable: NotificationRoutable): string[] {

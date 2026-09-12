@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
-import { CacheServiceProvider } from "@mahi/cache";
-import { DatabaseServiceProvider, Model } from "@mahi/database";
-import { EncryptionServiceProvider } from "@mahi/encryption";
-import { HttpResponse, HttpServiceProvider, type Router } from "@mahi/http";
-import { AuthServiceProvider, Auth, authenticate } from "@mahi/auth";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
+import { CacheServiceProvider } from "@mahiframework/cache";
+import { DatabaseServiceProvider, Model } from "@mahiframework/database";
+import { EncryptionServiceProvider } from "@mahiframework/encryption";
+import { HttpResponse, HttpServiceProvider, type Router } from "@mahiframework/http";
+import { AuthServiceProvider, Auth, authenticate } from "@mahiframework/auth";
 import { createTestApplication } from "../src/create-test-application.js";
 import { TestClient } from "../src/test-client.js";
 

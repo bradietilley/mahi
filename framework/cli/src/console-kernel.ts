@@ -1,5 +1,5 @@
 import { Command as CommanderProgram } from "commander";
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { CommandClass } from "./command.js";
 import { deriveProgramName, resolveRuntimeMode, type RuntimeMode } from "./runtime-mode.js";
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { Application, ServiceProvider } from "@mahi/core";
-import { HttpServiceProvider, HTTP_KERNEL_TOKEN } from "@mahi/http";
-import type { HttpKernel } from "@mahi/http";
+import { Application, ServiceProvider } from "@mahiframework/core";
+import { HttpServiceProvider, HTTP_KERNEL_TOKEN } from "@mahiframework/http";
+import type { HttpKernel } from "@mahiframework/http";
 import { HealthServiceProvider, HEALTH_TOKEN } from "../src/health-service-provider.js";
 import { HealthRegistry } from "../src/health-registry.js";
 import type { HealthCheck } from "../src/health-check.js";
@@ -83,7 +83,7 @@ describe("route mounting", () => {
     app.register(HttpServiceProvider);
     await app.bootstrap();
 
-    // `@mahi/http` resolves the registry by token and simply skips the
+    // `@mahiframework/http` resolves the registry by token and simply skips the
     // route when nothing has bound it — no import, no hard dependency.
     const res = await app.make<HttpKernel>(HTTP_KERNEL_TOKEN).raw().request("/health");
     expect(res.status).toBe(404);
@@ -103,7 +103,7 @@ describe("route mounting", () => {
   });
 
   it("serves /health in an app with no HTTP package by way of the CLI instead", async () => {
-    // The CLI frontend must work with @mahi/core alone — no HttpKernel,
+    // The CLI frontend must work with @mahiframework/core alone — no HttpKernel,
     // no routes, no config namespace.
     const app = new Application();
     app.register(HealthServiceProvider);

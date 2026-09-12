@@ -1,5 +1,5 @@
-import { Application } from "@mahi/core";
-import { HttpKernel } from "@mahi/http";
+import { Application } from "@mahiframework/core";
+import { HttpKernel } from "@mahiframework/http";
 import { afterEach, describe, expect, it } from "vitest";
 import { LocalBroadcastDriver } from "../src/drivers/local-broadcast-driver.js";
 import {
@@ -180,7 +180,7 @@ describe("LocalBroadcastDriver", () => {
    * with a websocket route of its own has to share this driver's
    * `createNodeWebSocket()`, because two of them on one Node server crash
    * the process on the first connection — see `WebSocketSupport` in
-   * `@mahi/http`. These two cases are what "shared" has to mean.
+   * `@mahiframework/http`. These two cases are what "shared" has to mean.
    */
   describe("sharing the kernel's websocket helper", () => {
     it("serves both its own endpoint and the application's on one helper", async () => {

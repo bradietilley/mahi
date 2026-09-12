@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/pipeline",
+  "name": "@mahiframework/pipeline",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",

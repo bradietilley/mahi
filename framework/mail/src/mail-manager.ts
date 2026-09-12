@@ -1,4 +1,4 @@
-import { Manager, afterCommit, inTransaction, type Application } from "@mahi/core";
+import { Manager, afterCommit, inTransaction, type Application } from "@mahiframework/core";
 import type { MailTransport, RenderedMail } from "./mail-transport.js";
 import type { SentMessage } from "./sent-message.js";
 import type { Mailable } from "./mailable.js";
@@ -17,11 +17,11 @@ export interface QueueMailOptions {
 
 /**
  * Enqueues an already-rendered message for later delivery. Filled in by
- * `QueueServiceProvider` when `@mahi/mail` is present.
+ * `QueueServiceProvider` when `@mahiframework/mail` is present.
  *
  * The handler slot is the same inversion `EventDispatcher`
  * uses for queued listeners: mail declares the shape and the queue package
- * fills it, so `@mahi/mail` keeps its two-dependency footprint and an app
+ * fills it, so `@mahiframework/mail` keeps its two-dependency footprint and an app
  * without a queue simply never binds one.
  */
 export type QueuedMailHandler = (message: RenderedMail, options: QueueMailOptions) => Promise<void>;
@@ -248,7 +248,7 @@ export class MailManager extends Manager<MailTransport> {
   async queue(mailable: Mailable, options: QueueMailOptions = {}): Promise<void> {
     if (this.queuedMailHandler === undefined) {
       throw new MailException(
-        "Mail.queue() requires @mahi/queue's QueueServiceProvider to be registered. " +
+        "Mail.queue() requires @mahiframework/queue's QueueServiceProvider to be registered. " +
           "Register it in config/app.ts, or use Mail.send() to deliver immediately.",
       );
     }

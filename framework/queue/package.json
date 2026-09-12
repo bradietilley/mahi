@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/queue",
+  "name": "@mahiframework/queue",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,16 +17,16 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cache": "workspace:*",
-    "@mahi/cli": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/datetime": "workspace:*",
-    "@mahi/events": "workspace:*",
-    "@mahi/facades": "workspace:*",
-    "@mahi/mail": "workspace:*",
-    "@mahi/pipeline": "workspace:*",
-    "@mahi/tui": "workspace:*",
+    "@mahiframework/cache": "workspace:*",
+    "@mahiframework/cli": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/datetime": "workspace:*",
+    "@mahiframework/events": "workspace:*",
+    "@mahiframework/facades": "workspace:*",
+    "@mahiframework/mail": "workspace:*",
+    "@mahiframework/pipeline": "workspace:*",
+    "@mahiframework/tui": "workspace:*",
     "commander": "^12.1.0",
     "kysely": "^0.29.5"
   },

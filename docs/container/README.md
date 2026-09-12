@@ -4,8 +4,8 @@ The container maps string tokens to factories. A service provider binds a
 factory; a consumer calls `app.make(TOKEN)`. That is the whole model.
 
 ```ts
-import { Application, CACHE_TOKEN } from "@mahi/core";
-import type { CacheManager } from "@mahi/cache";
+import { Application, CACHE_TOKEN } from "@mahiframework/core";
+import type { CacheManager } from "@mahiframework/cache";
 
 const app = new Application();
 const cache = app.make<CacheManager>(CACHE_TOKEN);
@@ -48,7 +48,7 @@ export class CacheServiceProvider extends ServiceProvider {
 }
 ```
 
-That is how `@mahi/cache` registers itself, and it shows the two things
+That is how `@mahiframework/cache` registers itself, and it shows the two things
 worth noting: a factory resolves its own
 dependencies by calling `app.make()`, and re-binding a token drops any
 cached instance — `bind()` and `singleton()` both call
@@ -126,7 +126,7 @@ export class BindingNotFoundError extends Error {
 ```
 
 `has()` returns true if either a binding *or* an instance is registered.
-Packages use it to make dependencies soft — `@mahi/notifications` only
+Packages use it to make dependencies soft — `@mahiframework/notifications` only
 wires its `mail` channel when `MAIL_TOKEN` is actually bound:
 
 ```ts
@@ -200,48 +200,48 @@ cached.
 ## Well-known tokens
 
 Tokens are strings. Tokens that cross package boundaries are declared once
-in `@mahi/core`'s `well-known-tokens.ts` and re-exported by their owning
+in `@mahiframework/core`'s `well-known-tokens.ts` and re-exported by their owning
 package, so a typo is a compile error rather than a runtime
 `BindingNotFoundError`.
 
 | Token constant | Value | Resolves to | Owner |
 |---|---|---|---|
-| `DATABASE_TOKEN` | `"db"` | `DatabaseManager` | `@mahi/database` |
-| `AUTH_TOKEN` | `"auth"` | `AuthManager` | `@mahi/auth` |
-| `GATE_TOKEN` | `"gate"` | `GateRegistry` | `@mahi/authorization` |
-| `QUEUE_TOKEN` | `"queue"` | `QueueManager` | `@mahi/queue` |
-| `CACHE_TOKEN` | `"cache"` | `CacheManager` | `@mahi/cache` |
-| `EVENTS_TOKEN` | `"events"` | `EventDispatcher` | `@mahi/events` |
-| `BROADCAST_TOKEN` | `"broadcast"` | `BroadcastManager` | `@mahi/broadcasting` |
-| `STORAGE_TOKEN` | `"storage"` | `StorageManager` | `@mahi/storage` |
+| `DATABASE_TOKEN` | `"db"` | `DatabaseManager` | `@mahiframework/database` |
+| `AUTH_TOKEN` | `"auth"` | `AuthManager` | `@mahiframework/auth` |
+| `GATE_TOKEN` | `"gate"` | `GateRegistry` | `@mahiframework/authorization` |
+| `QUEUE_TOKEN` | `"queue"` | `QueueManager` | `@mahiframework/queue` |
+| `CACHE_TOKEN` | `"cache"` | `CacheManager` | `@mahiframework/cache` |
+| `EVENTS_TOKEN` | `"events"` | `EventDispatcher` | `@mahiframework/events` |
+| `BROADCAST_TOKEN` | `"broadcast"` | `BroadcastManager` | `@mahiframework/broadcasting` |
+| `STORAGE_TOKEN` | `"storage"` | `StorageManager` | `@mahiframework/storage` |
 
-All eight are importable from `@mahi/core` *and* from their owning
-package. `@mahi/authorization` resolves the current user through
-`AUTH_TOKEN` without depending on `@mahi/auth`; `@mahi/schedule`
-dispatches through `QUEUE_TOKEN` without depending on `@mahi/queue`. That
+All eight are importable from `@mahiframework/core` *and* from their owning
+package. `@mahiframework/authorization` resolves the current user through
+`AUTH_TOKEN` without depending on `@mahiframework/auth`; `@mahiframework/schedule`
+dispatches through `QUEUE_TOKEN` without depending on `@mahiframework/queue`. That
 is what these constants are for.
 
 Package-private tokens stay in their own package:
 
 | Token constant | Value | Resolves to | Package |
 |---|---|---|---|
-| `LOG_TOKEN` | `"log"` | `LogManager` | `@mahi/core` |
-| `SCHEMA_TOKEN` | `"db.schema"` | `SchemaBuilder` | `@mahi/database` |
-| `MODEL_REGISTRY_TOKEN` | `"db.models"` | `ModelRegistry` | `@mahi/database` |
-| `HTTP_KERNEL_TOKEN` | `"http.kernel"` | `HttpKernel` | `@mahi/http` |
-| `ROOT_ROUTER_TOKEN` | `"http.router"` | `Router` | `@mahi/http` |
-| `URL_GENERATOR_TOKEN` | `"url.generator"` | `UrlGenerator` | `@mahi/http` |
-| `RATE_LIMITER_TOKEN` | `"rate-limiter"` | `RateLimiter` | `@mahi/cache` (re-exported by `@mahi/http`) |
-| `CONSOLE_KERNEL_TOKEN` | `"console.kernel"` | `ConsoleKernel` | `@mahi/cli` |
-| `ENCRYPTER_TOKEN` | `"encrypter"` | `Encrypter` | `@mahi/encryption` |
-| `HASHER_TOKEN` | `"hasher"` | `Hasher` | `@mahi/encryption` |
-| `SIGNER_TOKEN` | `"signer"` | `Signer` | `@mahi/encryption` |
-| `MAIL_TOKEN` | `"mail"` | `MailManager` | `@mahi/mail` |
-| `NOTIFICATIONS_TOKEN` | `"notifications"` | `ChannelManager` | `@mahi/notifications` |
-| `SCHEDULE_TOKEN` | `"schedule"` | `Schedule` | `@mahi/schedule` |
-| `JOB_REGISTRY_TOKEN` | `"queue.jobs"` | `JobRegistry` | `@mahi/queue` |
-| `REDIS_TOKEN` | `"redis"` | `RedisManager` | `@mahi/redis` |
-| `SNOWFLAKE_TOKEN` | `"snowflake"` | `SnowflakeGenerator` | `@mahi/snowflake` |
+| `LOG_TOKEN` | `"log"` | `LogManager` | `@mahiframework/core` |
+| `SCHEMA_TOKEN` | `"db.schema"` | `SchemaBuilder` | `@mahiframework/database` |
+| `MODEL_REGISTRY_TOKEN` | `"db.models"` | `ModelRegistry` | `@mahiframework/database` |
+| `HTTP_KERNEL_TOKEN` | `"http.kernel"` | `HttpKernel` | `@mahiframework/http` |
+| `ROOT_ROUTER_TOKEN` | `"http.router"` | `Router` | `@mahiframework/http` |
+| `URL_GENERATOR_TOKEN` | `"url.generator"` | `UrlGenerator` | `@mahiframework/http` |
+| `RATE_LIMITER_TOKEN` | `"rate-limiter"` | `RateLimiter` | `@mahiframework/cache` (re-exported by `@mahiframework/http`) |
+| `CONSOLE_KERNEL_TOKEN` | `"console.kernel"` | `ConsoleKernel` | `@mahiframework/cli` |
+| `ENCRYPTER_TOKEN` | `"encrypter"` | `Encrypter` | `@mahiframework/encryption` |
+| `HASHER_TOKEN` | `"hasher"` | `Hasher` | `@mahiframework/encryption` |
+| `SIGNER_TOKEN` | `"signer"` | `Signer` | `@mahiframework/encryption` |
+| `MAIL_TOKEN` | `"mail"` | `MailManager` | `@mahiframework/mail` |
+| `NOTIFICATIONS_TOKEN` | `"notifications"` | `ChannelManager` | `@mahiframework/notifications` |
+| `SCHEDULE_TOKEN` | `"schedule"` | `Schedule` | `@mahiframework/schedule` |
+| `JOB_REGISTRY_TOKEN` | `"queue.jobs"` | `JobRegistry` | `@mahiframework/queue` |
+| `REDIS_TOKEN` | `"redis"` | `RedisManager` | `@mahiframework/redis` |
+| `SNOWFLAKE_TOKEN` | `"snowflake"` | `SnowflakeGenerator` | `@mahiframework/snowflake` |
 
 The base app also binds `"env"` — the validated environment object, via
 `app.instance("env", env)` in `bin/bootstrap.ts`. That is an application
@@ -372,7 +372,7 @@ private extendCache(): void {
 
 Nothing about that is privileged. It is the same `extend()` the built-ins
 use, guarded by `has()` so the package works whether or not you installed
-`@mahi/cache`.
+`@mahiframework/cache`.
 
 ### Why driver() is synchronous
 
@@ -410,7 +410,7 @@ async boot(): Promise<void> {
 }
 ```
 
-`isConnectable(value)` is exported from `@mahi/core` and is a plain
+`isConnectable(value)` is exported from `@mahiframework/core` and is a plain
 duck-type check for both methods. The pattern is: resolution stays sync,
 connection is an explicit lifecycle step owned by a provider. See
 [Application lifecycle](../lifecycle/) for where `boot()` sits.
@@ -424,7 +424,7 @@ Driver "postgres" is not registered on DatabaseManager.
 ## The app() global
 
 ```ts
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 
 const cache = app().make<CacheManager>(CACHE_TOKEN);
 ```
@@ -453,7 +453,7 @@ The same caveat applies to every facade, since facades are built on
 
 ## Facades
 
-`@mahi/facades` exports a single function:
+`@mahiframework/facades` exports a single function:
 
 ```ts
 export function Facade<T>(getFacadeKey: () => string) {
@@ -566,7 +566,7 @@ reversal of it:
   decided by `bind()` vs `singleton()`.
 
 `Log` is hand-written directly against `app()` rather than built on
-`Facade<T>`, because `@mahi/facades` depends on `@mahi/core` and
+`Facade<T>`, because `@mahiframework/facades` depends on `@mahiframework/core` and
 `LOG_TOKEN`/`LogManager` live in core — importing `Facade` there would
 close a package cycle. Its `instance()` is otherwise identical to what
 `Facade<LogManager>(() => LOG_TOKEN)` would produce.

@@ -1,4 +1,4 @@
-# @mahi/queue
+# @mahiframework/queue
 
 Queues — background job dispatch and workers over sync, database, and Redis drivers, for Mahi.
 

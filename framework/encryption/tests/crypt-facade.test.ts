@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp } from "@mahiframework/core";
 import { EncryptionServiceProvider } from "../src/encryption-service-provider.js";
 import { Crypt } from "../src/crypt-facade.js";
 

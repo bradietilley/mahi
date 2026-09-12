@@ -1,4 +1,4 @@
-import { STORAGE_TOKEN, Str } from "@mahi/core";
+import { STORAGE_TOKEN, Str } from "@mahiframework/core";
 import type { HealthCheck } from "../health-check.js";
 import type { StorageManagerLike } from "./contracts.js";
 

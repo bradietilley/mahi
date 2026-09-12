@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN, SCHEMA_TOKEN } from "../src/database-service-provider.js";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";
@@ -10,7 +10,7 @@ import { MigrationRunner, type Migration, type RegisteredMigration } from "../sr
 import { Schema } from "../src/schema/schema-facade.js";
 
 const MIGRATION_A = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -25,7 +25,7 @@ export default {
 `;
 
 const MIGRATION_B = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -40,7 +40,7 @@ export default {
 `;
 
 const MIGRATION_C = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {
@@ -182,7 +182,7 @@ describe("MigrationRunner", () => {
     const otherDir = await mkdtemp(path.join(tmpdir(), "migrator-test-other-"));
     await writeFile(
       path.join(otherDir, "0000_first.js"),
-      `import { Schema } from "@mahi/database";
+      `import { Schema } from "@mahiframework/database";
 export default { async up() { await Schema.create("early", (table) => { table.string("id").primary(); }); }, async down() { await Schema.drop("early"); } };`,
     );
 
@@ -225,7 +225,7 @@ export default { async up() { await Schema.create("early", (table) => { table.st
     const brokenDownDir = await mkdtemp(path.join(tmpdir(), "migrator-test-broken-"));
     await writeFile(
       path.join(brokenDownDir, "0001_create_things.js"),
-      `import { Schema } from "@mahi/database";
+      `import { Schema } from "@mahiframework/database";
 export default {
         async up() {
           await Schema.create("things", (table) => { table.string("id").primary(); });
@@ -309,7 +309,7 @@ export default {
       const otherDir = await mkdtemp(path.join(tmpdir(), "migrator-test-mixed-"));
       await writeFile(
         path.join(otherDir, "0000_first.js"),
-        `import { Schema } from "@mahi/database";
+        `import { Schema } from "@mahiframework/database";
 export default { async up() { await Schema.create("early", (table) => { table.string("id").primary(); }); }, async down() { await Schema.drop("early"); } };`,
       );
 
@@ -524,7 +524,7 @@ export default { async up() { await Schema.create("early", (table) => { table.st
       // under two names; the `.js` is the one that loads on any Node.
       await writeFile(
         path.join(dir, "0003_thing.js"),
-        `import { Schema } from "@mahi/database";
+        `import { Schema } from "@mahiframework/database";
 export default { async up() { await Schema.create("thing", (t) => { t.string("id").primary(); }); }, async down() { await Schema.drop("thing"); } };`,
       );
       await writeFile(
@@ -544,12 +544,12 @@ export default { async up() { await Schema.create("thing", (t) => { t.string("id
       // machine-dependent. Byte order is stable everywhere.
       await writeFile(
         path.join(dir, "0003-dash.js"),
-        `import { Schema } from "@mahi/database";
+        `import { Schema } from "@mahiframework/database";
 export default { async up() { await Schema.create("dash", (t) => { t.string("id").primary(); }); }, async down() { await Schema.drop("dash"); } };`,
       );
       await writeFile(
         path.join(dir, "0003_underscore.js"),
-        `import { Schema } from "@mahi/database";
+        `import { Schema } from "@mahiframework/database";
 export default { async up() { await Schema.create("underscore", (t) => { t.string("id").primary(); }); }, async down() { await Schema.drop("underscore"); } };`,
       );
 

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Request } from "@mahi/http";
+import { Request } from "@mahiframework/http";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import { PersonalAccessToken } from "../../src/models/personal-access-token.js";
 import type { Credentials, UserProvider } from "../../src/user-provider.js";

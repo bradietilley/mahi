@@ -6,7 +6,7 @@ commands, listeners, migrations, jobs, policies, scheduled tasks, and
 container bindings all arrive through one.
 
 ```ts
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 
 export class PostsServiceProvider extends ServiceProvider {
   register(): void {
@@ -219,7 +219,7 @@ export class AuthServiceProvider extends ServiceProvider {
 }
 ```
 
-`HttpPipe` is `Pipe<Request, ResponseInput>` from `@mahi/pipeline` — it
+`HttpPipe` is `Pipe<Request, ResponseInput>` from `@mahiframework/pipeline` — it
 receives the framework `Request` (not a Hono context) and a `next`
 function, and returns a response. A pipe that returns without calling
 `next(request)` short-circuits the whole request.
@@ -278,8 +278,8 @@ export class QueueServiceProvider extends ServiceProvider {
 
 This is how the framework's own tables — `personal_access_tokens`,
 `sessions`, `jobs`, `failed_jobs`, `notifications` — get created without
-you copying migration files into your app. `@mahi/auth`, `@mahi/queue`,
-and `@mahi/notifications` each register theirs statically, so they work in
+you copying migration files into your app. `@mahiframework/auth`, `@mahiframework/queue`,
+and `@mahiframework/notifications` each register theirs statically, so they work in
 a compiled binary; each also keeps a `migrations()` directory for older
 consumers.
 
@@ -419,7 +419,7 @@ interval, on every instance. See [Health checks](../health/).
 
 ## How hook typing works
 
-`@mahi/core` declares an empty interface:
+`@mahiframework/core` declares an empty interface:
 
 ```ts
 export interface ProviderHooks {}
@@ -435,11 +435,11 @@ or the CLI exist.
 Each package that owns a hook augments the interface from its own side:
 
 ```ts
-// @mahi/http — provider-hooks.ts
+// @mahiframework/http — provider-hooks.ts
 import type { Router } from "./router.js";
 import type { HttpPipe } from "./middleware/pipeline-middleware.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     routes?(router: Router): void;
     middleware?(): HttpPipe[];
@@ -450,7 +450,7 @@ declare module "@mahi/core" {
 and imports that file for its side effect from its own entry point:
 
 ```ts
-// @mahi/http — index.ts
+// @mahiframework/http — index.ts
 import "./provider-hooks.js";
 ```
 
@@ -459,11 +459,11 @@ TypeScript merges every augmentation it sees into one interface. Because
 can implement any merged hook as a normal typed method override.
 
 The payoff is that **the set of hooks available to you is exactly the set
-of packages you installed**. An app importing `@mahi/http`, `@mahi/cli`,
-and `@mahi/events` sees `routes`, `middleware`, `commands`, and
+of packages you installed**. An app importing `@mahiframework/http`, `@mahiframework/cli`,
+and `@mahiframework/events` sees `routes`, `middleware`, `commands`, and
 `listeners` — fully typed, with `Router` and `CommandClass` resolved to
-their real types — while `@mahi/core` never imports any of those packages
-and has no dependency on them. Remove `@mahi/http` from your
+their real types — while `@mahiframework/core` never imports any of those packages
+and has no dependency on them. Remove `@mahiframework/http` from your
 `package.json` and `routes()` stops type-checking, which is correct: there
 is nothing to collect it.
 
@@ -484,7 +484,7 @@ export const BILLING_TOKEN = "billing";
 
 ```ts
 // src/billing-service-provider.ts
-import { ServiceProvider, isConnectable, EVENTS_TOKEN } from "@mahi/core";
+import { ServiceProvider, isConnectable, EVENTS_TOKEN } from "@mahiframework/core";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { BillingManager, type BillingConfig } from "./billing-manager.js";
@@ -560,10 +560,10 @@ if (app.has(MAIL_TOKEN)) {
 }
 ```
 
-An app that didn't install `@mahi/mail` gets a package that works, minus
+An app that didn't install `@mahiframework/mail` gets a package that works, minus
 the mail channel — not a `BindingNotFoundError` during boot.
 
-**Add a `declare module "@mahi/core"` block** if your package introduces a
+**Add a `declare module "@mahiframework/core"` block** if your package introduces a
 new hook, and import it for side effect from `index.ts`.
 
 **Document your ordering constraints in the provider's docstring.** You
@@ -653,7 +653,7 @@ providers almost always consume framework services and almost never the
 reverse.
 
 Note what's *not* on this list: nothing is registered implicitly. Even
-`LoggingServiceProvider`, which lives in `@mahi/core`, must be listed
+`LoggingServiceProvider`, which lives in `@mahiframework/core`, must be listed
 explicitly like everything else — consistent with there being no implicit
 registration anywhere, and with `Application.logger` remaining the
 always-available zero-config fallback.

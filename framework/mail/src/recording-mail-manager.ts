@@ -1,4 +1,4 @@
-import { afterCommit, inTransaction, type Application } from "@mahi/core";
+import { afterCommit, inTransaction, type Application } from "@mahiframework/core";
 import { MailManager, type MailConfig, type QueueMailOptions } from "./mail-manager.js";
 import type { Mailable } from "./mailable.js";
 import type { SentMessage } from "./sent-message.js";
@@ -16,7 +16,7 @@ export type MailableClass<M extends Mailable = Mailable> = abstract new (...args
  * the fake has to intercept at `send(mailable)` and keep the actual
  * `Mailable` instances so `assertSent(WelcomeMailable)` can match by class.
  *
- * Swap it in for the real manager for a test run (see `@mahi/testing`'s
+ * Swap it in for the real manager for a test run (see `@mahiframework/testing`'s
  * `createTestApplication({ fakeMail: true })`), then assert:
  *
  *   mail.assertSent(WelcomeMailable);

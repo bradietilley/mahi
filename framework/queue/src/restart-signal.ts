@@ -1,5 +1,5 @@
-import { CACHE_TOKEN, type Application } from "@mahi/core";
-import type { CacheManager } from "@mahi/cache";
+import { CACHE_TOKEN, type Application } from "@mahiframework/core";
+import type { CacheManager } from "@mahiframework/cache";
 
 /**
  * The cache key holding the epoch-milliseconds timestamp of the most

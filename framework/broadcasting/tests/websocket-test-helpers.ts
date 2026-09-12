@@ -3,7 +3,7 @@ import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
 import { Hono } from "hono";
 import WebSocket from "ws";
-import type { WebSocketSupport } from "@mahi/http";
+import type { WebSocketSupport } from "@mahiframework/http";
 import type { LocalBroadcastDriver } from "../src/drivers/local-broadcast-driver.js";
 
 export interface TestServer {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { DatabaseManager, DATABASE_TOKEN, SqliteDriver } from "@mahi/database";
-import { EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
-import { MailManager, MAIL_TOKEN, ArrayTransport } from "@mahi/mail";
+import { Application } from "@mahiframework/core";
+import { DatabaseManager, DATABASE_TOKEN, SqliteDriver } from "@mahiframework/database";
+import { EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
+import { MailManager, MAIL_TOKEN, ArrayTransport } from "@mahiframework/mail";
 import {
   NotificationsServiceProvider,
   NOTIFICATIONS_TOKEN,

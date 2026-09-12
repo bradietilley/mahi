@@ -1,5 +1,5 @@
 import { Redis, type RedisOptions } from "ioredis";
-import type { Connectable } from "@mahi/core";
+import type { Connectable } from "@mahiframework/core";
 
 /**
  * Per-connection configuration. Either give a `url` (`redis://[:password@]

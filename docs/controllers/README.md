@@ -5,7 +5,7 @@ method. There are no `index`/`store`/`show`/`update`/`destroy` resource
 controllers and no route-to-method string references.
 
 ```ts
-import { Controller, HttpResponse, type Request } from "@mahi/http";
+import { Controller, HttpResponse, type Request } from "@mahiframework/http";
 import { Post } from "../../models/post.model.js";
 import { PostResource } from "../resources/post.resource.js";
 
@@ -143,7 +143,7 @@ if (allowed === false) throw HttpError.forbidden();
 doesn't override it falls straight through.
 
 **Only an explicit `false` throws.** `undefined`, `void`, and `true` all
-pass. That's deliberate: `@mahi/authorization`'s `authorize(ability, …)`
+pass. That's deliberate: `@mahiframework/authorization`'s `authorize(ability, …)`
 returns `Promise<void>` and throws on denial, so delegating to it works
 without the framework second-guessing the return value:
 

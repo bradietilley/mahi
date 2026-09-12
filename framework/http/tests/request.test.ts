@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Model } from "@mahi/database";
+import { Model } from "@mahiframework/database";
 import { HttpError } from "../src/http-error.js";
 import { Request, requestFromContext } from "../src/request.js";
 import { toHonoMiddleware } from "../src/middleware/pipeline-middleware.js";
@@ -167,7 +167,7 @@ describe("Request.from()", () => {
 
 describe("Request validation", () => {
   it("validate() returns false and stashes errors; validateOrFail() throws", async () => {
-    const { rule, numberRule, ValidationException } = await import("@mahi/validation");
+    const { rule, numberRule, ValidationException } = await import("@mahiframework/validation");
 
     class CreateUserRequest extends Request {
       rules() {

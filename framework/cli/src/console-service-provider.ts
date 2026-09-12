@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { ServiceProvider, base_path } from "@mahi/core";
+import { ServiceProvider, base_path } from "@mahiframework/core";
 import { ConsoleKernel, type ConsoleKernelOptions } from "./console-kernel.js";
 import { MigrateCommand } from "./commands/migrate.js";
 import { MigrateRollbackCommand } from "./commands/migrate-rollback.js";

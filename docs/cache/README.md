@@ -1,11 +1,11 @@
 # Cache
 
-`@mahi/cache` is three things layered on one small interface: a
+`@mahiframework/cache` is three things layered on one small interface: a
 key/value `CacheStore`, a mutual-exclusion `Lock` built on that store's
 atomic `add()`, and a `RateLimiter` built on its atomic `increment()`.
 
 ```ts
-import { Cache } from "@mahi/cache";
+import { Cache } from "@mahiframework/cache";
 
 await Cache.put("feed:427185966743560456", posts, 300);
 const cached = await Cache.get<Post[]>("feed:427185966743560456");
@@ -14,7 +14,7 @@ const feed = await Cache.remember("feed:global", () => buildGlobalFeed(), 60);
 ```
 
 Two stores ship in the box — `array` (in-process `Map`) and `file` (JSON
-on disk). `@mahi/redis` adds a third. All three implement the same
+on disk). `@mahiframework/redis` adds a third. All three implement the same
 nine-method interface, so nothing above the store layer changes when you
 switch.
 
@@ -399,7 +399,7 @@ for you.
 
 ### `RedisCacheStore`
 
-Lives in `@mahi/redis`. `increment` maps to `INCRBY`, `add` to
+Lives in `@mahiframework/redis`. `increment` maps to `INCRBY`, `add` to
 `SET key value NX EX ttl`, and `releaseLock` to a compare-and-delete Lua
 script — all genuinely atomic *across processes*, so every `Lock` and
 `RateLimiter` built on it becomes multi-process correct for free. Its
@@ -461,7 +461,7 @@ A `Lock` is `add()` on a `"<key>_lock"` entry, plus a retry loop and an
 owner token.
 
 ```ts
-import { Cache, LockTimeoutError } from "@mahi/cache";
+import { Cache, LockTimeoutError } from "@mahiframework/cache";
 
 const lock = Cache.lock({
   key: "rebuild-feed",
@@ -682,7 +682,7 @@ module-load time. `index.ts` re-exports all three regardless.
 
 Bound as a singleton at `RATE_LIMITER_TOKEN` by `CacheServiceProvider`,
 backed by the app's **default** cache store. That's the same token
-`@mahi/http`'s `throttle()` resolves, and it's why
+`@mahiframework/http`'s `throttle()` resolves, and it's why
 `CacheServiceProvider` must be listed before `HttpServiceProvider`.
 
 Because it's built on the default store, `cache.default` decides whether

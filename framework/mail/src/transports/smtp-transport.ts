@@ -39,9 +39,9 @@ export interface SmtpTransportConfig {
 
 /**
  * The one universally-needed real-world sender — SMTP via `nodemailer`
- * (mature, connection-pooling, zero-config-friendly), `@mahi/mail`'s
+ * (mature, connection-pooling, zero-config-friendly), `@mahiframework/mail`'s
  * single real runtime dependency (matching `better-sqlite3` in
- * `@mahi/database` as the "one focused dependency per package"
+ * `@mahiframework/database` as the "one focused dependency per package"
  * precedent).
  *
  * The nodemailer `Transporter` is created lazily on first `send()` rather

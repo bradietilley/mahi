@@ -1,7 +1,7 @@
 import { sql, type ExpressionBuilder, type Kysely, type SelectQueryBuilder } from "kysely";
 import { Expression } from "./expression.js";
 import { applyWhen } from "./conditionable.js";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import { dialectOf } from "./drivers/dialect-registry.js";
 import { normalizeBinding, normalizeBindings, type Bindable } from "./bindings.js";
 import { queryGrammarFor, type JsonColumn, type QueryGrammar } from "./query/index.js";

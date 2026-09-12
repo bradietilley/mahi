@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { Tui } from "@mahi/tui";
+import { Application } from "@mahiframework/core";
+import { Tui } from "@mahiframework/tui";
 
-// Raw terminal keystrokes (not re-exported from @mahi/tui's public
+// Raw terminal keystrokes (not re-exported from @mahiframework/tui's public
 // surface) — a fake select() is driven by navigation + Enter, so we inline
 // the two we need.
 const DOWN = "\x1b[B";

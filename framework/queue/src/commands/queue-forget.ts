@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Command } from "@mahi/cli";
+import { Command } from "@mahiframework/cli";
 import { QueueManager } from "../queue-manager.js";
 import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsFailedJobs } from "../failed-job-repository.js";

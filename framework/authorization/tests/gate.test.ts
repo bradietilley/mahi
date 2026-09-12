@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Application } from "@mahi/core";
-import { HttpError } from "@mahi/http";
+import { Application } from "@mahiframework/core";
+import { HttpError } from "@mahiframework/http";
 import { GateRegistry } from "../src/gate.js";
 import { Policy } from "../src/policy.js";
 import { requireAuth } from "../src/guards.js";
@@ -289,7 +289,7 @@ describe("GateRegistry", () => {
   });
 
   describe("ambient user, resolved through AUTH_TOKEN", () => {
-    /** Stands in for @mahi/auth's AuthManager — resolved by string, never imported. */
+    /** Stands in for @mahiframework/auth's AuthManager — resolved by string, never imported. */
     function gateWithUser(user: User | null): GateRegistry {
       const app = new Application();
       app.instance("auth", { userOrNull: () => user });
@@ -328,7 +328,7 @@ describe("GateRegistry", () => {
     });
   });
 
-  describe("without @mahi/auth installed", () => {
+  describe("without @mahiframework/auth installed", () => {
     it("treats every request as a guest instead of throwing", async () => {
       // Authorization must be usable in an app that has no auth package
       // bound at all — every check simply sees a guest.

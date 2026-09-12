@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
 import { QueueServiceProvider } from "../src/queue-service-provider.js";
 import { Job } from "../src/job.js";
 import { Bus } from "../src/bus-facade.js";

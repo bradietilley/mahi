@@ -1,4 +1,4 @@
-import { Request, rule } from "@mahi/http";
+import { Request, rule } from "@mahiframework/http";
 import { User } from "../../models/user.model.js";
 
 /** POST /auth/register body validation. */

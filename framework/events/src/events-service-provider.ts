@@ -1,7 +1,7 @@
-import { ServiceProvider, EVENTS_TOKEN } from "@mahi/core";
+import { ServiceProvider, EVENTS_TOKEN } from "@mahiframework/core";
 import { EventDispatcher } from "./event-dispatcher.js";
 
-// Canonical definition in `@mahi/core`'s `well-known-tokens`
+// Canonical definition in `@mahiframework/core`'s `well-known-tokens`
 // (resolved cross-package by broadcasting and model events); re-exported
 // so this package's public API is unchanged.
 export { EVENTS_TOKEN };

@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/http-client",
+  "name": "@mahiframework/http-client",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,8 +17,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*",
-    "@mahi/pipeline": "workspace:*"
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/pipeline": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

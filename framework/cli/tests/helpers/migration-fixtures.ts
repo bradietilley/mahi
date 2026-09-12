@@ -7,15 +7,15 @@ import { fileURLToPath } from "node:url";
  * (`framework/cli/.tmp-tests/`) rather than the OS temp dir.
  *
  * The migration files these tests write out `import { Schema } from
- * "@mahi/database"`, and `MigrationRunner.discover()` loads them
+ * "@mahiframework/database"`, and `MigrationRunner.discover()` loads them
  * with a bare dynamic `import()`. That's resolved by **Node**, against
  * the importing file's own location — so a migration sitting in
  * `/var/folders/.../T/` has no `node_modules` anywhere up its parent
  * chain and the bare specifier fails with `Cannot find package
- * '@mahi/database'`.
+ * '@mahiframework/database'`.
  *
  * Keeping the fixtures under this package means the normal
- * `framework/cli/node_modules/@mahi/database` symlink is on the
+ * `framework/cli/node_modules/@mahiframework/database` symlink is on the
  * resolution path, exactly as it is for a real app's `database/
  * migrations/` directory. (Older vitest happened to route these imports
  * through Vite's resolver, which followed the *test file's* location and
@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
  */
 const FIXTURE_ROOT = path.join(fileURLToPath(new URL("../../", import.meta.url)), ".tmp-tests");
 
-/** Creates an empty, uniquely-named migrations directory that bare `@mahi/*` imports resolve from. */
+/** Creates an empty, uniquely-named migrations directory that bare `@mahiframework/*` imports resolve from. */
 export async function makeMigrationDir(prefix: string): Promise<string> {
   const { mkdir } = await import("node:fs/promises");
   await mkdir(FIXTURE_ROOT, { recursive: true });

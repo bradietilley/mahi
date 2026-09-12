@@ -20,8 +20,8 @@
  */
 
 import { expectTypeOf } from "vitest";
-import type { Collection } from "@mahi/core";
-import type { DateTime } from "@mahi/datetime";
+import type { Collection } from "@mahiframework/core";
+import type { DateTime } from "@mahiframework/datetime";
 import {
   Model,
   Cast,

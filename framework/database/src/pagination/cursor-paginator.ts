@@ -1,4 +1,4 @@
-import { Collection } from "@mahi/core";
+import { Collection } from "@mahiframework/core";
 import type { EloquentBuilder, Hydrated } from "../eloquent-builder.js";
 import type { RelationDefinitions } from "../relations.js";
 

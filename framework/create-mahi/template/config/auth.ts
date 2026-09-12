@@ -1,4 +1,4 @@
-import type { AuthConfig } from "@mahi/auth";
+import type { AuthConfig } from "@mahiframework/auth";
 import { User } from "../src/models/user.model.js";
 import type { Env } from "./env.js";
 
@@ -75,7 +75,7 @@ export function authConfig(env: Env): AuthConfig {
     /**
      * Whether the scaffolded auth controllers send their emails.
      *
-     * The framework never reads these — `@mahi/auth` sends no mail at all.
+     * The framework never reads these — `@mahiframework/auth` sends no mail at all.
      * The controllers in `src/http/controllers/` check them, so turning
      * one off hands delivery back to you (a listener, SMS, an ESP API)
      * without deleting the controller. The broker still mints the token or

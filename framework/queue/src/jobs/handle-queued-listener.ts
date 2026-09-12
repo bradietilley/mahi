@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import { EventDispatcher, EVENTS_TOKEN, type QueuedListenerPayload } from "@mahi/events";
+import { app } from "@mahiframework/core";
+import { EventDispatcher, EVENTS_TOKEN, type QueuedListenerPayload } from "@mahiframework/events";
 import { Job } from "../job.js";
 
 /**

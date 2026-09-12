@@ -1,4 +1,4 @@
-# @mahi/tui
+# @mahiframework/tui
 
 TUI — interactive terminal prompts, spinners, and progress bars for Mahi.
 

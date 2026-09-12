@@ -1,11 +1,11 @@
 import type { Redis } from "ioredis";
 import type { WSContext } from "hono/ws";
-import type { Connectable } from "@mahi/core";
+import type { Connectable } from "@mahiframework/core";
 import {
   LocalBroadcastDriver,
   DEFAULT_SOCKET_PATH,
   type LocalBroadcastDriverOptions,
-} from "@mahi/broadcasting";
+} from "@mahiframework/broadcasting";
 import type { RedisConnection } from "../redis-connection.js";
 
 /** The Redis pub/sub channel every process publishes broadcasts to and subscribes on. */

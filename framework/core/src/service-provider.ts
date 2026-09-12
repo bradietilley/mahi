@@ -2,18 +2,18 @@ import type { Application } from "./application.js";
 
 /**
  * Augmented via TypeScript declaration merging by whichever framework
- * packages are imported. `@mahi/core` itself declares no hooks here
+ * packages are imported. `@mahiframework/core` itself declares no hooks here
  * — this keeps core free of any dependency on http/cli/events. e.g.:
  *
- *   // in @mahi/http
- *   declare module "@mahi/core" {
+ *   // in @mahiframework/http
+ *   declare module "@mahiframework/core" {
  *     interface ProviderHooks {
  *       routes?(router: Router): void;
  *     }
  *   }
  *
- * An app that imports @mahi/http, @mahi/cli, and
- * @mahi/events will see all three hooks as valid, fully-typed
+ * An app that imports @mahiframework/http, @mahiframework/cli, and
+ * @mahiframework/events will see all three hooks as valid, fully-typed
  * overrides on any of its own ServiceProvider subclasses, without core
  * ever importing those packages.
  *

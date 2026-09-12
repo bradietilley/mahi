@@ -1,5 +1,5 @@
 import { once } from "node:events";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import WebSocket from "ws";
 import { HttpResponse } from "../src/response.js";

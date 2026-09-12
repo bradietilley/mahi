@@ -29,112 +29,112 @@ const BUILD_SCRIPT = "tsc -b && node ../../scripts/prune-dist.mjs";
 
 // Per-package description + keywords. `create-mahi` keeps its own description.
 const DESCRIPTIONS = {
-  "@mahi/auth": {
+  "@mahiframework/auth": {
     description:
       "Authentication — session and token guards, password brokers, and user providers for Mahi.",
     keywords: ["mahi", "auth", "authentication", "session", "token"],
   },
-  "@mahi/authorization": {
+  "@mahiframework/authorization": {
     description: "Authorization — gates, policies, and ability checks for Mahi.",
     keywords: ["mahi", "authorization", "gate", "policy", "abilities"],
   },
-  "@mahi/broadcasting": {
+  "@mahiframework/broadcasting": {
     description: "Broadcasting — event broadcasting over WebSocket and pub/sub channels for Mahi.",
     keywords: ["mahi", "broadcasting", "websocket", "pubsub", "realtime"],
   },
-  "@mahi/cache": {
+  "@mahiframework/cache": {
     description:
       "Cache — a unified cache API over array, file, and Redis stores, with atomic locks, for Mahi.",
     keywords: ["mahi", "cache", "store", "lock", "redis"],
   },
-  "@mahi/cli": {
+  "@mahiframework/cli": {
     description: "Console — the artisan-style command kernel and code generators for Mahi.",
     keywords: ["mahi", "cli", "console", "commands", "artisan"],
   },
-  "@mahi/core": {
+  "@mahiframework/core": {
     description:
       "Core — the application container, service providers, lifecycle, config, and logging for Mahi.",
     keywords: ["mahi", "core", "container", "ioc", "framework"],
   },
-  "@mahi/database": {
+  "@mahiframework/database": {
     description: "Database — the query builder, migrations, and Eloquent-style ORM for Mahi.",
     keywords: ["mahi", "database", "orm", "query-builder", "migrations"],
   },
-  "@mahi/datetime": {
+  "@mahiframework/datetime": {
     description: "Dates & times — an immutable, timezone-aware date/time value type for Mahi.",
     keywords: ["mahi", "datetime", "date", "time", "timezone"],
   },
-  "@mahi/encryption": {
+  "@mahiframework/encryption": {
     description: "Encryption — authenticated AES-GCM encryption and keyed signing for Mahi.",
     keywords: ["mahi", "encryption", "aes-gcm", "signing", "crypto"],
   },
-  "@mahi/events": {
+  "@mahiframework/events": {
     description: "Events — a synchronous event dispatcher and listener registry for Mahi.",
     keywords: ["mahi", "events", "dispatcher", "listeners", "pubsub"],
   },
-  "@mahi/facades": {
+  "@mahiframework/facades": {
     description: "Facades — static proxies over container-resolved services for Mahi.",
     keywords: ["mahi", "facades", "container", "proxy"],
   },
-  "@mahi/health": {
+  "@mahiframework/health": {
     description: "Health — application health checks and readiness reporting for Mahi.",
     keywords: ["mahi", "health", "healthcheck", "readiness"],
   },
-  "@mahi/http-client": {
+  "@mahiframework/http-client": {
     description: "HTTP client — a fluent, retryable HTTP client with fakes for Mahi.",
     keywords: ["mahi", "http-client", "fetch", "retry", "request"],
   },
-  "@mahi/http": {
+  "@mahiframework/http": {
     description: "HTTP — the router, request/response, middleware, and kernel for Mahi.",
     keywords: ["mahi", "http", "router", "middleware", "kernel"],
   },
-  "@mahi/mail": {
+  "@mahiframework/mail": {
     description: "Mail — mailables and transports for sending email from Mahi.",
     keywords: ["mahi", "mail", "email", "mailable", "smtp"],
   },
-  "@mahi/notifications": {
+  "@mahiframework/notifications": {
     description: "Notifications — multi-channel notifications for Mahi.",
     keywords: ["mahi", "notifications", "notify", "channels"],
   },
-  "@mahi/pipeline": {
+  "@mahiframework/pipeline": {
     description: "Pipeline — pass an object through a series of stages, for Mahi.",
     keywords: ["mahi", "pipeline", "middleware", "stages"],
   },
-  "@mahi/process": {
+  "@mahiframework/process": {
     description: "Process — a fluent wrapper for spawning and managing child processes, for Mahi.",
     keywords: ["mahi", "process", "child-process", "exec", "spawn"],
   },
-  "@mahi/queue": {
+  "@mahiframework/queue": {
     description:
       "Queues — background job dispatch and workers over sync, database, and Redis drivers, for Mahi.",
     keywords: ["mahi", "queue", "jobs", "worker", "background"],
   },
-  "@mahi/redis": {
+  "@mahiframework/redis": {
     description:
       "Redis — a shared Redis connection with cache, queue, and broadcast adapters, for Mahi.",
     keywords: ["mahi", "redis", "cache", "queue", "pubsub"],
   },
-  "@mahi/schedule": {
+  "@mahiframework/schedule": {
     description: "Scheduling — a cron-style task scheduler with overlap protection, for Mahi.",
     keywords: ["mahi", "schedule", "cron", "scheduler", "tasks"],
   },
-  "@mahi/snowflake": {
+  "@mahiframework/snowflake": {
     description: "Snowflake — distributed, time-sortable unique ID generation for Mahi.",
     keywords: ["mahi", "snowflake", "id", "unique", "distributed"],
   },
-  "@mahi/storage": {
+  "@mahiframework/storage": {
     description: "Storage — a filesystem abstraction over local and cloud disks for Mahi.",
     keywords: ["mahi", "storage", "filesystem", "disk", "files"],
   },
-  "@mahi/testing": {
+  "@mahiframework/testing": {
     description: "Testing — test helpers, fakes, and assertions for Mahi applications.",
     keywords: ["mahi", "testing", "fakes", "assertions", "test"],
   },
-  "@mahi/tui": {
+  "@mahiframework/tui": {
     description: "TUI — interactive terminal prompts, spinners, and progress bars for Mahi.",
     keywords: ["mahi", "tui", "terminal", "prompts", "cli"],
   },
-  "@mahi/validation": {
+  "@mahiframework/validation": {
     description: "Validation — a rule-based validator for Mahi.",
     keywords: ["mahi", "validation", "validator", "rules"],
   },
@@ -142,26 +142,26 @@ const DESCRIPTIONS = {
 
 // Package → docs/<slug> for the README "documentation" link, where one exists.
 const DOC_SLUGS = {
-  "@mahi/auth": "authentication",
-  "@mahi/authorization": "authorization",
-  "@mahi/broadcasting": "broadcasting",
-  "@mahi/cache": "cache",
-  "@mahi/cli": "console",
-  "@mahi/database": "database",
-  "@mahi/datetime": "datetime",
-  "@mahi/encryption": "encryption",
-  "@mahi/events": "events",
-  "@mahi/health": "health",
-  "@mahi/http-client": "http-client",
-  "@mahi/http": "routing",
-  "@mahi/mail": "mail",
-  "@mahi/notifications": "notifications",
-  "@mahi/queue": "queues",
-  "@mahi/redis": "redis",
-  "@mahi/schedule": "scheduling",
-  "@mahi/storage": "storage",
-  "@mahi/testing": "testing",
-  "@mahi/validation": "validation",
+  "@mahiframework/auth": "authentication",
+  "@mahiframework/authorization": "authorization",
+  "@mahiframework/broadcasting": "broadcasting",
+  "@mahiframework/cache": "cache",
+  "@mahiframework/cli": "console",
+  "@mahiframework/database": "database",
+  "@mahiframework/datetime": "datetime",
+  "@mahiframework/encryption": "encryption",
+  "@mahiframework/events": "events",
+  "@mahiframework/health": "health",
+  "@mahiframework/http-client": "http-client",
+  "@mahiframework/http": "routing",
+  "@mahiframework/mail": "mail",
+  "@mahiframework/notifications": "notifications",
+  "@mahiframework/queue": "queues",
+  "@mahiframework/redis": "redis",
+  "@mahiframework/schedule": "scheduling",
+  "@mahiframework/storage": "storage",
+  "@mahiframework/testing": "testing",
+  "@mahiframework/validation": "validation",
 };
 
 let hadDrift = false;

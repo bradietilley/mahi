@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { CacheServiceProvider } from "@mahi/cache";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { CacheServiceProvider } from "@mahiframework/cache";
 import { SequentialIdentifierResolver } from "../src/identifier-resolvers/sequential-identifier-resolver.js";
 import { CacheSequenceResolver } from "../src/sequence-resolvers/cache-sequence-resolver.js";
 import { defaultSnowflakeConfig } from "../src/snowflake-config.js";

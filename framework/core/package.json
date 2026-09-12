@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/core",
+  "name": "@mahiframework/core",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/datetime": "workspace:*",
+    "@mahiframework/datetime": "workspace:*",
     "dotenv": "^16.4.7",
     "zod": "^3.24.1"
   },

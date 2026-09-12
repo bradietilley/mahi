@@ -1,10 +1,10 @@
-import { type RateLimiter, type Limit, Unlimited } from "@mahi/cache";
+import { type RateLimiter, type Limit, Unlimited } from "@mahiframework/cache";
 import type { JobMiddleware, JobMiddlewarePassable } from "./job-middleware.js";
 import { ReleaseJobError } from "./release-job-error.js";
 
 /**
  * Job middleware that rate-limits how often a job may run, using a named
- * limiter registered on `@mahi/cache`'s `RateLimiter` (the very
+ * limiter registered on `@mahiframework/cache`'s `RateLimiter` (the very
  * same primitive the `throttle()` HTTP middleware uses). When the limit is
  * exceeded the job is **released** back onto the queue — via
  * `ReleaseJobError` — to be retried once the window frees up, rather than
@@ -12,7 +12,7 @@ import { ReleaseJobError } from "./release-job-error.js";
  *
  * The `RateLimiter` is passed in **explicitly** by the app (not
  * auto-resolved from the container inside the middleware), keeping
- * `@mahi/queue`'s relationship to `@mahi/cache` an optional
+ * `@mahiframework/queue`'s relationship to `@mahiframework/cache` an optional
  * peer rather than a hard dependency:
  *
  *   // once, at boot:

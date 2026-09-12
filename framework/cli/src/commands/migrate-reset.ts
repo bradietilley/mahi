@@ -1,6 +1,6 @@
 import type { Command as CommanderCommand } from "commander";
-import { DatabaseManager, MigrationRunner, DATABASE_TOKEN } from "@mahi/database";
-import { Tui } from "@mahi/tui";
+import { DatabaseManager, MigrationRunner, DATABASE_TOKEN } from "@mahiframework/database";
+import { Tui } from "@mahiframework/tui";
 import { Command } from "../command.js";
 import { collectMigrationSources } from "./migration-directories.js";
 

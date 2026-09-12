@@ -1,13 +1,13 @@
 import type { SessionRecord, SessionStore } from "./session-store.js";
 
 /**
- * Minimal structural view of `@mahi/cache`'s `CacheStore` — the
+ * Minimal structural view of `@mahiframework/cache`'s `CacheStore` — the
  * operations this store actually needs.
  *
- * Structural rather than an import so `@mahi/auth` doesn't take a
- * package dependency on `@mahi/cache` for one optional store. The
+ * Structural rather than an import so `@mahiframework/auth` doesn't take a
+ * package dependency on `@mahiframework/cache` for one optional store. The
  * concrete store is resolved at runtime via `CACHE_TOKEN`, the same
- * soft-dependency shape `@mahi/schedule` uses for `QUEUE_TOKEN`.
+ * soft-dependency shape `@mahiframework/schedule` uses for `QUEUE_TOKEN`.
  */
 export interface SessionCacheStore {
   get<T = unknown>(key: string): Promise<T | undefined>;

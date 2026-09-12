@@ -1,10 +1,10 @@
-import { AbstractEvent } from "@mahi/events";
+import { AbstractEvent } from "@mahiframework/events";
 import type { Job } from "./job.js";
 import type { QueuedJob } from "./queue-driver.js";
 
 /**
  * Queue lifecycle events, dispatched by the `queue:work` worker through
- * `@mahi/events` (when an `EventsServiceProvider` is registered) so
+ * `@mahiframework/events` (when an `EventsServiceProvider` is registered) so
  * app code — error reporting, a monitoring page, metrics — can react to
  * job progress without editing the worker. Analogous to Laravel's
  * `JobProcessing`/`JobProcessed`/`JobFailed`.

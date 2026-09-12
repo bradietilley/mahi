@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application, ServiceProvider } from "@mahi/core";
+import { Application, ServiceProvider } from "@mahiframework/core";
 import { HealthServiceProvider, HEALTH_TOKEN } from "../src/health-service-provider.js";
 import { HealthRegistry } from "../src/health-registry.js";
 import { HealthCommand } from "../src/commands/health.js";

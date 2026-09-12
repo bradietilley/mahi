@@ -1,5 +1,5 @@
-import { authenticate } from "@mahi/auth";
-import { throttle, validateSignature, type Router } from "@mahi/http";
+import { authenticate } from "@mahiframework/auth";
+import { throttle, validateSignature, type Router } from "@mahiframework/http";
 import { RegisterController } from "../http/controllers/register.controller.js";
 import { LoginController } from "../http/controllers/login.controller.js";
 import { LogoutController } from "../http/controllers/logout.controller.js";

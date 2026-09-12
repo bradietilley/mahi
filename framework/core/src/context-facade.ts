@@ -16,9 +16,9 @@ import type { ContextRepository } from "./context.js";
  * or any other registration to work.
  *
  * Hand-written directly against `app()` rather than built on
- * `@mahi/facades`' `Facade<T>(getFacadeKey)` mixin for the same
- * reason as the `Log` facade (see `log-facade.ts`): `@mahi/facades`
- * depends on `@mahi/core`, and `ContextRepository` lives in core,
+ * `@mahiframework/facades`' `Facade<T>(getFacadeKey)` mixin for the same
+ * reason as the `Log` facade (see `log-facade.ts`): `@mahiframework/facades`
+ * depends on `@mahiframework/core`, and `ContextRepository` lives in core,
  * so importing `Facade` here would create a circular package dependency —
  * and the repository isn't container-bound anyway, so there's no facade
  * key to resolve.

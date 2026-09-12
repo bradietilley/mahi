@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/notifications",
+  "name": "@mahiframework/notifications",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,11 +17,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/events": "workspace:*",
-    "@mahi/facades": "workspace:*",
-    "@mahi/mail": "workspace:*"
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/events": "workspace:*",
+    "@mahiframework/facades": "workspace:*",
+    "@mahiframework/mail": "workspace:*"
   },
   "devDependencies": {
     "kysely": "^0.29.5",

@@ -1,6 +1,6 @@
-import { DriverNotRegisteredError, Manager, type Application } from "@mahi/core";
-import type { Hasher } from "@mahi/encryption";
-import type { Request } from "@mahi/http";
+import { DriverNotRegisteredError, Manager, type Application } from "@mahiframework/core";
+import type { Hasher } from "@mahiframework/encryption";
+import type { Request } from "@mahiframework/http";
 import { isStatefulGuard, type Guard, type StatefulGuard } from "./guard.js";
 import type { Credentials, UserProvider } from "./user-provider.js";
 import { PasswordBroker, type PasswordBrokerConfig } from "./passwords/password-broker.js";
@@ -35,8 +35,8 @@ export interface AuthConfig {
   /**
    * Switches for the auth emails the scaffolded app sends.
    *
-   * **The framework does not read these.** `@mahi/auth` sends no mail and
-   * has no `@mahi/mail` dependency — the mailables and the controllers
+   * **The framework does not read these.** `@mahiframework/auth` sends no mail and
+   * has no `@mahiframework/mail` dependency — the mailables and the controllers
    * that send them are scaffolded into your app, where you can edit them
    * freely. These flags are declared here so the decision has one obvious
    * home and is typed, and the generated controllers check them:
@@ -574,7 +574,7 @@ export class AuthManager extends Manager<Guard> {
    * Unlike `runAs()` (which wraps a single synchronous scope), this swaps
    * the resolved guard so `authenticate()` → `resolve()` returns `user`
    * for real requests driven through the HTTP kernel — the mechanism
-   * `@mahi/testing`'s `TestClient.actingAs()` uses. Pass `null` to clear.
+   * `@mahiframework/testing`'s `TestClient.actingAs()` uses. Pass `null` to clear.
    */
   actingAs(user: unknown, guardName?: string): void {
     setActingAs(user, user === null ? null : (guardName ?? this.getDefaultDriver()));

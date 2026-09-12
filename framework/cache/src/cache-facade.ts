@@ -1,5 +1,5 @@
-import { Facade } from "@mahi/facades";
-import { CACHE_TOKEN } from "@mahi/core";
+import { Facade } from "@mahiframework/facades";
+import { CACHE_TOKEN } from "@mahiframework/core";
 import type { CacheManager } from "./cache-manager.js";
 import type { CacheStore } from "./cache-store.js";
 import type { Lock, LockOptions } from "./locking/lock.js";

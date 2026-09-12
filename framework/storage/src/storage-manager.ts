@@ -1,4 +1,4 @@
-import { Manager, type Application } from "@mahi/core";
+import { Manager, type Application } from "@mahiframework/core";
 import type { StorageDriver } from "./storage-driver.js";
 
 /**

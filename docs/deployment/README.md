@@ -73,8 +73,8 @@ does, because `./artisan` is a shell wrapper around exactly that file.
 
 ```ts
 // bin/server.ts
-import { trap } from "@mahi/cli";
-import { formatServeUrl, listenHttpServer } from "@mahi/http";
+import { trap } from "@mahiframework/cli";
+import { formatServeUrl, listenHttpServer } from "@mahiframework/http";
 import { bootstrap } from "./bootstrap.js";
 
 const app = await bootstrap();
@@ -689,7 +689,7 @@ liveness probe and get restarted in a loop, turning a planned maintenance
 window into an outage.
 
 `/health` runs every check registered through a provider's `checks()`
-hook — `@mahi/health` ships cache, database and filesystem checks — and
+hook — `@mahiframework/health` ships cache, database and filesystem checks — and
 returns `200`, or `503` if any failed. It is deliberately **not**
 maintenance-exempt: a readiness probe answering "ready" while you have
 explicitly taken the app down would put traffic straight back on it.

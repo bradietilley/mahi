@@ -1,5 +1,5 @@
-import type { Application } from "@mahi/core";
-import { Http } from "@mahi/http-client";
+import type { Application } from "@mahiframework/core";
+import { Http } from "@mahiframework/http-client";
 import {
   isCompiledCronDue,
   nextCronRun,
@@ -620,7 +620,7 @@ export class ScheduledTask {
    * fires for a task that actually succeeded, and you want to be able to
    * tell those apart.
    *
-   * Goes through `@mahi/http-client` rather than a bare `fetch()` so pings
+   * Goes through `@mahiframework/http-client` rather than a bare `fetch()` so pings
    * are fakeable: a test asserts on them with `Http.fake()` /
    * `Http.assertSent()` instead of monkey-patching `globalThis.fetch`.
    * Note that a non-2xx response resolves rather than throwing, so an

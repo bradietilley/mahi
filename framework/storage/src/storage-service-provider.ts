@@ -1,8 +1,8 @@
-import { ServiceProvider, STORAGE_TOKEN } from "@mahi/core";
+import { ServiceProvider, STORAGE_TOKEN } from "@mahiframework/core";
 import { StorageManager, isLocalDiskConfig, type StorageConfig } from "./storage-manager.js";
 import { LocalStorageDriver } from "./drivers/local-storage-driver.js";
 
-// Canonical definition in `@mahi/core`'s `well-known-tokens`;
+// Canonical definition in `@mahiframework/core`'s `well-known-tokens`;
 // re-exported so this package's public API is unchanged.
 export { STORAGE_TOKEN };
 

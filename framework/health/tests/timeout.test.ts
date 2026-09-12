@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { HealthRegistry } from "../src/health-registry.js";
 
 /**

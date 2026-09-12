@@ -80,7 +80,7 @@ from current state.
 job(factory: () => JobLike): ScheduledTask {
   return this.call(async (app) => {
     if (!app.has(QUEUE_TOKEN)) {
-      throw new Error(`schedule.job() requires @mahi/queue's QueueServiceProvider to be registered.`);
+      throw new Error(`schedule.job() requires @mahiframework/queue's QueueServiceProvider to be registered.`);
     }
     const queue = app.make<QueueManagerLike>(QUEUE_TOKEN);
     await queue.dispatch(factory());
@@ -88,8 +88,8 @@ job(factory: () => JobLike): ScheduledTask {
 }
 ```
 
-Two things follow. First, `@mahi/schedule` has **no compile-time
-dependency on `@mahi/queue`** — it resolves the string `QUEUE_TOKEN`
+Two things follow. First, `@mahiframework/schedule` has **no compile-time
+dependency on `@mahiframework/queue`** — it resolves the string `QUEUE_TOKEN`
 and types the result structurally. Register the schedule provider without
 the queue package and everything except `.job()` works; call `.job()` and
 you get a clear error rather than an unresolved-token failure.
@@ -345,11 +345,11 @@ that accepts the connection and then goes quiet would otherwise hang
 `pingBefore()` indefinitely and stall every task behind it.
 
 **Pings are fakeable.** They go through
-[`@mahi/http-client`](../http-client/), not a bare `fetch()`, so a test
+[`@mahiframework/http-client`](../http-client/), not a bare `fetch()`, so a test
 asserts on them without monkey-patching globals:
 
 ```ts
-import { Http } from "@mahi/http-client";
+import { Http } from "@mahiframework/http-client";
 
 Http.fake();
 await task.run(app);

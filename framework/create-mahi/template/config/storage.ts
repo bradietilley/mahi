@@ -1,5 +1,5 @@
-import { storage_path } from "@mahi/core";
-import type { StorageConfig } from "@mahi/storage";
+import { storage_path } from "@mahiframework/core";
+import type { StorageConfig } from "@mahiframework/storage";
 
 /**
  * `default` is `local` — a PRIVATE disk under `storage/app/private`, served

@@ -1,12 +1,12 @@
 # Validation
 
-`@mahi/validation` provides a fluent `Rule` builder, a `Validator` that
+`@mahiframework/validation` provides a fluent `Rule` builder, a `Validator` that
 runs it, and a `ValidationException` the HTTP layer renders as a 422. The
 package has no dependency on HTTP or the database — it runs in jobs, CLI
 commands, and tests as readily as in a request.
 
 ```ts
-import { Request, rule } from "@mahi/http";
+import { Request, rule } from "@mahiframework/http";
 
 export class RegisterRequest extends Request {
   rules() {
@@ -486,7 +486,7 @@ failed validation throws a `ValidationException` carrying the error bag
 rather than handing back a partially-built, unsafe object.
 
 ```ts
-import { Validator, rule } from "@mahi/validation";
+import { Validator, rule } from "@mahiframework/validation";
 
 const validator = new Validator({ name: "Ada" }, {}, {
   name: rule().string().required(),
@@ -624,7 +624,7 @@ username: rule()
 ### Global overrides
 
 ```ts
-import { Rule } from "@mahi/validation";
+import { Rule } from "@mahiframework/validation";
 
 Rule.setDefaultErrors({
   required: "Please provide a value for :attribute.",
@@ -655,7 +655,7 @@ entry → `humanize(fieldName)`.
 Extend `ValidationRule` for logic the built-ins can't express:
 
 ```ts
-import { ValidationRule } from "@mahi/validation";
+import { ValidationRule } from "@mahiframework/validation";
 
 class ValidPostTitle extends ValidationRule {
   run(attribute: string, value: unknown): this {
@@ -678,7 +678,7 @@ request's `await` inside `run()` can't observe another's pass/fail state.
 
 ## The presence resolver
 
-`exists()` and `unique()` need database access, which `@mahi/validation`
+`exists()` and `unique()` need database access, which `@mahiframework/validation`
 deliberately doesn't have — it would make every consumer of the package
 depend on the ORM. Instead there's a single injection point:
 
@@ -694,7 +694,7 @@ export interface PresenceResolver {
 }
 ```
 
-`@mahi/database`'s `DatabaseServiceProvider.boot()` calls
+`@mahiframework/database`'s `DatabaseServiceProvider.boot()` calls
 `registerValidationPresenceResolver()`, which implements both against the
 default connection's Kysely instance and installs it via
 `Rule.setPresenceResolver()`. It's registered in the database provider,

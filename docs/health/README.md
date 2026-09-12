@@ -34,8 +34,8 @@ returns `200` when everything passed and `503` when anything failed;
 This is the part to understand before anything else, because the two
 endpoints look redundant and are not.
 
-`@mahi/http` registers an opt-in `GET /up` that does no I/O at all.
-`@mahi/health` adds an opt-in `GET /health` that runs every check. They are
+`@mahiframework/http` registers an opt-in `GET /up` that does no I/O at all.
+`@mahiframework/health` adds an opt-in `GET /health` that runs every check. They are
 the two halves of the standard orchestrator split:
 
 | | `/up` | `/health` |
@@ -68,7 +68,7 @@ A check is a plain object — a name and a function. There is no base class
 to extend and no file-per-check convention.
 
 ```ts
-import type { HealthCheck } from "@mahi/health";
+import type { HealthCheck } from "@mahiframework/health";
 
 const stripe: HealthCheck = {
   name: "stripe",
@@ -118,8 +118,8 @@ aggregate, never scan.
 
 ## The built-in checks
 
-`@mahi/health` registers three under the `core` group. Each skips itself
-when its package isn't installed, so an app without `@mahi/storage` reports
+`@mahiframework/health` registers three under the `core` group. Each skips itself
+when its package isn't installed, so an app without `@mahiframework/storage` reports
 `"filesystem": null` rather than failing to start.
 
 | Check | What it does |
@@ -179,8 +179,8 @@ export function httpConfig(env: Env): HttpConfig {
 `503` rather than `500` is deliberate: a load balancer drains a 503 and
 pages on a 500, and a failing dependency is the former.
 
-The route is registered by `@mahi/http` when `@mahi/health` is installed and
-the config key is set. `@mahi/health` itself depends only on `@mahi/core`,
+The route is registered by `@mahiframework/http` when `@mahiframework/health` is installed and
+the config key is set. `@mahiframework/health` itself depends only on `@mahiframework/core`,
 so `./artisan health` works in an app with no HTTP package at all.
 
 ### Redaction

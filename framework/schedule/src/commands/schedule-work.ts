@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Command, trap } from "@mahi/cli";
+import { Command, trap } from "@mahiframework/cli";
 import { Schedule } from "../schedule.js";
 import { SCHEDULE_TOKEN } from "../tokens.js";
 import { runDueTasks } from "../run-due-tasks.js";

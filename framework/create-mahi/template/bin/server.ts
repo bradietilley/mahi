@@ -1,5 +1,5 @@
-import { trap } from "@mahi/cli";
-import { formatServeUrl, listenHttpServer } from "@mahi/http";
+import { trap } from "@mahiframework/cli";
+import { formatServeUrl, listenHttpServer } from "@mahiframework/http";
 import type { Env } from "../config/env.js";
 import { bootstrap } from "./bootstrap.js";
 

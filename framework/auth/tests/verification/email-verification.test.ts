@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Cast, Model, Schema } from "@mahi/database";
+import { Cast, Model, Schema } from "@mahiframework/database";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import {
   hasVerifiedEmail,

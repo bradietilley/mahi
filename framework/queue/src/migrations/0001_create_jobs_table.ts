@@ -1,4 +1,4 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /**
  * The original `jobs`/`failed_jobs` tables backing `DatabaseQueueDriver`.

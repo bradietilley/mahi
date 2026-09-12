@@ -1,9 +1,9 @@
-import { QUEUE_TOKEN, type Application } from "@mahi/core";
+import { QUEUE_TOKEN, type Application } from "@mahiframework/core";
 import { ScheduledTask, type TaskCallback } from "./scheduled-task.js";
 
 /**
- * Structural stand-in for a `@mahi/queue` `Job` instance — kept
- * minimal (a nominal marker via `handle`) so `@mahi/schedule` never
+ * Structural stand-in for a `@mahiframework/queue` `Job` instance — kept
+ * minimal (a nominal marker via `handle`) so `@mahiframework/schedule` never
  * needs a compile-time import of the queue package.
  */
 interface JobLike {
@@ -22,9 +22,9 @@ export interface ScheduleEvaluationError {
 
 /**
  * Registry of every recurring task defined across the app. `.job()`
- * softly depends on `@mahi/queue` — resolved via `app.make(QUEUE_TOKEN)`
+ * softly depends on `@mahiframework/queue` — resolved via `app.make(QUEUE_TOKEN)`
  * using the string token only (no compile-time import), so
- * `@mahi/schedule` never hard-depends on the queue package. Calling
+ * `@mahiframework/schedule` never hard-depends on the queue package. Calling
  * `.job()` without a queue provider registered throws a clear error.
  */
 export class Schedule {
@@ -59,7 +59,7 @@ export class Schedule {
     return this.call(async (app) => {
       if (!app.has(QUEUE_TOKEN)) {
         throw new Error(
-          `schedule.job() requires @mahi/queue's QueueServiceProvider to be registered.`,
+          `schedule.job() requires @mahiframework/queue's QueueServiceProvider to be registered.`,
         );
       }
 

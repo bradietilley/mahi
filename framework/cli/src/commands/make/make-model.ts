@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold } from "./scaffold.js";
 import { MakeMigrationCommand, type KeyType } from "../make-migration.js";
@@ -15,7 +15,7 @@ import { MakeFactoryCommand } from "./make-factory.js";
  * - `uuid`      — client-generated UUID string. `id: string`,
  *   `keyType: "uuid"`, `table.string("id").primary()`, factory omits `id`.
  * - `snowflake` — client-generated Snowflake. `id: string`,
- *   `keyType: snowflake()` (from `@mahi/snowflake`),
+ *   `keyType: snowflake()` (from `@mahiframework/snowflake`),
  *   `table.string("id").primary()`, factory omits `id`.
  *
  * The model, migration and factory a single `make:model -m -f` emits must
@@ -34,8 +34,8 @@ function template(className: string, keyType: ModelKeyType): string {
 
   const importLine =
     keyType === "snowflake"
-      ? `import { Model } from "@mahi/database";\nimport { snowflake } from "@mahi/snowflake";`
-      : `import { Model } from "@mahi/database";`;
+      ? `import { Model } from "@mahiframework/database";\nimport { snowflake } from "@mahiframework/snowflake";`
+      : `import { Model } from "@mahiframework/database";`;
 
   const configLines: string[] = [`  table: "${table}",`, `  primaryKey: "id",`];
 
@@ -55,8 +55,8 @@ function template(className: string, keyType: ModelKeyType): string {
  */
 export interface ${className}Attributes {
   id: ${idTs};
-  created_at: import("@mahi/datetime").DateTime;
-  updated_at: import("@mahi/datetime").DateTime;
+  created_at: import("@mahiframework/datetime").DateTime;
+  updated_at: import("@mahiframework/datetime").DateTime;
 }
 
 export class ${className} extends Model<${className}Attributes>()({

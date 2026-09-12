@@ -1,4 +1,4 @@
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import { formatTimestamp } from "./timestamps.js";
 import { narrowKey } from "./key-identity.js";
 import type { SqlBinding } from "./query-builder.js";

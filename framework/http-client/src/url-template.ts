@@ -44,7 +44,7 @@ export function resolveUrl(baseUrl: string | undefined, url: string): string {
 /**
  * Appends query parameters to a URL, preserving any already present.
  * Arrays and nested objects expand to bracket notation (`?tag[0]=a&tag[1]=b`,
- * `?filter[status]=active`), the inverse of `@mahi/http`'s query parser;
+ * `?filter[status]=active`), the inverse of `@mahiframework/http`'s query parser;
  * `null`/`undefined` values are skipped rather than serialized as the
  * string `"null"`.
  */

@@ -34,7 +34,7 @@ anchors on a value rather than a position, so neither happens.
 ## `paginate()`
 
 ```ts
-import { paginate } from "@mahi/database";
+import { paginate } from "@mahiframework/database";
 
 const page = await paginate(Post.query().where("published", 1), 1, 20);
 const page = await Post.paginate(1, 20);   // equivalent, unfiltered
@@ -122,7 +122,7 @@ additionally appends an `orderBy` and, when a cursor is present, a
 ## `simplePaginate()`
 
 ```ts
-import { simplePaginate } from "@mahi/database";
+import { simplePaginate } from "@mahiframework/database";
 
 const page = await simplePaginate(Post.query(), 1, 20);
 const page = await Post.simplePaginate(1, 20);
@@ -155,7 +155,7 @@ negative value produces a nonsense `LIMIT`. Clamp before calling — see
 ## `cursorPaginate()`
 
 ```ts
-import { cursorPaginate } from "@mahi/database";
+import { cursorPaginate } from "@mahiframework/database";
 
 const result = await cursorPaginate(Post.query().whereNull("parent_id"), {
   column: "id",
@@ -196,8 +196,8 @@ one. A `randomUUID()` primary key sorts in random order, which makes the
 pages meaningless. Use a Snowflake key strategy instead:
 
 ```ts
-import { Model } from "@mahi/database";
-import { snowflake } from "@mahi/snowflake";
+import { Model } from "@mahiframework/database";
+import { snowflake } from "@mahiframework/snowflake";
 
 interface PostAttributes {
   id: string;
@@ -214,7 +214,7 @@ export class Post extends Model<PostAttributes>()({
 
 A Snowflake is a 63-bit time-ordered id, so `cursorPaginate({ column:
 "id", direction: "desc" })` pages newest-first with no separate
-`created_at` ordering and no tie-breaking (`@mahi/snowflake` provides
+`created_at` ordering and no tie-breaking (`@mahiframework/snowflake` provides
 the `snowflake()` key strategy).
 
 An auto-increment integer primary key works equally well. A `created_at`
@@ -347,7 +347,7 @@ Put the policy in one place and route every list endpoint through it:
 
 ```ts
 // src/support/pagination.ts
-import type { Request } from "@mahi/http";
+import type { Request } from "@mahiframework/http";
 
 export const DEFAULT_PER_PAGE = 20;
 export const MAX_PER_PAGE = 100;
@@ -362,8 +362,8 @@ export function perPageFrom(request: Request): number {
 ## A complete controller
 
 ```ts
-import { Controller, HttpResponse, type Request } from "@mahi/http";
-import { cursorPaginate } from "@mahi/database";
+import { Controller, HttpResponse, type Request } from "@mahiframework/http";
+import { cursorPaginate } from "@mahiframework/database";
 import { Post } from "../../models/post.model.js";
 import { PostResource } from "../resources/post.resource.js";
 import { loadPosts } from "../../support/load-posts.js";
@@ -405,13 +405,13 @@ See [Relationships](../relationships/#eager-loading).
 
 ## HTTP envelopes
 
-`@mahi/http` provides two helpers that transform a paginator result
+`@mahiframework/http` provides two helpers that transform a paginator result
 through a `Resource` while preserving the metadata.
 
 ### `paginatedResource()`
 
 ```ts
-import { paginatedResource } from "@mahi/http";
+import { paginatedResource } from "@mahiframework/http";
 
 const page = await Post.paginate(1, 20);
 return HttpResponse.json(await paginatedResource(PostResource, page));
@@ -447,7 +447,7 @@ await paginatedResource(PostResource, page, { nestMeta: true });
 ### `cursorPaginatedResource()`
 
 ```ts
-import { cursorPaginatedResource } from "@mahi/http";
+import { cursorPaginatedResource } from "@mahiframework/http";
 
 const result = await Post.cursorPaginate({ column: "id", perPage: 20, cursor });
 return HttpResponse.json(await cursorPaginatedResource(PostResource, result));

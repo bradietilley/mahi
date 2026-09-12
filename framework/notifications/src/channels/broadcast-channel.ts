@@ -1,4 +1,4 @@
-import type { EventDispatcher } from "@mahi/events";
+import type { EventDispatcher } from "@mahiframework/events";
 import type { NotificationChannel } from "../notification-channel.js";
 import type { Notification } from "../notification.js";
 import type { NotificationRoutable } from "../notifiable.js";
@@ -7,7 +7,7 @@ import { NotificationBroadcast } from "../notification-broadcast.js";
 /**
  * A thin wrapper over the existing `EventDispatcher`: it dispatches a
  * `NotificationBroadcast` event carrying the notification's `toBroadcast()`
- * payload, and lets `@mahi/broadcasting`'s `afterDispatch()` hook
+ * payload, and lets `@mahiframework/broadcasting`'s `afterDispatch()` hook
  * pick it up (because `NotificationBroadcast` structurally implements
  * `ShouldBroadcast`). No new broadcasting plumbing lives here — if
  * broadcasting isn't installed, the event dispatches harmlessly with no

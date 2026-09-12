@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import { CHANNEL_REGISTRY_TOKEN } from "./broadcast-service-provider.js";
 import type { ChannelRegistry, ChannelAuthorizationCallback } from "./channel-registry.js";
 

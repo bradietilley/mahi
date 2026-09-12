@@ -1,4 +1,4 @@
-import { Manager, type Application } from "@mahi/core";
+import { Manager, type Application } from "@mahiframework/core";
 import type { CacheStore } from "./cache-store.js";
 
 export interface CacheConfig {

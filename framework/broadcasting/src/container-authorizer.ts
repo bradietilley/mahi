@@ -1,15 +1,15 @@
-import { AUTH_TOKEN, type Application } from "@mahi/core";
-import { requestFromContext } from "@mahi/http";
+import { AUTH_TOKEN, type Application } from "@mahiframework/core";
+import { requestFromContext } from "@mahiframework/http";
 import type { Context } from "hono";
 import type { BroadcastAuthorizer, SubscribeAuthorization } from "./broadcast-authorizer.js";
 import type { ChannelRegistry } from "./channel-registry.js";
 import { isPresenceChannel } from "./channel-name.js";
 
 /**
- * Minimal shape of `@mahi/auth`'s `AuthManager` this authorizer needs —
- * resolved by the `"auth"` token so `@mahi/broadcasting` takes NO
- * compile-time dependency on `@mahi/auth`, the same soft-dependency shape
- * `@mahi/authorization`'s Gate uses. `guard(name?).user(request)` returns
+ * Minimal shape of `@mahiframework/auth`'s `AuthManager` this authorizer needs —
+ * resolved by the `"auth"` token so `@mahiframework/broadcasting` takes NO
+ * compile-time dependency on `@mahiframework/auth`, the same soft-dependency shape
+ * `@mahiframework/authorization`'s Gate uses. `guard(name?).user(request)` returns
  * the authenticated user (or `null`).
  */
 interface AuthManagerLike {
@@ -17,7 +17,7 @@ interface AuthManagerLike {
 }
 
 /**
- * Minimal `Signer` shape (from `@mahi/encryption`), resolved by the
+ * Minimal `Signer` shape (from `@mahiframework/encryption`), resolved by the
  * `"signer"` token for the same reason. `for(purpose)` domain-separates
  * the broadcast grant from session cookies / signed URLs.
  */

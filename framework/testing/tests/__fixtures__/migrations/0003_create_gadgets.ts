@@ -1,4 +1,4 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /** A soft-deleting table, for assertSoftDeleted()/assertNotSoftDeleted(). */
 const migration: Migration = {

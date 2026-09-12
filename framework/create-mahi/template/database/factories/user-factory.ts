@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { Factory } from "@mahi/database";
+import { Factory } from "@mahiframework/database";
 import { User } from "../../src/models/user.model.js";
 
 /**

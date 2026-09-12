@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { GateRegistry } from "./gate.js";
 import { GATE_TOKEN } from "./tokens.js";
 

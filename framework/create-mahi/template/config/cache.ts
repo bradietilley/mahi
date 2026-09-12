@@ -1,4 +1,4 @@
-import type { CacheConfig } from "@mahi/cache";
+import type { CacheConfig } from "@mahiframework/cache";
 import type { Env } from "./env.js";
 
 export function cacheConfig(env: Env): CacheConfig {
@@ -22,7 +22,7 @@ export function cacheConfig(env: Env): CacheConfig {
       // keys than you read back.
       file: { path: "storage/cache" },
 
-      // Multi-process-shared store. Requires @mahi/redis's
+      // Multi-process-shared store. Requires @mahiframework/redis's
       // RedisServiceProvider to be registered; point `default` here when
       // running more than one Node process, or more than one host.
       //

@@ -1,4 +1,4 @@
-# @mahi/http-client
+# @mahiframework/http-client
 
 HTTP client — a fluent, retryable HTTP client with fakes for Mahi.
 

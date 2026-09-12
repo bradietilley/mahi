@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { Signer, SIGNER_TOKEN } from "@mahi/encryption";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { Signer, SIGNER_TOKEN } from "@mahiframework/encryption";
 import { Request } from "../src/request.js";
 import { RouteRegistry } from "../src/route-registry.js";
 import { UrlGenerator, RouteNotFoundError } from "../src/url-generator.js";

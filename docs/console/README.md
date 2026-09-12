@@ -45,7 +45,7 @@ extensionless TS file executed directly fails to transpile.
 
 **It execs the locally installed `tsx`, not `npx tsx`.** `npx` may
 download its own copy into `~/.npm/_npx`, whose module resolver does not
-see this project's `node_modules/@mahi/*`. The `../node_modules`
+see this project's `node_modules/@mahiframework/*`. The `../node_modules`
 fallback covers monorepos that hoist dependencies to the workspace root.
 
 **It `cd`s to its own directory first.** Every path helper —
@@ -57,7 +57,7 @@ the app's own `vitest.config.ts`.
 `bin/console.ts` is four lines:
 
 ```ts
-import { ConsoleKernel, CONSOLE_KERNEL_TOKEN } from "@mahi/cli";
+import { ConsoleKernel, CONSOLE_KERNEL_TOKEN } from "@mahiframework/cli";
 import { bootstrap } from "./bootstrap.js";
 
 const app = await bootstrap();
@@ -136,7 +136,7 @@ export class ConsoleServiceProvider extends ServiceProvider {
 }
 ```
 
-The built-ins in that list are the ones `@mahi/cli` owns — migrations,
+The built-ins in that list are the ones `@mahiframework/cli` owns — migrations,
 `db:*`, `make:*`, `test`. Everything else (`serve`, `queue:work`,
 `route:list`, `key:generate`) comes from its own package's provider via
 the `commands()` hook.
@@ -276,14 +276,14 @@ which is why defaulting them in the signature matters.
 ## The `commands()` provider hook
 
 ```ts
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     commands?(): CommandClass[];
   }
 }
 ```
 
-Declared by `@mahi/cli` via module augmentation, so a provider in any
+Declared by `@mahiframework/cli` via module augmentation, so a provider in any
 package can implement it without core knowing about the CLI.
 
 ```ts
@@ -318,7 +318,7 @@ Import it for the hook that needs it, and leave the registration alone:
 // than re-registered via commands() — AuthServiceProvider already
 // contributes it, and registering the same signature twice makes
 // ConsoleKernel throw at startup.
-import { AuthGcCommand } from "@mahi/auth";
+import { AuthGcCommand } from "@mahiframework/auth";
 ```
 
 ## Built-in commands
@@ -427,7 +427,7 @@ scaffolding, write your own `make:*` command; the `scaffold()` helper is
 exported for exactly that:
 
 ```ts
-import { scaffold, toClassName } from "@mahi/cli";
+import { scaffold, toClassName } from "@mahiframework/cli";
 
 await scaffold({
   name,
@@ -649,8 +649,8 @@ vitest is in the invoking app's `node_modules` and uses that app's
 
 ## Output
 
-Commands print through `@mahi/tui` — a from-scratch port of
-`laravel/prompts` with no dependency on `@mahi/core` or the
+Commands print through `@mahiframework/tui` — a from-scratch port of
+`laravel/prompts` with no dependency on `@mahiframework/core` or the
 container, so it's usable standalone and talks directly to
 `process.stdin`/`process.stdout`.
 
@@ -712,7 +712,7 @@ alignment.
 ### Colours
 
 ```ts
-import { colors } from "@mahi/tui";
+import { colors } from "@mahiframework/tui";
 
 colors.red("failed")
 colors.green("ok")
@@ -848,7 +848,7 @@ step in a sequence.
 ## Signal handling
 
 ```ts
-import { trap, type Signal } from "@mahi/cli";
+import { trap, type Signal } from "@mahiframework/cli";
 
 function trap(signals: Signal | Signal[], callback: (signal: Signal) => void): () => void
 ```
@@ -894,9 +894,9 @@ generic primitive.
 ```ts
 // src/console/commands/import-users.command.ts
 import type { Command as CommanderCommand } from "commander";
-import { Command, trap } from "@mahi/cli";
-import { Tui, colors } from "@mahi/tui";
-import { DatabaseManager, DATABASE_TOKEN } from "@mahi/database";
+import { Command, trap } from "@mahiframework/cli";
+import { Tui, colors } from "@mahiframework/tui";
+import { DatabaseManager, DATABASE_TOKEN } from "@mahiframework/database";
 import { User } from "../../models/user.model.js";
 
 interface Options {
@@ -1001,8 +1001,8 @@ The pieces, in the order they matter:
 without a shell:
 
 ```ts
-import { Application } from "@mahi/core";
-import { ConsoleKernel, Command } from "@mahi/cli";
+import { Application } from "@mahiframework/core";
+import { ConsoleKernel, Command } from "@mahiframework/cli";
 
 const calls: string[] = [];
 
@@ -1031,7 +1031,7 @@ terminal that yields keystrokes instead of reading stdin — public API,
 mirroring `Prompt::fake([...])` in `laravel/prompts`:
 
 ```ts
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 
 const tui = Tui.fake(["y", "\r"]);
 try {

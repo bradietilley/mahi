@@ -1,4 +1,4 @@
-import type { Collection } from "@mahi/core";
+import type { Collection } from "@mahiframework/core";
 import type { EloquentBuilder, Hydrated } from "../eloquent-builder.js";
 import type { RelationDefinitions } from "../relations.js";
 import { clampPage } from "./clamp-page.js";

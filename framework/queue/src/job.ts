@@ -1,4 +1,4 @@
-import type { CacheStore } from "@mahi/cache";
+import type { CacheStore } from "@mahiframework/cache";
 import type { JobMiddleware } from "./middleware/job-middleware.js";
 
 /**
@@ -101,7 +101,7 @@ export abstract class Job {
 
   /**
    * Optional — job middleware wrapping the call to `handle()`, run as a
-   * `@mahi/pipeline` pipeline (exactly like Laravel's `middleware()`
+   * `@mahiframework/pipeline` pipeline (exactly like Laravel's `middleware()`
    * on a queued job). Built-ins: `RateLimited`, `WithoutOverlapping`,
    * `ThrottlesExceptions`. A middleware may throw `ReleaseJobError` to
    * reschedule the job instead of failing it. Runs identically under the

@@ -6,7 +6,7 @@ afterEach(() => {
   Http.restore();
 });
 
-// Thin: the mechanics live in @mahi/core's `pooled()` and are tested in
+// Thin: the mechanics live in @mahiframework/core's `pooled()` and are tested in
 // framework/core/tests/pooled.test.ts. What matters here is the wiring.
 
 describe("Http.pool", () => {

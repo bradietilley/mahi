@@ -1,6 +1,6 @@
-import { ServiceProvider } from "@mahi/core";
-import type { AnyModelClass } from "@mahi/database";
-import type { Router, Request, HttpPipe } from "@mahi/http";
+import { ServiceProvider } from "@mahiframework/core";
+import type { AnyModelClass } from "@mahiframework/database";
+import type { Router, Request, HttpPipe } from "@mahiframework/http";
 import {
   RateLimiter,
   Limit,
@@ -8,15 +8,15 @@ import {
   trustProxies,
   trustHosts,
   hostsFromUrl,
-} from "@mahi/http";
-import type { Schedule } from "@mahi/schedule";
-import { servePublicDisk } from "@mahi/storage";
+} from "@mahiframework/http";
+import type { Schedule } from "@mahiframework/schedule";
+import { servePublicDisk } from "@mahiframework/storage";
 import type { Env } from "../../config/env.js";
 // `AuthGcCommand` is invoked directly by the scheduled task below rather
 // than re-registered via `commands()` — `AuthServiceProvider` already
 // contributes it, and registering the same signature twice makes the
 // ConsoleKernel throw at startup.
-import { AuthGcCommand } from "@mahi/auth";
+import { AuthGcCommand } from "@mahiframework/auth";
 import { User } from "../models/user.model.js";
 import { registerAuthRoutes } from "../routes/auth.routes.js";
 import { DatabaseSeeder } from "../../database/seeders/database-seeder.js";
@@ -188,7 +188,7 @@ export class AppServiceProvider extends ServiceProvider {
    *   }
    *
    * Adding it also needs the type import at the top of this file:
-   * `import type { ChannelRegistry } from "@mahi/broadcasting";`
+   * `import type { ChannelRegistry } from "@mahiframework/broadcasting";`
    */
 
   /**
@@ -209,7 +209,7 @@ export class AppServiceProvider extends ServiceProvider {
    * Readiness checks — the things that must be working for this instance
    * to serve traffic. Surfaced by `GET /health` and `./artisan health`.
    *
-   * `@mahi/health` already checks the cache, database and default storage
+   * `@mahiframework/health` already checks the cache, database and default storage
    * disk under the `core` group. Add the dependencies only your app knows
    * about — a third-party API, a background daemon, a licence that
    * expires:
@@ -231,7 +231,7 @@ export class AppServiceProvider extends ServiceProvider {
    * every probe interval, on every instance. Never a table scan.
    *
    * Adding it also needs the type import at the top of this file:
-   * `import type { HealthCheck } from "@mahi/health";`
+   * `import type { HealthCheck } from "@mahiframework/health";`
    */
 
   /**

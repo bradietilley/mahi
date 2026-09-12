@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { Kysely } from "kysely";
-import { afterCommitOn, dialectOf, getActiveTransaction, transaction } from "@mahi/database";
-import type { Dialect } from "@mahi/database";
+import { afterCommitOn, dialectOf, getActiveTransaction, transaction } from "@mahiframework/database";
+import type { Dialect } from "@mahiframework/database";
 import type { QueueDriver, QueuedJob, PushOptions, ChainedJob } from "../queue-driver.js";
 import type { JobState } from "../job-serialization.js";
 import type { FailedJobRepository, FailedJobRecord } from "../failed-job-repository.js";
@@ -478,7 +478,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
    * production. Truncating here means what we store is exactly what we
    * later compare against.
    *
-   * That second point is why this is not `@mahi/database`'s
+   * That second point is why this is not `@mahiframework/database`'s
    * `formatTimestamp()`, which is otherwise the same function: it keeps
    * sub-second precision, correctly, because a model's `created_at` may
    * be a `timestamp(3)` and coarsening every model's timestamps to whole

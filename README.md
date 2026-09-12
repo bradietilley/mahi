@@ -21,7 +21,7 @@ This is the framework monorepo. If you want to *use* Mahi, you want
 [documentation](./docs/), not this repo.
 
 ```
-framework/            The framework packages (published as @mahi/*)
+framework/            The framework packages (published as @mahiframework/*)
   core/                 Container, Manager, Application, ServiceProvider, Config, Env, Logger, Str/Arr/Collection, helpers
   events/               Event, Listener, EventDispatcher (wildcard + listenQueued)
   database/             DatabaseManager, SQLite/MySQL/Postgres drivers, MigrationRunner, Model, Seeder, Factory, transaction()
@@ -72,7 +72,7 @@ pnpm turbo run test --concurrency=1
 
 ### Testing the scaffolder
 
-`create-mahi` generates an app that depends on `@mahi/*` at published
+`create-mahi` generates an app that depends on `@mahiframework/*` at published
 versions. To scaffold against the working tree instead, use
 `--link-workspace` to rewrite them to `workspace:*` and scaffold into
 `.tmp-scaffold/` (a gitignored workspace member):
@@ -100,7 +100,7 @@ pnpm services:down
 
 ### Releasing
 
-Every `@mahi/*` package shares one version and is published together. To
+Every `@mahiframework/*` package shares one version and is published together. To
 cut a release:
 
 ```bash
@@ -115,7 +115,7 @@ The `Release` workflow builds, lints, typechecks, tests, verifies the tag
 matches the lockstep version, and runs `pnpm -r publish` — which only
 publishes packages whose version is not already on npm, so re-running a
 release is safe. It needs an `NPM_TOKEN` repository secret with publish
-rights to the `@mahi` scope.
+rights to the `@mahiframework` scope.
 
 ## Documentation
 

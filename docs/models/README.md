@@ -7,8 +7,8 @@ pre-save (`getDirty()`) and post-save (`getChanges()`/`wasChanged()`) —
 plus `save()`/`refresh()`/`replicate()`.
 
 ```ts
-import { Model } from "@mahi/database";
-import type { DateTime } from "@mahi/datetime";
+import { Model } from "@mahiframework/database";
+import type { DateTime } from "@mahiframework/datetime";
 
 export interface PostAttributes {
   id: string;
@@ -46,8 +46,8 @@ types, the primary-key type) is derived from it. There is exactly one
 declaration to keep in sync.
 
 ```ts
-import { Model, Cast, belongsTo, accessor } from "@mahi/database";
-import type { BelongsTo, Computed } from "@mahi/database";
+import { Model, Cast, belongsTo, accessor } from "@mahiframework/database";
+import type { BelongsTo, Computed } from "@mahiframework/database";
 
 interface PostAttributes {
   id: string;
@@ -177,10 +177,10 @@ export class User extends Model<UserAttributes>()({
 ```
 
 `keyType` takes `"increment"`, `"uuid"`, or a `KeyStrategy` object for
-anything else — `snowflake()` from `@mahi/snowflake` is one:
+anything else — `snowflake()` from `@mahiframework/snowflake` is one:
 
 ```ts
-import { snowflake } from "@mahi/snowflake";
+import { snowflake } from "@mahiframework/snowflake";
 
 export class Message extends Model<MessageAttributes>()({
   table: "messages",
@@ -232,7 +232,7 @@ against the primary-key column's declared type), and `generate` produces
 the value.
 
 ```ts
-import type { KeyStrategy } from "@mahi/database";
+import type { KeyStrategy } from "@mahiframework/database";
 
 function prefixed(prefix: string): KeyStrategy<string> {
   return {
@@ -248,7 +248,7 @@ export class Invoice extends Model<InvoiceAttributes>()({
 ```
 
 `generate` may be async, and receives the model class name — which is
-what `@mahi/snowflake` uses as its per-model sequence group.
+what `@mahiframework/snowflake` uses as its per-model sequence group.
 
 Timing matters: it runs **after** `saving` and **before** `creating`. So a
 `saving` hook can still supply an explicit key and win, and both `creating`
@@ -912,7 +912,7 @@ equal the column's declared type — a `Cast.datetime()` on a `string`
 column is a compile error, not a surprise at runtime:
 
 ```ts
-import { Model, Cast } from "@mahi/database";
+import { Model, Cast } from "@mahiframework/database";
 
 export class Post extends Model<PostAttributes>()({
   table: "posts",
@@ -996,7 +996,7 @@ function isNullish(value: unknown): value is null | undefined {
 Any object matching the interface works. No registration step:
 
 ```ts
-import type { Cast } from "@mahi/database";
+import type { Cast } from "@mahiframework/database";
 
 /** A comma-separated text column ↔ a string array. */
 export const CsvCast: Cast<string[], string> = {
@@ -1080,7 +1080,7 @@ expression) passes through untouched.
 ## Soft deletes
 
 ```ts
-import { Model } from "@mahi/database";
+import { Model } from "@mahiframework/database";
 
 export class Post extends Model<PostAttributes>()({
   table: "posts",
@@ -1336,7 +1336,7 @@ so the guard keeps ordinary query reads cheap. Its use case
 ### Observers
 
 ```ts
-import { ModelObserver } from "@mahi/database";
+import { ModelObserver } from "@mahiframework/database";
 
 class PostObserver extends ModelObserver<Post> {
   override created(post: Post): void {
@@ -1370,7 +1370,7 @@ A lighter alternative for a one-off or test-only hook. Same payload rules.
 
 ### `dispatchesEvents`
 
-Maps a lifecycle event to an `@mahi/events` `Event` class dispatched
+Maps a lifecycle event to an `@mahiframework/events` `Event` class dispatched
 through the app's `EventDispatcher`:
 
 ```ts
@@ -1430,7 +1430,7 @@ await Post.withoutEvents(async () => {
 ```
 
 Builds a wildcard pattern from `table` — `"model.posts.*"` — and delegates
-to `@mahi/events`' `Event.suppress()`. It suppresses **only that model's
+to `@mahiframework/events`' `Event.suppress()`. It suppresses **only that model's
 events**; every other model and every non-model event is unaffected.
 
 Called on the base `Model` class directly (which has no `table`), the

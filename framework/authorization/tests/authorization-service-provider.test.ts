@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
 import { GateRegistry } from "../src/gate.js";
 import { Policy } from "../src/policy.js";
 import { AuthorizationServiceProvider, GATE_TOKEN } from "../src/authorization-service-provider.js";

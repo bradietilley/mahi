@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   DATABASE_TOKEN,
   DatabaseManager,
@@ -10,7 +10,7 @@ import {
   type DatabaseDriver,
   type MysqlConnectionConfig,
   type PostgresConnectionConfig,
-} from "@mahi/database";
+} from "@mahiframework/database";
 import { DatabaseQueueDriver } from "../../src/drivers/database-queue-driver.js";
 import createJobsTable from "../../src/migrations/0001_create_jobs_table.js";
 import queueReliability from "../../src/migrations/0002_queue_reliability.js";

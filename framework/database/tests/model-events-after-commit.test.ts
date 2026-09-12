@@ -5,8 +5,8 @@ import {
   setCurrentApp,
   setAfterCommitResolver,
   clearAfterCommitResolver,
-} from "@mahi/core";
-import { AbstractEvent, EventDispatcher, EventsServiceProvider, EVENTS_TOKEN } from "@mahi/events";
+} from "@mahiframework/core";
+import { AbstractEvent, EventDispatcher, EventsServiceProvider, EVENTS_TOKEN } from "@mahiframework/events";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN } from "../src/database-service-provider.js";

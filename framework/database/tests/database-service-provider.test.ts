@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Application, clearCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp } from "@mahiframework/core";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DatabaseServiceProvider, DATABASE_TOKEN } from "../src/database-service-provider.js";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";

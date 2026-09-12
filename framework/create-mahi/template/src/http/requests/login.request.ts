@@ -1,4 +1,4 @@
-import { Request, rule } from "@mahi/http";
+import { Request, rule } from "@mahiframework/http";
 
 /** POST /auth/login body validation. */
 export class LoginRequest extends Request {

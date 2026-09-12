@@ -1,18 +1,18 @@
-import type { AnyModelClass } from "@mahi/database";
-import { DateTime } from "@mahi/datetime";
+import type { AnyModelClass } from "@mahiframework/database";
+import { DateTime } from "@mahiframework/datetime";
 
 /**
  * Email verification as plain composable functions, NOT a trait/mixin —
  * `Model` rows are plain objects, so there's no class to mix into. These
  * mirror the free-function shape of `requireAuth`/`requireGuest` in
- * `@mahi/authorization`, operating on any row that carries an
+ * `@mahiframework/authorization`, operating on any row that carries an
  * `email_verified_at` column.
  *
  * There is deliberately no `MustVerifyEmail` interface to implement and
  * no base class: opting a model in is just adding the nullable
  * `email_verified_at` column in its migration. Sending the notification
- * is the app's job (it needs `@mahi/mail` and a signed URL from
- * `@mahi/http`'s `signedUrl()`); these helpers only cover the
+ * is the app's job (it needs `@mahiframework/mail` and a signed URL from
+ * `@mahiframework/http`'s `signedUrl()`); these helpers only cover the
  * state-check and state-transition mechanics.
  */
 

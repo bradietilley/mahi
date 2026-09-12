@@ -1,4 +1,4 @@
-# @mahi/redis
+# @mahiframework/redis
 
 Redis — a shared Redis connection with cache, queue, and broadcast adapters, for Mahi.
 

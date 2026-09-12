@@ -1,6 +1,6 @@
 import type { Context } from "hono";
-import { Collection, app } from "@mahi/core";
-import { Validator, ValidationException, type InferRules } from "@mahi/validation";
+import { Collection, app } from "@mahiframework/core";
+import { Validator, ValidationException, type InferRules } from "@mahiframework/validation";
 import { HttpError } from "./http-error.js";
 import {
   expiredCookie,
@@ -947,7 +947,7 @@ export class Request {
   }
 
   /**
-   * Thin delegate to `Auth.userOrNull()` when `@mahi/auth` is bound,
+   * Thin delegate to `Auth.userOrNull()` when `@mahiframework/auth` is bound,
    * else `undefined`. Not a second user-storage mechanism.
    */
   user<T = unknown>(): T | undefined {
@@ -1034,7 +1034,7 @@ export class Request {
     return true;
   }
 
-  rules(): Record<string, import("@mahi/validation").Rule<any, any>> {
+  rules(): Record<string, import("@mahiframework/validation").Rule<any, any>> {
     return {};
   }
 

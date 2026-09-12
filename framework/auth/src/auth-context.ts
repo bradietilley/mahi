@@ -1,6 +1,6 @@
 /**
  * The per-request "who is logged in" scope, backed by AsyncLocalStorage —
- * the same mechanism `@mahi/database`'s `transaction-context.ts`
+ * the same mechanism `@mahiframework/database`'s `transaction-context.ts`
  * uses to make static `Model` calls join an enclosing transaction.
  *
  * WHY THIS EXISTS AT ALL: Laravel's `Guard` is request-scoped and

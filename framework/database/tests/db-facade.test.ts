@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Kysely } from "kysely";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN } from "../src/database-service-provider.js";
 import { DB } from "../src/db-facade.js";

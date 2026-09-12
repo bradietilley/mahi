@@ -1,4 +1,4 @@
-# @mahi/database
+# @mahiframework/database
 
 Database — the query builder, migrations, and Eloquent-style ORM for Mahi.
 

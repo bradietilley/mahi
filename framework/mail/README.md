@@ -1,4 +1,4 @@
-# @mahi/mail
+# @mahiframework/mail
 
 Mail — mailables and transports for sending email from Mahi.
 

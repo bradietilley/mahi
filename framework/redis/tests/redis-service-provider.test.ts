@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Application, clearCurrentApp } from "@mahi/core";
-import { CacheServiceProvider, CACHE_TOKEN, type CacheManager } from "@mahi/cache";
-import { BroadcastManager, BROADCAST_TOKEN } from "@mahi/broadcasting";
+import { Application, clearCurrentApp } from "@mahiframework/core";
+import { CacheServiceProvider, CACHE_TOKEN, type CacheManager } from "@mahiframework/cache";
+import { BroadcastManager, BROADCAST_TOKEN } from "@mahiframework/broadcasting";
 import { RedisServiceProvider, REDIS_TOKEN } from "../src/redis-service-provider.js";
 import { RedisManager } from "../src/redis-manager.js";
 import { RedisBroadcastDriver } from "../src/drivers/redis-broadcast-driver.js";

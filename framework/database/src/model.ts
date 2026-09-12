@@ -1,10 +1,10 @@
 import type { Kysely } from "kysely";
 import { narrowKey } from "./key-identity.js";
-import { Collection, app } from "@mahi/core";
-import { AbstractEvent } from "@mahi/events";
+import { Collection, app } from "@mahiframework/core";
+import { AbstractEvent } from "@mahiframework/events";
 import { EloquentBuilder } from "./eloquent-builder.js";
 import type { Cast } from "./casts.js";
-import type { DateTime } from "@mahi/datetime";
+import type { DateTime } from "@mahiframework/datetime";
 import { DateTimeCast as DateTimeCastValue } from "./casts.js";
 import type {
   BuilderMarkerOf,
@@ -125,9 +125,9 @@ const instanceState = new WeakMap<object, InstanceState>();
 
 /**
  * The minimal structural contract a `Model`'s default resource satisfies —
- * declared here (rather than importing `Resource` from `@mahi/http`)
- * so `@mahi/database` keeps no dependency on the HTTP layer. The
- * real `Resource` (in `@mahi/http`) is structurally assignable to
+ * declared here (rather than importing `Resource` from `@mahiframework/http`)
+ * so `@mahiframework/database` keeps no dependency on the HTTP layer. The
+ * real `Resource` (in `@mahiframework/http`) is structurally assignable to
  * this. Returned by `Model.toJsonResource()`; consumed by `Resource`'s
  * output normalization.
  */
@@ -199,7 +199,7 @@ export class MassAssignmentError extends Error {
  * Access is **static** for queries: `Todo.all()`, `Todo.find(id)`,
  * `Todo.query()...` — not `new Todo(db).all()`. The connection is
  * resolved internally via the global `app()` container lookup
- * (`@mahi/core`), the one deliberate piece of "magic" this
+ * (`@mahiframework/core`), the one deliberate piece of "magic" this
  * framework allows for `Model` access (the "no magic" rule targets
  * hidden dispatch like magic `whereName()` methods, not a single
  * documented static-resolution point) — `app.bootstrap()` must have run
@@ -499,7 +499,7 @@ export abstract class BaseModel {
 
   /**
    * Laravel's `$dispatchesEvents` — maps a lifecycle event name to an
-   * `@mahi/events` `Event` subclass to dispatch through the app's
+   * `@mahiframework/events` `Event` subclass to dispatch through the app's
    * `EventDispatcher` (in addition to the always-fires generic
    * `ModelCreated`/`ModelUpdated`/etc. events — see `model-events.ts`).
    * Empty by default; only declared events are dispatched.
@@ -839,7 +839,7 @@ export abstract class BaseModel {
 
   /**
    * Runs `callback` with this model's lifecycle events suppressed — a
-   * thin proxy to `@mahi/events`' `Event.suppress()`, scoped via
+   * thin proxy to `@mahiframework/events`' `Event.suppress()`, scoped via
    * a wildcard pattern built from `table`: `Post.withoutEvents(cb)`
    * suppresses only `"model.posts.*"`, leaving every other model's
    * events (and non-model events) unaffected. Called on the base `Model`
@@ -1139,7 +1139,7 @@ export abstract class BaseModel {
    * that column explicitly, in which case the DB won't have
    * auto-generated anything and the caller's value passes through
    * unchanged. Declare `keyType` on models with a client-generated
-   * primary key — `"uuid"`, or `snowflake()` from `@mahi/snowflake`;
+   * primary key — `"uuid"`, or `snowflake()` from `@mahiframework/snowflake`;
    * `incrementing` is a read-only accessor derived from it.
    *
    * When `incrementing` is false and the payload has no primary key,
@@ -2732,7 +2732,7 @@ export abstract class BaseModel {
    * cycle this creates in an app is safe for the same reason `factory()`'s
    * is: the resource is referenced at call time, never as a static field
    * initializer. Return type is the structural `ModelResource` so
-   * `@mahi/database` needn't depend on `@mahi/http`; a model
+   * `@mahiframework/database` needn't depend on `@mahiframework/http`; a model
    * narrows it to its concrete resource via its own declaration merge
    * (`interface Post { toJsonResource(): PostResource }`). Consumed by
    * `Resource`'s output normalization, which turns a loaded relation model
@@ -4447,7 +4447,7 @@ function validateModelConfig(config: ModelConfig<A_ANY>): void {
     if (typeof keyType !== "object" || keyType === null || typeof keyType.generate !== "function") {
       fail(
         '`keyType` must be "increment", "uuid", or a KeyStrategy ' +
-          "({ type, generate }) — e.g. snowflake() from @mahi/snowflake.",
+          "({ type, generate }) — e.g. snowflake() from @mahiframework/snowflake.",
       );
     }
 

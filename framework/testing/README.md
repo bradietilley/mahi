@@ -1,4 +1,4 @@
-# @mahi/testing
+# @mahiframework/testing
 
 Testing — test helpers, fakes, and assertions for Mahi applications.
 

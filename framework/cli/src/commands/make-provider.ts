@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../command.js";
 import { scaffold, toClassName } from "./make/scaffold.js";
 
 function template(className: string): string {
-  return `import { ServiceProvider } from "@mahi/core";
+  return `import { ServiceProvider } from "@mahiframework/core";
 
 export class ${className} extends ServiceProvider {
   register(): void {

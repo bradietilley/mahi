@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { HealthRegistry } from "../src/health-registry.js";
 import type { HealthCheck } from "../src/health-check.js";
 

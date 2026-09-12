@@ -142,7 +142,7 @@ Web `File`/`Blob` (what `Request` parses inbound), or a raw byte buffer.
 > source into memory before constructing the response. That is fine for
 > reports, avatars, and generated CSVs; it is not fine for multi-gigabyte
 > downloads. Streaming is a follow-up. For serving a whole disk of static
-> files, use `@mahi/storage`'s `servePublicDisk()` instead.
+> files, use `@mahiframework/storage`'s `servePublicDisk()` instead.
 
 | Method | Effect |
 |---|---|
@@ -172,7 +172,7 @@ At `toWeb()` time, in order:
 `Content-Length` is always set from the buffered byte length.
 
 The extension map is small and deliberately duplicated rather than imported
-from `@mahi/storage`, so `@mahi/http` doesn't depend on it:
+from `@mahiframework/storage`, so `@mahiframework/http` doesn't depend on it:
 
 | Extension | MIME |
 |---|---|
@@ -503,8 +503,8 @@ author: this.whenLoaded("author"),   // emits UserResource's shape, not a raw mo
 | Anything else — primitives, `Date`, class instances | Unchanged |
 
 Models and collections are detected **structurally** (duck-typed), not with
-`instanceof`, so `@mahi/http` needs no runtime import of `@mahi/database`
-or `@mahi/core`.
+`instanceof`, so `@mahiframework/http` needs no runtime import of `@mahiframework/database`
+or `@mahiframework/core`.
 
 Two properties worth knowing:
 

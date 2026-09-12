@@ -1,4 +1,4 @@
-import type { Request } from "@mahi/http";
+import type { Request } from "@mahiframework/http";
 
 /**
  * Strategy for turning an inbound request into an authenticated user.

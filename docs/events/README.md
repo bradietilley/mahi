@@ -4,7 +4,7 @@ An event is a typed payload class. A listener is a class with `handle()`.
 The dispatcher walks its registrations in order and awaits each match.
 
 ```ts
-import { AbstractEvent } from "@mahi/events";
+import { AbstractEvent } from "@mahiframework/events";
 
 export class PostCreated extends AbstractEvent {
   constructor(public readonly post: PostTable) {
@@ -14,7 +14,7 @@ export class PostCreated extends AbstractEvent {
 ```
 
 ```ts
-import type { Listener } from "@mahi/events";
+import type { Listener } from "@mahiframework/events";
 
 export class LogPostCreated implements Listener<PostCreated> {
   constructor(private app: Application) {}
@@ -45,7 +45,7 @@ export abstract class AbstractEvent {
 The base class carries almost nothing. Subclass it, add constructor
 fields, done. There is no `dispatch()` method on the event itself and no
 `broadcastAs()` — broadcasting is opted into by implementing
-`ShouldBroadcast` from [`@mahi/broadcasting`](../broadcasting/), which
+`ShouldBroadcast` from [`@mahiframework/broadcasting`](../broadcasting/), which
 the events package knows nothing about.
 
 ### `eventName`
@@ -62,7 +62,7 @@ export class PostCreated extends AbstractEvent {
 }
 ```
 
-`@mahi/database`'s `ModelLifecycleEvent` does exactly this, returning
+`@mahiframework/database`'s `ModelLifecycleEvent` does exactly this, returning
 `"model.{table}.{event}"`, which is what lets `Post.withoutEvents()`
 suppress just that model's events via `"model.posts.*"` rather than
 silencing the whole app. See [Models](../models/).
@@ -391,7 +391,7 @@ Deliberately general rather than a hook tailored to one consumer: it's
 "run this after every dispatch", which is what cross-cutting concerns —
 auditing, metrics, broadcasting — actually want, and none of them can
 enumerate every event class up front the way `listen()` requires. It's
-also what keeps `@mahi/events` free of any dependency on, or knowledge
+also what keeps `@mahiframework/events` free of any dependency on, or knowledge
 of, broadcasting.
 
 ```ts
@@ -425,7 +425,7 @@ await DB.transaction(async () => {
 
 `Events.dispatchAfterCommit(event)` (and
 `dispatcher.dispatchAfterCommit(event)`) is the explicit per-call form for
-an event you don't want to mark. This builds on `@mahi/database`'s
+an event you don't want to mark. This builds on `@mahiframework/database`'s
 `afterCommit()` — see
 [Database → After-commit dispatch](../database/#after-commit-dispatch-for-events-jobs-mail--notifications).
 A suppressed event stays suppressed regardless of the marker: the
@@ -447,7 +447,7 @@ suppressed for every event name matching one of `patterns`. Default is
 `["*"]` — everything.
 
 Scoped via `AsyncLocalStorage`, the same mechanism
-`@mahi/database`'s `transaction()` uses. So it covers every
+`@mahiframework/database`'s `transaction()` uses. So it covers every
 `dispatch()` made synchronously **or through nested async calls** inside
 the callback, with zero call-site changes. `EventDispatcher.dispatch()`
 checks the store itself, so *every* dispatch is covered — not only the
@@ -481,7 +481,7 @@ AbstractEvent.isSuppressed("model.posts.created")   // does THIS name match one?
 
 The no-argument form is `hasActiveSuppression()`; the named form runs the
 patterns. Consumers that dispatch outside `EventDispatcher` entirely —
-`@mahi/database`'s `ModelObserver`/`Model.on()` hooks, which are direct
+`@mahiframework/database`'s `ModelObserver`/`Model.on()` hooks, which are direct
 calls rather than `Event` instances — check this themselves at their own
 dispatch point, passing the equivalent `"model.{table}.{event}"` name.
 

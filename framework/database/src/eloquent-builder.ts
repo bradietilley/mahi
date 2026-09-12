@@ -1,5 +1,5 @@
-import { Collection } from "@mahi/core";
-import type { DateTime } from "@mahi/datetime";
+import { Collection } from "@mahiframework/core";
+import type { DateTime } from "@mahiframework/datetime";
 import { applyWhen } from "./conditionable.js";
 import { findSoftDeleteScope } from "./soft-delete-support.js";
 import {

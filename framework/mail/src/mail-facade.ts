@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { MailManager, QueueMailOptions } from "./mail-manager.js";
 import type { MailTransport } from "./mail-transport.js";
 import type { SentMessage } from "./sent-message.js";

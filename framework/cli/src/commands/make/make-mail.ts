@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { Mailable, Envelope, Content } from "@mahi/mail";
+  return `import { Mailable, Envelope, Content } from "@mahiframework/mail";
 
 export class ${className} extends Mailable {
   override envelope(): Envelope {

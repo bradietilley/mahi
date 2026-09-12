@@ -1,4 +1,4 @@
-import { type RateLimiter } from "@mahi/cache";
+import { type RateLimiter } from "@mahiframework/cache";
 import type { JobMiddleware, JobMiddlewarePassable } from "./job-middleware.js";
 import { ReleaseJobError } from "./release-job-error.js";
 
@@ -8,7 +8,7 @@ import { ReleaseJobError } from "./release-job-error.js";
  * subsequent runs are **released** back onto the queue without executing
  * `handle()` at all — until the window elapses — sparing a failing
  * downstream dependency from being hammered by every retry. Ports
- * Laravel's `ThrottlesExceptions`, reusing `@mahi/cache`'s
+ * Laravel's `ThrottlesExceptions`, reusing `@mahiframework/cache`'s
  * `RateLimiter` as the exception counter (keyed on occurrence, not on
  * calls).
  *

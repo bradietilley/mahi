@@ -8,7 +8,7 @@
 # shebang alone, so an extensionless TS file executed directly fails to
 # transpile. We exec the locally installed `tsx` binary rather than `npx
 # tsx`: npx may download a copy into ~/.npm/_npx whose module resolver
-# does not see this project's `node_modules/@mahi/*` packages.
+# does not see this project's `node_modules/@mahiframework/*` packages.
 #
 # The `../node_modules` fallback is for the case where this app lives
 # inside a monorepo that hoists dependencies to the workspace root.

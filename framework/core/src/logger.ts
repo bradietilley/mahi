@@ -1,4 +1,4 @@
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import type { ContextRepository } from "./context.js";
 
 /**

@@ -1,11 +1,11 @@
-import { app } from "@mahi/core";
-import { Signer, SIGNER_TOKEN } from "@mahi/encryption";
+import { app } from "@mahiframework/core";
+import { Signer, SIGNER_TOKEN } from "@mahiframework/encryption";
 import type { Request } from "./request.js";
 import { HttpError } from "./http-error.js";
 import type { HttpPipe } from "./middleware/pipeline-middleware.js";
 
 /**
- * HTTP-layer wrapper over `@mahi/encryption`'s `Signer` — the
+ * HTTP-layer wrapper over `@mahiframework/encryption`'s `Signer` — the
  * equivalent of Laravel's `UrlGenerator::signedRoute()` + the
  * `ValidateSignature` middleware. This is the path-based form, where the
  * caller passes the raw path it already has; for a NAMED route, use

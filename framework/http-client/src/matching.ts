@@ -1,9 +1,9 @@
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 
 /**
  * `*`-wildcard match — the behaviour behind Laravel's
  * `Http::fake(['github.com/*' => ...])`/`assertSent('github.com/*')`,
- * which delegate to `Str::is()`. Delegates to `@mahi/core`'s `Str.is`
+ * which delegate to `Str::is()`. Delegates to `@mahiframework/core`'s `Str.is`
  * rather than carrying its own copy, so `?` and every other regex
  * metacharacter are literals here exactly as they are everywhere else.
  */

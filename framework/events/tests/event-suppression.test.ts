@@ -1,4 +1,4 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import { AbstractEvent, AbstractEvent as Event } from "../src/event.js";
 import type { Listener } from "../src/listener.js";

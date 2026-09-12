@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { AbstractEvent, EventClass } from "./event.js";
 import type { EventDispatcher, WildcardListener } from "./event-dispatcher.js";
 import type { ListenerClass, ListenerFn } from "./listener.js";

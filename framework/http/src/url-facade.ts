@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import {
   UrlGenerator,
   URL_GENERATOR_TOKEN,

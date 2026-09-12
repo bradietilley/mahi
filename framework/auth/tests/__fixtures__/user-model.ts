@@ -1,4 +1,4 @@
-import { Model } from "@mahi/database";
+import { Model } from "@mahiframework/database";
 
 export interface UserAttributes {
   id: string;

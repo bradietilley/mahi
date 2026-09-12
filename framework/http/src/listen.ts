@@ -1,12 +1,12 @@
 import { serve, type ServerType } from "@hono/node-server";
-import { BROADCAST_TOKEN, type Application } from "@mahi/core";
+import { BROADCAST_TOKEN, type Application } from "@mahiframework/core";
 import { HTTP_KERNEL_TOKEN } from "./http-service-provider.js";
 import type { HttpKernel } from "./http-kernel.js";
 
-// `@mahi/broadcasting`'s `BroadcastManager` token, resolved by
+// `@mahiframework/broadcasting`'s `BroadcastManager` token, resolved by
 // string so this package does not import broadcasting (that package
 // already depends on http, so importing it back would be a cycle). The
-// token literal comes from `@mahi/core`'s `well-known-tokens`, the
+// token literal comes from `@mahiframework/core`'s `well-known-tokens`, the
 // shared source of truth both packages agree on.
 
 /**

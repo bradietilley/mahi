@@ -1,7 +1,7 @@
 import { mkdtemp, readFile, rm, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Application, clearBasePath, setBasePath } from "@mahi/core";
+import { Application, clearBasePath, setBasePath } from "@mahiframework/core";
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import type { Router } from "../../src/router.js";
 import { HttpKernel } from "../../src/http-kernel.js";

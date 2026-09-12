@@ -1,4 +1,4 @@
-# @mahi/events
+# @mahiframework/events
 
 Events — a synchronous event dispatcher and listener registry for Mahi.
 

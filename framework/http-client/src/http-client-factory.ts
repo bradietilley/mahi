@@ -1,4 +1,4 @@
-import type { PipeFn } from "@mahi/pipeline";
+import type { PipeFn } from "@mahiframework/pipeline";
 import { ClientRequest, currentClientRequest } from "./client-request.js";
 import type { ClientResponse } from "./client-response.js";
 import { StrayRequestError } from "./errors.js";

@@ -1,8 +1,8 @@
-import { ServiceProvider } from "@mahi/core";
-import { DatabaseManager, DATABASE_TOKEN, type RegisteredMigration } from "@mahi/database";
+import { ServiceProvider } from "@mahiframework/core";
+import { DatabaseManager, DATABASE_TOKEN, type RegisteredMigration } from "@mahiframework/database";
 import createNotificationsTable from "./migrations/0001_create_notifications_table.js";
-import { EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
-import { MailManager, MAIL_TOKEN } from "@mahi/mail";
+import { EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
+import { MailManager, MAIL_TOKEN } from "@mahiframework/mail";
 import { ChannelManager } from "./channel-manager.js";
 import { MailChannel } from "./channels/mail-channel.js";
 import { DatabaseChannel } from "./channels/database-channel.js";
@@ -18,13 +18,13 @@ export { NOTIFICATIONS_TOKEN };
  * dependency token is present in the container:
  *
  *   - `database` — always (the `notifications` table is this package's own
- *     hard dependency on `@mahi/database`).
+ *     hard dependency on `@mahiframework/database`).
  *   - `mail` — only if `MAIL_TOKEN` is bound (`MailServiceProvider`
  *     registered). Mail is a hard dependency of `MailChannel` specifically,
  *     not of the package as a whole.
  *   - `broadcast` — only if `EVENTS_TOKEN` is bound. Broadcasting itself is
  *     optional: `BroadcastChannel` only needs the `EventDispatcher`, and
- *     `@mahi/broadcasting`'s `afterDispatch()` hook (if installed)
+ *     `@mahiframework/broadcasting`'s `afterDispatch()` hook (if installed)
  *     forwards the dispatched `NotificationBroadcast` to clients.
  *
  * A `via()` naming a channel that wasn't registered (because its package is

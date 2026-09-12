@@ -393,7 +393,7 @@ to code that doesn't hold the request (loggers, the URL generator), use the
 const user = request.user<UserTable>();
 ```
 
-A thin delegate to `Auth.userOrNull()` when `@mahi/auth` is bound, and
+A thin delegate to `Auth.userOrNull()` when `@mahiframework/auth` is bound, and
 `undefined` otherwise. It is **not** a second user-storage mechanism — it
 resolves the `"auth"` token and calls through. Prefer `Auth.user()` /
 `Auth.id()` directly in controllers; `request.user()` exists so framework
@@ -406,8 +406,8 @@ A form request is a `Request` subclass carrying validation rules and,
 optionally, authorization. Generate one with `./artisan make:request`.
 
 ```ts
-import { Request, rule, fileRule } from "@mahi/http";
-import { authorize } from "@mahi/authorization";
+import { Request, rule, fileRule } from "@mahiframework/http";
+import { authorize } from "@mahiframework/authorization";
 import { Post } from "../../models/post.model.js";
 
 export class CreatePostRequest extends Request {
@@ -438,7 +438,7 @@ authorize(): boolean | void | Promise<boolean | void>
 
 **Only an explicit `false` produces a 403.** The controller pipeline checks
 `allowed === false` — `undefined` (from a `void`-returning override) and
-`true` both pass. That's what makes delegating to `@mahi/authorization`
+`true` both pass. That's what makes delegating to `@mahiframework/authorization`
 work: `authorize("create", Post)` returns `Promise<void>` and *throws* on
 denial, so it never returns `false` and the check is a no-op for it.
 

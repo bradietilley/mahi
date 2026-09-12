@@ -1,13 +1,13 @@
-import { Cast, Model } from "@mahi/database";
-import { snowflake } from "@mahi/snowflake";
-import type { DateTime } from "@mahi/datetime";
+import { Cast, Model } from "@mahiframework/database";
+import { snowflake } from "@mahiframework/snowflake";
+import type { DateTime } from "@mahiframework/datetime";
 import { UserFactory } from "../../database/factories/user-factory.js";
 import { UserResource } from "../http/resources/user.resource.js";
 
 /**
  * The app owns this model and its migration, NOT the framework — every
  * real app wants its own columns here (tenant, avatar, role, ...). The
- * `@mahi/auth` package only ships the tables internal to its own guards.
+ * `@mahiframework/auth` package only ships the tables internal to its own guards.
  *
  * The single `UserAttributes` interface is the whole declaration: plain
  * columns are plain types, and the timestamps are `DateTime` (auto-cast

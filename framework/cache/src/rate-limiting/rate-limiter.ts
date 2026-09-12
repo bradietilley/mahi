@@ -4,7 +4,7 @@ import { Limit } from "./limit.js";
 /**
  * `args` is untyped (`any[]`, not `unknown[]`) — this package has zero
  * knowledge of what a consumer will pass at `limiter(name)`'s call site
- * (`@mahi/http`'s `throttle()` passes a Hono `Context`; a queue
+ * (`@mahiframework/http`'s `throttle()` passes a Hono `Context`; a queue
  * consumer might pass a job payload). `unknown[]` would make a concretely
  * typed callback like `(c: Context) => Limit` fail TypeScript's
  * contravariant parameter-type check against this type — `any[]` is the
@@ -31,7 +31,7 @@ export type LimiterCallback = (...args: any[]) => Limit | Limit[] | Promise<Limi
  *    limiter configuration (a callback returning one or several `Limit`s,
  *    given whatever arguments the caller passes to `limiter(name)`'s
  *    resolved closure), referenced by name from multiple call sites
- *    without redeclaring the limit inline each time. `@mahi/http`'s
+ *    without redeclaring the limit inline each time. `@mahiframework/http`'s
  *    `throttle("name")` is the HTTP-specific consumer of this.
  */
 export class RateLimiter {

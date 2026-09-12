@@ -1,6 +1,6 @@
 import type { Transaction } from "kysely";
-import { Facade } from "@mahi/facades";
-import { DATABASE_TOKEN } from "@mahi/core";
+import { Facade } from "@mahiframework/facades";
+import { DATABASE_TOKEN } from "@mahiframework/core";
 import type { DatabaseManager } from "./database-manager.js";
 import type { DatabaseDriver } from "./drivers/driver.js";
 import type { QueryBuilder } from "./query-builder.js";

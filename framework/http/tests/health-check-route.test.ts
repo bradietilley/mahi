@@ -1,13 +1,13 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import { HttpKernel } from "../src/http-kernel.js";
 import { HEALTH_TOKEN } from "../src/health-check-route.js";
-import { CacheManager, ArrayCacheStore, CACHE_TOKEN } from "@mahi/cache";
+import { CacheManager, ArrayCacheStore, CACHE_TOKEN } from "@mahiframework/cache";
 import { MaintenanceMode, MAINTENANCE_MODE_TOKEN } from "../src/maintenance/maintenance-mode.js";
 
 /**
- * A stand-in for `@mahi/health`'s `HealthRegistry`, bound at the same
- * token. `@mahi/http` deliberately has no dependency on that package —
+ * A stand-in for `@mahiframework/health`'s `HealthRegistry`, bound at the same
+ * token. `@mahiframework/http` deliberately has no dependency on that package —
  * it resolves the registry by string and serializes whatever it returns —
  * so these tests describe exactly the contract the route relies on.
  */
@@ -42,7 +42,7 @@ describe("readiness route registration", () => {
   });
 
   it("is not registered when no health registry is bound", async () => {
-    // `@mahi/health` isn't installed: the config is set but nothing has
+    // `@mahiframework/health` isn't installed: the config is set but nothing has
     // bound the token, so the route must not exist rather than 500.
     const app = new Application();
     app.config.set("http", { healthCheck: {} });

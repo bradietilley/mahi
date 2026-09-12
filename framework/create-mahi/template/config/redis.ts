@@ -1,4 +1,4 @@
-import type { RedisConfig } from "@mahi/redis";
+import type { RedisConfig } from "@mahiframework/redis";
 import type { Env } from "./env.js";
 
 /**

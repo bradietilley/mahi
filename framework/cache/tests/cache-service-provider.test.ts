@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Application, clearCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp } from "@mahiframework/core";
 import {
   CacheServiceProvider,
   CACHE_TOKEN,

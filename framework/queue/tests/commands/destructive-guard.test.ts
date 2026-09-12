@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { Tui } from "@mahi/tui";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { Tui } from "@mahiframework/tui";
 import { QueueManager } from "../../src/queue-manager.js";
 import { QueueClearCommand } from "../../src/commands/queue-clear.js";
 import { QueueFlushCommand } from "../../src/commands/queue-flush.js";

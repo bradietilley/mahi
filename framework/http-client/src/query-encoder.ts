@@ -1,6 +1,6 @@
 /**
  * Bracket-notation encoder for query strings, urlencoded form bodies, and
- * multipart fields — the producer side of `@mahi/http`'s query parser, and
+ * multipart fields — the producer side of `@mahiframework/http`'s query parser, and
  * the behaviour PHP's `http_build_query()` (and `qs.stringify`) give you.
  *
  * A plain `String(value)` over every field turns a nested value like
@@ -19,8 +19,8 @@
  * Object nesting must be walked explicitly — naive stringification turns
  * `{ a: { b: 1 } }` into the literal `a=[object Object]`.
  *
- * (These packages share a wire format, not code: `@mahi/http-client` sits
- * below `@mahi/http` in the dependency graph and cannot import from it.)
+ * (These packages share a wire format, not code: `@mahiframework/http-client` sits
+ * below `@mahiframework/http` in the dependency graph and cannot import from it.)
  */
 
 /** A single flattened `[key, value]` pair, ready for `URLSearchParams`/`FormData`. */

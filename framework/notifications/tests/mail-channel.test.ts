@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { MailManager, Mailable, ArrayTransport } from "@mahi/mail";
+import { Application } from "@mahiframework/core";
+import { MailManager, Mailable, ArrayTransport } from "@mahiframework/mail";
 import { MailChannel } from "../src/channels/mail-channel.js";
 import { Notification } from "../src/notification.js";
 import type { NotificationRoutable } from "../src/notifiable.js";

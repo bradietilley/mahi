@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/redis",
+  "name": "@mahiframework/redis",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,10 +17,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cache": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/broadcasting": "workspace:*",
-    "@mahi/queue": "workspace:*",
+    "@mahiframework/cache": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/broadcasting": "workspace:*",
+    "@mahiframework/queue": "workspace:*",
     "ioredis": "^5.11.1"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { MailManager, type QueueMailOptions } from "../src/mail-manager.js";
 import { ArrayTransport } from "../src/transports/array-transport.js";
 import { Mailable } from "../src/mailable.js";

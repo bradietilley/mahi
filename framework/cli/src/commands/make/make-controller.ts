@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { Controller, HttpResponse, type Request, type ResponseInput } from "@mahi/http";
+  return `import { Controller, HttpResponse, type Request, type ResponseInput } from "@mahiframework/http";
 
 export class ${className} extends Controller {
   async handle(request: Request): Promise<ResponseInput> {

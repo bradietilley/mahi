@@ -1,11 +1,11 @@
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   DATABASE_TOKEN,
   SCHEMA_TOKEN,
   DatabaseManager,
   Schema,
   SqliteDriver,
-} from "@mahi/database";
+} from "@mahiframework/database";
 import createTokensTable from "../../src/migrations/0001_create_personal_access_tokens_table.js";
 import createSessionsTable from "../../src/migrations/0002_create_sessions_table.js";
 import createPasswordResetTokensTable from "../../src/migrations/0003_create_password_reset_tokens_table.js";

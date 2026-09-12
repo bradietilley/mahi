@@ -1,6 +1,6 @@
 import { Readable } from "node:stream";
 import { guessMimeType } from "./mime-types.js";
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 import { pathFromPublicUrl } from "./public-url.js";
 import type { StorageDriver } from "./storage-driver.js";
 import { STORAGE_TOKEN } from "./storage-service-provider.js";
@@ -218,7 +218,7 @@ function bindAbort(stream: Readable, signal: AbortSignal | undefined): void {
  * configured `url` prefix. Wire it with a catch-all whose path matches
  * the prefix, e.g. `router.get("/storage/*", servePublicDisk("public"))`.
  *
- * Takes a structural `{ path() }` rather than `@mahi/http`'s
+ * Takes a structural `{ path() }` rather than `@mahiframework/http`'s
  * `Request` so this package doesn't depend on HTTP — Node can point a
  * thin route at the storage root without Laravel's `storage:link`
  * symlink (which exists to work around PHP web-servers not serving

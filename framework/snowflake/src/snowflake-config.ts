@@ -1,5 +1,5 @@
 /**
- * Framework config for `@mahi/snowflake`. Apps typically build this
+ * Framework config for `@mahiframework/snowflake`. Apps typically build this
  * from env in `config/snowflake.ts` and `app.config.set("snowflake", …)`
  * before bootstrap, same as `cache` / `database`.
  */

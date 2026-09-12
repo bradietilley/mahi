@@ -3,7 +3,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 /**
  * Tracks the currently-active set of suppressed event-name wildcard
  * patterns via AsyncLocalStorage — same mechanism/shape as
- * `@mahi/database`'s `transaction-context.ts` (`storage.run(value,
+ * `@mahiframework/database`'s `transaction-context.ts` (`storage.run(value,
  * callback)` + plain getters, no class wrapper). Backs `Event.suppress()`/
  * `Event.isSuppressed()` (see `event.ts`); `EventDispatcher.dispatch()`
  * checks it directly so EVERY `dispatch()` call — not just ones a

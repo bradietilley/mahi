@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { Encrypter } from "./encrypter.js";
 import { Hasher, type HasherOptions } from "./hasher.js";
 import { Signer } from "./signer.js";

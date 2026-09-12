@@ -13,7 +13,7 @@ export { CachePruneCommand } from "./commands/cache-prune.js";
 
 // Shared CacheStore.remember()/rememberViaLock()/lock() implementations,
 // exported so out-of-package CacheStore implementations (e.g.
-// @mahi/redis's RedisCacheStore) can delegate to them exactly like
+// @mahiframework/redis's RedisCacheStore) can delegate to them exactly like
 // the built-in array/file stores do, rather than re-deriving the logic.
 export { remember, rememberViaLock, lock } from "./cache-store-helpers.js";
 

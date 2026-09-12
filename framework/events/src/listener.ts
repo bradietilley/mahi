@@ -1,4 +1,4 @@
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { AbstractEvent } from "./event.js";
 
 /**

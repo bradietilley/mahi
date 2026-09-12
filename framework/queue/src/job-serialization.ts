@@ -1,5 +1,5 @@
-import type { Application } from "@mahi/core";
-import { MODEL_REGISTRY_TOKEN, type ModelRegistry } from "@mahi/database";
+import type { Application } from "@mahiframework/core";
+import { MODEL_REGISTRY_TOKEN, type ModelRegistry } from "@mahiframework/database";
 import type { Job, JobClass } from "./job.js";
 import { encodeModels, decodeModels } from "./model-serialization.js";
 

@@ -1,4 +1,4 @@
-import { MailMessage } from "@mahi/mail";
+import { MailMessage } from "@mahiframework/mail";
 
 /**
  * The email-verification email.

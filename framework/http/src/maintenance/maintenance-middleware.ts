@@ -1,4 +1,4 @@
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { Request } from "../request.js";
 import { HttpResponse, type HttpResponse as HttpResponseType } from "../response.js";
 import type { HttpPipe } from "../middleware/pipeline-middleware.js";

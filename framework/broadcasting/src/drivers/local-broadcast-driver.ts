@@ -1,7 +1,7 @@
 import type { ServerType } from "@hono/node-server";
 import type { Context, Hono } from "hono";
 import type { WSContext } from "hono/ws";
-import type { WebSocketSupport } from "@mahi/http";
+import type { WebSocketSupport } from "@mahiframework/http";
 import { createNodeWebSocket } from "@hono/node-ws";
 import type { BroadcastDriver, BroadcastMessage } from "../broadcast-driver.js";
 import type { BroadcastAuthorizer, SubscribeAuthorization } from "../broadcast-authorizer.js";
@@ -168,7 +168,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    * crash the process on the first connection rather than conflicting
    * politely. `HttpKernel.websocketSupport()` is that shared helper and
    * `BroadcastServiceProvider` hands it in; see `WebSocketSupport`'s
-   * docstring in `@mahi/http` for the full mechanism.
+   * docstring in `@mahiframework/http` for the full mechanism.
    *
    * The fallback of building its own is kept only for a caller with a
    * bare Hono and no kernel (the driver's own tests), where by definition

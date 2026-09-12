@@ -8,7 +8,7 @@ import {
 import { ArraySessionStore } from "../../src/session/array-session-store.js";
 import type { SessionStore } from "../../src/session/session-store.js";
 
-/** Bare in-memory stand-in for `@mahi/cache`'s CacheStore. */
+/** Bare in-memory stand-in for `@mahiframework/cache`'s CacheStore. */
 class FakeCache implements SessionCacheStore {
   private entries = new Map<string, { value: unknown; expiresAt: number | null }>();
 

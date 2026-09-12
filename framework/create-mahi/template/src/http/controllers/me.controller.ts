@@ -1,5 +1,5 @@
-import { Auth } from "@mahi/auth";
-import { Controller, HttpResponse } from "@mahi/http";
+import { Auth } from "@mahiframework/auth";
+import { Controller, HttpResponse } from "@mahiframework/http";
 import type { User } from "../../models/user.model.js";
 import { UserResource } from "../resources/user.resource.js";
 

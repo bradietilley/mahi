@@ -135,32 +135,32 @@ Mahi is a set of packages, not a monolith. Install what you use.
 
 | Package | Contents |
 |---|---|
-| `@mahi/core` | Container, Application, ServiceProvider, Config, Env, Logger, `Str`/`Arr`/`Collection`, helpers |
-| `@mahi/http` | HTTP kernel (Hono), router, request, responses, resources, middleware |
-| `@mahi/database` | Models, query builder, relations, migrations, factories, seeders |
-| `@mahi/validation` | `Rule`, `Validator`, `ValidationException` |
-| `@mahi/auth` | Guards (token, session), user providers, password reset, verification |
-| `@mahi/authorization` | Gates, policies, abilities |
-| `@mahi/cache` | Cache stores, locks, rate limiter |
-| `@mahi/queue` | Jobs, queue drivers, workers, middleware |
-| `@mahi/schedule` | Recurring task scheduling |
-| `@mahi/health` | Readiness checks, `GET /health`, `./artisan health` |
-| `@mahi/events` | Event dispatcher, listeners |
-| `@mahi/broadcasting` | Websocket broadcasting |
-| `@mahi/storage` | Filesystem disks |
-| `@mahi/mail` | Mailables, SMTP/log transports |
-| `@mahi/notifications` | Multi-channel notifications |
-| `@mahi/encryption` | Encrypter, hasher, signer |
-| `@mahi/redis` | Redis-backed cache/queue/broadcast drivers |
-| `@mahi/cli` | Console kernel, `make:*` generators, migration commands |
-| `@mahi/testing` | Test application, HTTP client, database assertions |
-| `@mahi/datetime` | Immutable date/time library |
-| `@mahi/snowflake` | Distributed 63-bit IDs |
-| `@mahi/tui` | Terminal UI — prompts, tables, spinners, progress bars |
-| `@mahi/pipeline` | Send a value through a series of pipes |
-| `@mahi/process` | Run external commands |
-| `@mahi/http-client` | Outbound HTTP — fluent requests, retries, `Http.fake()` |
-| `@mahi/facades` | The `Facade<T>` mixin |
+| `@mahiframework/core` | Container, Application, ServiceProvider, Config, Env, Logger, `Str`/`Arr`/`Collection`, helpers |
+| `@mahiframework/http` | HTTP kernel (Hono), router, request, responses, resources, middleware |
+| `@mahiframework/database` | Models, query builder, relations, migrations, factories, seeders |
+| `@mahiframework/validation` | `Rule`, `Validator`, `ValidationException` |
+| `@mahiframework/auth` | Guards (token, session), user providers, password reset, verification |
+| `@mahiframework/authorization` | Gates, policies, abilities |
+| `@mahiframework/cache` | Cache stores, locks, rate limiter |
+| `@mahiframework/queue` | Jobs, queue drivers, workers, middleware |
+| `@mahiframework/schedule` | Recurring task scheduling |
+| `@mahiframework/health` | Readiness checks, `GET /health`, `./artisan health` |
+| `@mahiframework/events` | Event dispatcher, listeners |
+| `@mahiframework/broadcasting` | Websocket broadcasting |
+| `@mahiframework/storage` | Filesystem disks |
+| `@mahiframework/mail` | Mailables, SMTP/log transports |
+| `@mahiframework/notifications` | Multi-channel notifications |
+| `@mahiframework/encryption` | Encrypter, hasher, signer |
+| `@mahiframework/redis` | Redis-backed cache/queue/broadcast drivers |
+| `@mahiframework/cli` | Console kernel, `make:*` generators, migration commands |
+| `@mahiframework/testing` | Test application, HTTP client, database assertions |
+| `@mahiframework/datetime` | Immutable date/time library |
+| `@mahiframework/snowflake` | Distributed 63-bit IDs |
+| `@mahiframework/tui` | Terminal UI — prompts, tables, spinners, progress bars |
+| `@mahiframework/pipeline` | Send a value through a series of pipes |
+| `@mahiframework/process` | Run external commands |
+| `@mahiframework/http-client` | Outbound HTTP — fluent requests, retries, `Http.fake()` |
+| `@mahiframework/facades` | The `Facade<T>` mixin |
 
 ## Requirements
 

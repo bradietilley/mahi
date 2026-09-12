@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { Schedule } from "./schedule.js";
 import { ScheduleRunCommand } from "./commands/schedule-run.js";
 import { ScheduleListCommand } from "./commands/schedule-list.js";

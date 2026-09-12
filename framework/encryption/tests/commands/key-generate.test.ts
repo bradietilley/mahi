@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { KeyGenerateCommand } from "../../src/commands/key-generate.js";
 

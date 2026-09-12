@@ -1,8 +1,8 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /**
  * App-owned users table — add your own columns here freely; nothing in
- * `@mahi/auth` depends on this shape beyond the two columns named in
+ * `@mahiframework/auth` depends on this shape beyond the two columns named in
  * `config/auth.ts` (`identifierColumn`, `passwordColumn`).
  *
  * The framework's own tables (`personal_access_tokens`, `sessions`,

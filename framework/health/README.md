@@ -1,4 +1,4 @@
-# @mahi/health
+# @mahiframework/health
 
 Health — application health checks and readiness reporting for Mahi.
 

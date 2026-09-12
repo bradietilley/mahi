@@ -1,9 +1,9 @@
 import { once } from "node:events";
 import type { AddressInfo } from "node:net";
 import { serve, type ServerType } from "@hono/node-server";
-import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahi/core";
-import { AbstractEvent, EventsServiceProvider, EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
-import { HttpServiceProvider, HttpKernel, HTTP_KERNEL_TOKEN } from "@mahi/http";
+import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahiframework/core";
+import { AbstractEvent, EventsServiceProvider, EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
+import { HttpServiceProvider, HttpKernel, HTTP_KERNEL_TOKEN } from "@mahiframework/http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { BroadcastManager } from "../src/broadcast-manager.js";
 import { BroadcastServiceProvider, BROADCAST_TOKEN } from "../src/broadcast-service-provider.js";

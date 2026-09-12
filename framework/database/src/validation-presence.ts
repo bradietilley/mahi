@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import { Rule, type PresenceResolver } from "@mahi/validation";
+import { app } from "@mahiframework/core";
+import { Rule, type PresenceResolver } from "@mahiframework/validation";
 import { DATABASE_TOKEN } from "./database-service-provider.js";
 import type { DatabaseManager } from "./database-manager.js";
 

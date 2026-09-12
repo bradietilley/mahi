@@ -2,7 +2,7 @@ import type { Seeder } from "./seeder.js";
 import type { AnyModelClass } from "./model.js";
 import type { RegisteredMigration } from "./migrator.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Return `Model` subclasses this provider makes serializable inside
@@ -53,6 +53,6 @@ declare module "@mahi/core" {
      * Return Seeder classes this provider contributes. Collected and run,
      * in registration order, by the `db:seed` CLI command.
      */
-    seeders?(): Array<new (app: import("@mahi/core").Application) => Seeder>;
+    seeders?(): Array<new (app: import("@mahiframework/core").Application) => Seeder>;
   }
 }

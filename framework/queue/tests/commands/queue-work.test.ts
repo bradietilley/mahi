@@ -1,6 +1,6 @@
-import { Application, CACHE_TOKEN } from "@mahi/core";
-import { ArrayCacheStore, CacheManager } from "@mahi/cache";
-import { MODEL_REGISTRY_TOKEN } from "@mahi/database";
+import { Application, CACHE_TOKEN } from "@mahiframework/core";
+import { ArrayCacheStore, CacheManager } from "@mahiframework/cache";
+import { MODEL_REGISTRY_TOKEN } from "@mahiframework/database";
 import { describe, expect, it } from "vitest";
 import { QUEUE_RESTART_KEY } from "../../src/restart-signal.js";
 import { QueueWorkCommand } from "../../src/commands/queue-work.js";
@@ -11,7 +11,7 @@ import { ReleaseJobError } from "../../src/middleware/release-job-error.js";
 import type { JobMiddleware } from "../../src/middleware/job-middleware.js";
 import { QUEUE_TOKEN, JOB_REGISTRY_TOKEN } from "../../src/tokens.js";
 import type { PushOptions, QueueDriver, QueuedJob } from "../../src/queue-driver.js";
-import { EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
+import { EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
 import { JobProcessing, JobProcessed, JobFailed } from "../../src/job-events.js";
 
 class HandledJob extends Job {

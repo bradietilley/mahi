@@ -1,9 +1,9 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahi/database";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahiframework/database";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 import { makeMigrationDir, removeMigrationDir } from "../helpers/migration-fixtures.js";
 import { MigrateFreshCommand } from "../../src/commands/migrate-fresh.js";
 import { MigrateResetCommand } from "../../src/commands/migrate-reset.js";
@@ -12,7 +12,7 @@ import { MigrateCommand } from "../../src/commands/migrate.js";
 import { MigrateRollbackCommand } from "../../src/commands/migrate-rollback.js";
 
 const MIGRATION_A = `
-import { Schema } from "@mahi/database";
+import { Schema } from "@mahiframework/database";
 
 export default {
   async up() {

@@ -11,7 +11,7 @@ export default defineConfig({
      * That is ~800ms idle but ~2.4s when the full monorepo suite saturates
      * the machine, leaving too little headroom under a 5s budget.
      *
-     * Matches `@mahi/auth`/`@mahi/testing`, which set the same value for
+     * Matches `@mahiframework/auth`/`@mahiframework/testing`, which set the same value for
      * their own argon2 cost.
      */
     testTimeout: 15000,

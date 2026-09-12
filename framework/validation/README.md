@@ -1,4 +1,4 @@
-# @mahi/validation
+# @mahiframework/validation
 
 Validation — a rule-based validator for Mahi.
 

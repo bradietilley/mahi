@@ -1,4 +1,4 @@
-# @mahi/core
+# @mahiframework/core
 
 Core — the application container, service providers, lifecycle, config, and logging for Mahi.
 

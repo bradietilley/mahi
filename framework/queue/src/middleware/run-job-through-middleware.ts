@@ -1,11 +1,11 @@
-import type { Application } from "@mahi/core";
-import { Pipeline, type Pipe } from "@mahi/pipeline";
+import type { Application } from "@mahiframework/core";
+import { Pipeline, type Pipe } from "@mahiframework/pipeline";
 import type { Job } from "../job.js";
 import type { JobMiddleware, JobMiddlewarePassable } from "./job-middleware.js";
 
 /**
  * Runs `job.handle()` through the job's own `middleware()` stack (if any),
- * using `@mahi/pipeline` — the exact same composition Laravel's
+ * using `@mahiframework/pipeline` — the exact same composition Laravel's
  * `CallQueuedHandler` performs with its own `Pipeline`. Each `JobMiddleware`
  * wraps the eventual `handle()` call and may short-circuit (e.g. by
  * throwing `ReleaseJobError`) instead of calling `next()`.

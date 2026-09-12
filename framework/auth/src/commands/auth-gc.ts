@@ -1,4 +1,4 @@
-import { Command } from "@mahi/cli";
+import { Command } from "@mahiframework/cli";
 import { Auth } from "../auth-facade.js";
 
 /**

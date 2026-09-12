@@ -1,4 +1,4 @@
-import { Resource } from "@mahi/http";
+import { Resource } from "@mahiframework/http";
 import type { User } from "../../models/user.model.js";
 
 export interface UserJson {

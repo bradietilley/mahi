@@ -8,7 +8,7 @@ export default defineConfig({
      *
      * A handful of tests here `await import()` a module cold —
      * `controller.test.ts`'s 422 case pulls in `HttpKernel` and
-     * `@mahi/core` — which takes ~400ms idle but far longer when all 27
+     * `@mahiframework/core` — which takes ~400ms idle but far longer when all 27
      * packages are competing under a full `pnpm test`. It intermittently
      * crossed 5s there while passing in isolation every time.
      */

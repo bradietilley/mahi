@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import { HttpError, type HttpPipe, type Request } from "@mahi/http";
+import { app } from "@mahiframework/core";
+import { HttpError, type HttpPipe, type Request } from "@mahiframework/http";
 import type { GateRegistry } from "../gate.js";
 import type { ModelClass } from "../policy.js";
 import { GATE_TOKEN } from "../tokens.js";

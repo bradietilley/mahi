@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
 import { AbstractEvent } from "../src/event.js";
 import type { Listener } from "../src/listener.js";
 import type { EventDispatcher, QueuedListenerPayload } from "../src/event-dispatcher.js";

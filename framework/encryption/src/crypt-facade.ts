@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { Encrypter } from "./encrypter.js";
 import { ENCRYPTER_TOKEN } from "./encryption-service-provider.js";
 

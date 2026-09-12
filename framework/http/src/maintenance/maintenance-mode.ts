@@ -1,6 +1,6 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { app as currentApp, storage_path, type Application } from "@mahi/core";
+import { app as currentApp, storage_path, type Application } from "@mahiframework/core";
 
 export const MAINTENANCE_MODE_TOKEN = "maintenance-mode";
 

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Cast, Model, Schema } from "@mahi/database";
-import { Signer } from "@mahi/encryption";
-import { hasValidSignature, Request } from "@mahi/http";
+import { Cast, Model, Schema } from "@mahiframework/database";
+import { Signer } from "@mahiframework/encryption";
+import { hasValidSignature, Request } from "@mahiframework/http";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import { EmailVerificationBroker } from "../../src/verification/email-verification-broker.js";
 import type { Credentials, UserProvider } from "../../src/user-provider.js";

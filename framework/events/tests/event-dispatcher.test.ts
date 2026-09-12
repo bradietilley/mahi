@@ -1,4 +1,4 @@
-import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahi/core";
+import { Application, setAfterCommitResolver, clearAfterCommitResolver } from "@mahiframework/core";
 import { afterEach, describe, expect, it } from "vitest";
 import { AbstractEvent } from "../src/event.js";
 import type { Listener } from "../src/listener.js";

@@ -13,7 +13,7 @@
  * to the relevant model's own `primaryKeyColumn`.
  */
 
-import type { Collection } from "@mahi/core";
+import type { Collection } from "@mahiframework/core";
 import type { AttributesOf, RelationKeys, RelationKind, RelationMarker } from "./markers.js";
 
 /**

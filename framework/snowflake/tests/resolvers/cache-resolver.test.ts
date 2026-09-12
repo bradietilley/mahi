@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ArrayCacheStore } from "@mahi/cache";
+import { ArrayCacheStore } from "@mahiframework/cache";
 import { CacheSequenceResolver } from "../../src/sequence-resolvers/cache-sequence-resolver.js";
 
 describe("CacheSequenceResolver", () => {

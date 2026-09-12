@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import { DatabaseManager } from "../../src/database-manager.js";
 import { DATABASE_TOKEN } from "../../src/database-service-provider.js";
 import type { DatabaseDriver } from "../../src/drivers/driver.js";

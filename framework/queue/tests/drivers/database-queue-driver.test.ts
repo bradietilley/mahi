@@ -5,7 +5,7 @@ import type {
   PluginTransformQueryArgs,
   PluginTransformResultArgs,
 } from "kysely";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   DATABASE_TOKEN,
   DatabaseManager,
@@ -13,7 +13,7 @@ import {
   SCHEMA_TOKEN,
   SqliteDriver,
   transaction,
-} from "@mahi/database";
+} from "@mahiframework/database";
 import { DatabaseQueueDriver } from "../../src/drivers/database-queue-driver.js";
 import type { DatabaseQueueDriverOptions } from "../../src/drivers/database-queue-driver.js";
 

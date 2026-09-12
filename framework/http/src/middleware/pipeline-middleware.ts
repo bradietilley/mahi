@@ -1,11 +1,11 @@
 import type { Context, MiddlewareHandler, Next as HonoNext } from "hono";
-import { Pipeline, type Pipe, type PipeFn } from "@mahi/pipeline";
+import { Pipeline, type Pipe, type PipeFn } from "@mahiframework/pipeline";
 import { Request, requestFromContext } from "../request.js";
 import type { ResponseInput } from "../response.js";
 import { finalizeResponse } from "../boundary.js";
 
 /**
- * A global HTTP middleware stage, written against `@mahi/pipeline`'s
+ * A global HTTP middleware stage, written against `@mahiframework/pipeline`'s
  * `Pipe` shape. The passable is the framework `Request`, not Hono's
  * `Context` — app and provider code never import Hono.
  *

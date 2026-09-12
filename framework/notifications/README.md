@@ -1,4 +1,4 @@
-# @mahi/notifications
+# @mahiframework/notifications
 
 Notifications — multi-channel notifications for Mahi.
 

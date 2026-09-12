@@ -1,4 +1,4 @@
-import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahi/cache";
+import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahiframework/cache";
 import { JOB_REGISTRY_TOKEN } from "../tokens.js";
 import type { JobRegistry } from "../job-registry.js";
 import type { JobMiddleware, JobMiddlewarePassable } from "./job-middleware.js";
@@ -26,7 +26,7 @@ export interface WithoutOverlappingOptions {
    * The cache store backing the lock — a live `CacheStore`, or a store
    * name resolved from the cache manager, or omitted to use the cache
    * manager's default store (resolved from the container via `CACHE_TOKEN`
-   * at run time). Passing a live store keeps `@mahi/cache` an optional
+   * at run time). Passing a live store keeps `@mahiframework/cache` an optional
    * peer for jobs that would rather resolve it themselves.
    */
   store?: CacheStore | string;
@@ -43,7 +43,7 @@ export interface WithoutOverlappingOptions {
 
 /**
  * Job middleware ensuring no two jobs sharing the same lock key run
- * concurrently — wraps `@mahi/cache`'s `Lock` (backed by a
+ * concurrently — wraps `@mahiframework/cache`'s `Lock` (backed by a
  * `CacheStore`'s atomic `add()`). While one instance holds the lock, other
  * instances are either **released** back onto the queue to retry later
  * (the default) or silently dropped, matching Laravel's

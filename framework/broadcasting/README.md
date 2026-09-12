@@ -1,4 +1,4 @@
-# @mahi/broadcasting
+# @mahiframework/broadcasting
 
 Broadcasting — event broadcasting over WebSocket and pub/sub channels for Mahi.
 

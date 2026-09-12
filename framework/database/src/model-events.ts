@@ -1,7 +1,7 @@
-import { app } from "@mahi/core";
-import { AbstractEvent, type EventClass } from "@mahi/events";
-import type { EventDispatcher } from "@mahi/events";
-import { EVENTS_TOKEN } from "@mahi/events";
+import { app } from "@mahiframework/core";
+import { AbstractEvent, type EventClass } from "@mahiframework/events";
+import type { EventDispatcher } from "@mahiframework/events";
+import { EVENTS_TOKEN } from "@mahiframework/events";
 import type { AnyModelClass } from "./model.js";
 import { afterCommitOn } from "./transaction-context.js";
 
@@ -97,7 +97,7 @@ export function modelEventName(modelClass: AnyModelClass, event: ModelEventName)
  *
  * Instantiated once, immediately, when `observe()` is called (no
  * constructor arguments) — same statelessness contract as
- * `@mahi/authorization`'s `Policy`: don't hold per-request state
+ * `@mahiframework/authorization`'s `Policy`: don't hold per-request state
  * on an observer instance, it's shared across every call.
  *
  * See `ModelEventPayload`'s docstring for exactly what each method
@@ -122,7 +122,7 @@ export type ModelObserverClass<TModel = Record<string, any>> = new () => ModelOb
 /**
  * A model's `static dispatchesEvents` map — Laravel's
  * `protected $dispatchesEvents` equivalent. Maps a lifecycle event name to
- * an `@mahi/events` `Event` subclass constructed with that event's
+ * an `@mahiframework/events` `Event` subclass constructed with that event's
  * `ModelEventPayload` and dispatched through the app's `EventDispatcher`:
  *
  *   class PostCreated extends AbstractEvent {
@@ -135,10 +135,10 @@ export type ModelObserverClass<TModel = Record<string, any>> = new () => ModelOb
  *     };
  *   }
  *
- * Only fires when `@mahi/events`' `EventsServiceProvider` has been
+ * Only fires when `@mahiframework/events`' `EventsServiceProvider` has been
  * registered (i.e. `EVENTS_TOKEN` is bound) — a `Model` used in a test or
  * script that never bootstrapped events support simply never dispatches,
- * same graceful-no-op precedent as `@mahi/authorization`'s
+ * same graceful-no-op precedent as `@mahiframework/authorization`'s
  * `GateRegistry.currentUser()` no-op'ing when `AUTH_TOKEN` isn't bound.
  */
 export type DispatchesEventsMap = Partial<Record<ModelEventName, EventClass<AbstractEvent>>>;
@@ -211,7 +211,7 @@ const LIFECYCLE_EVENT_CLASSES: Record<
 };
 
 // Keyed by the model CLASS itself (exact identity, not `table`) — same
-// dispatch-by-class-reference approach `@mahi/authorization`'s
+// dispatch-by-class-reference approach `@mahiframework/authorization`'s
 // `GateRegistry` uses for policies, so a typo'd/renamed model can't
 // silently register against the wrong table string.
 const observerRegistry = new Map<AnyModelClass, ModelObserver<any>[]>();
@@ -268,7 +268,7 @@ export function registerModelListener(
  * `modelEventName(modelClass, event)` (e.g. `"model.posts.created"`)
  * matches an active `Event.suppress()` pattern (see
  * `Model.withoutEvents()`, which delegates to `Event.suppress()` in
- * `@mahi/events` with a `"model.{table}.*"`/`"model.*"` pattern)
+ * `@mahiframework/events` with a `"model.{table}.*"`/`"model.*"` pattern)
  * — `ModelObserver`/`on()` listeners are invoked directly rather than
  * through `EventDispatcher`, so they check the shared suppression
  * pattern list here rather than relying on `EventDispatcher.dispatch()`'s

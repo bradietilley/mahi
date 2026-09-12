@@ -1,4 +1,4 @@
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 
 /**
  * A bidirectional attribute cast — the typed replacement for Laravel's
@@ -278,7 +278,7 @@ export function json<T>(): Cast<T, string> {
 }
 
 /**
- * `datetime` — a timestamp column ↔ a `DateTime` (`@mahi/datetime`) on
+ * `datetime` — a timestamp column ↔ a `DateTime` (`@mahiframework/datetime`) on
  * the model side, mirroring Laravel's Carbon casting.
  *
  * The DB type is `string | Date` rather than just `string` because what

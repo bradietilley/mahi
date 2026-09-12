@@ -3,7 +3,7 @@ import path from "node:path";
 import { access, rm } from "node:fs/promises";
 import { constants } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { Tui, colors } from "@mahi/tui";
+import { Tui, colors } from "@mahiframework/tui";
 import { detectPackageManager, runScript } from "./pm.js";
 import { parseArgs, isValidProjectName, toProjectName } from "./options.js";
 import {
@@ -30,7 +30,7 @@ ${colors.bold("Options")}
   --no-install               Skip installing dependencies
   --no-migrate               Skip the initial database migration
   --no-git                   Skip git initialisation
-  --link-workspace           Point @mahi/* at workspace:* (monorepo development)
+  --link-workspace           Point @mahiframework/* at workspace:* (monorepo development)
   --force                    Scaffold into a non-empty directory
   -y, --yes                  Accept defaults without prompting
   -h, --help                 Show this message

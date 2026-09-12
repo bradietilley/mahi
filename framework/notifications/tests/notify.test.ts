@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, setCurrentApp, clearCurrentApp } from "@mahi/core";
+import { Application, setCurrentApp, clearCurrentApp } from "@mahiframework/core";
 import { ChannelManager } from "../src/channel-manager.js";
 import { Notification } from "../src/notification.js";
 import { notify } from "../src/notify.js";

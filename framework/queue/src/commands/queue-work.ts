@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Command, trap } from "@mahi/cli";
+import { Command, trap } from "@mahiframework/cli";
 import { QueueManager } from "../queue-manager.js";
 import { JobRegistry } from "../job-registry.js";
 import { QUEUE_TOKEN, JOB_REGISTRY_TOKEN } from "../tokens.js";
@@ -11,8 +11,8 @@ import { acquireUniqueLockForState, releaseUniqueLock } from "../unique-jobs.js"
 import { runJobThroughMiddleware } from "../middleware/run-job-through-middleware.js";
 import { SkipJobMissingModelError } from "../model-serialization.js";
 import { ReleaseJobError } from "../middleware/release-job-error.js";
-import { EventDispatcher, EVENTS_TOKEN } from "@mahi/events";
-import type { AbstractEvent } from "@mahi/events";
+import { EventDispatcher, EVENTS_TOKEN } from "@mahiframework/events";
+import type { AbstractEvent } from "@mahiframework/events";
 import { JobProcessing, JobProcessed, JobFailed } from "../job-events.js";
 import { restartSignalledAt } from "../restart-signal.js";
 
@@ -572,7 +572,7 @@ export class QueueWorkCommand extends Command {
   }
 
   /**
-   * Dispatch a queue lifecycle event through `@mahi/events`, but
+   * Dispatch a queue lifecycle event through `@mahiframework/events`, but
    * only if an events provider is registered — the queue package works
    * standalone (events is a soft dependency here), so this is a no-op when
    * `EVENTS_TOKEN` is unbound. Failures in a listener are swallowed and

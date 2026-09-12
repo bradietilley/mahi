@@ -2,11 +2,11 @@ import { randomUUID } from "node:crypto";
 import type { ScheduleLocker } from "./schedule-locker.js";
 
 /**
- * The slice of `@mahi/cache`'s `CacheStore` this locker needs. Declared
+ * The slice of `@mahiframework/cache`'s `CacheStore` this locker needs. Declared
  * structurally, and resolved through the `"cache"` token at runtime, so
- * `@mahi/schedule` keeps its "no compile-time dependency on the packages
+ * `@mahiframework/schedule` keeps its "no compile-time dependency on the packages
  * it can optionally use" property — the same arrangement `schedule.job()`
- * has with `@mahi/queue`.
+ * has with `@mahiframework/queue`.
  */
 export interface LockingCacheStore {
   /** Set only if absent. MUST be atomic — this is the whole lock. */
@@ -53,7 +53,7 @@ export class CacheScheduleLocker implements ScheduleLocker {
   constructor(private readonly store: LockingCacheStore) {}
 
   /**
-   * `_lock` suffix, matching `@mahi/cache`'s own `Lock`, so a schedule
+   * `_lock` suffix, matching `@mahiframework/cache`'s own `Lock`, so a schedule
    * lock can never collide with a plain cached value under the same key.
    */
   private cacheKey(key: string): string {

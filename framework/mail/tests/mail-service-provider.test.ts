@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { MailServiceProvider, MAIL_TOKEN } from "../src/mail-service-provider.js";
 import { MailManager } from "../src/mail-manager.js";
 import { ArrayTransport } from "../src/transports/array-transport.js";

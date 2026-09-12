@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/schedule",
+  "name": "@mahiframework/schedule",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,10 +17,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cli": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/http-client": "workspace:*",
-    "@mahi/tui": "workspace:*",
+    "@mahiframework/cli": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/http-client": "workspace:*",
+    "@mahiframework/tui": "workspace:*",
     "commander": "^12.1.0"
   },
   "devDependencies": {

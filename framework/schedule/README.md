@@ -1,4 +1,4 @@
-# @mahi/schedule
+# @mahiframework/schedule
 
 Scheduling — a cron-style task scheduler with overlap protection, for Mahi.
 

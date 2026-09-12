@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
@@ -12,7 +12,7 @@ import { scaffold, toClassName } from "./scaffold.js";
 function template(className: string): string {
   const pipeName = className.charAt(0).toLowerCase() + className.slice(1);
 
-  return `import type { HttpPipe } from "@mahi/http";
+  return `import type { HttpPipe } from "@mahiframework/http";
 
 export const ${pipeName}: HttpPipe = async (request, next) => {
   // Inspect/short-circuit here, or continue down the pipeline:

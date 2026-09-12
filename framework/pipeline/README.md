@@ -1,4 +1,4 @@
-# @mahi/pipeline
+# @mahiframework/pipeline
 
 Pipeline — pass an object through a series of stages, for Mahi.
 

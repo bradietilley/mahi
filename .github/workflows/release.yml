@@ -2,11 +2,11 @@ name: Release
 
 # Publishes every workspace package whose version is not yet on npm when a
 # `v<version>` tag is pushed. The tag must equal the lockstep framework
-# version (`node scripts/set-version.mjs --print`); `@mahi/datetime` is
+# version (`node scripts/set-version.mjs --print`); `@mahiframework/datetime` is
 # versioned independently and is published whenever its own version is new.
 #
 # Requires an `NPM_TOKEN` repository secret with publish rights to the
-# `@mahi` scope (an automation token, so 2FA does not block CI).
+# `@mahiframework` scope (an automation token, so 2FA does not block CI).
 
 on:
   push:

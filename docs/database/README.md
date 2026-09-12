@@ -1,6 +1,6 @@
 # Database
 
-`@mahi/database` is the whole data layer: connection management, a
+`@mahiframework/database` is the whole data layer: connection management, a
 query builder, an Active Record `Model`, relations, migrations,
 factories, and seeders. This page covers the bottom of that stack —
 connections, the `DB` facade, raw access, and transactions. The layers
@@ -18,7 +18,7 @@ above have their own pages:
 
 ```ts
 import path from "node:path";
-import type { DatabaseConfig } from "@mahi/database";
+import type { DatabaseConfig } from "@mahiframework/database";
 import type { Env } from "./env.js";
 
 // Resolved relative to THIS file, not `process.cwd()`: `config/` under
@@ -94,7 +94,7 @@ entrypoint. See [Migrations](../migrations/) and
 
 ## DatabaseManager
 
-`DatabaseManager` extends `@mahi/core`'s `Manager` and is bound as a
+`DatabaseManager` extends `@mahiframework/core`'s `Manager` and is bound as a
 singleton at `DATABASE_TOKEN` by `DatabaseServiceProvider`.
 
 | Method | Returns | Notes |
@@ -110,7 +110,7 @@ singleton at `DATABASE_TOKEN` by `DatabaseServiceProvider`.
 | `getDefaultDriver()` | `string` | Reads `config.default`. |
 
 ```ts
-import { DatabaseManager, DATABASE_TOKEN } from "@mahi/database";
+import { DatabaseManager, DATABASE_TOKEN } from "@mahiframework/database";
 
 const db = app.make<DatabaseManager>(DATABASE_TOKEN);
 
@@ -137,7 +137,7 @@ interface DatabaseDriver<DB = any> extends Partial<Connectable> {
 }
 ```
 
-`Connectable` (from `@mahi/core`) is `{ connect(): Promise<void>;
+`Connectable` (from `@mahiframework/core`) is `{ connect(): Promise<void>;
 disconnect(): Promise<void> }` and is **optional**. This is the
 framework-wide "synchronous driver resolution" rule: `manager.driver()`
 never returns a promise, because constructing a driver handle is cheap.
@@ -263,7 +263,7 @@ Plus `DB.instance()`, inherited from the `Facade` mixin, which returns the
 The model-free entry point into the [query builder](../queries/):
 
 ```ts
-import { DB } from "@mahi/database";
+import { DB } from "@mahiframework/database";
 
 await DB.table("users").count();
 await DB.table("users").where("first_name", "John").get();
@@ -370,7 +370,7 @@ is genuinely inconvenient, the same guidance as `app()` itself.
 ## Transactions
 
 ```ts
-import { DB } from "@mahi/database";
+import { DB } from "@mahiframework/database";
 
 await DB.transaction(async (trx) => {
   const post = await Post.create({ user_id: userId, body });
@@ -382,7 +382,7 @@ await DB.transaction(async (trx) => {
 Three equivalent entry points, all landing in the same place:
 
 ```ts
-import { transaction, DB, DatabaseManager } from "@mahi/database";
+import { transaction, DB, DatabaseManager } from "@mahiframework/database";
 
 await transaction(kysely, callback);           // standalone, explicit connection
 await db.transaction(callback, "analytics");   // DatabaseManager, resolves the driver for you
@@ -441,7 +441,7 @@ dispatching a job that reads the rows being written, notifying an external
 system — registers with `afterCommit()`:
 
 ```ts
-import { afterCommit } from "@mahi/database";
+import { afterCommit } from "@mahiframework/database";
 
 await DB.transaction(async () => {
   const order = await Order.create({ ... });
@@ -634,7 +634,7 @@ export class BillingServiceProvider extends ServiceProvider {
 }
 ```
 
-This is how `@mahi/auth`, `@mahi/queue` and `@mahi/notifications` ship
+This is how `@mahiframework/auth`, `@mahiframework/queue` and `@mahiframework/notifications` ship
 their own tables (`personal_access_tokens`, `sessions`, `jobs`,
 `notifications`, …) without anything being copied into your app.
 
@@ -672,21 +672,21 @@ error. See [Queues](../queues/).
 
 | Token | Bound as | Value |
 |---|---|---|
-| `DATABASE_TOKEN` (`@mahi/core`) | singleton | `DatabaseManager`, with `"sqlite"` pre-registered |
+| `DATABASE_TOKEN` (`@mahiframework/core`) | singleton | `DatabaseManager`, with `"sqlite"` pre-registered |
 | `SCHEMA_TOKEN` (`"db.schema"`) | binding | `manager.schema()` — a fresh `SchemaBuilder` per resolve |
 | `MODEL_REGISTRY_TOKEN` (`"db.models"`) | singleton | `ModelRegistry` |
 
-`DATABASE_TOKEN`'s canonical definition lives in `@mahi/core`'s
+`DATABASE_TOKEN`'s canonical definition lives in `@mahiframework/core`'s
 well-known tokens (the CLI's migration commands and the queue's database
 driver resolve it cross-package) and is re-exported from
-`@mahi/database` so this package's public API is unchanged.
+`@mahiframework/database` so this package's public API is unchanged.
 
 On `boot()`, the provider also:
 
 1. Collects every provider's `models()` into the `ModelRegistry`.
 2. Connects the default driver if it implements `Connectable`.
 3. Registers the `exists` / `unique` presence resolver with
-   `@mahi/validation`, so those rules work in jobs and CLI commands
+   `@mahiframework/validation`, so those rules work in jobs and CLI commands
    without an HTTP request in flight. See [Validation](../validation/).
 
 ## Testing against a database

@@ -1,5 +1,5 @@
-import { Application } from "@mahi/core";
-import { Tui } from "@mahi/tui";
+import { Application } from "@mahiframework/core";
+import { Tui } from "@mahiframework/tui";
 import { describe, expect, it } from "vitest";
 import type { Router } from "../../src/router.js";
 import { HttpResponse } from "../../src/response.js";

@@ -38,9 +38,9 @@ export class ConnectionFailed {
 export type HttpClientEvent = RequestSending | ResponseReceived | ConnectionFailed;
 
 /**
- * The slice of `@mahi/events`' dispatcher this package needs. Structural,
- * so wiring the real dispatcher costs no dependency edge — `@mahi/events`
- * is not a dependency of `@mahi/http-client`.
+ * The slice of `@mahiframework/events`' dispatcher this package needs. Structural,
+ * so wiring the real dispatcher costs no dependency edge — `@mahiframework/events`
+ * is not a dependency of `@mahiframework/http-client`.
  */
 export interface EventSink {
   dispatch(event: HttpClientEvent): unknown;

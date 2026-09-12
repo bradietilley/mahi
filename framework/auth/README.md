@@ -1,4 +1,4 @@
-# @mahi/auth
+# @mahiframework/auth
 
 Authentication — session and token guards, password brokers, and user providers for Mahi.
 

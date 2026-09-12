@@ -3,7 +3,7 @@
  * `Illuminate\Mail\Attachment` (which carries a whole strategy object for
  * from-path/from-storage/from-data resolution): here an attachment is just
  * the already-resolved bytes-or-path plus its metadata, and *how* those
- * bytes were obtained (read off disk, pulled from `@mahi/storage`,
+ * bytes were obtained (read off disk, pulled from `@mahiframework/storage`,
  * built in memory) is the caller's concern, not this value object's.
  *
  * Exactly one of `content` / `path` should be provided:

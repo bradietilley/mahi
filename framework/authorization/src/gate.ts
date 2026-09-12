@@ -1,5 +1,5 @@
-import { app as globalApp, AUTH_TOKEN, type Application } from "@mahi/core";
-import { HttpError } from "@mahi/http";
+import { app as globalApp, AUTH_TOKEN, type Application } from "@mahiframework/core";
+import { HttpError } from "@mahiframework/http";
 import type { ModelClass, Policy, PolicyClass, PolicyMethod, PolicyResult } from "./policy.js";
 import { AuthorizationResponse, isAuthorizationResponse } from "./response.js";
 
@@ -8,7 +8,7 @@ import { AuthorizationResponse, isAuthorizationResponse } from "./response.js";
  * purpose: a concretely typed ability like `(user, post: Post) => ...`
  * must be assignable here, and TypeScript's contravariant parameter check
  * rejects `Post` against `unknown`. The same rationale applies to
- * `BeforeCallback`/`AfterCallback` below and to `@mahi/cache`'s
+ * `BeforeCallback`/`AfterCallback` below and to `@mahiframework/cache`'s
  * `LimiterCallback`.
  */
 export type Ability<TUser = unknown> = (
@@ -30,15 +30,15 @@ export type AfterCallback<TUser = unknown> = (
   ...args: any[]
 ) => boolean | null | Promise<boolean | null>;
 
-// The token `@mahi/auth` binds its `AuthManager` under, resolved by
-// string at runtime rather than by importing `@mahi/auth`, so this
+// The token `@mahiframework/auth` binds its `AuthManager` under, resolved by
+// string at runtime rather than by importing `@mahiframework/auth`, so this
 // package takes NO compile-time dependency on it — authorization is useful
 // against a user from anywhere (a third-party identity provider, a queue
 // job, a test), and `forUser()` covers those. The token literal comes from
-// `@mahi/core`'s `well-known-tokens` (imported above), the shared
-// source of truth both this package and `@mahi/auth` agree on — so
+// `@mahiframework/core`'s `well-known-tokens` (imported above), the shared
+// source of truth both this package and `@mahiframework/auth` agree on — so
 // a typo can't silently diverge into a `BindingNotFoundError`. Same
-// soft-dependency shape `@mahi/schedule` uses for `QUEUE_TOKEN`.
+// soft-dependency shape `@mahiframework/schedule` uses for `QUEUE_TOKEN`.
 
 interface CurrentUserSource {
   userOrNull(): unknown | null;
@@ -258,7 +258,7 @@ export class GateRegistry {
   }
 
   /**
-   * The current user from `@mahi/auth`'s AsyncLocalStorage scope.
+   * The current user from `@mahiframework/auth`'s AsyncLocalStorage scope.
    *
    * Returns null when auth isn't installed at all, so a gate can still be
    * used in an app with no authentication (every check then sees a

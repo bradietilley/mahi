@@ -1,6 +1,6 @@
 # Redis
 
-`@mahi/redis` is one shared connection and three thin driver adapters:
+`@mahiframework/redis` is one shared connection and three thin driver adapters:
 a `CacheStore`, a `QueueDriver`, and a `BroadcastDriver`. It is the
 framework's answer to "we now run more than one Node process."
 
@@ -399,7 +399,7 @@ value) stays the miss sentinel — matching `ArrayCacheStore`.
 | `increment` | `INCRBY` | Atomic. **Preserves the existing TTL.** Rejects a non-numeric value. |
 | `add` | `SET … NX [EX n]` | Atomic. `true` iff this call set the key. |
 | `releaseLock` | `EVAL` (compare-and-delete) | Atomic. What `Lock.release()` uses. |
-| `remember` / `rememberViaLock` / `lock` | — | Delegated to the shared helpers exported by `@mahi/cache`. |
+| `remember` / `rememberViaLock` / `lock` | — | Delegated to the shared helpers exported by `@mahiframework/cache`. |
 
 `releaseLock()` is the one worth understanding. The portable release is a
 `GET` then a `DEL` — two round-trips with a window between them, in which
@@ -422,7 +422,7 @@ Math.ceil(ttlSeconds))`), because Redis `EX` takes whole seconds and
 rejects `0`. A sub-second TTL becomes one second rather than an error.
 
 `remember`/`rememberViaLock`/`lock` are one-line delegations to the
-`remember`, `rememberViaLock` and `lock` helpers that `@mahi/cache`
+`remember`, `rememberViaLock` and `lock` helpers that `@mahiframework/cache`
 exports for exactly this purpose — an out-of-package store gets them by
 delegating rather than re-deriving the logic, identically to the built-in
 array and file stores.

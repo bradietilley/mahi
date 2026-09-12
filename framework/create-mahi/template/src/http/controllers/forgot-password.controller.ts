@@ -1,7 +1,7 @@
-import { Auth, PasswordResetToken } from "@mahi/auth";
-import { app } from "@mahi/core";
-import { Controller, HttpResponse, signedUrl } from "@mahi/http";
-import { Mail } from "@mahi/mail";
+import { Auth, PasswordResetToken } from "@mahiframework/auth";
+import { app } from "@mahiframework/core";
+import { Controller, HttpResponse, signedUrl } from "@mahiframework/http";
+import { Mail } from "@mahiframework/mail";
 import { ResetPasswordMail } from "../../mail/reset-password.mail.js";
 import { ForgotPasswordRequest } from "../requests/forgot-password.request.js";
 

@@ -1,6 +1,6 @@
 import type { HealthCheck } from "./health-check.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Contribute readiness checks. Collected during

@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { SequentialIdentifierResolver } from "./identifier-resolvers/sequential-identifier-resolver.js";
 import { defaultSnowflakeConfig } from "./snowflake-config.js";
 import { SnowflakeGenerator } from "./snowflake-generator.js";

@@ -1,4 +1,4 @@
-import type { HttpConfig } from "@mahi/http";
+import type { HttpConfig } from "@mahiframework/http";
 import type { Env } from "./env.js";
 
 /**

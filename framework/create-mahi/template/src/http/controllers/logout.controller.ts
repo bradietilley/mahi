@@ -1,5 +1,5 @@
-import { Auth, TokenGuard } from "@mahi/auth";
-import { Controller, HttpResponse, type Request } from "@mahi/http";
+import { Auth, TokenGuard } from "@mahiframework/auth";
+import { Controller, HttpResponse, type Request } from "@mahiframework/http";
 import type { User } from "../../models/user.model.js";
 
 /**

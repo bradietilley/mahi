@@ -1,5 +1,5 @@
-import { retry } from "@mahi/core";
-import { Pipeline, type PipeFn } from "@mahi/pipeline";
+import { retry } from "@mahiframework/core";
+import { Pipeline, type PipeFn } from "@mahiframework/pipeline";
 import { ClientRequest, type ClientRequestBody } from "./client-request.js";
 import { makeClientResponse, type ClientResponse } from "./client-response.js";
 import { ConnectionError, RequestFailedError } from "./errors.js";
@@ -91,7 +91,7 @@ const defaultOptions: RequestOptions = {
 
 /**
  * Sentinel that converts a failed *response* into a thrown error so
- * `@mahi/core`'s exception-driven `retry()` can drive HTTP retries — a
+ * `@mahiframework/core`'s exception-driven `retry()` can drive HTTP retries — a
  * failed status is an ordinary return value here, which is the whole point
  * of `throw()` being opt-in.
  *
@@ -330,7 +330,7 @@ export class PendingRequest {
   }
 
   /**
-   * Add a `@mahi/pipeline` pipe seeing the request on the way down and the
+   * Add a `@mahiframework/pipeline` pipe seeing the request on the way down and the
    * response on the way back. One mechanism covering Laravel's
    * `withMiddleware` + `beforeSending` + `afterResponse`.
    *
@@ -572,7 +572,7 @@ export class PendingRequest {
   }
 
   /**
-   * Wraps the whole pipeline in `@mahi/core`'s `retry()`, bridging failed
+   * Wraps the whole pipeline in `@mahiframework/core`'s `retry()`, bridging failed
    * responses into it via `RetrySignal`. Middleware therefore re-runs and
    * `RequestSending` re-fires per attempt, matching Laravel.
    */

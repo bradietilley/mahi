@@ -273,7 +273,7 @@ export type FileSource = string | File | Blob | Uint8Array | Readable | Readable
 /**
  * Tiny extension→MIME map for path-backed files. Unknown extensions become
  * `application/octet-stream`. Duplicated (rather than imported from
- * `@mahi/storage`) so `@mahi/http` stays independent of it.
+ * `@mahiframework/storage`) so `@mahiframework/http` stays independent of it.
  */
 const EXTENSION_MIME_TYPES: Record<string, string> = {
   jpg: "image/jpeg",

@@ -1,4 +1,4 @@
-# @mahi/cache
+# @mahiframework/cache
 
 Cache — a unified cache API over array, file, and Redis stores, with atomic locks, for Mahi.
 

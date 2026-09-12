@@ -1,11 +1,11 @@
 # Broadcasting
 
-`@mahi/broadcasting` pushes already-dispatched application events to
+`@mahiframework/broadcasting` pushes already-dispatched application events to
 connected websocket clients, scoped to named channels.
 
 ```ts
-import { AbstractEvent } from "@mahi/events";
-import type { ShouldBroadcast } from "@mahi/broadcasting";
+import { AbstractEvent } from "@mahiframework/events";
+import type { ShouldBroadcast } from "@mahiframework/broadcasting";
 
 export class PostCreated extends AbstractEvent implements ShouldBroadcast {
   constructor(public readonly post: PostTable) {
@@ -45,7 +45,7 @@ notices until a user says "sometimes the feed doesn't update".
 
 `local` is correct for exactly one server process. For anything
 horizontally scaled, use a driver that fans out through shared
-infrastructure. `@mahi/redis` ships one — see
+infrastructure. `@mahiframework/redis` ships one — see
 [Redis](../redis/#redisbroadcastdriver), and the
 [section below](#the-multi-process-fix).
 
@@ -94,8 +94,8 @@ interface ShouldBroadcast {
 | `broadcastEventName()` | no | the event's `constructor.name` |
 | `broadcastPayload()` | no | the event instance itself, `JSON.stringify`d |
 
-The interface lives in `@mahi/broadcasting`, not on `Event` in
-`@mahi/events`, because `events` has no dependency on HTTP or
+The interface lives in `@mahiframework/broadcasting`, not on `Event` in
+`@mahiframework/events`, because `events` has no dependency on HTTP or
 broadcasting and shouldn't gain one just to host a marker interface. That's the framework's dependency-direction rule applied to
 its own packages.
 
@@ -113,7 +113,7 @@ export function shouldBroadcast(event: unknown): event is AbstractEvent & Should
 
 An event opts in by *having* a `broadcastChannel()` method. It doesn't
 have to import or `implements` anything. That's what lets
-`@mahi/notifications` define a `NotificationBroadcast` event that
+`@mahiframework/notifications` define a `NotificationBroadcast` event that
 broadcasts without depending on this package at all — see
 [Notifications](../notifications/#broadcast).
 
@@ -427,7 +427,7 @@ Register callbacks from a provider's `channels()` hook, or via the
 `Broadcast` facade:
 
 ```ts
-import { Broadcast, type ChannelRegistry } from "@mahi/broadcasting";
+import { Broadcast, type ChannelRegistry } from "@mahiframework/broadcasting";
 
 export class BroadcastChannelsProvider extends ServiceProvider {
   channels(broadcast: ChannelRegistry): void {
@@ -515,7 +515,7 @@ class OrderShipped extends AbstractEvent implements ShouldBroadcast {
 
 This defers only the websocket side channel, not the event's in-process
 listeners (mark the event `shouldDispatchAfterCommit` for those). Built on
-`@mahi/database`'s
+`@mahiframework/database`'s
 [after-commit dispatch](../database/#after-commit-dispatch-for-events-jobs-mail--notifications).
 
 ## Wiring
@@ -576,7 +576,7 @@ do nothing**. If you hand-roll an entrypoint with `serve()` directly, add
 the injection yourself:
 
 ```ts
-import { BroadcastManager, BROADCAST_TOKEN } from "@mahi/broadcasting";
+import { BroadcastManager, BROADCAST_TOKEN } from "@mahiframework/broadcasting";
 
 const server = serve({ fetch: kernel.raw().fetch, port });
 app.make<BroadcastManager>(BROADCAST_TOKEN).injectWebSocket(server);
@@ -634,7 +634,7 @@ kernel.raw().get(
 
 ```ts
 // config/broadcasting.ts
-import type { BroadcastConfig } from "@mahi/broadcasting";
+import type { BroadcastConfig } from "@mahiframework/broadcasting";
 
 export function broadcastingConfig(): BroadcastConfig {
   return {
@@ -684,7 +684,7 @@ See [Providers](../providers/).
 ## The multi-process fix
 
 `BroadcastManager.extend()` is the supported extension point, and
-`@mahi/redis` uses it:
+`@mahiframework/redis` uses it:
 
 ```ts
 manager.extend("redis", (app) => new RedisBroadcastDriver(/* ... */));
@@ -728,7 +728,7 @@ here.
 
 ## Broadcasting a notification
 
-`@mahi/notifications`' `BroadcastChannel` dispatches a
+`@mahiframework/notifications`' `BroadcastChannel` dispatches a
 `NotificationBroadcast` event that structurally implements
 `ShouldBroadcast`, so it flows through the same `afterDispatch()` hook
 with no extra wiring:
@@ -747,8 +747,8 @@ string, otherwise the notification's class name. See
 ## Writing a driver
 
 ```ts
-import { ServiceProvider, BROADCAST_TOKEN } from "@mahi/core";
-import { BroadcastManager, type BroadcastDriver, type BroadcastMessage } from "@mahi/broadcasting";
+import { ServiceProvider, BROADCAST_TOKEN } from "@mahiframework/core";
+import { BroadcastManager, type BroadcastDriver, type BroadcastMessage } from "@mahiframework/broadcasting";
 
 export class PusherBroadcastDriver implements BroadcastDriver {
   constructor(private client: PusherClient) {}

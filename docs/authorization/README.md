@@ -1,19 +1,19 @@
 # Authorization
 
-`@mahi/authorization` answers *"may this user do this to this thing"*.
+`@mahiframework/authorization` answers *"may this user do this to this thing"*.
 [Authentication](../authentication/) answers the other half — *who* is
 making the request.
 
 ```ts
-import { Gate, authorize, can, Policy, requireAuth } from "@mahi/authorization";
+import { Gate, authorize, can, Policy, requireAuth } from "@mahiframework/authorization";
 
 await Gate.authorize("update", Post, post);        // throws 403 if denied
 if (await Gate.allows("create", Post)) { /* ... */ }
 ```
 
 The package deliberately takes **no compile-time dependency on
-`@mahi/auth`**. It resolves the current user through a runtime
-`AUTH_TOKEN` lookup — the same soft-dependency shape `@mahi/schedule` uses
+`@mahiframework/auth`**. It resolves the current user through a runtime
+`AUTH_TOKEN` lookup — the same soft-dependency shape `@mahiframework/schedule` uses
 for queues — so authorization also works against a user from anywhere
 else: an external identity provider, a queue job, a test. If auth isn't
 installed at all, every check sees a guest rather than crashing.
@@ -69,7 +69,7 @@ stays greppable.
 
 ```ts
 // app/src/policies/post.policy.ts
-import { Policy, requireAuth } from "@mahi/authorization";
+import { Policy, requireAuth } from "@mahiframework/authorization";
 import type { UserTable } from "../models/user.model.js";
 import type { PostTable } from "../models/post.model.js";
 
@@ -99,7 +99,7 @@ export type PolicyMethod<TUser = unknown, TRow = unknown> = (
 
 **Policies are stateless by contract.** They're instantiated once and
 cached on the registry, so they must not hold per-request state — the same
-contract as `Guard` in `@mahi/auth`, and for the same reason: one
+contract as `Guard` in `@mahiframework/auth`, and for the same reason: one
 long-lived `Application` serves every concurrent request.
 
 ### `requireAuth` and `requireGuest`
@@ -159,7 +159,7 @@ no model-class stripping.
 Register explicitly via the `gates()` provider hook:
 
 ```ts
-import type { GateRegistry } from "@mahi/authorization";
+import type { GateRegistry } from "@mahiframework/authorization";
 
 export class PostsServiceProvider extends ServiceProvider {
   gates(gate: GateRegistry): void {
@@ -174,8 +174,8 @@ A single hook covers both policies and abilities rather than a separate
 shape (receive the registry, call methods on it) and avoiding the question
 of what a provider does when it wants both.
 
-The hook is declared by `@mahi/authorization` via TypeScript declaration
-merging onto `@mahi/core`'s `ProviderHooks` interface, so it's typed on
+The hook is declared by `@mahiframework/authorization` via TypeScript declaration
+merging onto `@mahiframework/core`'s `ProviderHooks` interface, so it's typed on
 every `ServiceProvider` subclass once the package is imported.
 
 ### There is no name-guessing convention
@@ -289,7 +289,7 @@ Instance members: `allowed` (readonly boolean), `message`, `status`, and
 `denied()`. `isAuthorizationResponse(value)` is exported for narrowing.
 
 ```ts
-import { AuthorizationResponse } from "@mahi/authorization";
+import { AuthorizationResponse } from "@mahiframework/authorization";
 
 export class BookmarkPolicy extends Policy<UserTable, BookmarkTable> {
   view(user: UserTable | null, bookmark: BookmarkTable): AuthorizationResponse {
@@ -352,7 +352,7 @@ anyway.
 ### The `authorize()` helper
 
 ```ts
-import { authorize } from "@mahi/authorization";
+import { authorize } from "@mahiframework/authorization";
 
 export class DeletePostController extends Controller {
   async handle(request: Request) {
@@ -382,7 +382,7 @@ scope and taking no `Context`:
 ### The `can()` middleware
 
 ```ts
-import { can } from "@mahi/authorization";
+import { can } from "@mahiframework/authorization";
 
 posts.post("/", CreatePostController)
   .middleware(authenticate(), can("create", Post));
@@ -419,8 +419,8 @@ and validation second — **authorize → 403, then validate → 422**:
 
 ```ts
 // app/src/http/requests/create-post.request.ts
-import { Request, rule, fileRule } from "@mahi/http";
-import { authorize } from "@mahi/authorization";
+import { Request, rule, fileRule } from "@mahiframework/http";
+import { authorize } from "@mahiframework/authorization";
 import { Post } from "../../models/post.model.js";
 
 export class CreatePostRequest extends Request {
@@ -466,7 +466,7 @@ sites — mirroring how `Hash`/`Crypt` front `Hasher`/`Encrypter`.
 | `Gate.forUser(user)` | `UserGate` |
 | `Gate.abilitiesFor(abilities, model, row?)` | `Promise<Record<string, boolean>>` |
 
-The user is implicit, read from `@mahi/auth`'s `AsyncLocalStorage` scope.
+The user is implicit, read from `@mahiframework/auth`'s `AsyncLocalStorage` scope.
 
 ## Authorizing without a request
 

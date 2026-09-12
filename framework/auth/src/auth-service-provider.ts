@@ -1,10 +1,10 @@
-import { ServiceProvider, CACHE_TOKEN } from "@mahi/core";
-import type { RegisteredMigration } from "@mahi/database";
+import { ServiceProvider, CACHE_TOKEN } from "@mahiframework/core";
+import type { RegisteredMigration } from "@mahiframework/database";
 import createPersonalAccessTokensTable from "./migrations/0001_create_personal_access_tokens_table.js";
 import createSessionsTable from "./migrations/0002_create_sessions_table.js";
 import createPasswordResetTokensTable from "./migrations/0003_create_password_reset_tokens_table.js";
-import { HASHER_TOKEN, SIGNER_TOKEN, type Hasher, type Signer } from "@mahi/encryption";
-import type { HttpPipe } from "@mahi/http";
+import { HASHER_TOKEN, SIGNER_TOKEN, type Hasher, type Signer } from "@mahiframework/encryption";
+import type { HttpPipe } from "@mahiframework/http";
 import { AuthManager, type AuthConfig } from "./auth-manager.js";
 import { actingAs, runWithAuth } from "./auth-context.js";
 import {
@@ -140,10 +140,10 @@ export class AuthServiceProvider extends ServiceProvider {
     }
 
     if (name === "cache") {
-      // Resolved by string token rather than importing @mahi/cache,
+      // Resolved by string token rather than importing @mahiframework/cache,
       // so auth doesn't take a package dependency for one optional store
       // — the same soft-dependency shape schedule uses for QUEUE_TOKEN.
-      // `CACHE_TOKEN` comes from @mahi/core's well-known-tokens,
+      // `CACHE_TOKEN` comes from @mahiframework/core's well-known-tokens,
       // the shared source of truth, not a private string literal here.
       const manager = this.app.make<{ store(): SessionCacheStore }>(CACHE_TOKEN);
 

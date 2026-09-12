@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { Seeder } from "@mahi/database";
+  return `import { Seeder } from "@mahiframework/database";
 
 export class ${className} extends Seeder {
   async run(): Promise<void> {

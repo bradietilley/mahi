@@ -19,12 +19,12 @@ import type { Logger, LogLevel } from "./logger.js";
  * rather than always-on.
  *
  * Hand-written directly against `app()`/`LOG_TOKEN` rather than built on
- * `@mahi/facades`' `Facade<T>(getFacadeKey)` mixin (the pattern
+ * `@mahiframework/facades`' `Facade<T>(getFacadeKey)` mixin (the pattern
  * every other facade in this framework uses — `Events`, `Bus`, `Crypt`,
- * `Hash`, `Gate`, `Auth`) because `@mahi/facades` itself depends on
- * `@mahi/core` (for `app()`); `LOG_TOKEN`/`LogManager` live in
- * `@mahi/core` itself, so importing `Facade` from
- * `@mahi/facades` here would create a circular package dependency
+ * `Hash`, `Gate`, `Auth`) because `@mahiframework/facades` itself depends on
+ * `@mahiframework/core` (for `app()`); `LOG_TOKEN`/`LogManager` live in
+ * `@mahiframework/core` itself, so importing `Facade` from
+ * `@mahiframework/facades` here would create a circular package dependency
  * (`core -> facades -> core`). `LogManager` is a concrete (non-generic)
  * type in this file, so there's no need for `Facade<T>`'s generic-static
  * workaround anyway — `instance()` below is exactly what

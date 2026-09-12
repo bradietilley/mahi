@@ -1,4 +1,4 @@
-# @mahi/storage
+# @mahiframework/storage
 
 Storage — a filesystem abstraction over local and cloud disks for Mahi.
 

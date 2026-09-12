@@ -1,11 +1,11 @@
 import type { ChannelRegistry } from "./channel-registry.js";
 
-declare module "@mahi/core" {
+declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Declare channel-authorization callbacks for `private-`/`presence-`
      * channels. Collected by `BroadcastServiceProvider` from every
-     * provider during its own `boot()`, exactly like `@mahi/http`
+     * provider during its own `boot()`, exactly like `@mahiframework/http`
      * collects `routes()`.
      *
      *   channels(broadcast: ChannelRegistry): void {

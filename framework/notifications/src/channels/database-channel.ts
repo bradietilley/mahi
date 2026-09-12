@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { DatabaseManager } from "@mahi/database";
+import type { DatabaseManager } from "@mahiframework/database";
 import type { NotificationChannel } from "../notification-channel.js";
 import type { Notification } from "../notification.js";
 import type { NotificationRoutable } from "../notifiable.js";
@@ -46,7 +46,7 @@ function notifiableClassOf(notifiable: NotificationRoutable): NotifiableClass {
  * insert needs no relation machinery.
  *
  * `notifiable_type` comes from the notifiable class's `morphAlias()`
- * (`@mahi/database`'s morph-map → `morphName` → `table` chain), so a
+ * (`@mahiframework/database`'s morph-map → `morphName` → `table` chain), so a
  * notifiable that's a real `Model` writes the same discriminant a
  * `morphMany`/`morphTo` against the same table would — which is what
  * makes `Notification`'s own `notifiable` relation resolve. Plain adapter
@@ -107,7 +107,7 @@ export class DatabaseChannel implements NotificationChannel {
 
     throw new Error(
       "The database channel requires the notifiable's class to expose either a `morphAlias()` " +
-        "(every @mahi/database Model does) or a static `table` name.",
+        "(every @mahiframework/database Model does) or a static `table` name.",
     );
   }
 }

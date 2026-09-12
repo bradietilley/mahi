@@ -1,6 +1,6 @@
-import { Auth, TokenGuard } from "@mahi/auth";
-import { Hash } from "@mahi/encryption";
-import { Controller, HttpResponse, HttpError } from "@mahi/http";
+import { Auth, TokenGuard } from "@mahiframework/auth";
+import { Hash } from "@mahiframework/encryption";
+import { Controller, HttpResponse, HttpError } from "@mahiframework/http";
 import { User } from "../../models/user.model.js";
 import { UserResource } from "../resources/user.resource.js";
 import { LoginRequest } from "../requests/login.request.js";

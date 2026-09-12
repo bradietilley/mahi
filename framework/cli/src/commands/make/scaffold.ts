@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 
 /**
  * Shared scaffolding helper for the `make:*` generators. Turns a

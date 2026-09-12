@@ -1,12 +1,12 @@
 # Testing
 
-`@mahi/testing` boots your **real** application against a throwaway SQLite
+`@mahiframework/testing` boots your **real** application against a throwaway SQLite
 database and dispatches requests straight into its Hono instance — no
 server, no port, no mocking of the framework.
 
 ```ts
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createTestApplication, TestClient, type TestApplication } from "@mahi/testing";
+import { createTestApplication, TestClient, type TestApplication } from "@mahiframework/testing";
 import { bootstrap } from "../bin/bootstrap.js";
 
 describe("Auth API", () => {
@@ -161,7 +161,7 @@ recorded, not run.
 `RecordingEventDispatcher` — the `Event::fake()` equivalent. Events are
 recorded; no listener, queued listener, or `afterDispatch` callback runs.
 
-**`fakeHttp`** calls `Http.fake()` so `@mahi/http-client` intercepts every
+**`fakeHttp`** calls `Http.fake()` so `@mahiframework/http-client` intercepts every
 outbound request, and registers `Http.restore()` on `cleanup()`. Unlike the
 other two it needs no container swap and no provider — `Http` is a static
 facade over module-level state — so there is **no `testApp.http`**; assert
@@ -180,7 +180,7 @@ The stub map starts empty and an unmatched request raises
 `Http.fake({ ... })` in the test itself to stub specific responses. See
 [Faking HTTP requests](#faking-http-requests).
 
-**`fakeProcess`** is the same arrangement for `@mahi/process`: it calls
+**`fakeProcess`** is the same arrangement for `@mahiframework/process`: it calls
 `Process.fake()` so commands are intercepted instead of spawned, and
 registers `Process.restore()` on `cleanup()`. Also a static facade, so
 there is no `testApp.process`:
@@ -317,7 +317,7 @@ testApp.actingAs(user);
 const me = await client.getJson("/me");   // 200, Auth.user() === user
 ```
 
-Pass `null` to clear it. It requires `@mahi/auth`'s `AuthServiceProvider`
+Pass `null` to clear it. It requires `@mahiframework/auth`'s `AuthServiceProvider`
 to be registered — calling it otherwise throws a clear error. For a full
 round trip through a real guard (issuing a bearer token or a session
 cookie) rather than short-circuiting resolution, use
@@ -614,7 +614,7 @@ import {
   assertNotSoftDeleted,
   countDatabaseRows,
   type DatabaseCriteria,
-} from "@mahi/testing";
+} from "@mahiframework/testing";
 ```
 
 | Function | Signature | Asserts |
@@ -980,7 +980,7 @@ injected `CacheManager` both see it.
 ## Faking processes
 
 ```ts
-import { Process, makeProcessResult } from "@mahi/process";
+import { Process, makeProcessResult } from "@mahiframework/process";
 
 beforeEach(() => {
   Process.fake({
@@ -1015,7 +1015,7 @@ See [Helpers](../helpers/#mahiprocess).
 ## Faking HTTP requests
 
 ```ts
-import { Http } from "@mahi/http-client";
+import { Http } from "@mahiframework/http-client";
 
 afterEach(() => Http.restore());
 
@@ -1087,7 +1087,7 @@ See [HTTP client](../http-client/).
 ## Faking the terminal
 
 ```ts
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 
 it("prompts for an environment", async () => {
   const fake = Tui.fake(["\u001b[B", "\r"]);   // down arrow, enter
@@ -1267,7 +1267,7 @@ await testApp.app.make<QueueManager>(QUEUE_TOKEN).dispatch(new CaptureUserJob(us
 ## Freezing time
 
 ```ts
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 
 afterEach(() => DateTime.setTestNow(null));
 

@@ -1,5 +1,5 @@
-import type { Application } from "@mahi/core";
-import type { MigrationSource, RegisteredMigration } from "@mahi/database";
+import type { Application } from "@mahiframework/core";
+import type { MigrationSource, RegisteredMigration } from "@mahiframework/database";
 
 /**
  * Gathers every migration source in play, in the order the runner should

@@ -1,4 +1,4 @@
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 import type { ChannelManager } from "./channel-manager.js";
 import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";

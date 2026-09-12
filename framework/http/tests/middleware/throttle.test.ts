@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { RateLimiter, Limit, ArrayCacheStore, RATE_LIMITER_TOKEN } from "@mahi/cache";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { RateLimiter, Limit, ArrayCacheStore, RATE_LIMITER_TOKEN } from "@mahiframework/cache";
 import { HttpResponse } from "../../src/response.js";
 import { Router } from "../../src/router.js";
 import { throttle } from "../../src/middleware/throttle.js";

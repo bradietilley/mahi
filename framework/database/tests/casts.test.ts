@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import {
   ArrayCast,
   BooleanCast,

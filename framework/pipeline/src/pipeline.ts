@@ -71,7 +71,7 @@ function isPipeObject<TPassable, TResult>(
  * the destination, and an un-`send()`'d pipeline would hang forever. Keep
  * `then` off this class.
  *
- * Framework-agnostic and has no knowledge of HTTP — `@mahi/http`
+ * Framework-agnostic and has no knowledge of HTTP — `@mahiframework/http`
  * builds a Hono-specific adapter on top of this for request middleware
  * (see `HttpKernel`'s global pipeline / the `middleware()` provider hook).
  */

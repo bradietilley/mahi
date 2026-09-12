@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import type { Command as CommanderCommand } from "commander";
-import { base_path } from "@mahi/core";
+import { base_path } from "@mahiframework/core";
 import { Command } from "../command.js";
 
 /**

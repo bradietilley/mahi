@@ -31,10 +31,10 @@ export interface FakeTuiHandle {
 }
 
 /**
- * The `@mahi/tui` public facade — one static method per feature.
+ * The `@mahiframework/tui` public facade — one static method per feature.
  * Talks directly to `process.stdin`/`process.stdout` (through the
  * module-level indirection in `context.ts`); no dependency on
- * `@mahi/core`, the container, or any other framework package.
+ * `@mahiframework/core`, the container, or any other framework package.
  */
 export class Tui {
   static note(message: string): void {
@@ -186,7 +186,7 @@ export class Tui {
    * one at a time instead of reading real stdin, and forces
    * `Tui.interactive(true)`. Public API (not test-only internals) —
    * mirrors `Prompt::fake([...keys])` being part of `laravel/prompts`'
-   * own public surface, so consumers' tests (e.g. `@mahi/cli`
+   * own public surface, so consumers' tests (e.g. `@mahiframework/cli`
    * command tests) can simulate a terminal without a real TTY.
    */
   static fake(keys: string[] = []): FakeTuiHandle {

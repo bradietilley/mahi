@@ -2,7 +2,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { ScheduleWorkCommand } from "../../src/commands/schedule-work.js";
 import { Schedule } from "../../src/schedule.js";
 import { SCHEDULE_TOKEN } from "../../src/tokens.js";

@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import { ENGINES, EngineHarness, engineAvailable } from "../support/drivers.js";
 import { Model } from "../../src/model.js";
 import { Cast } from "../../src/casts.js";

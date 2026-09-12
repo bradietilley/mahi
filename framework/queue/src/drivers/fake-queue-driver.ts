@@ -1,4 +1,4 @@
-import { afterCommit } from "@mahi/database";
+import { afterCommit } from "@mahiframework/database";
 import type { QueueDriver, QueuedJob, PushOptions, ChainedJob } from "../queue-driver.js";
 import type { JobState } from "../job-serialization.js";
 import type { JobClass } from "../job.js";
@@ -73,7 +73,7 @@ export interface PushedJob {
  *
  * Assertions throw a plain `Error` on failure (not a vitest matcher) so
  * the driver stays runner-agnostic, matching the rest of
- * `@mahi/testing`'s "plain functions, compose from vitest" style.
+ * `@mahiframework/testing`'s "plain functions, compose from vitest" style.
  */
 export class FakeQueueDriver implements QueueDriver {
   private jobs: PushedJob[] = [];

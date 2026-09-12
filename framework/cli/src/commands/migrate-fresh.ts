@@ -1,9 +1,9 @@
 import type { Command as CommanderCommand } from "commander";
-import { DatabaseManager, MigrationRunner, DATABASE_TOKEN } from "@mahi/database";
+import { DatabaseManager, MigrationRunner, DATABASE_TOKEN } from "@mahiframework/database";
 import { Command } from "../command.js";
 import { collectMigrationSources } from "./migration-directories.js";
 import { DbSeedCommand } from "./db-seed.js";
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 
 export class MigrateFreshCommand extends Command {
   signature = "migrate:fresh";

@@ -1,5 +1,5 @@
-import { Application } from "@mahi/core";
-import { ArrayCacheStore, CACHE_TOKEN, CacheManager, type CacheStore } from "@mahi/cache";
+import { Application } from "@mahiframework/core";
+import { ArrayCacheStore, CACHE_TOKEN, CacheManager, type CacheStore } from "@mahiframework/cache";
 import { beforeEach, describe, expect, it } from "vitest";
 import { Job } from "../src/job.js";
 import { JobRegistry } from "../src/job-registry.js";

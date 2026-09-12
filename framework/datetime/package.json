@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/datetime",
+  "name": "@mahiframework/datetime",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",

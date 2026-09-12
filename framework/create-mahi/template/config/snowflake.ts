@@ -1,4 +1,4 @@
-import type { SnowflakeConfig } from "@mahi/snowflake";
+import type { SnowflakeConfig } from "@mahiframework/snowflake";
 import type { Env } from "./env.js";
 
 /**

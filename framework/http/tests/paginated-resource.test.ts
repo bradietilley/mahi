@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Collection } from "@mahi/core";
-import type { LengthAwarePaginationResult, CursorPaginationResult } from "@mahi/database";
+import { Collection } from "@mahiframework/core";
+import type { LengthAwarePaginationResult, CursorPaginationResult } from "@mahiframework/database";
 import { Resource } from "../src/resource.js";
 import { paginatedResource, cursorPaginatedResource } from "../src/paginated-resource.js";
 

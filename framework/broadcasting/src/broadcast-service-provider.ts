@@ -1,12 +1,12 @@
-import { ServiceProvider, BROADCAST_TOKEN, afterCommit, type Application } from "@mahi/core";
-import { EVENTS_TOKEN, type EventDispatcher } from "@mahi/events";
+import { ServiceProvider, BROADCAST_TOKEN, afterCommit, type Application } from "@mahiframework/core";
+import { EVENTS_TOKEN, type EventDispatcher } from "@mahiframework/events";
 import {
   HTTP_KERNEL_TOKEN,
   HttpResponse,
   type HttpKernel,
   type Request,
   type Router,
-} from "@mahi/http";
+} from "@mahiframework/http";
 import { BroadcastManager, type BroadcastConfig } from "./broadcast-manager.js";
 import {
   LocalBroadcastDriver,
@@ -24,15 +24,15 @@ import { isPresenceChannel, isProtectedChannel } from "./channel-name.js";
 
 import "./provider-hooks.js";
 
-// Canonical definition in `@mahi/core`'s `well-known-tokens`
-// (resolved cross-package by `@mahi/http`'s `listen.ts`);
+// Canonical definition in `@mahiframework/core`'s `well-known-tokens`
+// (resolved cross-package by `@mahiframework/http`'s `listen.ts`);
 // re-exported so this package's public API is unchanged.
 export { BROADCAST_TOKEN };
 
 /** The container token the shared `ChannelRegistry` singleton is bound under. */
 export const CHANNEL_REGISTRY_TOKEN = "broadcast.channels";
 
-/** The `signer` token from `@mahi/encryption`, resolved softly by string. */
+/** The `signer` token from `@mahiframework/encryption`, resolved softly by string. */
 const SIGNER_TOKEN = "signer";
 
 /** How long a `POST /broadcasting/auth` grant is valid, in ms. */
@@ -70,7 +70,7 @@ interface BroadcastConfigWithAuth extends BroadcastConfig {
 /**
  * Build the `LocalBroadcastDriverOptions` every websocket driver shares —
  * authorizer, origin allow-list, limits, logger — from the app's
- * `broadcasting` config. Exported so `@mahi/redis`'s `RedisBroadcastDriver`
+ * `broadcasting` config. Exported so `@mahiframework/redis`'s `RedisBroadcastDriver`
  * gets identical authorization/hardening without re-deriving any of it.
  */
 export function resolveBroadcastDriverOptions(
@@ -188,7 +188,7 @@ export class BroadcastServiceProvider extends ServiceProvider {
    * driver build its own, so that an application adding a websocket route
    * of its own shares this one helper. Two `createNodeWebSocket()` helpers
    * on a single Node server crash the process on the first connection —
-   * see `WebSocketSupport` in `@mahi/http`.
+   * see `WebSocketSupport` in `@mahiframework/http`.
    */
   private registerSocketRoutes(broadcaster: BroadcastManager): void {
     const driver = broadcaster.connection();

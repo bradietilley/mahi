@@ -1,4 +1,4 @@
-# @mahi/encryption
+# @mahiframework/encryption
 
 Encryption — authenticated AES-GCM encryption and keyed signing for Mahi.
 

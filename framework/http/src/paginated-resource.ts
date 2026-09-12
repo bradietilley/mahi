@@ -1,4 +1,4 @@
-import type { LengthAwarePaginationResult, CursorPaginationResult } from "@mahi/database";
+import type { LengthAwarePaginationResult, CursorPaginationResult } from "@mahiframework/database";
 import type { Resource } from "./resource.js";
 
 export interface PaginationMeta {
@@ -34,7 +34,7 @@ export interface PaginatedResourceOptions {
 }
 
 /**
- * Turns a `LengthAwarePaginationResult<TModel>` (from `@mahi/
+ * Turns a `LengthAwarePaginationResult<TModel>` (from `@mahiframework/
  * database`'s `paginate()`/`Model.paginate()`) into an HTTP JSON envelope,
  * transforming each row through the given `Resource` subclass while
  * preserving the `page`/`perPage`/`total`/`totalPages`/`hasMore` metadata.

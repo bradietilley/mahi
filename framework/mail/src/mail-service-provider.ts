@@ -1,4 +1,4 @@
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import { MailManager, type MailConfig } from "./mail-manager.js";
 import { SmtpTransport, type SmtpTransportConfig } from "./transports/smtp-transport.js";
 import { LogTransport } from "./transports/log-transport.js";

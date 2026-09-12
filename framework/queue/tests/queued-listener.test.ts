@@ -1,12 +1,12 @@
-import { Application, ServiceProvider } from "@mahi/core";
-import { DatabaseServiceProvider } from "@mahi/database";
+import { Application, ServiceProvider } from "@mahiframework/core";
+import { DatabaseServiceProvider } from "@mahiframework/database";
 import {
   AbstractEvent,
   EventDispatcher,
   EventsServiceProvider,
   EVENTS_TOKEN,
   type Listener,
-} from "@mahi/events";
+} from "@mahiframework/events";
 import { describe, expect, it } from "vitest";
 import { QueueServiceProvider } from "../src/queue-service-provider.js";
 

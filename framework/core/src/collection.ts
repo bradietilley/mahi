@@ -1887,10 +1887,10 @@ export class Collection<V, K extends PropertyKey = number> {
 /**
  * Coerce a value to a number for comparison if it is meaningfully numeric:
  * a `number`/`bigint`, or an object exposing a finite numeric `valueOf()`
- * (`Date`, `@mahi/datetime`'s `DateTime`, `BigInt` boxes, …). Returns
+ * (`Date`, `@mahiframework/datetime`'s `DateTime`, `BigInt` boxes, …). Returns
  * `undefined` for values that should be compared some other way (strings,
  * plain objects, `null`). This keeps `Collection` free of a hard dependency
- * on `@mahi/datetime` while still ordering dates chronologically.
+ * on `@mahiframework/datetime` while still ordering dates chronologically.
  */
 function numericComparisonValue(value: unknown): number | undefined {
   if (typeof value === "number") {

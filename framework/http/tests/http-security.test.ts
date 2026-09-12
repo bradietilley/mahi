@@ -1,4 +1,4 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import type { Router } from "../src/router.js";
 import { HttpKernel } from "../src/http-kernel.js";

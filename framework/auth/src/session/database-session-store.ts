@@ -1,4 +1,4 @@
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import { Session } from "../models/session.js";
 import type { SessionRecord, SessionStore } from "./session-store.js";
 

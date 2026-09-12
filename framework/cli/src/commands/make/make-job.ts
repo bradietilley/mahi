@@ -1,11 +1,11 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { app } from "@mahi/core";
-import { Job } from "@mahi/queue";
+  return `import { app } from "@mahiframework/core";
+import { Job } from "@mahiframework/queue";
 
 export class ${className} extends Job {
   constructor() {

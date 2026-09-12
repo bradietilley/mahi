@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Application, ServiceProvider } from "@mahi/core";
-import { DatabaseServiceProvider } from "@mahi/database";
+import { Application, ServiceProvider } from "@mahiframework/core";
+import { DatabaseServiceProvider } from "@mahiframework/database";
 import {
   QueueServiceProvider,
   QUEUE_TOKEN,

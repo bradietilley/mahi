@@ -1,5 +1,5 @@
 import type { Kysely, Transaction } from "kysely";
-import { Manager, type Application } from "@mahi/core";
+import { Manager, type Application } from "@mahiframework/core";
 import type { DatabaseDriver } from "./drivers/driver.js";
 import { QueryBuilder } from "./query-builder.js";
 import { SchemaBuilder } from "./schema/schema-builder.js";

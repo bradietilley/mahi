@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { app, Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { app, Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   AbstractEvent,
   AbstractEvent as Event,
@@ -7,7 +7,7 @@ import {
   EventsServiceProvider,
   EVENTS_TOKEN,
   type Listener,
-} from "@mahi/events";
+} from "@mahiframework/events";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN } from "../src/database-service-provider.js";

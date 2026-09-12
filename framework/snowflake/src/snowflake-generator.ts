@@ -1,5 +1,5 @@
-import { CACHE_TOKEN, type CacheManager } from "@mahi/cache";
-import type { Application } from "@mahi/core";
+import { CACHE_TOKEN, type CacheManager } from "@mahiframework/cache";
+import type { Application } from "@mahiframework/core";
 import { SequentialIdentifierResolver } from "./identifier-resolvers/sequential-identifier-resolver.js";
 import { CacheSequenceResolver } from "./sequence-resolvers/cache-sequence-resolver.js";
 import { FileSequenceResolver } from "./sequence-resolvers/file-sequence-resolver.js";

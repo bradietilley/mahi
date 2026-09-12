@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { Tui } from "@mahi/tui";
+import { Application } from "@mahiframework/core";
+import { Tui } from "@mahiframework/tui";
 import { ScheduleListCommand } from "../../src/commands/schedule-list.js";
 import { Schedule } from "../../src/schedule.js";
 import { SCHEDULE_TOKEN } from "../../src/tokens.js";

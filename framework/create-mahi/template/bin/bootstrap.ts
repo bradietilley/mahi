@@ -1,4 +1,4 @@
-import { Application, loadEnv } from "@mahi/core";
+import { Application, loadEnv } from "@mahiframework/core";
 import { envSchema } from "../config/env.js";
 import { databaseConfig } from "../config/database.js";
 import { httpConfig } from "../config/http.js";

@@ -867,7 +867,7 @@ specific clause, an `Expression` is a *value* you can pass anywhere a
 subquery is accepted:
 
 ```ts
-import { Expression } from "@mahi/database";
+import { Expression } from "@mahiframework/database";
 
 const recent = Expression.raw(
   "select post_id from likes where user_id = ? and created_at > ?",
@@ -927,7 +927,7 @@ Subclass `EloquentBuilder` to add per-model scopes:
 
 ```ts
 // src/builders/post.builder.ts
-import { EloquentBuilder } from "@mahi/database";
+import { EloquentBuilder } from "@mahiframework/database";
 import type { PostAttributes } from "../models/post.model.js";
 
 export default class PostBuilder extends EloquentBuilder<PostAttributes> {

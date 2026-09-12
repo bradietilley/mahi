@@ -1,4 +1,4 @@
-# @mahi/facades
+# @mahiframework/facades
 
 Facades — static proxies over container-resolved services for Mahi.
 

@@ -1,4 +1,4 @@
-import { afterCommit } from "@mahi/core";
+import { afterCommit } from "@mahiframework/core";
 import { ChannelManager } from "./channel-manager.js";
 import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";
@@ -23,7 +23,7 @@ interface RecordedNotification {
  * `(notifiable, notification)` pair so `assertSentTo(user, InvoicePaid)`
  * can match the target notifiable and the notification class together.
  *
- * Swap it in for the real manager for a test run (see `@mahi/testing`'s
+ * Swap it in for the real manager for a test run (see `@mahiframework/testing`'s
  * `createTestApplication({ fakeNotifications: true })`), then assert:
  *
  *   notifications.assertSentTo(user, InvoicePaid);

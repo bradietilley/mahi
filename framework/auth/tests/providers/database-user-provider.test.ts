@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Model } from "@mahi/database";
-import { Hasher } from "@mahi/encryption";
+import { Model } from "@mahiframework/database";
+import { Hasher } from "@mahiframework/encryption";
 import { createTestDatabase, type TestDatabase } from "../__fixtures__/test-database.js";
 import { DatabaseUserProvider } from "../../src/providers/database-user-provider.js";
 

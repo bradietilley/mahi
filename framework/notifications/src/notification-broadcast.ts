@@ -1,10 +1,10 @@
-import { AbstractEvent } from "@mahi/events";
+import { AbstractEvent } from "@mahiframework/events";
 import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";
 
 /**
  * The `Event` `BroadcastChannel` dispatches for a broadcastable
- * notification. It structurally implements `@mahi/broadcasting`'s
+ * notification. It structurally implements `@mahiframework/broadcasting`'s
  * `ShouldBroadcast` marker (a `broadcastChannel()` method plus the optional
  * `broadcastEventName()`/`broadcastPayload()`), so when broadcasting is
  * installed its `afterDispatch()` hook forwards this to websocket clients
@@ -12,7 +12,7 @@ import type { NotificationRoutable } from "./notifiable.js";
  *
  * It **does not import** `ShouldBroadcast` — that interface is checked
  * structurally by broadcasting, so implementing its shape is enough. This
- * keeps `@mahi/broadcasting` an *optional* dependency of
+ * keeps `@mahiframework/broadcasting` an *optional* dependency of
  * notifications: an app with no broadcasting installed can still dispatch
  * this event (it's simply a no-op event with no listeners), and the
  * notifications package needn't depend on broadcasting to define it.

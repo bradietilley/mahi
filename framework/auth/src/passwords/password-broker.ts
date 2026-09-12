@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { DateTime } from "@mahi/datetime";
-import type { Hasher } from "@mahi/encryption";
+import { DateTime } from "@mahiframework/datetime";
+import type { Hasher } from "@mahiframework/encryption";
 import type { UserProvider } from "../user-provider.js";
 import { PasswordResetToken } from "./password-reset-token.model.js";
 
@@ -26,8 +26,8 @@ export interface PasswordBrokerConfig {
  * Told when a password is successfully reset, so the rest of the app can
  * react (notify the user, write an audit record).
  *
- * A callback rather than an event-bus dependency: `@mahi/auth` does not
- * depend on `@mahi/events`, and the one consumer that needs this is the
+ * A callback rather than an event-bus dependency: `@mahiframework/auth` does not
+ * depend on `@mahiframework/events`, and the one consumer that needs this is the
  * app itself.
  */
 export type PasswordResetListener = (event: {

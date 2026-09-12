@@ -1,5 +1,5 @@
 import { sql, type Kysely, type Transaction } from "kysely";
-import { app } from "@mahi/core";
+import { app } from "@mahiframework/core";
 import {
   DeferredCallbacks,
   findScopeByTransaction,

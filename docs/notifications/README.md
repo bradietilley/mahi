@@ -5,7 +5,7 @@ once — an email *and* a row in a table *and* a websocket push — from a
 single class.
 
 ```ts
-import { Notification } from "@mahi/notifications";
+import { Notification } from "@mahiframework/notifications";
 
 export class InvoicePaid extends Notification {
   constructor(private invoice: Invoice) {
@@ -150,7 +150,7 @@ loading the row just to notify it would be a wasted query. A tiny adapter
 closes the gap:
 
 ```ts
-import type { NotificationRoutable } from "@mahi/notifications";
+import type { NotificationRoutable } from "@mahiframework/notifications";
 
 export class UserNotifiable implements NotificationRoutable {
   /** Read by DatabaseChannel as the row's `notifiable_type`. */
@@ -209,7 +209,7 @@ For notifying an address you hold directly, with no persisted recipient
 behind it — Laravel's `Notification::route(...)->notify(...)`.
 
 ```ts
-import { AnonymousNotifiable, notify } from "@mahi/notifications";
+import { AnonymousNotifiable, notify } from "@mahiframework/notifications";
 
 await notify(
   new AnonymousNotifiable().route("mail", "ops@example.com"),
@@ -453,11 +453,11 @@ It dispatches an event and stops. No websocket code lives in this
 package.
 
 `NotificationBroadcast` extends `AbstractEvent` and **structurally
-implements** `@mahi/broadcasting`'s `ShouldBroadcast` — it has
+implements** `@mahiframework/broadcasting`'s `ShouldBroadcast` — it has
 `broadcastChannel()`, `broadcastEventName()` and `broadcastPayload()`,
 without importing the interface. Broadcasting checks for that shape
 structurally, so implementing it is enough. That's what keeps
-`@mahi/broadcasting` an *optional* dependency: an app without
+`@mahiframework/broadcasting` an *optional* dependency: an app without
 broadcasting installed still dispatches the event, it simply has no
 listeners, and the notifications package doesn't depend on broadcasting
 to define the class.
@@ -492,7 +492,7 @@ class NotificationBroadcast extends AbstractEvent {
 | Payload | `{ id, type, ...toBroadcast() }` |
 
 Requires `EVENTS_TOKEN` to be bound. The push to actual clients requires
-`@mahi/broadcasting` too — see [Broadcasting](../broadcasting/), and
+`@mahiframework/broadcasting` too — see [Broadcasting](../broadcasting/), and
 note its single-process limitation before relying on it.
 
 ## Channel registration and graceful degradation
@@ -604,11 +604,11 @@ and a UUID doesn't.
 
 ### Reading them back — `DatabaseNotification`
 
-`@mahi/notifications` ships a read-model for this table so you don't have
+`@mahiframework/notifications` ships a read-model for this table so you don't have
 to hand-roll one:
 
 ```ts
-import { DatabaseNotification } from "@mahi/notifications";
+import { DatabaseNotification } from "@mahiframework/notifications";
 
 // A recipient's notifications, newest first. Pass the discriminant + id
 // the way DatabaseChannel wrote them: a real Model's morphAlias(), or a
@@ -635,8 +635,8 @@ If you'd rather resolve the recipient as a relation, declare your own
 model over the same table with a `notifiable` marker in its attributes:
 
 ```ts
-import { Model, morphTo } from "@mahi/database";
-import type { MorphTo } from "@mahi/database";
+import { Model, morphTo } from "@mahiframework/database";
+import type { MorphTo } from "@mahiframework/database";
 
 interface AppNotificationAttributes {
   id: string;
@@ -688,7 +688,7 @@ every notifiable model, it's a plain function that resolves
 `NOTIFICATIONS_TOKEN` off the global app.
 
 ```ts
-import { notify } from "@mahi/notifications";
+import { notify } from "@mahiframework/notifications";
 
 await notify(new UserNotifiable(post.user_id), notification);
 ```
@@ -796,7 +796,7 @@ await DB.transaction(async () => {
 });
 ```
 
-Outside a transaction it delivers immediately. Built on `@mahi/database`'s
+Outside a transaction it delivers immediately. Built on `@mahiframework/database`'s
 [after-commit dispatch](../database/#after-commit-dispatch-for-events-jobs-mail--notifications).
 
 ## Writing a channel
@@ -805,16 +805,16 @@ Implement `NotificationChannel`, invent an optional `toXxx()` convention,
 and register it with `extend()`:
 
 ```ts
-import { ServiceProvider } from "@mahi/core";
+import { ServiceProvider } from "@mahiframework/core";
 import {
   ChannelManager,
   NOTIFICATIONS_TOKEN,
   type NotificationChannel,
   type Notification,
   type NotificationRoutable,
-} from "@mahi/notifications";
+} from "@mahiframework/notifications";
 
-declare module "@mahi/notifications" {
+declare module "@mahiframework/notifications" {
   interface Notification {
     toSlack?(notifiable: NotificationRoutable): { text: string };
   }
@@ -899,7 +899,7 @@ no-op, not an error. That's intentional (conditional channels) and is the
 one place where a typo goes unnoticed.
 
 **`DatabaseChannel` needs a static `table` on the notifiable's
-constructor.** Plain rows from `@mahi/database` don't have one — wrap
+constructor.** Plain rows from `@mahiframework/database` don't have one — wrap
 them, as `UserNotifiable` does.
 
 **`route("database", ...)` on an `AnonymousNotifiable` throws.** By

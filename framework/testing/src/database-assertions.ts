@@ -1,5 +1,5 @@
-import type { Application } from "@mahi/core";
-import { DATABASE_TOKEN, DatabaseManager } from "@mahi/database";
+import type { Application } from "@mahiframework/core";
+import { DATABASE_TOKEN, DatabaseManager } from "@mahiframework/database";
 
 /**
  * A set of column/value equality constraints for a database assertion —
@@ -106,7 +106,7 @@ export async function assertDatabaseCount(
 
 /**
  * The shape `assertSoftDeleted`/`assertNotSoftDeleted` accept in place of
- * a table name — satisfied by any model class, without `@mahi/testing`
+ * a table name — satisfied by any model class, without `@mahiframework/testing`
  * depending on the model type itself.
  */
 export interface SoftDeletableModel {

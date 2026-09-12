@@ -1,4 +1,4 @@
-import { Collection, data_get } from "@mahi/core";
+import { Collection, data_get } from "@mahiframework/core";
 import type { ClientRequest } from "./client-request.js";
 import { RequestFailedError } from "./errors.js";
 

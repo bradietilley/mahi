@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { PasswordResetToken } from "@mahi/auth";
-import { createTestApplication, TestClient, type TestApplication } from "@mahi/testing";
+import { PasswordResetToken } from "@mahiframework/auth";
+import { createTestApplication, TestClient, type TestApplication } from "@mahiframework/testing";
 import { bootstrap } from "../bin/bootstrap.js";
 import { ResetPasswordMail } from "../src/mail/reset-password.mail.js";
 import { registerUser, resetRateLimits } from "./helpers/auth.js";

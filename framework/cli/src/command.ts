@@ -1,4 +1,4 @@
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { Command as CommanderCommand } from "commander";
 import {
   Tui,
@@ -7,7 +7,7 @@ import {
   type ConfirmOptions,
   type SecretOptions,
   type SelectOptions,
-} from "@mahi/tui";
+} from "@mahiframework/tui";
 
 /**
  * Base class for CLI commands. Subclasses declare a `signature` (the
@@ -19,10 +19,10 @@ import {
  * is registered.
  *
  * The protected `ask`/`confirm`/`secret`/`choice`/`table`/`info`/etc.
- * methods below are thin forwarding wrappers over `@mahi/tui`'s
+ * methods below are thin forwarding wrappers over `@mahiframework/tui`'s
  * `Tui` facade — Laravel-`Command`-familiar ergonomics (`this.ask(...)`
  * instead of `Tui.ask(...)`) with zero new architecture, since `Tui`
- * already has no dependency on `@mahi/core`/the container.
+ * already has no dependency on `@mahiframework/core`/the container.
  * Subclasses are free to call `Tui.*` directly instead; both are
  * equivalent.
  *

@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/facades",
+  "name": "@mahiframework/facades",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/core": "workspace:*"
+    "@mahiframework/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

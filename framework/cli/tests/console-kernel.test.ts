@@ -1,4 +1,4 @@
-import { Application, ServiceProvider, clearCurrentApp } from "@mahi/core";
+import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Command } from "../src/command.js";
 import { ConsoleKernel } from "../src/console-kernel.js";

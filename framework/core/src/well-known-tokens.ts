@@ -4,26 +4,26 @@
  *
  * WHY THIS EXISTS: several packages deliberately avoid a compile-time
  * dependency on the package that owns a service, resolving it by string
- * token at runtime instead — `@mahi/authorization` reads the
- * current user via `"auth"` without depending on `@mahi/auth`,
- * `@mahi/schedule` dispatches jobs via `"queue"` without depending
- * on `@mahi/queue`, `@mahi/http` fans broadcasts out via
- * `"broadcast"` without depending on `@mahi/broadcasting`, and
- * `@mahi/auth`'s optional "cache" session store reaches
- * `@mahi/cache` via `"cache"`. Sharing the constants here means the token
+ * token at runtime instead — `@mahiframework/authorization` reads the
+ * current user via `"auth"` without depending on `@mahiframework/auth`,
+ * `@mahiframework/schedule` dispatches jobs via `"queue"` without depending
+ * on `@mahiframework/queue`, `@mahiframework/http` fans broadcasts out via
+ * `"broadcast"` without depending on `@mahiframework/broadcasting`, and
+ * `@mahiframework/auth`'s optional "cache" session store reaches
+ * `@mahiframework/cache` via `"cache"`. Sharing the constants here means the token
  * is declared in exactly one place; a private `const X_TOKEN = "..."`
  * literal per package would let a typo in either copy become a silent
  * `BindingNotFoundError` at runtime with no compile-time protection.
  *
- * Every package already depends on `@mahi/core` (it's where
+ * Every package already depends on `@mahiframework/core` (it's where
  * `Application`/`ServiceProvider` live), so hoisting these token strings
  * here gives both the owning package AND every soft-dependent a single
  * literal to import — a typo is now a compile error, not a runtime one,
  * and the value can never drift between the two sides.
  *
  * Each owning package still re-exports its token under the historical
- * name (`AUTH_TOKEN` from `@mahi/auth`, `QUEUE_TOKEN` from
- * `@mahi/queue`, …) so existing imports keep working — those
+ * name (`AUTH_TOKEN` from `@mahiframework/auth`, `QUEUE_TOKEN` from
+ * `@mahiframework/queue`, …) so existing imports keep working — those
  * re-exports now just point back here.
  *
  * Only genuinely cross-package tokens belong here. Package-private tokens
@@ -32,26 +32,26 @@
  * that package.
  */
 
-/** `DatabaseManager` — owned by `@mahi/database`. */
+/** `DatabaseManager` — owned by `@mahiframework/database`. */
 export const DATABASE_TOKEN = "db";
 
-/** `AuthManager` — owned by `@mahi/auth`. */
+/** `AuthManager` — owned by `@mahiframework/auth`. */
 export const AUTH_TOKEN = "auth";
 
-/** `GateRegistry` — owned by `@mahi/authorization`. */
+/** `GateRegistry` — owned by `@mahiframework/authorization`. */
 export const GATE_TOKEN = "gate";
 
-/** `QueueManager` — owned by `@mahi/queue`. */
+/** `QueueManager` — owned by `@mahiframework/queue`. */
 export const QUEUE_TOKEN = "queue";
 
-/** `CacheManager` — owned by `@mahi/cache`. */
+/** `CacheManager` — owned by `@mahiframework/cache`. */
 export const CACHE_TOKEN = "cache";
 
-/** `EventDispatcher` — owned by `@mahi/events`. */
+/** `EventDispatcher` — owned by `@mahiframework/events`. */
 export const EVENTS_TOKEN = "events";
 
-/** `BroadcastManager` — owned by `@mahi/broadcasting`. */
+/** `BroadcastManager` — owned by `@mahiframework/broadcasting`. */
 export const BROADCAST_TOKEN = "broadcast";
 
-/** `StorageManager` — owned by `@mahi/storage`. */
+/** `StorageManager` — owned by `@mahiframework/storage`. */
 export const STORAGE_TOKEN = "storage";

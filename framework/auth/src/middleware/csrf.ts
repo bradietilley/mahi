@@ -1,7 +1,7 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
-import { app } from "@mahi/core";
-import { SIGNER_TOKEN, type Signer } from "@mahi/encryption";
-import { HttpError, type CookieOptions, type HttpPipe } from "@mahi/http";
+import { app } from "@mahiframework/core";
+import { SIGNER_TOKEN, type Signer } from "@mahiframework/encryption";
+import { HttpError, type CookieOptions, type HttpPipe } from "@mahiframework/http";
 
 export interface CsrfOptions {
   /** Cookie holding the token. Readable by JS by design — see below. */
@@ -68,7 +68,7 @@ const DEFAULT_SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
  * defense.
  *
  * The cookie is queued on the `Request`, so it is written by the HTTP
- * boundary regardless of what the handler returns — see `@mahi/http`'s
+ * boundary regardless of what the handler returns — see `@mahiframework/http`'s
  * `cookies.ts`.
  */
 export function csrf(options: CsrfOptions = {}): HttpPipe {

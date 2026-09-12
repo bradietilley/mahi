@@ -2,21 +2,21 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, ServiceProvider } from "@mahi/core";
-import { DatabaseServiceProvider, Model } from "@mahi/database";
+import { Application, ServiceProvider } from "@mahiframework/core";
+import { DatabaseServiceProvider, Model } from "@mahiframework/database";
 import {
   AbstractEvent,
   EventsServiceProvider,
   EVENTS_TOKEN,
   type EventDispatcher,
-} from "@mahi/events";
+} from "@mahiframework/events";
 import {
   Job,
   QueueServiceProvider,
   QUEUE_TOKEN,
   type QueueManager,
   type JobClass,
-} from "@mahi/queue";
+} from "@mahiframework/queue";
 import { createTestApplication } from "../src/create-test-application.js";
 import {
   assertDatabaseHas,

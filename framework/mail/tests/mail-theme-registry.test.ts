@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { MailManager, type MailConfig } from "../src/mail-manager.js";
 import { DefaultMailTheme } from "../src/messages/default-mail-theme.js";
 import { MailException } from "../src/mail-exception.js";

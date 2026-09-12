@@ -1,5 +1,5 @@
 /**
- * `@mahi/datetime` — an immutable, timezone-aware temporal model.
+ * `@mahiframework/datetime` — an immutable, timezone-aware temporal model.
  *
  * The public surface is deliberately narrow: `DateTime`, `Duration`, the
  * `Timezone` helpers, the error types, and the vocabulary types. Nothing

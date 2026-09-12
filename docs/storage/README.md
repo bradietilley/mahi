@@ -1,12 +1,12 @@
 # Storage
 
-`@mahi/storage` is a named-disk abstraction over file storage. One
+`@mahiframework/storage` is a named-disk abstraction over file storage. One
 interface — a core of six methods plus listing, streaming and metadata —
 resolved by name through a `Manager`, the same pattern as
 `DatabaseManager` and `CacheManager`.
 
 ```ts
-import { Storage } from "@mahi/storage";
+import { Storage } from "@mahiframework/storage";
 
 await Storage.put("avatars/427185966743560456.png", buffer);
 const bytes = await Storage.get("avatars/427185966743560456.png");
@@ -87,8 +87,8 @@ every backend, so it makes you write the non-portable thing explicitly.
 `config/storage.ts`:
 
 ```ts
-import { storage_path } from "@mahi/core";
-import type { StorageConfig } from "@mahi/storage";
+import { storage_path } from "@mahiframework/core";
+import type { StorageConfig } from "@mahiframework/storage";
 
 export function storageConfig(): StorageConfig {
   return {
@@ -259,7 +259,7 @@ wasn't there. `start`/`end` are inclusive byte offsets (as
 `fs.createReadStream`), for serving a byte range.
 
 ```ts
-import { FileNotFoundException } from "@mahi/storage";
+import { FileNotFoundException } from "@mahiframework/storage";
 
 const stream = await Storage.readStream("videos/clip.mp4");
 stream.pipe(somewhere);
@@ -362,8 +362,8 @@ mapping a `driver` string onto a method. That's the same choice every
 Resolve it directly where you have the app:
 
 ```ts
-import { app } from "@mahi/core";
-import { StorageManager, STORAGE_TOKEN } from "@mahi/storage";
+import { app } from "@mahiframework/core";
+import { StorageManager, STORAGE_TOKEN } from "@mahiframework/storage";
 
 const storage = app().make<StorageManager>(STORAGE_TOKEN);
 await storage.disk().put(path, image.buffer);
@@ -402,7 +402,7 @@ off that instance.
 
 Three exported functions handle the prefix arithmetic. They're pure
 string functions with no dependency on the container, which is what lets
-`servePublicDisk` live in this package without pulling in `@mahi/http`.
+`servePublicDisk` live in this package without pulling in `@mahiframework/http`.
 
 ### `joinPublicUrl(prefix, path)`
 
@@ -493,9 +493,9 @@ Omit `options.request` and you get a plain 200 with the whole body
 (still streamed, still with the validators set).
 
 ```ts
-import { Auth } from "@mahi/auth";
-import { Controller, HttpResponse, type Request } from "@mahi/http";
-import { Storage, serveStoredFile } from "@mahi/storage";
+import { Auth } from "@mahiframework/auth";
+import { Controller, HttpResponse, type Request } from "@mahiframework/http";
+import { Storage, serveStoredFile } from "@mahiframework/storage";
 
 export class DownloadInvoiceController extends Controller {
   async handle(request: Request) {
@@ -561,8 +561,8 @@ prefix:
 
 ```ts
 // src/routes/media.routes.ts
-import type { Router } from "@mahi/http";
-import { servePublicDisk } from "@mahi/storage";
+import type { Router } from "@mahiframework/http";
+import { servePublicDisk } from "@mahiframework/storage";
 
 export function registerMediaRoutes(router: Router): void {
   router.get(
@@ -596,7 +596,7 @@ Two failure modes, deliberately different:
   `pathFromPublicUrl` returns `null` and the handler 404s.
 
 The handler's parameter type is structural — `{ path(): string }`, not
-`@mahi/http`'s `Request`. That's what keeps `@mahi/storage` free of a
+`@mahiframework/http`'s `Request`. That's what keeps `@mahiframework/storage` free of a
 dependency on the HTTP package while still being usable directly as a
 route handler.
 
@@ -628,8 +628,8 @@ copy API; `path()` → throw (there is no on-disk path). Only the core six
 are shown below for brevity.
 
 ```ts
-import { ServiceProvider } from "@mahi/core";
-import { StorageManager, STORAGE_TOKEN, joinPublicUrl, type StorageDriver } from "@mahi/storage";
+import { ServiceProvider } from "@mahiframework/core";
+import { StorageManager, STORAGE_TOKEN, joinPublicUrl, type StorageDriver } from "@mahiframework/storage";
 
 export class S3StorageDriver implements StorageDriver {
   constructor(private config: { bucket: string; region: string; url?: string }) {}
@@ -695,7 +695,7 @@ at a temp directory.
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { LocalStorageDriver } from "@mahi/storage";
+import { LocalStorageDriver } from "@mahiframework/storage";
 
 const root = mkdtempSync(join(tmpdir(), "mahi-storage-"));
 const disk = new LocalStorageDriver(root, "/storage");
@@ -746,7 +746,7 @@ still throws, like every other method.
 **Stream/metadata methods throw `FileNotFoundException` on a missing
 file.** `readStream`, `size`, `lastModified`, and the source of
 `copy`/`move` reject with the typed exception (importable from
-`@mahi/storage`), distinct from the plain `Error` a traversal raises.
+`@mahiframework/storage`), distinct from the plain `Error` a traversal raises.
 
 **`writeStream`/`putStream` are atomic for `"w"`, not `"a"`.** A truncating
 write goes through a temp file + `rename`, so a crash leaves no partial

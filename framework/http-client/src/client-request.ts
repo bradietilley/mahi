@@ -33,7 +33,7 @@ export interface ClientRequestInit {
  * and holding one across a retry can't observe a later attempt's changes.
  *
  * Named `ClientRequest` rather than `Request` to avoid shadowing both the
- * platform global and `@mahi/http`'s inbound request class.
+ * platform global and `@mahiframework/http`'s inbound request class.
  */
 export class ClientRequest {
   readonly method: string;

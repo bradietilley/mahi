@@ -5,8 +5,8 @@ fields. You dispatch an instance; a driver persists the fields; a worker
 in some other process rebuilds the instance and calls `handle()`.
 
 ```ts
-import { app } from "@mahi/core";
-import { Job } from "@mahi/queue";
+import { app } from "@mahiframework/core";
+import { Job } from "@mahiframework/queue";
 import type { Post } from "../models/post.model.js";
 
 export class LogPostCreatedJob extends Job {
@@ -28,7 +28,7 @@ await Bus.dispatch(new LogPostCreatedJob(post));
 ```
 
 Three drivers ship: `sync` (run inline), `database` (a `jobs` table), and
-`fake` (record, never run). `@mahi/redis` adds a fourth.
+`fake` (record, never run). `@mahiframework/redis` adds a fourth.
 
 ## The `Job` base class
 
@@ -466,7 +466,7 @@ chain(jobs: Job[], options?: { delaySeconds?: number; connection?: string }): Pr
 ### The `Bus` facade
 
 ```ts
-import { Bus } from "@mahi/queue";
+import { Bus } from "@mahiframework/queue";
 
 await Bus.dispatch(new LogPostCreatedJob(post));
 await Bus.dispatch(new SendDigestJob(user), { delaySeconds: 3600 });
@@ -1118,7 +1118,7 @@ default.
 ## Job middleware
 
 Middleware wraps the call to `handle()`, composed as a
-[`@mahi/pipeline`](../helpers/) pipeline:
+[`@mahiframework/pipeline`](../helpers/) pipeline:
 
 ```ts
 interface JobMiddleware {

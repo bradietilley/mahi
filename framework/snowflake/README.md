@@ -1,4 +1,4 @@
-# @mahi/snowflake
+# @mahiframework/snowflake
 
 Snowflake — distributed, time-sortable unique ID generation for Mahi.
 

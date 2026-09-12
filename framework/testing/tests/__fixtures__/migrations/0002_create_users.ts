@@ -1,4 +1,4 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 const migration: Migration = {
   async up(): Promise<void> {

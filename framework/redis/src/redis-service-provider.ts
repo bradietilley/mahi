@@ -1,12 +1,12 @@
-import { ServiceProvider, isConnectable } from "@mahi/core";
-import { CacheManager, CACHE_TOKEN } from "@mahi/cache";
-import { QueueManager, QUEUE_TOKEN } from "@mahi/queue";
+import { ServiceProvider, isConnectable } from "@mahiframework/core";
+import { CacheManager, CACHE_TOKEN } from "@mahiframework/cache";
+import { QueueManager, QUEUE_TOKEN } from "@mahiframework/queue";
 import {
   BroadcastManager,
   BROADCAST_TOKEN,
   DEFAULT_SOCKET_PATH,
   resolveBroadcastDriverOptions,
-} from "@mahi/broadcasting";
+} from "@mahiframework/broadcasting";
 import { RedisManager, type RedisConfig } from "./redis-manager.js";
 import { RedisConnection } from "./redis-connection.js";
 import { RedisCacheStore, DEFAULT_CACHE_PREFIX } from "./drivers/redis-cache-store.js";

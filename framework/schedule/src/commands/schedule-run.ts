@@ -1,4 +1,4 @@
-import { Command } from "@mahi/cli";
+import { Command } from "@mahiframework/cli";
 import { Schedule } from "../schedule.js";
 import { SCHEDULE_TOKEN } from "../tokens.js";
 import { runDueTasks } from "../run-due-tasks.js";

@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { ChannelManager } from "./channel-manager.js";
 import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";

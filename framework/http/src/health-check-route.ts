@@ -1,19 +1,19 @@
-import type { Application } from "@mahi/core";
+import type { Application } from "@mahiframework/core";
 import type { Request } from "./request.js";
 import type { HttpHealthCheckConfig } from "./http-config.js";
 import { secretMatches } from "./secret-compare.js";
 
 /**
- * Container token for `@mahi/health`'s `HealthRegistry`.
+ * Container token for `@mahiframework/health`'s `HealthRegistry`.
  *
- * Resolved here by string rather than imported, so `@mahi/http` keeps no
- * dependency on `@mahi/health` — the same one-way arrangement this package
+ * Resolved here by string rather than imported, so `@mahiframework/http` keeps no
+ * dependency on `@mahiframework/health` — the same one-way arrangement this package
  * already has with `MAINTENANCE_MODE_TOKEN` and `BROADCAST_TOKEN`. The
  * readiness route is simply not registered when nothing has bound it.
  */
 export const HEALTH_TOKEN = "health";
 
-/** What this package needs from `@mahi/health`'s registry: one method. */
+/** What this package needs from `@mahiframework/health`'s registry: one method. */
 export interface HealthRegistryLike {
   run(): Promise<{
     healthy: boolean;

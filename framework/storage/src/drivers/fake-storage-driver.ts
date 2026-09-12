@@ -4,7 +4,7 @@ import { LocalStorageDriver } from "./local-storage-driver.js";
  * The storage equivalent of Laravel's `Storage::fake($disk)`.
  *
  * A `LocalStorageDriver` pointed at an isolated temp directory, plus the
- * `assertExists`/`assertMissing` helpers a test wants. `@mahi/testing`'s
+ * `assertExists`/`assertMissing` helpers a test wants. `@mahiframework/testing`'s
  * `createTestApplication({ fakeStorage: ["public"] })` builds one per named
  * disk (each with its own temp dir) and swaps it in via the manager, so
  * writes under test never touch the app's real disk roots.

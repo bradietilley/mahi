@@ -1,4 +1,4 @@
-import { Facade } from "@mahi/facades";
+import { Facade } from "@mahiframework/facades";
 import type { DispatchOptions, QueueManager } from "./queue-manager.js";
 import type { Job } from "./job.js";
 import { QUEUE_TOKEN } from "./tokens.js";

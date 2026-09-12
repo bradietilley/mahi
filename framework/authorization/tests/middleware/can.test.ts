@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Hono } from "hono";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { HttpError, HttpResponse, Router } from "@mahi/http";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { HttpError, HttpResponse, Router } from "@mahiframework/http";
 import { GateRegistry } from "../../src/gate.js";
 import { Policy } from "../../src/policy.js";
 import { requireAuth } from "../../src/guards.js";
@@ -54,7 +54,7 @@ describe("can middleware", () => {
     authThrows = false;
 
     const app = new Application();
-    // Stands in for @mahi/auth's AuthManager.
+    // Stands in for @mahiframework/auth's AuthManager.
     app.instance("auth", {
       userOrNull: () => {
         if (authThrows) {

@@ -1,4 +1,4 @@
-import { Application, EVENTS_TOKEN } from "@mahi/core";
+import { Application, EVENTS_TOKEN } from "@mahiframework/core";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   ConnectionFailed,
@@ -190,7 +190,7 @@ describe("events", () => {
     bootApp();
     Http.fake({ "*": { ok: true } });
 
-    // @mahi/events stays an optional peer — a missing dispatcher must not
+    // @mahiframework/events stays an optional peer — a missing dispatcher must not
     // fail the request.
     await expect(Http.get("https://x.test/")).resolves.toBeDefined();
   });

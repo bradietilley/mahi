@@ -34,7 +34,7 @@ export interface HttpLivenessConfig {
 
 /**
  * Opt-in **readiness** endpoint (`GET /health`), registered only when
- * `@mahi/health` is installed and its `HEALTH_TOKEN` is bound.
+ * `@mahiframework/health` is installed and its `HEALTH_TOKEN` is bound.
  * Present-but-empty (`{}`) enables it at the default `/health` path.
  *
  * Runs every registered health check and responds with the terse result
@@ -150,7 +150,7 @@ export interface HttpConfig {
   liveness?: HttpLivenessConfig;
   /**
    * If set, a readiness route (default `GET /health`) running every
-   * registered health check is mounted — requires `@mahi/health`.
+   * registered health check is mounted — requires `@mahiframework/health`.
    */
   healthCheck?: HttpHealthCheckConfig;
   /**

@@ -1,4 +1,4 @@
-import type { QueueConfig } from "@mahi/queue";
+import type { QueueConfig } from "@mahiframework/queue";
 import type { Env } from "./env.js";
 
 export function queueConfig(env: Env): QueueConfig {
@@ -20,7 +20,7 @@ export function queueConfig(env: Env): QueueConfig {
         // per dispatch with `Bus.dispatch(job, { afterCommit: false })`.
         afterCommit: true,
       },
-      // Redis-backed queue (requires @mahi/redis) — worth it for
+      // Redis-backed queue (requires @mahiframework/redis) — worth it for
       // throughput and for cross-process locks (`WithoutOverlapping`,
       // `RateLimited`), which the array/file cache stores cannot provide.
       redis: { queue: "default", retryAfter: 90 },

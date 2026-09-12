@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application, DriverNotRegisteredError, clearCurrentApp } from "@mahi/core";
-import { Hasher } from "@mahi/encryption";
-import { Request } from "@mahi/http";
+import { Application, DriverNotRegisteredError, clearCurrentApp } from "@mahiframework/core";
+import { Hasher } from "@mahiframework/encryption";
+import { Request } from "@mahiframework/http";
 import {
   AuthManager,
   UnknownUserProviderError,

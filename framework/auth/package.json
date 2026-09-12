@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/auth",
+  "name": "@mahiframework/auth",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,13 +17,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/cli": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/datetime": "workspace:*",
-    "@mahi/encryption": "workspace:*",
-    "@mahi/facades": "workspace:*",
-    "@mahi/http": "workspace:*",
+    "@mahiframework/cli": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/datetime": "workspace:*",
+    "@mahiframework/encryption": "workspace:*",
+    "@mahiframework/facades": "workspace:*",
+    "@mahiframework/http": "workspace:*",
     "commander": "^12.1.0",
     "hono": "^4.6.14",
     "kysely": "^0.29.5"

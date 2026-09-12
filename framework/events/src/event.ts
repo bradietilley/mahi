@@ -42,7 +42,7 @@ export abstract class AbstractEvent {
    * This event instance's name for `Event.suppress()`/`isSuppressed()`
    * pattern matching — the class's stable `static eventName` when set,
    * otherwise the constructor's name (`"TodoCreated"`, ...).
-   * `@mahi/database`'s `ModelLifecycleEvent` overrides this getter to
+   * `@mahiframework/database`'s `ModelLifecycleEvent` overrides this getter to
    * `"model.{table}.{event}"` (e.g. `"model.posts.created"`), so
    * `Post.withoutEvents()` can suppress just that model's events via the
    * `"model.posts.*"` pattern rather than every event in the app.
@@ -58,7 +58,7 @@ export abstract class AbstractEvent {
    * async calls inside `callback` becomes a no-op for a matching event
    * (listeners never run), with zero call-site changes needed inside it.
    * AsyncLocalStorage-scoped (see `event-suppression.ts`), same pattern
-   * `@mahi/database`'s `transaction()`/`Model.withoutEvents()`
+   * `@mahiframework/database`'s `transaction()`/`Model.withoutEvents()`
    * use. Always returns a `Promise`, even for a sync callback, so callers
    * can `await` uniformly.
    *
@@ -71,7 +71,7 @@ export abstract class AbstractEvent {
    * inside a broader `Event.suppress()` call and both stay in effect.
    *
    * Consumers that dispatch outside `EventDispatcher` entirely (e.g.
-   * `@mahi/database`'s `ModelObserver`/`Model.on()` hooks, invoked
+   * `@mahiframework/database`'s `ModelObserver`/`Model.on()` hooks, invoked
    * directly rather than as `Event` instances) check `isSuppressed(name)`
    * themselves at their own dispatch point, passing the equivalent
    * `"model.{table}.{event}"` name — see `Model.withoutEvents()`, which

@@ -1,4 +1,4 @@
-import type { Logger } from "@mahi/core";
+import type { Logger } from "@mahiframework/core";
 import type { MailTransport, RenderedMail } from "../mail-transport.js";
 import type { SentMessage } from "../sent-message.js";
 import { formatAddress, formatAddressList } from "../mailables/address.js";

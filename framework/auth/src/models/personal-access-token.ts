@@ -1,10 +1,10 @@
-import { Cast, Model } from "@mahi/database";
-import type { DateTime } from "@mahi/datetime";
+import { Cast, Model } from "@mahiframework/database";
+import type { DateTime } from "@mahiframework/datetime";
 
 /**
  * The framework-owned `personal_access_tokens` table backing `TokenGuard`.
  * Owned by the package (not the app) because it's an internal detail of a
- * built-in guard — same rationale as `@mahi/queue` owning `jobs`.
+ * built-in guard — same rationale as `@mahiframework/queue` owning `jobs`.
  *
  * The timestamp columns are `DateTime`, cast on both sides: the table
  * declares them `table.timestamp()`, and reading one back as a real

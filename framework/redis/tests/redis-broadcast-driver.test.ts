@@ -31,7 +31,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
   const prefix = testPrefix();
 
   async function startProcess(
-    options: Partial<import("@mahi/broadcasting").LocalBroadcastDriverOptions> & {
+    options: Partial<import("@mahiframework/broadcasting").LocalBroadcastDriverOptions> & {
       keyPrefix?: string;
     } = {},
   ): Promise<{ driver: RedisBroadcastDriver; port: number }> {

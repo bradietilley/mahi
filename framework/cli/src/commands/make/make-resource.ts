@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
@@ -7,7 +7,7 @@ function template(className: string): string {
   const base = className.replace(/Resource$/, "");
   const jsonType = `${base}Json`;
 
-  return `import { Resource } from "@mahi/http";
+  return `import { Resource } from "@mahiframework/http";
 
 export interface ${jsonType} {
   id: string;

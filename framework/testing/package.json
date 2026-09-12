@@ -1,5 +1,5 @@
 {
-  "name": "@mahi/testing",
+  "name": "@mahiframework/testing",
   "version": "0.1.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,22 +17,22 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mahi/auth": "workspace:*",
-    "@mahi/cache": "workspace:*",
-    "@mahi/cli": "workspace:*",
-    "@mahi/core": "workspace:*",
-    "@mahi/database": "workspace:*",
-    "@mahi/events": "workspace:*",
-    "@mahi/http": "workspace:*",
-    "@mahi/http-client": "workspace:*",
-    "@mahi/mail": "workspace:*",
-    "@mahi/notifications": "workspace:*",
-    "@mahi/process": "workspace:*",
-    "@mahi/queue": "workspace:*",
-    "@mahi/storage": "workspace:*"
+    "@mahiframework/auth": "workspace:*",
+    "@mahiframework/cache": "workspace:*",
+    "@mahiframework/cli": "workspace:*",
+    "@mahiframework/core": "workspace:*",
+    "@mahiframework/database": "workspace:*",
+    "@mahiframework/events": "workspace:*",
+    "@mahiframework/http": "workspace:*",
+    "@mahiframework/http-client": "workspace:*",
+    "@mahiframework/mail": "workspace:*",
+    "@mahiframework/notifications": "workspace:*",
+    "@mahiframework/process": "workspace:*",
+    "@mahiframework/queue": "workspace:*",
+    "@mahiframework/storage": "workspace:*"
   },
   "devDependencies": {
-    "@mahi/encryption": "workspace:*",
+    "@mahiframework/encryption": "workspace:*",
     "hono": "^4.6.14",
     "kysely": "^0.29.5",
     "typescript": "^5.7.2",

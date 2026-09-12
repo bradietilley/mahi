@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Application } from "@mahi/core";
-import { EventDispatcher } from "@mahi/events";
+import { Application } from "@mahiframework/core";
+import { EventDispatcher } from "@mahiframework/events";
 import { BroadcastChannel } from "../src/channels/broadcast-channel.js";
 import { NotificationBroadcast } from "../src/notification-broadcast.js";
 import { Notification } from "../src/notification.js";

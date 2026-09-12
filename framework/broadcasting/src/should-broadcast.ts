@@ -1,4 +1,4 @@
-import type { AbstractEvent } from "@mahi/events";
+import type { AbstractEvent } from "@mahiframework/events";
 
 /**
  * Marker interface an `Event` subclass implements to opt into being pushed
@@ -12,8 +12,8 @@ import type { AbstractEvent } from "@mahi/events";
  * The central design property here: **no dispatch call site changes.**
  * Existing `dispatcher.dispatch(new TodoCreated(todo))` calls keep working
  * untouched, and whether an event broadcasts is purely a property of the
- * event class. That's why this lives in `@mahi/broadcasting` rather
- * than on `Event` itself in `@mahi/events` — `events` has no
+ * event class. That's why this lives in `@mahiframework/broadcasting` rather
+ * than on `Event` itself in `@mahiframework/events` — `events` has no
  * dependency on HTTP or broadcasting today and shouldn't gain one just to
  * host a marker interface (the dependency-direction rule: lower-level
  * packages never depend on higher-level ones).

@@ -1,4 +1,4 @@
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { describe, expect, it } from "vitest";
 import { Schedule, type ScheduleEvaluationError } from "../src/schedule.js";
 

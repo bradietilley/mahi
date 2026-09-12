@@ -1,4 +1,4 @@
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /**
  * Brings the `jobs`/`failed_jobs` tables up to what a crash-safe,

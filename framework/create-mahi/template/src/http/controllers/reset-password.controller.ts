@@ -1,5 +1,5 @@
-import { Auth } from "@mahi/auth";
-import { Controller, HttpError, HttpResponse } from "@mahi/http";
+import { Auth } from "@mahiframework/auth";
+import { Controller, HttpError, HttpResponse } from "@mahiframework/http";
 import { ResetPasswordRequest } from "../requests/reset-password.request.js";
 
 /**

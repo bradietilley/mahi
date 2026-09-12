@@ -278,7 +278,7 @@ const untrap = trap(["SIGINT", "SIGTERM"], () => {
 ```
 
 ```ts
-// tests — via @mahi/testing
+// tests — via @mahiframework/testing
 testApp = await createTestApplication(bootstrap);
 ```
 
@@ -316,9 +316,9 @@ The generated layout isn't required. The minimum is an `Application`,
 some config, and providers:
 
 ```ts
-import { Application } from "@mahi/core";
-import { DatabaseServiceProvider } from "@mahi/database";
-import { HttpServiceProvider, listenHttpServer } from "@mahi/http";
+import { Application } from "@mahiframework/core";
+import { DatabaseServiceProvider } from "@mahiframework/database";
+import { HttpServiceProvider, listenHttpServer } from "@mahiframework/http";
 
 const app = new Application();
 

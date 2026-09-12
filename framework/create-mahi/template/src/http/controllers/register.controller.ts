@@ -1,8 +1,8 @@
-import { Hash } from "@mahi/encryption";
-import { Auth, TokenGuard } from "@mahi/auth";
-import { app } from "@mahi/core";
-import { Controller, HttpResponse } from "@mahi/http";
-import { Mail } from "@mahi/mail";
+import { Hash } from "@mahiframework/encryption";
+import { Auth, TokenGuard } from "@mahiframework/auth";
+import { app } from "@mahiframework/core";
+import { Controller, HttpResponse } from "@mahiframework/http";
+import { Mail } from "@mahiframework/mail";
 import { User } from "../../models/user.model.js";
 import { UserResource } from "../resources/user.resource.js";
 import { VerifyEmailMail } from "../../mail/verify-email.mail.js";

@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import type { KeyStrategy, KeyStrategyContext } from "@mahi/database";
+import { app } from "@mahiframework/core";
+import type { KeyStrategy, KeyStrategyContext } from "@mahiframework/database";
 import { SnowflakeGenerator } from "./snowflake-generator.js";
 import { SNOWFLAKE_TOKEN } from "./tokens.js";
 

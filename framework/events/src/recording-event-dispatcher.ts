@@ -1,4 +1,4 @@
-import { inTransaction, type Application } from "@mahi/core";
+import { inTransaction, type Application } from "@mahiframework/core";
 import { AbstractEvent, dispatchesAfterCommit, type EventClass } from "./event.js";
 import { EventDispatcher } from "./event-dispatcher.js";
 
@@ -27,7 +27,7 @@ interface RecordedEvent {
  * dispatch `PostCreated` without any of its side effects happening.
  *
  * Swap it in for the real dispatcher for a test run (see
- * `@mahi/testing`'s `createTestApplication({ fakeEvents: true })`),
+ * `@mahiframework/testing`'s `createTestApplication({ fakeEvents: true })`),
  * then assert:
  *
  *   dispatcher.assertDispatched(PostCreated);

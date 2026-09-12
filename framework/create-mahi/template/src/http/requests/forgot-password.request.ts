@@ -1,4 +1,4 @@
-import { Request, rule } from "@mahi/http";
+import { Request, rule } from "@mahiframework/http";
 
 /** POST /auth/forgot-password body validation. */
 export class ForgotPasswordRequest extends Request {

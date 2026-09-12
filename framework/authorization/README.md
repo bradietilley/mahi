@@ -1,4 +1,4 @@
-# @mahi/authorization
+# @mahiframework/authorization
 
 Authorization — gates, policies, and ability checks for Mahi.
 

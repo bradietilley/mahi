@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Application, ServiceProvider } from "@mahi/core";
+import { Application, ServiceProvider } from "@mahiframework/core";
 import { ScheduleServiceProvider, SCHEDULE_TOKEN } from "../src/schedule-service-provider.js";
 import { Schedule } from "../src/schedule.js";
 

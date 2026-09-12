@@ -1,4 +1,4 @@
-import { storage_path, type LogConfig } from "@mahi/core";
+import { storage_path, type LogConfig } from "@mahiframework/core";
 
 export function loggingConfig(): LogConfig {
   return {

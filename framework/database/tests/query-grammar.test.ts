@@ -6,7 +6,7 @@ import { QueryBuilder } from "../src/query-builder.js";
 import { errorTranslatingDialect } from "../src/drivers/error-translating-dialect.js";
 import { dialectOf } from "../src/drivers/dialect-registry.js";
 import { formatTimestamp, toDriverTimestamp } from "../src/timestamps.js";
-import { DateTime } from "@mahi/datetime";
+import { DateTime } from "@mahiframework/datetime";
 import type { Dialect } from "../src/schema/dialect.js";
 
 /**

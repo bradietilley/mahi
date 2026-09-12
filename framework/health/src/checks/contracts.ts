@@ -2,13 +2,13 @@
  * Minimal structural types for the three managers the built-in checks
  * touch.
  *
- * **`@mahi/core` is this package's only dependency, and that is
+ * **`@mahiframework/core` is this package's only dependency, and that is
  * load-bearing.** The checks reach `CacheManager`/`DatabaseManager`/
  * `StorageManager` through `CACHE_TOKEN`/`DATABASE_TOKEN`/`STORAGE_TOKEN`,
  * which live in core's `well-known-tokens.ts` precisely so a package can
  * resolve a service across a boundary without a compile-time edge to it.
  * Importing the real manager types here would reinstate exactly the edge
- * the tokens exist to avoid, and would make `@mahi/health` — and
+ * the tokens exist to avoid, and would make `@mahiframework/health` — and
  * therefore `./artisan health` — unusable in an app that hasn't installed
  * all three.
  *

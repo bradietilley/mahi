@@ -1,6 +1,6 @@
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DatabaseManager, SqliteDriver, DATABASE_TOKEN } from "@mahi/database";
-import { Tui } from "@mahi/tui";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DatabaseManager, SqliteDriver, DATABASE_TOKEN } from "@mahiframework/database";
+import { Tui } from "@mahiframework/tui";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { DbShowCommand } from "../../src/commands/db-show.js";
 import { DbTableCommand } from "../../src/commands/db-table.js";

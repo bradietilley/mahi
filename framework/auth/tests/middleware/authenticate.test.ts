@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Hono } from "hono";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { Hasher } from "@mahi/encryption";
-import { HttpError, HttpResponse, Router, toHonoMiddleware } from "@mahi/http";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { Hasher } from "@mahiframework/encryption";
+import { HttpError, HttpResponse, Router, toHonoMiddleware } from "@mahiframework/http";
 import { AuthManager } from "../../src/auth-manager.js";
 import { Auth } from "../../src/auth-facade.js";
 import { AUTH_TOKEN } from "../../src/tokens.js";

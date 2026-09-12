@@ -1,6 +1,6 @@
 import type { Readable, Writable } from "node:stream";
-import { Facade } from "@mahi/facades";
-import { STORAGE_TOKEN } from "@mahi/core";
+import { Facade } from "@mahiframework/facades";
+import { STORAGE_TOKEN } from "@mahiframework/core";
 import type { StorageManager } from "./storage-manager.js";
 import type { StorageDriver, StreamSource } from "./storage-driver.js";
 

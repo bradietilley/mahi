@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, beforeEach, describe, it, vi } from "vitest";
 import { MakeModelCommand } from "../../src/commands/make/make-model.js";
 import { MakeFactoryCommand } from "../../src/commands/make/make-factory.js";
@@ -25,11 +25,11 @@ import { MakeProviderCommand } from "../../src/commands/make-provider.js";
 /**
  * The strongest guard against a generator emitting code that does not
  * compile (G1 was exactly that: `make:listener` imported a type
- * `@mahi/events` does not export). Every unit test above only string-matches
+ * `@mahiframework/events` does not export). Every unit test above only string-matches
  * the output; this one actually type-checks it.
  *
  * It scaffolds a small app tree, writes a tsconfig whose `paths` map
- * `@mahi/*` to each package's built `dist`, and runs `tsc --noEmit`. It
+ * `@mahiframework/*` to each package's built `dist`, and runs `tsc --noEmit`. It
  * therefore requires the workspace to be built first — which the monorepo's
  * `test` task depends on — and is skipped (not failed) if a required `dist`
  * is missing, so a bare `vitest` in one package without a full build does
@@ -63,7 +63,7 @@ function tsconfig(): string {
   const paths: Record<string, string[]> = {};
 
   for (const p of MAHI_PACKAGES) {
-    paths[`@mahi/${p}`] = [path.join(frameworkDir, p, "dist", "index.d.ts")];
+    paths[`@mahiframework/${p}`] = [path.join(frameworkDir, p, "dist", "index.d.ts")];
   }
 
   return JSON.stringify(

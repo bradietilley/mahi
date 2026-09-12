@@ -1,10 +1,10 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold } from "./scaffold.js";
 
 function template(className: string): string {
-  return `import { AbstractEvent } from "@mahi/events";
+  return `import { AbstractEvent } from "@mahiframework/events";
 
 export class ${className} extends AbstractEvent {
   constructor() {

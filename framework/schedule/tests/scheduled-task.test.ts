@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { Application } from "@mahi/core";
-import { Http } from "@mahi/http-client";
+import { Application } from "@mahiframework/core";
+import { Http } from "@mahiframework/http-client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ScheduledTask, formatNextRun } from "../src/scheduled-task.js";
 
@@ -336,7 +336,7 @@ describe("ScheduledTask", () => {
   });
 
   describe("webhook pings", () => {
-    // Pings go through @mahi/http-client, so these assert with Http.fake()
+    // Pings go through @mahiframework/http-client, so these assert with Http.fake()
     // rather than monkey-patching globalThis.fetch — which is exactly what
     // that package exists for.
     afterEach(() => {

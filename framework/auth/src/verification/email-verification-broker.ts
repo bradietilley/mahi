@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
-import type { AnyModelClass } from "@mahi/database";
-import { signedUrl, type SignedUrlOptions } from "@mahi/http";
+import type { AnyModelClass } from "@mahiframework/database";
+import { signedUrl, type SignedUrlOptions } from "@mahiframework/http";
 import type { UserProvider } from "../user-provider.js";
 import { hasVerifiedEmail, markEmailAsVerified } from "./email-verification.js";
 
@@ -42,7 +42,7 @@ export type SendVerificationResult =
  * ## Signed URLs, not a token table
  *
  * Unlike `PasswordBroker`, this stores nothing. The link is an HMAC-signed
- * URL (`@mahi/http`'s `signedUrl()`), so there is no table, no migration
+ * URL (`@mahiframework/http`'s `signedUrl()`), so there is no table, no migration
  * and no GC sweep. That is the right trade here and NOT for password
  * reset, because the two differ in one decisive way: a reset token is a
  * credential that grants the ability to *change* a password, so it must be

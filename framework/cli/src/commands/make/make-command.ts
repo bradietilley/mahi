@@ -1,5 +1,5 @@
 import type { Command as CommanderCommand } from "commander";
-import { Str } from "@mahi/core";
+import { Str } from "@mahiframework/core";
 import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
@@ -12,7 +12,7 @@ import { scaffold, toClassName } from "./scaffold.js";
 function template(className: string): string {
   const signature = Str.kebab(className.replace(/Command$/, ""));
 
-  return `import { Command } from "@mahi/cli";
+  return `import { Command } from "@mahiframework/cli";
 
 export class ${className} extends Command {
   signature = "${signature}";

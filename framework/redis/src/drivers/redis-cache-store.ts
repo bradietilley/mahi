@@ -1,6 +1,6 @@
 import type { Redis } from "ioredis";
-import type { CacheStore, Lock, LockOptions } from "@mahi/cache";
-import { remember, rememberViaLock, lock } from "@mahi/cache";
+import type { CacheStore, Lock, LockOptions } from "@mahiframework/cache";
+import { remember, rememberViaLock, lock } from "@mahiframework/cache";
 import type { RedisConnection } from "../redis-connection.js";
 
 /**

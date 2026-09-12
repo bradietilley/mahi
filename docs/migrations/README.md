@@ -2,7 +2,7 @@
 
 Migrations are schema changes as versioned, ordered files. Seeders
 populate a database with fixed data. Factories generate realistic rows on
-demand for tests and seeders. All three live in `@mahi/database`.
+demand for tests and seeders. All three live in `@mahiframework/database`.
 
 ```bash
 ./artisan make:migration create_posts_table
@@ -52,9 +52,9 @@ export function collectMigrationSources(app: Application): MigrationSource[] {
 }
 ```
 
-This is how `@mahi/auth` ships `personal_access_tokens`, `sessions` and
-`password_reset_tokens`, `@mahi/queue` ships `jobs` and `failed_jobs`, and
-`@mahi/notifications` ships `notifications` — none of them are copied into
+This is how `@mahiframework/auth` ships `personal_access_tokens`, `sessions` and
+`password_reset_tokens`, `@mahiframework/queue` ships `jobs` and `failed_jobs`, and
+`@mahiframework/notifications` ships `notifications` — none of them are copied into
 your app, and all of them run alongside your own.
 
 To contribute a directory from your own package or provider:
@@ -101,7 +101,7 @@ migration itself:
 
 ```ts
 // database/registry.ts
-import type { RegisteredMigration } from "@mahi/database";
+import type { RegisteredMigration } from "@mahiframework/database";
 import createPostsTable from "./migrations/2026_01_01_000000_create_posts_table.js";
 
 export const MIGRATIONS: RegisteredMigration[] = [
@@ -132,7 +132,7 @@ export class BillingServiceProvider extends ServiceProvider {
 }
 ```
 
-`@mahi/auth`, `@mahi/queue` and `@mahi/notifications` all do this, so a
+`@mahiframework/auth`, `@mahiframework/queue` and `@mahiframework/notifications` all do this, so a
 bundled app gets their tables without any filesystem access. They still
 implement `migrations()` too, for older consumers; when a provider has
 both, `migrationSources()` wins.
@@ -159,7 +159,7 @@ export interface Migration {
 ```
 
 ```ts
-import { Schema, type Migration, type Blueprint } from "@mahi/database";
+import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 const migration: Migration = {
   async up(): Promise<void> {
@@ -301,7 +301,7 @@ Cannot roll back migration "2026_01_03_000000_create_posts_table": source file n
 ## MigrationRunner
 
 ```ts
-import { MigrationRunner, DatabaseManager, DATABASE_TOKEN } from "@mahi/database";
+import { MigrationRunner, DatabaseManager, DATABASE_TOKEN } from "@mahiframework/database";
 
 const db = app.make<DatabaseManager>(DATABASE_TOKEN);
 const runner = new MigrationRunner(db.driver().kysely);
@@ -423,7 +423,7 @@ All seven set `autoIncrement`, `primary` and `unsigned` on the definition.
 | `decimal(column, total = 8, places = 2)` | `numeric` |
 
 Pair a `boolean` column with `Cast.boolean()`, and a `decimal` column with
-`Cast.decimal(places)` from `@mahi/database` — see
+`Cast.decimal(places)` from `@mahiframework/database` — see
 [Models](../models/#casts). A `boolean` attribute without a cast is a
 compile error, precisely because the column comes back as `0`/`1`.
 
@@ -975,7 +975,7 @@ export abstract class Seeder {
 ```
 
 ```ts
-import { Seeder } from "@mahi/database";
+import { Seeder } from "@mahiframework/database";
 import { User } from "../../src/models/user.model.js";
 
 export class DatabaseSeeder extends Seeder {
@@ -1021,7 +1021,7 @@ A `Factory` generates realistic model instances on demand. Seeders and
 tests are the audience.
 
 ```ts
-import { Factory } from "@mahi/database";
+import { Factory } from "@mahiframework/database";
 import { Post, type PostAttributes } from "../../src/models/post.model.js";
 
 export class PostFactory extends Factory<typeof Post> {

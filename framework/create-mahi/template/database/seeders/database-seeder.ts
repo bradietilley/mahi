@@ -1,4 +1,4 @@
-import { Seeder } from "@mahi/database";
+import { Seeder } from "@mahiframework/database";
 import { User } from "../../src/models/user.model.js";
 
 /**

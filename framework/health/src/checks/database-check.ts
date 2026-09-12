@@ -1,4 +1,4 @@
-import { DATABASE_TOKEN } from "@mahi/core";
+import { DATABASE_TOKEN } from "@mahiframework/core";
 import type { HealthCheck } from "../health-check.js";
 import type { DatabaseManagerLike } from "./contracts.js";
 

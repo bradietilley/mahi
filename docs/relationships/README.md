@@ -7,8 +7,8 @@ instance — mirroring Laravel's `$post->comments()` (the query) versus
 `$post->comments` (the loaded value).
 
 ```ts
-import { Model, belongsTo, hasMany } from "@mahi/database";
-import type { BelongsTo, HasMany } from "@mahi/database";
+import { Model, belongsTo, hasMany } from "@mahiframework/database";
+import type { BelongsTo, HasMany } from "@mahiframework/database";
 import { User } from "./user.model.js";
 import { Comment } from "./comment.model.js";
 
@@ -682,7 +682,7 @@ with no container dependencies, and relations may resolve during another
 provider's boot:
 
 ```ts
-import { Relation } from "@mahi/database";
+import { Relation } from "@mahiframework/database";
 
 register(): void {
   Relation.morphMap({
@@ -972,7 +972,7 @@ const post = await Post.query().with("author").firstOrFail();
 so in its signature rather than asserting inside:
 
 ```ts
-import type { Loaded } from "@mahi/database";
+import type { Loaded } from "@mahiframework/database";
 
 function byline(post: Loaded<Post, "author">): string {
   return post.author.name;   // no `!`, no cast
@@ -998,7 +998,7 @@ and `load()` when you already have the instance.
 ### `loadMany()` on an array
 
 ```ts
-import { loadMany } from "@mahi/database";
+import { loadMany } from "@mahiframework/database";
 
 const posts = result.data.toArray();
 await loadMany(posts, "author", "images", "hashtags");
@@ -1488,7 +1488,7 @@ whereMorphedTo("author"): "author" is not a morphTo relation.
 ## Type-level details
 
 Useful when writing generic helpers over models. Everything here is
-exported from `@mahi/database`.
+exported from `@mahiframework/database`.
 
 **The names you'll actually reach for:**
 

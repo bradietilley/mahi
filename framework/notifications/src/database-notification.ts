@@ -1,5 +1,5 @@
-import { Model } from "@mahi/database";
-import type { BuilderFor } from "@mahi/database";
+import { Model } from "@mahiframework/database";
+import type { BuilderFor } from "@mahiframework/database";
 
 /** The attributes of the polymorphic `notifications` table backing `DatabaseChannel`. */
 export interface DatabaseNotificationAttributes {

@@ -1,8 +1,8 @@
 import type { Context, ErrorHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { ValidationException } from "@mahi/validation";
-import { ModelNotFoundError } from "@mahi/database";
-import type { Application } from "@mahi/core";
+import { ValidationException } from "@mahiframework/validation";
+import { ModelNotFoundError } from "@mahiframework/database";
+import type { Application } from "@mahiframework/core";
 import { HttpError } from "../http-error.js";
 
 /**

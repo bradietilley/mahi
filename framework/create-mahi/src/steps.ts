@@ -88,7 +88,7 @@ export async function copyTemplate(templateDir: string, target: string): Promise
 
 /**
  * Set the project name, and — with `linkWorkspace` — repoint every
- * `@mahi/*` dependency at `workspace:*` so an app scaffolded inside the
+ * `@mahiframework/*` dependency at `workspace:*` so an app scaffolded inside the
  * framework monorepo resolves against the local packages rather than the
  * registry.
  */
@@ -114,7 +114,7 @@ export async function patchPackageJson(
       }
 
       for (const dep of Object.keys(deps)) {
-        if (dep.startsWith("@mahi/")) {
+        if (dep.startsWith("@mahiframework/")) {
           deps[dep] = "workspace:*";
         }
       }

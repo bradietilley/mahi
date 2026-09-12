@@ -1,11 +1,11 @@
 # Mail
 
-`@mahi/mail` is a message builder (`Mailable`), a driver resolver
+`@mahiframework/mail` is a message builder (`Mailable`), a driver resolver
 (`MailManager`), and three transports. A `Mailable` describes *what* to
 send and *to whom*; a transport decides *how*.
 
 ```ts
-import { Mail, Mailable, Envelope, Content } from "@mahi/mail";
+import { Mail, Mailable, Envelope, Content } from "@mahiframework/mail";
 
 export class WelcomeMailable extends Mailable {
   constructor(private user: User) {
@@ -36,7 +36,7 @@ mailable, not on the facade. More on that [below](#the-mail-facade).
 `config/mail.ts`:
 
 ```ts
-import type { MailConfig } from "@mahi/mail";
+import type { MailConfig } from "@mahiframework/mail";
 import type { Env } from "./env.js";
 
 export function mailConfig(env: Env): MailConfig {
@@ -457,7 +457,7 @@ resolution. Here an attachment is just resolved bytes-or-path plus
 metadata; *how* the bytes were obtained is the caller's business:
 
 ```ts
-import { Storage } from "@mahi/storage";
+import { Storage } from "@mahiframework/storage";
 
 // A local disk hands you a real filesystem path — let the transport read it.
 attachments(): Attachment[] {
@@ -539,7 +539,7 @@ message in the app re-decides its own markup, and they drift.
 swappable **theme**:
 
 ```ts
-import { Mail, MailMessage } from "@mahi/mail";
+import { Mail, MailMessage } from "@mahiframework/mail";
 
 await Mail.send(
   new MailMessage()
@@ -717,7 +717,7 @@ For a one-off that doesn't warrant its own class, `Message` is a concrete
 `Mailable`:
 
 ```ts
-import { Mail, Message } from "@mahi/mail";
+import { Mail, Message } from "@mahiframework/mail";
 
 await Mail.send(
   new Message()
@@ -851,7 +851,7 @@ When deferred, `send()` resolves with a placeholder `SentMessage`
 (`{ deferred: true }`) — the transport runs later, so `messageId`/
 `accepted`/`rejected` aren't known yet. Outside a transaction it sends
 immediately and returns the transport's real result. A mailable's own
-`afterCommit()` beats the config default. Built on `@mahi/database`'s
+`afterCommit()` beats the config default. Built on `@mahiframework/database`'s
 [after-commit dispatch](../database/#after-commit-dispatch-for-events-jobs-mail--notifications).
 
 ## The `Mail` facade
@@ -1022,8 +1022,8 @@ a bare mailable. See [Notifications](../notifications/).
 Set `mail.default` to `"array"` and assert on captured messages.
 
 ```ts
-import { Application } from "@mahi/core";
-import { MailManager, MailServiceProvider, MAIL_TOKEN, ArrayTransport } from "@mahi/mail";
+import { Application } from "@mahiframework/core";
+import { MailManager, MailServiceProvider, MAIL_TOKEN, ArrayTransport } from "@mahiframework/mail";
 
 const app = new Application();
 app.config.set("mail", { default: "array", mailers: { array: {} } });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Moves every framework package to one version and repoints the
-// `create-mahi` template's `@mahi/*` pins at it. All `@mahi/*` packages
+// `create-mahi` template's `@mahiframework/*` pins at it. All `@mahiframework/*` packages
 // share a version line and are released together.
 //
 //   node scripts/set-version.mjs 0.2.0     # write
@@ -57,7 +57,7 @@ const template = readJson(templatePackage);
 const templatePins = new Map();
 for (const field of ["dependencies", "devDependencies"]) {
   for (const [name, range] of Object.entries(template[field] ?? {})) {
-    if (name.startsWith("@mahi/")) templatePins.set(name, range);
+    if (name.startsWith("@mahiframework/")) templatePins.set(name, range);
   }
 }
 
@@ -104,7 +104,7 @@ for (const { path, pkg } of packages) {
 let templateChanged = false;
 for (const field of ["dependencies", "devDependencies"]) {
   for (const name of Object.keys(template[field] ?? {})) {
-    if (!name.startsWith("@mahi/")) continue;
+    if (!name.startsWith("@mahiframework/")) continue;
     const next = `^${target}`;
     if (template[field][name] !== next) {
       template[field][name] = next;
@@ -114,5 +114,5 @@ for (const field of ["dependencies", "devDependencies"]) {
 }
 if (templateChanged) {
   writeJson(templatePackage, template);
-  console.log(`create-mahi template: @mahi/* pins -> ^${target}`);
+  console.log(`create-mahi template: @mahiframework/* pins -> ^${target}`);
 }

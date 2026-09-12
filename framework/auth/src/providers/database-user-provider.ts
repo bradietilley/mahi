@@ -1,5 +1,5 @@
-import type { AnyModelClass } from "@mahi/database";
-import type { Hasher } from "@mahi/encryption";
+import type { AnyModelClass } from "@mahiframework/database";
+import type { Hasher } from "@mahiframework/encryption";
 import type { Credentials, UserProvider } from "../user-provider.js";
 
 /**

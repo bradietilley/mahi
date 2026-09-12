@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { mkdtemp, rm, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { Application, CACHE_TOKEN, DATABASE_TOKEN, STORAGE_TOKEN } from "@mahi/core";
-import { ArrayCacheStore, CacheManager } from "@mahi/cache";
-import type { CacheStore } from "@mahi/cache";
-import { DatabaseManager, SqliteDriver } from "@mahi/database";
-import { LocalStorageDriver, StorageManager } from "@mahi/storage";
+import { Application, CACHE_TOKEN, DATABASE_TOKEN, STORAGE_TOKEN } from "@mahiframework/core";
+import { ArrayCacheStore, CacheManager } from "@mahiframework/cache";
+import type { CacheStore } from "@mahiframework/cache";
+import { DatabaseManager, SqliteDriver } from "@mahiframework/database";
+import { LocalStorageDriver, StorageManager } from "@mahiframework/storage";
 import { cacheCheck, databaseCheck, filesystemCheck } from "../src/checks/index.js";
 
 /**

@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Hono } from "hono";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { SIGNER_TOKEN, Signer } from "@mahi/encryption";
-import { HttpError, HttpResponse, Router, toHonoMiddleware } from "@mahi/http";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { SIGNER_TOKEN, Signer } from "@mahiframework/encryption";
+import { HttpError, HttpResponse, Router, toHonoMiddleware } from "@mahiframework/http";
 import { csrf, type CsrfOptions } from "../../src/middleware/csrf.js";
 
 function tokenFrom(response: Response): string | null {

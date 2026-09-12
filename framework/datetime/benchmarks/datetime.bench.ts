@@ -1,5 +1,5 @@
 /**
- * Plan §33. Run with `pnpm --filter @mahi/datetime bench`.
+ * Plan §33. Run with `pnpm --filter @mahiframework/datetime bench`.
  *
  * The point of these is not a number to put in a README. It is to catch the
  * shape of a regression: `format()` and `parse()` cross the `Intl` boundary

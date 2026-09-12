@@ -8,8 +8,8 @@ provider's `routes()` hook, so a feature's routes live beside the rest of
 it.
 
 ```ts
-import { ServiceProvider } from "@mahi/core";
-import type { Router } from "@mahi/http";
+import { ServiceProvider } from "@mahiframework/core";
+import type { Router } from "@mahiframework/http";
 
 export class PostsServiceProvider extends ServiceProvider {
   routes(router: Router): void {
@@ -27,9 +27,9 @@ its optional `routes(router)` hook. By the time `bin/server.ts` or
 entrypoint booted the application. That's also why `./artisan route:list`
 works from the console without starting a server.
 
-The `routes()` hook is declared by `@mahi/http` via TypeScript declaration
-merging onto `@mahi/core`'s `ProviderHooks` interface, so it's typed on
-every `ServiceProvider` subclass once `@mahi/http` is imported.
+The `routes()` hook is declared by `@mahiframework/http` via TypeScript declaration
+merging onto `@mahiframework/core`'s `ProviderHooks` interface, so it's typed on
+every `ServiceProvider` subclass once `@mahiframework/http` is imported.
 
 Most applications keep the route definitions in their own module and have
 the provider delegate:
@@ -150,11 +150,11 @@ router.group("/api", (api) => {
 
 ## Middleware
 
-Mahi middleware is an `HttpPipe` — a `@mahi/pipeline` `Pipe<Request,
+Mahi middleware is an `HttpPipe` — a `@mahiframework/pipeline` `Pipe<Request,
 ResponseInput>`:
 
 ```ts
-import type { HttpPipe } from "@mahi/http";
+import type { HttpPipe } from "@mahiframework/http";
 
 const requestId: HttpPipe = async (request, next) => {
   request.share("requestId", crypto.randomUUID());
@@ -250,7 +250,7 @@ Routes can also be registered statically, outside a provider's `routes()`
 hook:
 
 ```ts
-import { Route } from "@mahi/http";
+import { Route } from "@mahiframework/http";
 
 Route.get("/health", () => HttpResponse.json({ ok: true })).name("health");
 Route.group("/admin", (admin) => admin.get("/", DashboardController));
@@ -344,7 +344,7 @@ until a user clicks it. The error names both fixes.
 
 A signed URL is tamper-evident but not secret: `path?params&expires&signature`,
 where the signature is an HMAC over the path plus every query param except
-`signature` itself. It uses `@mahi/encryption`'s `Signer` (HMAC), not the
+`signature` itself. It uses `@mahiframework/encryption`'s `Signer` (HMAC), not the
 `Encrypter` — the payload doesn't need to stay hidden, only to be
 unforgeable, and `Signer.verify()` gives key rotation for free. This is the
 machinery behind email verification, password reset, and one-click
@@ -357,14 +357,14 @@ Two entry points, sharing the same canonical payload:
 URL.signedRoute("unsubscribe", { user: id }, { expiresInSeconds: 86400 });
 
 // Raw path
-import { signedUrl } from "@mahi/http";
+import { signedUrl } from "@mahiframework/http";
 signedUrl("/verify-email", { id: user.id }, { expiresInSeconds: 3600 });
 ```
 
 Verify on the receiving end:
 
 ```ts
-import { validateSignature, hasValidSignature } from "@mahi/http";
+import { validateSignature, hasValidSignature } from "@mahiframework/http";
 
 // As middleware — 403s on missing/tampered/expired
 router.get("/verify-email", verifyEmail).middleware(validateSignature());
@@ -423,7 +423,7 @@ export class AppServiceProvider extends ServiceProvider {
 }
 ```
 
-These run through `@mahi/pipeline`'s `Pipeline`, not Hono's own middleware
+These run through `@mahiframework/pipeline`'s `Pipeline`, not Hono's own middleware
 composition, so ordering is the array order you can read in your provider
 list rather than Hono's registration semantics.
 
@@ -485,7 +485,7 @@ caller looking for a deployment problem.
 
 ## Rate limiting
 
-`throttle()` is a pipe backed by `@mahi/cache`'s `RateLimiter`. It has two
+`throttle()` is a pipe backed by `@mahiframework/cache`'s `RateLimiter`. It has two
 forms.
 
 **Inline** — a plain options object:
@@ -656,7 +656,7 @@ CORS is **opt-in**. Nothing is installed unless the app sets the
 
 ```ts
 // config/http.ts
-import type { HttpConfig } from "@mahi/http";
+import type { HttpConfig } from "@mahiframework/http";
 
 export function httpConfig(env: Env): HttpConfig {
   return {
@@ -710,7 +710,7 @@ able to tell a down-for-maintenance app from a dead one.
 
 ### `GET /health` — readiness
 
-`http.healthCheck`; requires `@mahi/health`. Runs every registered check
+`http.healthCheck`; requires `@mahiframework/health`. Runs every registered check
 and returns `200`, or `503` if any failed. Unlike `/up` it is **not**
 maintenance-exempt.
 
@@ -789,7 +789,7 @@ makes exactly one attempt rather than quietly serving on `8081`.
 `serve` is the development server. For production, bind directly:
 
 ```ts
-import { listenHttpServer } from "@mahi/http";
+import { listenHttpServer } from "@mahiframework/http";
 
 await app.bootstrap();
 await listenHttpServer(app, { port: 8000 });

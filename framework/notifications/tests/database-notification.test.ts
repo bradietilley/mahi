@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   DATABASE_TOKEN,
   DatabaseManager,
@@ -7,7 +7,7 @@ import {
   Relation,
   SCHEMA_TOKEN,
   SqliteDriver,
-} from "@mahi/database";
+} from "@mahiframework/database";
 import { DatabaseChannel } from "../src/channels/database-channel.js";
 import { DatabaseNotification } from "../src/database-notification.js";
 import { Notification } from "../src/notification.js";

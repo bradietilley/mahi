@@ -1,5 +1,5 @@
-import { app } from "@mahi/core";
-import { HttpError, type HttpPipe } from "@mahi/http";
+import { app } from "@mahiframework/core";
+import { HttpError, type HttpPipe } from "@mahiframework/http";
 import { AUTH_TOKEN } from "../tokens.js";
 import type { AuthManager } from "../auth-manager.js";
 import { hasVerifiedEmail } from "../verification/email-verification.js";

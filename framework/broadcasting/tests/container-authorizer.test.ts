@@ -1,10 +1,10 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { ContainerBroadcastAuthorizer, type SignerLike } from "../src/container-authorizer.js";
 import { ChannelRegistry } from "../src/channel-registry.js";
 
-/** A minimal HMAC signer with the same `sign`/`verify`/`for` shape as `@mahi/encryption`'s. */
+/** A minimal HMAC signer with the same `sign`/`verify`/`for` shape as `@mahiframework/encryption`'s. */
 class FakeSigner implements SignerLike {
   constructor(private readonly secret = "test-secret") {}
   for(purpose: string): SignerLike {

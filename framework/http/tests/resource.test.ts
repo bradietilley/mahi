@@ -182,7 +182,7 @@ describe("Resource appended attributes + async toJson", () => {
   });
 });
 
-// A minimal duck-typed stand-in for a `@mahi/database` Model: it
+// A minimal duck-typed stand-in for a `@mahiframework/database` Model: it
 // carries `toJsonResource()` (returning its default resource, or undefined)
 // and `toJSON()` (its own attribute serialization) — the two surfaces
 // `normalizeResourceValue` detects structurally.

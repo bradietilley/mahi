@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Application, Collection, clearCurrentApp, setCurrentApp } from "@mahi/core";
+import { Application, Collection, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
 import {
   BaseModel,
   DatabaseManager,
@@ -9,7 +9,7 @@ import {
   ModelNotFoundError,
   ModelRegistry,
   SqliteDriver,
-} from "@mahi/database";
+} from "@mahiframework/database";
 import { encodeModels, decodeModels } from "../src/model-serialization.js";
 import { QueueManager } from "../src/queue-manager.js";
 import { JobRegistry } from "../src/job-registry.js";

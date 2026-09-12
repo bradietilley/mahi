@@ -1,14 +1,14 @@
 # Helpers
 
-`@mahi/core` ships the utility layer everything else is built on: string
+`@mahiframework/core` ships the utility layer everything else is built on: string
 and array manipulation, an ordered-map `Collection`, locale-aware number
 formatting, type-checked dot-notation access into nested data, and a
 handful of Laravel's global helpers. Three small standalone packages sit
-alongside it — `@mahi/pipeline`, `@mahi/process`, `@mahi/tui` — each
+alongside it — `@mahiframework/pipeline`, `@mahiframework/process`, `@mahiframework/tui` — each
 usable without the framework.
 
 ```ts
-import { Str, Arr, Collection, Num, data_get, collect } from "@mahi/core";
+import { Str, Arr, Collection, Num, data_get, collect } from "@mahiframework/core";
 
 Str.slug("Héllo, World!");                      // "hello-world"
 Arr.wrap(maybeArray);                            // always an array
@@ -236,7 +236,7 @@ yourself; for a filename suffix or a test fixture, this is fine.
 10 characters are `Date.now()` in Crockford base32, the remaining 16 are
 80 random bits. Two ULIDs generated in the same millisecond do **not**
 have a defined relative order (there is no monotonic counter). For
-guaranteed-ordered IDs, see [`@mahi/snowflake`](../models/).
+guaranteed-ordered IDs, see [`@mahiframework/snowflake`](../models/).
 
 `Str.uuid7()` is the UUID-shaped equivalent: a 48-bit millisecond
 timestamp followed by 74 random bits, so ids sort in creation order while
@@ -496,7 +496,7 @@ becomes its `toString()`. Format non-scalars before passing them in.
 ## `Collection`
 
 ```ts
-import { Collection, collect } from "@mahi/core";
+import { Collection, collect } from "@mahiframework/core";
 ```
 
 A near 1:1 port of Laravel's `Illuminate\Support\Collection`, and the
@@ -567,7 +567,7 @@ source.length;   // still 3
 `collect()` is the shorthand, and the one you'll write most:
 
 ```ts
-import { collect } from "@mahi/core";
+import { collect } from "@mahiframework/core";
 
 collect(users);           // Collection<User, number>
 collect(null);            // Collection<never, number> — empty, not a crash
@@ -853,7 +853,7 @@ hook: `.tap((c) => console.log(c.count()))`.
 ### `ItemNotFoundError` and `MultipleItemsFoundError`
 
 ```ts
-import { ItemNotFoundError, MultipleItemsFoundError } from "@mahi/core";
+import { ItemNotFoundError, MultipleItemsFoundError } from "@mahiframework/core";
 ```
 
 | Error | Thrown by | Message |
@@ -887,7 +887,7 @@ facades are.
 ## `Num`
 
 ```ts
-import { Num } from "@mahi/core";
+import { Num } from "@mahiframework/core";
 ```
 
 A thin wrapper over Node's built-in `Intl.NumberFormat`, plus three
@@ -901,7 +901,7 @@ module, so a later `Number.isInteger(...)` / `Number(x)` becomes a runtime
 `TypeError`.
 
 ```ts
-import { Num } from "@mahi/core";
+import { Num } from "@mahiframework/core";
 
 Num.format(1234.5);        // "1,234.5"  — the helper
 Number.isInteger(4);       // true — the global is untouched
@@ -1013,7 +1013,7 @@ validation that `min <= max`, so an inverted range returns `min`.
 ## Dot-notation access
 
 ```ts
-import { data_get, data_set, data_fill, data_has, data_forget } from "@mahi/core";
+import { data_get, data_set, data_fill, data_has, data_forget } from "@mahiframework/core";
 ```
 
 Laravel's `data_*` global helpers, with one enormous difference: **the
@@ -1216,7 +1216,7 @@ field from every element.
 ## Global helpers
 
 ```ts
-import { blank, filled, value, withValue, tap, retry, collect } from "@mahi/core";
+import { blank, filled, value, withValue, tap, retry, collect } from "@mahiframework/core";
 ```
 
 ### `blank` / `filled`
@@ -1449,7 +1449,7 @@ collection instead of a one-item one. See [`Collection`](#collection).
 ## Path helpers
 
 ```ts
-import { base_path, storage_path, resource_path, database_path } from "@mahi/core";
+import { base_path, storage_path, resource_path, database_path } from "@mahiframework/core";
 ```
 
 | Helper | Resolves to |
@@ -1496,15 +1496,15 @@ compiled binary run from anywhere — calls `setBasePath(root)` as the first
 statement of its `bootstrap()` instead, and the other three helpers follow
 it. See [Configuration → setBasePath()](../configuration/README.md#setbasepath--for-apps-that-arent-run-from-their-own-directory).
 
-## `@mahi/pipeline`
+## `@mahiframework/pipeline`
 
 ```ts
-import { Pipeline, Hub } from "@mahi/pipeline";
+import { Pipeline, Hub } from "@mahiframework/pipeline";
 ```
 
 Send a value through an ordered list of pipes, each of which may transform
 it, short-circuit, or post-process on the way back out. This is the
-mechanism `@mahi/http` builds its middleware stack on — see
+mechanism `@mahiframework/http` builds its middleware stack on — see
 [Routing](../routing/).
 
 ### `Pipeline`
@@ -1584,15 +1584,15 @@ passable, and is responsible for `send`/`through`/`then` itself. An
 unregistered name throws
 `` `Pipeline [${name}] is not registered on this Hub.` ``.
 
-## `@mahi/process`
+## `@mahiframework/process`
 
 ```ts
-import { Process, makeProcessResult, ProcessFailedError } from "@mahi/process";
+import { Process, makeProcessResult, ProcessFailedError } from "@mahiframework/process";
 ```
 
 A wrapper over `node:child_process` for running external commands, with a
 `fake()`/`assertRan()` pair for tests. No `execa` dependency, no
-dependency on `@mahi/core` — it's usable standalone.
+dependency on `@mahiframework/core` — it's usable standalone.
 
 ```ts
 const result = await Process.run(["git", "rev-parse", "HEAD"]);
@@ -1724,7 +1724,7 @@ anything. Keys are `*`-wildcard patterns matched against the joined
 command string; the **first** matching handler wins.
 
 ```ts
-import { Process, makeProcessResult } from "@mahi/process";
+import { Process, makeProcessResult } from "@mahiframework/process";
 
 beforeEach(() => {
   Process.fake({
@@ -1766,10 +1766,10 @@ ran:
 Expected a process matching "git push *" to have run. Ran: git status, git add .
 ```
 
-## `@mahi/tui`
+## `@mahiframework/tui`
 
 ```ts
-import { Tui } from "@mahi/tui";
+import { Tui } from "@mahiframework/tui";
 ```
 
 A from-scratch port of `laravel/prompts` — notes, prompts, tables,

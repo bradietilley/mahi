@@ -1,6 +1,6 @@
 import { once } from "node:events";
 import type { AddressInfo } from "node:net";
-import { Application } from "@mahi/core";
+import { Application } from "@mahiframework/core";
 import { afterEach, describe, expect, it } from "vitest";
 import WebSocket from "ws";
 import { HttpKernel } from "../src/http-kernel.js";

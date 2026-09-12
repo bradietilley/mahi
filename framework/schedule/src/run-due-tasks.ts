@@ -1,4 +1,4 @@
-import { CACHE_TOKEN, type Application } from "@mahi/core";
+import { CACHE_TOKEN, type Application } from "@mahiframework/core";
 import type { Schedule, ScheduleEvaluationError } from "./schedule.js";
 import type { ScheduledTask } from "./scheduled-task.js";
 import { ScheduleLock } from "./locking/schedule-lock.js";
@@ -89,7 +89,7 @@ function resolveLocker(app: Application): ScheduleLocker {
   if (!app.has(CACHE_TOKEN)) {
     app.logger.warning(
       `schedule.lockStore is set to "${storeName}" but no cache is registered — ` +
-        `falling back to lock files. Register @mahi/cache's CacheServiceProvider.`,
+        `falling back to lock files. Register @mahiframework/cache's CacheServiceProvider.`,
     );
 
     return files;

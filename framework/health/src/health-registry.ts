@@ -1,4 +1,4 @@
-import { pooled, type Application } from "@mahi/core";
+import { pooled, type Application } from "@mahiframework/core";
 import type { CheckOutcome, HealthCheck, HealthReport, HealthResults } from "./health-check.js";
 import type { HealthConfig } from "./health-config.js";
 

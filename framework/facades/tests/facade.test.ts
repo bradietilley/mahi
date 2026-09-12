@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp } from "@mahi/core";
+import { Application, clearCurrentApp } from "@mahiframework/core";
 import { Facade } from "../src/facade.js";
 
 class Greeter {

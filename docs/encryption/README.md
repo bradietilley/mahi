@@ -1,6 +1,6 @@
 # Encryption & hashing
 
-`@mahi/encryption` ships three primitives, and choosing between them is
+`@mahiframework/encryption` ships three primitives, and choosing between them is
 the whole game:
 
 | Class | Operation | Reversible | Use for |
@@ -10,7 +10,7 @@ the whole game:
 | `Signer` | HMAC-SHA256 | N/A — the payload is public | "This value really came from us and hasn't been edited" |
 
 ```ts
-import { Crypt, Hash } from "@mahi/encryption";
+import { Crypt, Hash } from "@mahiframework/encryption";
 
 const sealed = Crypt.encrypt("sensitive value");
 const original = Crypt.decrypt(sealed);
@@ -21,7 +21,7 @@ const matches = await Hash.check("user-password", hash);
 
 All three are registered by `EncryptionServiceProvider`, which has no
 ordering dependency on any other provider — but
-[`@mahi/auth`](../authentication/) depends on it, so list it earlier than
+[`@mahiframework/auth`](../authentication/) depends on it, so list it earlier than
 `AuthServiceProvider`.
 
 ## The application key
@@ -464,7 +464,7 @@ wire even if an instance is returned directly.
 
 ### Not for API tokens
 
-`@mahi/auth`'s personal access tokens are hashed with **SHA-256, not
+`@mahiframework/auth`'s personal access tokens are hashed with **SHA-256, not
 argon2**, and that is deliberate. argon2's slowness exists to make
 brute-forcing *human-chosen* passwords infeasible; a 32-byte random token
 has no low-entropy space to brute-force, so the slowness buys nothing
@@ -588,7 +588,7 @@ issued before the rotation.
 
 ## Signed URLs
 
-`@mahi/http` wraps `Signer` into tamper-evident, optionally-expiring
+`@mahiframework/http` wraps `Signer` into tamper-evident, optionally-expiring
 links — the equivalent of Laravel's `URL::signedRoute()` plus the
 `ValidateSignature` middleware. It uses `Signer` (HMAC) rather than
 `Encrypter` because the payload doesn't need to stay secret, only
@@ -608,7 +608,7 @@ the deadline; because `id` does, they can't swap in someone else's.
 ### Building
 
 ```ts
-import { signedUrl, URL } from "@mahi/http";
+import { signedUrl, URL } from "@mahiframework/http";
 
 // Raw path
 const link = signedUrl("/verify-email", { id: user.id }, { expiresInSeconds: 3600 });
@@ -630,7 +630,7 @@ they're reserved. It signs the **relative** path regardless of
 ### Verifying
 
 ```ts
-import { validateSignature, hasValidSignature } from "@mahi/http";
+import { validateSignature, hasValidSignature } from "@mahiframework/http";
 
 router.get("/verify-email", VerifyEmailController)
   .middleware(validateSignature());
@@ -657,7 +657,7 @@ Runs `fn`, then waits so the **total** elapsed time is at least `minMs`
 regardless of which branch `fn` took.
 
 ```ts
-import { timebox } from "@mahi/encryption";
+import { timebox } from "@mahiframework/encryption";
 
 const result = await timebox(() => broker.sendResetLink(body.email), 250);
 ```
@@ -694,7 +694,7 @@ All three are singletons registered by `EncryptionServiceProvider`, which
 also contributes the `key:generate` command.
 
 ```ts
-import { HASHER_TOKEN, type Hasher } from "@mahi/encryption";
+import { HASHER_TOKEN, type Hasher } from "@mahiframework/encryption";
 
 export class SomeServiceProvider extends ServiceProvider {
   boot(): void {
@@ -704,8 +704,8 @@ export class SomeServiceProvider extends ServiceProvider {
 }
 ```
 
-`@mahi/auth` resolves `HASHER_TOKEN` for passwords and `SIGNER_TOKEN` for
-session cookies; `@mahi/http`'s signed URLs resolve `SIGNER_TOKEN`.
+`@mahiframework/auth` resolves `HASHER_TOKEN` for passwords and `SIGNER_TOKEN` for
+session cookies; `@mahiframework/http`'s signed URLs resolve `SIGNER_TOKEN`.
 
 ## Choosing between them
 

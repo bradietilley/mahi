@@ -114,16 +114,16 @@ Mahi is a set of packages; there is nothing that requires the generated
 layout. Install the pieces you want:
 
 ```bash
-npm install @mahi/core @mahi/http @mahi/database
+npm install @mahiframework/core @mahiframework/http @mahiframework/database
 ```
 
 The minimum viable application is an `Application`, some config, and a
 provider list:
 
 ```ts
-import { Application } from "@mahi/core";
-import { DatabaseServiceProvider } from "@mahi/database";
-import { HttpServiceProvider, listenHttpServer } from "@mahi/http";
+import { Application } from "@mahiframework/core";
+import { DatabaseServiceProvider } from "@mahiframework/database";
+import { HttpServiceProvider, listenHttpServer } from "@mahiframework/http";
 
 const app = new Application();
 
@@ -193,5 +193,5 @@ dispatch requests in-process — no server, no port. See
 Mahi packages are versioned together. Update them as a set:
 
 ```bash
-npm update '@mahi/*'
+npm update '@mahiframework/*'
 ```

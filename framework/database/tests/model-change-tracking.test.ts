@@ -11,8 +11,8 @@
  * (`order.wasChanged("status")`) has no other way to know.
  */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { DateTime } from "@mahi/datetime";
+import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { DateTime } from "@mahiframework/datetime";
 import { SqliteDriver } from "../src/drivers/sqlite-driver.js";
 import { DatabaseManager } from "../src/database-manager.js";
 import { DATABASE_TOKEN } from "../src/database-service-provider.js";

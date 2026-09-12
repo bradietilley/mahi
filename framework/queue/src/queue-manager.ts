@@ -1,4 +1,4 @@
-import { Manager, type Application } from "@mahi/core";
+import { Manager, type Application } from "@mahiframework/core";
 import { supportsAfterCommit, type QueueDriver } from "./queue-driver.js";
 import type { Job } from "./job.js";
 import { JobRegistry } from "./job-registry.js";
@@ -82,7 +82,7 @@ export class QueueManager extends Manager<QueueDriver> {
    * the *default* connection, so a `Queue::fake()`-style helper can make
    * `dispatch()` (which uses the default connection) record into a
    * `FakeQueueDriver` with a single call — see
-   * `@mahi/testing`'s `createTestApplication({ fakeQueue: true })`.
+   * `@mahiframework/testing`'s `createTestApplication({ fakeQueue: true })`.
    */
   swap(driver: QueueDriver, name?: string): void {
     this.resolved.set(name ?? this.getDefaultDriver(), driver);

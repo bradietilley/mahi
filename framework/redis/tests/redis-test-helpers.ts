@@ -57,7 +57,7 @@ const available = await redisAvailable();
 
 if (!available && process.env.CI === "true") {
   throw new Error(
-    `No Redis at ${REDIS_URL}. The @mahi/redis integration tests must run on CI — ` +
+    `No Redis at ${REDIS_URL}. The @mahiframework/redis integration tests must run on CI — ` +
       `start one with \`docker compose up -d redis\`, or set REDIS_URL.`,
   );
 }

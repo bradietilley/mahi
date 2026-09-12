@@ -1,12 +1,12 @@
-import type { Application } from "@mahi/core";
-import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahi/cache";
+import type { Application } from "@mahiframework/core";
+import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahiframework/cache";
 import type { Job, JobClass } from "./job.js";
 import { uniqueModeOf } from "./job.js";
 import { decodeJob, type JobState } from "./job-serialization.js";
 
 /**
  * Dispatch-time uniqueness for jobs — Laravel's `ShouldBeUnique` /
- * `ShouldBeUniqueUntilProcessing`, built on `@mahi/cache` locks.
+ * `ShouldBeUniqueUntilProcessing`, built on `@mahiframework/cache` locks.
  *
  * A job opts in with a `static unique` marker (see `Job.uniqueId`/
  * `UniqueJobClass`). At dispatch, `QueueManager.dispatch()` tries to
@@ -47,7 +47,7 @@ export function uniqueLockKey(registryName: string, job: Job): string {
  * `uniqueVia()` (a live store or a store name) when given, else the cache
  * manager's default store.
  *
- * Returns `undefined` when no cache is available at all (the `@mahi/cache`
+ * Returns `undefined` when no cache is available at all (the `@mahiframework/cache`
  * manager isn't bound and the job named no explicit store) — the caller
  * treats that as "uniqueness cannot be enforced", allowing the dispatch to
  * proceed rather than throwing, so a queue-only app without a configured

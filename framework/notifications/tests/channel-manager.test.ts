@@ -4,7 +4,7 @@ import {
   DriverNotRegisteredError,
   setAfterCommitResolver,
   clearAfterCommitResolver,
-} from "@mahi/core";
+} from "@mahiframework/core";
 import { ChannelManager } from "../src/channel-manager.js";
 import { Notification } from "../src/notification.js";
 import type { NotificationChannel } from "../src/notification-channel.js";

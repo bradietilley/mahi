@@ -1,4 +1,4 @@
-import { ServiceProvider, isConnectable, setAfterCommitResolver, DATABASE_TOKEN } from "@mahi/core";
+import { ServiceProvider, isConnectable, setAfterCommitResolver, DATABASE_TOKEN } from "@mahiframework/core";
 import { DatabaseManager, type DatabaseConfig } from "./database-manager.js";
 import type { DatabaseDriver } from "./drivers/driver.js";
 import { SqliteDriver } from "./drivers/sqlite-driver.js";
@@ -23,7 +23,7 @@ const BUILTIN_DRIVERS: Record<string, DriverFactory> = {
   pgsql: (config) => new PostgresDriver(config as any),
 };
 
-// `DATABASE_TOKEN`'s canonical definition lives in `@mahi/core`'s
+// `DATABASE_TOKEN`'s canonical definition lives in `@mahiframework/core`'s
 // `well-known-tokens` (resolved cross-package by CLI migration commands
 // and the queue's database driver); re-exported so this package's public
 // API is unchanged. `SCHEMA_TOKEN`/`MODEL_REGISTRY_TOKEN` are
@@ -50,9 +50,9 @@ export class DatabaseServiceProvider extends ServiceProvider {
   private modelRegistry = new ModelRegistry();
 
   register(): void {
-    // Wire the cross-package after-commit seam (see `@mahi/core`'s
+    // Wire the cross-package after-commit seam (see `@mahiframework/core`'s
     // `deferral.ts`): producers below this package in the dependency graph
-    // (`@mahi/events`, `@mahi/mail`, `@mahi/broadcasting`) can't import our
+    // (`@mahiframework/events`, `@mahiframework/mail`, `@mahiframework/broadcasting`) can't import our
     // `afterCommit()` directly without a cycle, so they call core's, which
     // we back here with the real transaction-aware implementation. Done in
     // `register()` (not `boot()`) so deferral works from the moment

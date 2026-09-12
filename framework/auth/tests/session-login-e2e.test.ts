@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { Application, CACHE_TOKEN, clearCurrentApp, setCurrentApp } from "@mahi/core";
-import { HASHER_TOKEN, Hasher, SIGNER_TOKEN, Signer } from "@mahi/encryption";
+import { Application, CACHE_TOKEN, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
+import { HASHER_TOKEN, Hasher, SIGNER_TOKEN, Signer } from "@mahiframework/encryption";
 import {
   DATABASE_TOKEN,
   DatabaseManager,
   SCHEMA_TOKEN,
   Schema,
   SqliteDriver,
-} from "@mahi/database";
-import { HttpKernel, HttpResponse, type Router } from "@mahi/http";
+} from "@mahiframework/database";
+import { HttpKernel, HttpResponse, type Router } from "@mahiframework/http";
 import { AuthServiceProvider } from "../src/auth-service-provider.js";
 import { AUTH_TOKEN } from "../src/tokens.js";
 import type { AuthManager } from "../src/auth-manager.js";
