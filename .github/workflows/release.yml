@@ -17,8 +17,9 @@ permissions:
   contents: read
   id-token: write # npm provenance
 
-env:
-  CI: "true"
+# No `CI_STRICT_MODE` here: this job starts no services, so the database and
+# Redis integration suites self-skip, exactly like the service-free CI job.
+# They are gated by the `integration` job in ci.yml before a tag is cut.
 
 jobs:
   publish:
