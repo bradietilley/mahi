@@ -33,7 +33,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Pipeline — pass an object through a series of stages, for Mahi.",

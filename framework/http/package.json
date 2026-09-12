@@ -51,7 +51,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "HTTP — the router, request/response, middleware, and kernel for Mahi.",

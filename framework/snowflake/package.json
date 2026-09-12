@@ -39,7 +39,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Snowflake — distributed, time-sortable unique ID generation for Mahi.",

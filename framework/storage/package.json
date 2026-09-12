@@ -37,7 +37,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Storage — a filesystem abstraction over local and cloud disks for Mahi.",

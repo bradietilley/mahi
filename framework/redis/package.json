@@ -45,7 +45,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Redis — a shared Redis connection with cache, queue, and broadcast adapters, for Mahi.",

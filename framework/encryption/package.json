@@ -40,7 +40,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Encryption — authenticated AES-GCM encryption and keyed signing for Mahi.",

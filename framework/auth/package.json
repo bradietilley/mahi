@@ -45,7 +45,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Authentication — session and token guards, password brokers, and user providers for Mahi.",

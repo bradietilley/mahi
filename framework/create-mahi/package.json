@@ -11,7 +11,7 @@
     "template"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "scripts": {
     "build": "tsc -b && node ../../scripts/prune-dist.mjs",

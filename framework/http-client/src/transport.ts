@@ -19,5 +19,5 @@ export type Transport = (
   init: RequestInit & Record<string, unknown>,
 ) => Promise<Response>;
 
-/** The default `Transport`: the platform `fetch` (undici-backed on Node 22). */
+/** The default `Transport`: the platform `fetch` (undici-backed on Node 26). */
 export const fetchTransport: Transport = (request, init) => fetch(request, init);

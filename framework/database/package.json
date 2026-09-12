@@ -46,7 +46,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Database — the query builder, migrations, and Eloquent-style ORM for Mahi.",

@@ -40,7 +40,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Scheduling — a cron-style task scheduler with overlap protection, for Mahi.",

@@ -27,7 +27,7 @@ let factory = new HttpClientFactory();
  * `Http::fake()`, `Http::assertSent()`).
  *
  * Built on the platform `fetch`, not a third-party client: `undici` *is*
- * `fetch` on Node 22, and axios would make this a port of axios wearing
+ * `fetch` on Node 26, and axios would make this a port of axios wearing
  * Laravel's method names. What that costs — no separate connect timeout,
  * no cookie jar, no digest auth, proxies via
  * `withFetchOptions({ dispatcher })` — is documented in the package guide.

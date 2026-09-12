@@ -22,7 +22,7 @@ const REPO_URL = "https://github.com/bradietilley/mahi";
 const HOMEPAGE = "https://github.com/bradietilley/mahi#readme";
 const LICENSE = "MIT";
 const AUTHOR = "Bradie Tilley";
-const ENGINES = { node: ">=22" };
+const ENGINES = { node: ">=26" };
 // `tsc -b` never deletes outputs for removed sources; prune them after every
 // build so `files: ["dist"]` can't ship a stale module.
 const BUILD_SCRIPT = "tsc -b && node ../../scripts/prune-dist.mjs";

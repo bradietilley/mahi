@@ -66,7 +66,7 @@ an answer. Raising on a failed status is opt-in via
 
 ### Built on `fetch`
 
-The transport is the platform `fetch` (undici-backed on Node 22), not a
+The transport is the platform `fetch` (undici-backed on Node 26), not a
 third-party client. `undici` *is* `fetch` here, so depending on it would
 duplicate the runtime; `axios` would make this a port of axios wearing
 Laravel's method names. Anything `fetch` supports that this package

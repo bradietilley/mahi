@@ -39,7 +39,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "Cache — a unified cache API over array, file, and Redis stores, with atomic locks, for Mahi.",

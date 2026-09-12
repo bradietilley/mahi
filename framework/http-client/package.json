@@ -38,7 +38,7 @@
     "url": "https://github.com/bradietilley/mahi/issues"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "sideEffects": false,
   "description": "HTTP client — a fluent, retryable HTTP client with fakes for Mahi.",
