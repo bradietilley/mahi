@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "scripts": {
     "build": "turbo run build",
-    "test": "turbo run test",
+    "test": "turbo run test --concurrency=4",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "format": "eslint . --fix && prettier --write .",
