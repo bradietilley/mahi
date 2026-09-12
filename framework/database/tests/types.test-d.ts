@@ -234,9 +234,7 @@ async function dotPaths() {
   // Sibling paths under one head merge into a single value, matching the
   // one query the loader issues for that node.
   const merged = await Post.query().with("comments.author", "comments.post").firstOrFail();
-  expectTypeOf(merged.comments).toEqualTypeOf<
-    Collection<Comment & { author: User; post: Post }>
-  >();
+  expectTypeOf(merged.comments).toEqualTypeOf<Collection<Comment & { author: User; post: Post }>>();
 
   // Every segment is name-checked, not just the head.
   // @ts-expect-error User declares no relation named "nope"

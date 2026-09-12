@@ -5,7 +5,12 @@ import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { Application, ServiceProvider, clearCurrentApp } from "@mahiframework/core";
 import { CacheServiceProvider } from "@mahiframework/cache";
-import { DatabaseServiceProvider, DatabaseManager, DATABASE_TOKEN, Model } from "@mahiframework/database";
+import {
+  DatabaseServiceProvider,
+  DatabaseManager,
+  DATABASE_TOKEN,
+  Model,
+} from "@mahiframework/database";
 import type { Router } from "@mahiframework/http";
 import { HttpResponse, HttpServiceProvider } from "@mahiframework/http";
 import { createTestApplication } from "../src/create-test-application.js";

@@ -113,7 +113,9 @@ describe("make:* generators", () => {
     expect(contents).toContain("export class LogPostCreated implements Listener");
     // @mahiframework/events exports `AbstractEvent`, not `Event`; importing the
     // latter would not compile.
-    expect(contents).toContain('import type { AbstractEvent, Listener } from "@mahiframework/events";');
+    expect(contents).toContain(
+      'import type { AbstractEvent, Listener } from "@mahiframework/events";',
+    );
     expect(contents).not.toMatch(/import type \{ Event,/);
   });
 

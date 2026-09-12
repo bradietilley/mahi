@@ -203,17 +203,13 @@ describe("Period safety", () => {
   // machine, and well past vitest's 5s default when the rest of the suite is
   // saturating the CPU. The budget is the thing under test, so raise the
   // timeout rather than shrink it — `maxSteps` is covered cheaply below.
-  it(
-    "refuses to run away when a filter rejects everything",
-    () => {
-      const period = Period.recurring(at("2026-08-01T00:00:00Z"), Duration.days(1), 5)
-        .filter(() => false)
-        .take(1);
+  it("refuses to run away when a filter rejects everything", () => {
+    const period = Period.recurring(at("2026-08-01T00:00:00Z"), Duration.days(1), 5)
+      .filter(() => false)
+      .take(1);
 
-      expect(() => period.toArray()).toThrow(/exceeded 100000 steps/);
-    },
-    30_000,
-  );
+    expect(() => period.toArray()).toThrow(/exceeded 100000 steps/);
+  }, 30_000);
 
   it("honours a custom step budget", () => {
     const period = Period.recurring(at("2026-08-01T00:00:00Z"), Duration.days(1), 5, {

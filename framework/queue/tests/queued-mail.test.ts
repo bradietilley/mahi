@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { Application, clearCurrentApp } from "@mahiframework/core";
-import { ArrayTransport, Mailable, MailManager, MailServiceProvider, MAIL_TOKEN } from "@mahiframework/mail";
+import {
+  ArrayTransport,
+  Mailable,
+  MailManager,
+  MailServiceProvider,
+  MAIL_TOKEN,
+} from "@mahiframework/mail";
 import { QueueServiceProvider, QUEUE_TOKEN } from "../src/queue-service-provider.js";
 import { QueueManager } from "../src/queue-manager.js";
 import { SendQueuedMail, QUEUED_MAIL_JOB } from "../src/jobs/send-queued-mail.js";

@@ -1,7 +1,12 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 import { Application, clearCurrentApp, setCurrentApp } from "@mahiframework/core";
-import { DatabaseManager, SqliteDriver, DATABASE_TOKEN, SCHEMA_TOKEN } from "@mahiframework/database";
+import {
+  DatabaseManager,
+  SqliteDriver,
+  DATABASE_TOKEN,
+  SCHEMA_TOKEN,
+} from "@mahiframework/database";
 import { Tui } from "@mahiframework/tui";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { makeMigrationDir, removeMigrationDir } from "../helpers/migration-fixtures.js";

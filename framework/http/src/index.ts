@@ -62,7 +62,13 @@ export { HttpError } from "./http-error.js";
 
 export { throttle } from "./middleware/throttle.js";
 export type { ThrottleOptions } from "./middleware/throttle.js";
-export { RateLimiter, Limit, GlobalLimit, Unlimited, RATE_LIMITER_TOKEN } from "@mahiframework/cache";
+export {
+  RateLimiter,
+  Limit,
+  GlobalLimit,
+  Unlimited,
+  RATE_LIMITER_TOKEN,
+} from "@mahiframework/cache";
 
 export { toHonoMiddleware } from "./middleware/pipeline-middleware.js";
 export type { HttpPipe, HttpPipeFn } from "./middleware/pipeline-middleware.js";

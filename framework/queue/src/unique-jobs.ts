@@ -1,5 +1,10 @@
 import type { Application } from "@mahiframework/core";
-import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahiframework/cache";
+import {
+  CACHE_TOKEN,
+  LockTimeoutError,
+  type CacheManager,
+  type CacheStore,
+} from "@mahiframework/cache";
 import type { Job, JobClass } from "./job.js";
 import { uniqueModeOf } from "./job.js";
 import { decodeJob, type JobState } from "./job-serialization.js";

@@ -1,4 +1,9 @@
-import { CACHE_TOKEN, LockTimeoutError, type CacheManager, type CacheStore } from "@mahiframework/cache";
+import {
+  CACHE_TOKEN,
+  LockTimeoutError,
+  type CacheManager,
+  type CacheStore,
+} from "@mahiframework/cache";
 import { JOB_REGISTRY_TOKEN } from "../tokens.js";
 import type { JobRegistry } from "../job-registry.js";
 import type { JobMiddleware, JobMiddlewarePassable } from "./job-middleware.js";

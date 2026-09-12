@@ -1,4 +1,9 @@
-import { ServiceProvider, isConnectable, setAfterCommitResolver, DATABASE_TOKEN } from "@mahiframework/core";
+import {
+  ServiceProvider,
+  isConnectable,
+  setAfterCommitResolver,
+  DATABASE_TOKEN,
+} from "@mahiframework/core";
 import { DatabaseManager, type DatabaseConfig } from "./database-manager.js";
 import type { DatabaseDriver } from "./drivers/driver.js";
 import { SqliteDriver } from "./drivers/sqlite-driver.js";

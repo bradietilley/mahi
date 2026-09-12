@@ -1,4 +1,9 @@
-import { ServiceProvider, BROADCAST_TOKEN, afterCommit, type Application } from "@mahiframework/core";
+import {
+  ServiceProvider,
+  BROADCAST_TOKEN,
+  afterCommit,
+  type Application,
+} from "@mahiframework/core";
 import { EVENTS_TOKEN, type EventDispatcher } from "@mahiframework/events";
 import {
   HTTP_KERNEL_TOKEN,

@@ -5,7 +5,13 @@ import { Application, ServiceProvider, CACHE_TOKEN } from "@mahiframework/core";
 import { DatabaseServiceProvider } from "@mahiframework/database";
 import { EventsServiceProvider } from "@mahiframework/events";
 import { Process, makeProcessResult } from "@mahiframework/process";
-import { Mail, MAIL_TOKEN, Mailable, MailServiceProvider, type MailManager } from "@mahiframework/mail";
+import {
+  Mail,
+  MAIL_TOKEN,
+  Mailable,
+  MailServiceProvider,
+  type MailManager,
+} from "@mahiframework/mail";
 import {
   Notification,
   NOTIFICATIONS_TOKEN,
