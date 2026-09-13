@@ -6,7 +6,7 @@ lifecycle, a service container, Manager-based driver resolution, an
 expressive ORM, an HTTP kernel (Hono), a CLI kernel (Commander), queues,
 scheduling, and an event system. All plugin-extensible.
 
-**[Read the documentation →](./docs/)**
+**[Read the documentation →](https://bradietilley.dev/mahi/dev-main)**
 
 ```bash
 npm create mahi@latest my-app
@@ -17,8 +17,8 @@ cd my-app
 ## This repository
 
 This is the framework monorepo. If you want to *use* Mahi, you want
-[`npm create mahi@latest`](./docs/installation/) and the
-[documentation](./docs/), not this repo.
+[`npm create mahi@latest`](https://bradietilley.dev/mahi/dev-main/installation) and the
+[documentation](https://bradietilley.dev/mahi/dev-main), not this repo.
 
 ```
 framework/            The framework packages (published as @mahiframework/*)
@@ -119,15 +119,17 @@ rights to the `@mahiframework` scope.
 
 ## Documentation
 
-Full documentation lives in [`docs/`](./docs/):
+Full documentation lives at
+[bradietilley.dev/mahi](https://bradietilley.dev/mahi/dev-main) (source in
+[`docs/`](./docs/)):
 
-- [Installation](./docs/installation/) · [Configuration](./docs/configuration/) · [Lifecycle](./docs/lifecycle/) · [Deployment](./docs/deployment/)
-- [Container](./docs/container/) · [Providers](./docs/providers/) · [Helpers](./docs/helpers/)
-- [Routing](./docs/routing/) · [Requests](./docs/requests/) · [Validation](./docs/validation/) · [Controllers](./docs/controllers/) · [Responses](./docs/responses/)
-- [Database](./docs/database/) · [Models](./docs/models/) · [Relationships](./docs/relationships/) · [Queries](./docs/queries/) · [Migrations](./docs/migrations/) · [Pagination](./docs/pagination/)
-- [Authentication](./docs/authentication/) · [Authorization](./docs/authorization/) · [Encryption](./docs/encryption/)
-- [Cache](./docs/cache/) · [Queues](./docs/queues/) · [Scheduling](./docs/scheduling/) · [Events](./docs/events/) · [Broadcasting](./docs/broadcasting/) · [Storage](./docs/storage/) · [Mail](./docs/mail/) · [Notifications](./docs/notifications/) · [Logging](./docs/logging/) · [Redis](./docs/redis/) · [Health](./docs/health/) · [HTTP client](./docs/http-client/)
-- [Console](./docs/console/) · [Testing](./docs/testing/) · [Dates & times](./docs/datetime/)
+- [Installation](https://bradietilley.dev/mahi/dev-main/installation) · [Configuration](https://bradietilley.dev/mahi/dev-main/configuration) · [Lifecycle](https://bradietilley.dev/mahi/dev-main/lifecycle) · [Deployment](https://bradietilley.dev/mahi/dev-main/deployment)
+- [Container](https://bradietilley.dev/mahi/dev-main/container) · [Providers](https://bradietilley.dev/mahi/dev-main/providers) · [Helpers](https://bradietilley.dev/mahi/dev-main/helpers)
+- [Routing](https://bradietilley.dev/mahi/dev-main/routing) · [Requests](https://bradietilley.dev/mahi/dev-main/requests) · [Validation](https://bradietilley.dev/mahi/dev-main/validation) · [Controllers](https://bradietilley.dev/mahi/dev-main/controllers) · [Responses](https://bradietilley.dev/mahi/dev-main/responses)
+- [Database](https://bradietilley.dev/mahi/dev-main/database) · [Models](https://bradietilley.dev/mahi/dev-main/models) · [Relationships](https://bradietilley.dev/mahi/dev-main/relationships) · [Queries](https://bradietilley.dev/mahi/dev-main/queries) · [Migrations](https://bradietilley.dev/mahi/dev-main/migrations) · [Pagination](https://bradietilley.dev/mahi/dev-main/pagination)
+- [Authentication](https://bradietilley.dev/mahi/dev-main/authentication) · [Authorization](https://bradietilley.dev/mahi/dev-main/authorization) · [Encryption](https://bradietilley.dev/mahi/dev-main/encryption)
+- [Cache](https://bradietilley.dev/mahi/dev-main/cache) · [Queues](https://bradietilley.dev/mahi/dev-main/queues) · [Scheduling](https://bradietilley.dev/mahi/dev-main/scheduling) · [Events](https://bradietilley.dev/mahi/dev-main/events) · [Broadcasting](https://bradietilley.dev/mahi/dev-main/broadcasting) · [Storage](https://bradietilley.dev/mahi/dev-main/storage) · [Mail](https://bradietilley.dev/mahi/dev-main/mail) · [Notifications](https://bradietilley.dev/mahi/dev-main/notifications) · [Logging](https://bradietilley.dev/mahi/dev-main/logging) · [Redis](https://bradietilley.dev/mahi/dev-main/redis) · [Health](https://bradietilley.dev/mahi/dev-main/health) · [HTTP client](https://bradietilley.dev/mahi/dev-main/http-client)
+- [Console](https://bradietilley.dev/mahi/dev-main/console) · [Testing](https://bradietilley.dev/mahi/dev-main/testing) · [Dates & times](https://bradietilley.dev/mahi/dev-main/datetime)
 
 ## Requirements
 
