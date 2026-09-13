@@ -1,6 +1,6 @@
 /**
  * One-way password hashing via argon2 (OWASP-recommended, winner of the
- * Password Hashing Competition) — for "verify a password without ever
+ * Password Hashing Competition), for "verify a password without ever
  * storing it in a reversible form" use cases. Fundamentally different
  * from `Encrypter`: never decryptable, only comparable via `check()`.
  */
@@ -9,7 +9,7 @@ import * as argon2 from "argon2";
 
 /**
  * Tunable argon2 cost parameters. Omit to accept the argon2 library's
- * current defaults — the base app ships no `hashing` config file, so most
+ * current defaults, the base app ships no `hashing` config file, so most
  * apps never touch these. Provide them only to deliberately trade CPU/RAM
  * for resistance to offline cracking (or to lower cost in constrained
  * environments).
@@ -29,8 +29,8 @@ export class Hasher {
   /**
    * argon2id is pinned EXPLICITLY rather than relying on the `argon2`
    * package's current default (also argon2id today, but a default is not
-   * a contract). argon2id is the OWASP-recommended variant — hybrid
-   * resistance to both GPU and side-channel attacks — so this is the one
+   * a contract). argon2id is the OWASP-recommended variant, hybrid
+   * resistance to both GPU and side-channel attacks, so this is the one
    * we want auditable at the call site, not implied.
    */
   async make(value: string): Promise<string> {
@@ -47,7 +47,7 @@ export class Hasher {
 
   /**
    * Whether `hash` was produced with different parameters than `make()`
-   * currently uses — call after a successful `check()` to transparently
+   * currently uses, call after a successful `check()` to transparently
    * upgrade a user's stored hash when argon2 defaults change:
    *
    *   if (await hasher.check(password, user.password)) {
@@ -56,14 +56,14 @@ export class Hasher {
    *     }
    *   }
    *
-   * A malformed/unparseable hash returns `true` (i.e. "rehash it") — the
+   * A malformed/unparseable hash returns `true` (i.e. "rehash it"), the
    * safe direction, since the alternative is leaving a hash we can't
    * reason about in place forever.
    *
    * The ALGORITHM and PARALLELISM checks are ours, not the library's, and
    * they are the reason this method isn't a one-line delegation.
    * `argon2.needsRehash()` compares only `version`, `memoryCost` and
-   * `timeCost` — so an `argon2i` hash (the GPU-weak variant this class
+   * `timeCost`, so an `argon2i` hash (the GPU-weak variant this class
    * pins `argon2id` specifically to avoid) reports "no rehash needed" and
    * `check()` happily keeps accepting it forever. Same for a hash written
    * with a different `p=`. Both are silent downgrades that survive every
@@ -88,7 +88,7 @@ export class Hasher {
     }
 
     // `make()` always pins argon2id, so anything else is stale by
-    // definition — including the argon2i/argon2d hashes `verify()` still
+    // definition, including the argon2i/argon2d hashes `verify()` still
     // accepts.
     if (parsed.type !== "argon2id") {
       return true;
@@ -142,7 +142,7 @@ export class Hasher {
  */
 function parsePhc(hash: string): { type: string; parallelism: number | undefined } | null {
   const fields = hash.split("$");
-  // ["", type, v=…, m=…,t=…,p=…, salt, hash] — the parameter segment is
+  // ["", type, v=…, m=…,t=…,p=…, salt, hash]. The parameter segment is
   // optional in the PHC spec, so only the type is required here.
   const type = fields[1];
 

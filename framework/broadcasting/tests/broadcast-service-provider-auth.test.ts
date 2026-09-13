@@ -105,7 +105,7 @@ describe("BroadcastServiceProvider channel authorization", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as { auth: string | null };
     // No signer bound in this app, so the grant is null but the request is
-    // authorized (200, not 403) — the endpoint ran the channel callback.
+    // authorized (200, not 403), the endpoint ran the channel callback.
     expect(body).toHaveProperty("auth");
   });
 
@@ -137,14 +137,14 @@ describe("BroadcastServiceProvider channel authorization", () => {
 });
 
 /**
- * A fresh app has no `APP_KEY` — that is the state `key:generate` exists
+ * A fresh app has no `APP_KEY`. That is the state `key:generate` exists
  * to leave. `@mahiframework/encryption` binds `"signer"` as a singleton whose
  * FACTORY calls `parseAppKey()` and throws when the key is unset, so the
  * token is bound but not buildable until the key exists.
  *
  * This provider resolves the signer for the `/broadcasting/auth` grant.
  * Doing so eagerly, at boot, turned that throw into a failure of
- * `app.bootstrap()` itself — so the app could not start, so
+ * `app.bootstrap()` itself, so the app could not start, so
  * `key:generate` could never run, so the key was never created. A fresh
  * `npm create mahi` was unbootable.
  *
@@ -153,8 +153,8 @@ describe("BroadcastServiceProvider channel authorization", () => {
  * not resolving it can.
  *
  * The signer here is bound to throw rather than pulling in
- * `@mahiframework/encryption` (which `@mahiframework/broadcasting` does not depend on) —
- * the throw is the whole of the behaviour that matters.
+ * `@mahiframework/encryption` (which `@mahiframework/broadcasting` does not depend on).
+ * The throw is the whole of the behaviour that matters.
  */
 describe("BroadcastServiceProvider boot without an APP_KEY", () => {
   /** Boots with a `"signer"` bound exactly as a keyless app's is: bound, unbuildable. */
@@ -186,7 +186,7 @@ describe("BroadcastServiceProvider boot without an APP_KEY", () => {
   it("boots when the signer is bound but cannot be built", async () => {
     const { app, builds } = await bootAppWithUnbuildableSigner();
 
-    // The token is bound — `app.has()` is true, which is exactly why a
+    // The token is bound. `app.has()` is true, which is exactly why a
     // `has()` guard was not enough on its own.
     expect(app.has("signer")).toBe(true);
     // ...but boot never built it, so the throw never fired.
@@ -198,7 +198,7 @@ describe("BroadcastServiceProvider boot without an APP_KEY", () => {
     const { app } = await bootAppWithUnbuildableSigner();
 
     // Boot completed, so the console kernel could now dispatch
-    // `key:generate` — the whole point of deferring the signer.
+    // `key:generate`, the whole point of deferring the signer.
     expect(app.make<HttpKernel>(HTTP_KERNEL_TOKEN)).toBeInstanceOf(HttpKernel);
     expect(app.make<BroadcastManager>(BROADCAST_TOKEN)).toBeInstanceOf(BroadcastManager);
   });

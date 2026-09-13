@@ -81,7 +81,7 @@ const BUILT_IN_COMMANDS = [
 export class ConsoleServiceProvider extends ServiceProvider {
   /**
    * Options for the kernel. Empty by default, which derives the program name
-   * from `argv[1]` and detects the runtime mode — correct for a compiled
+   * from `argv[1]` and detects the runtime mode, correct for a compiled
    * binary and for `npx <app>`, and wrong only for an app invoked through a
    * wrapper script named differently from its entry point.
    */

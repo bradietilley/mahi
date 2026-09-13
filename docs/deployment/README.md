@@ -1,7 +1,7 @@
 # Deployment
 
 A Mahi application in production is a compiled `dist/` directory, a Node
-process running `bin/server.js`, and — depending on what you use — a
+process running `bin/server.js`, and, depending on what you use, a
 queue worker and a cron entry.
 
 ```bash
@@ -39,7 +39,7 @@ npm start          # node dist/bin/server.js
 ```
 
 Both scripts are already in the generated `package.json`. `tsc -b` is
-incremental — it writes a `.tsbuildinfo` and skips unchanged projects — so
+incremental, it writes a `.tsbuildinfo` and skips unchanged projects, so
 a CI cache on that file speeds up repeat builds. It is also a real
 typecheck: `npm run build` failing is your first line of defence, and
 `npm run typecheck` is the same command.
@@ -49,7 +49,7 @@ modules loaded at runtime by `MigrationRunner`, so they must exist as
 `.js` in `dist/` for `./artisan migrate` to find them on a server without
 `tsx`. The template's `config/database.ts` resolves `migrationsPath`
 relative to the running file (`import.meta.dirname`), not the working
-directory — so `node dist/bin/console.js migrate` loads
+directory, so `node dist/bin/console.js migrate` loads
 `dist/database/migrations/*.js` automatically, on any Node, whether or not
 it strips types. The migrator prefers a compiled `.js` over a `.ts` sibling
 and warns loudly if it ever discovers a `.ts` migration under a compiled
@@ -58,7 +58,7 @@ entrypoint (the tell-tale of a deploy that shipped source or mis-pointed
 
 **There is no `tsx` in production.** `./artisan` shells out to `tsx` to run
 `bin/console.ts` directly, which is right for development and wrong for a
-server — it transpiles on every invocation and pulls a dev dependency into
+server. It transpiles on every invocation and pulls a dev dependency into
 the runtime image. In production, run the compiled console entry instead:
 
 ```bash
@@ -100,7 +100,7 @@ const untrap = trap(["SIGINT", "SIGTERM"], (signal) => {
 
 It boots the same `bootstrap()` the CLI and the test suite use, binds
 `@hono/node-server` once, and exits if the bind fails. No supervision, no
-watching, no port walking — one process doing one thing, which is what a
+watching, no port walking, one process doing one thing, which is what a
 process manager wants.
 
 `listenHttpServer()` also injects the websocket upgrade handler into the
@@ -108,7 +108,7 @@ HTTP server when a broadcast driver is bound, so websockets work on the
 same port with no extra wiring. See [Broadcasting](../broadcasting/).
 
 Note the log line uses `listening.hostname`, not a hardcoded
-`localhost` — in a container the server binds `0.0.0.0`, and a line
+`localhost`, in a container the server binds `0.0.0.0`, and a line
 claiming `localhost` points at the one interface it is *not* reachable on
 from outside.
 
@@ -122,16 +122,16 @@ without closing.
 
 Two steps, in order:
 
-1. **`listening.close()`** — stop accepting connections, close open
+1. **`listening.close()`**: stop accepting connections, close open
    websockets with a `1001 "going away"` frame, drop idle keep-alives,
    give in-flight requests up to 10s to finish
    (`close({ drainTimeoutMs })` to change it), then destroy the rest.
-2. **`app.terminate()`** — run every provider's `shutdown()` hook,
+2. **`app.terminate()`**: run every provider's `shutdown()` hook,
    releasing database pools, Redis clients, and anything else the
    application opened.
 
 Both are needed. `close()` alone leaves the *application's* connections
-open, and each of those keeps Node's event loop alive on its own — so the
+open, and each of those keeps Node's event loop alive on its own, so the
 listener goes away and the process keeps running with nothing to do.
 Equally, `close()` without the websocket step never resolves at all: a
 bare `server.close()` waits for open connections to end, and an upgraded
@@ -181,7 +181,7 @@ attempts: binding.portWasExplicit ? 1 : parseTries(options),
 
 On a laptop, "8000 was busy so I'm on 8001" is a convenience. Behind a
 load balancer configured to health-check port 8000, it's a service that
-starts successfully and receives no traffic — the worst possible failure
+starts successfully and receives no traffic, the worst possible failure
 mode, because nothing errors.
 
 **It defaults to `127.0.0.1`.** `DEFAULT_HOST` is loopback, so without
@@ -194,7 +194,7 @@ That requires a dev dependency and re-transpiles the whole application on
 every restart.
 
 `--no-reload` disables the supervisor and gives you a single in-process
-server, which is closer — but you're still going through `tsx` and still
+server, which is closer, but you're still going through `tsx` and still
 walking ports. Run `bin/server.js` instead.
 
 ## Environment
@@ -209,7 +209,7 @@ Invalid environment configuration:
   PORT: Expected number, received nan
 ```
 
-The process exits. That's the intent — an app that boots with a broken
+The process exits. That's the intent, an app that boots with a broken
 config surfaces the problem inside a request weeks later. See
 [Configuration](../configuration/).
 
@@ -244,19 +244,19 @@ Generate it once, per environment, and treat it as a secret:
 ./artisan key:generate
 ```
 
-It must decode to exactly 32 bytes. Every derived key — the encrypter, the
-signer for signed URLs, session and token machinery — is HKDF-derived from
+It must decode to exactly 32 bytes. Every derived key, the encrypter, the
+signer for signed URLs, session and token machinery, is HKDF-derived from
 it, so **rotating `APP_KEY` invalidates everything encrypted or signed
 under the old one.** `key:generate` refuses to overwrite an existing key
 for exactly that reason; `--force` rotates anyway. Before rotating, copy
 the outgoing value into `APP_PREVIOUS_KEYS` (comma-separated) so
-`Encrypter`/`Signer` can still read old data — the command will not do it
+`Encrypter`/`Signer` can still read old data. The command will not do it
 for you, and once the old key is gone it is unrecoverable.
 
 See [Encryption & hashing](../encryption/).
 
 **`APP_URL` is what absolute URLs are built from** when there is no
-in-flight request to borrow the host from — queue jobs, scheduled tasks,
+in-flight request to borrow the host from, queue jobs, scheduled tasks,
 CLI commands, mailables. It's wired through `http.url`:
 
 ```ts
@@ -276,7 +276,7 @@ config set. Set `http.url` (APP_URL) or pass `{ absolute: false }`.
 The failure mode this prevents is silent and expensive: password reset and
 email verification links generated inside a queue job would otherwise
 point at `http://localhost:8000` in every production email. Set `APP_URL`
-to the public origin — the one users see, not the container's internal
+to the public origin, the one users see, not the container's internal
 address.
 
 Also set `CORS_ORIGIN` to your real frontend origins. The template
@@ -296,7 +296,7 @@ forgotten variable degrades toward caution, not toward a debug-mode
 service on the public internet.
 
 Note the base app's own env schema defaults `NODE_ENV` to
-`"development"` — a different fail-safe for a different situation (a
+`"development"`. A different fail-safe for a different situation (a
 developer who hasn't written a `.env` yet gets a development app). Once
 `bootstrap()` calls `app.useEnvironment(env.NODE_ENV)`, the validated
 value wins. **Set `NODE_ENV` explicitly in production** and the question
@@ -305,14 +305,14 @@ doesn't arise.
 ### Where variables come from
 
 `loadEnv()` reads `process.env`. On a server, prefer real environment
-variables — from systemd's `Environment=`, Docker's `--env-file`, or your
-orchestrator's secret store — over shipping a `.env` file into the image.
+variables, from systemd's `Environment=`, Docker's `--env-file`, or your
+orchestrator's secret store, over shipping a `.env` file into the image.
 The template's `.gitignore` excludes `.env` for the obvious reason.
 
 ## The process model
 
 This is the section that decides your architecture, because **three
-framework defaults are single-process-only**. Not as a caveat — as their
+framework defaults are single-process-only**. Not as a caveat, as their
 defining limit.
 
 A new app is configured like this:
@@ -338,7 +338,7 @@ two Maps and share nothing:
   stale value until their own TTLs expire.
 - **`Cache.lock()` guarantees nothing.** Each process's `add()` is atomic
   within itself and invisible to the others, so two processes both acquire
-  "the" lock — which takes `WithoutOverlapping` job middleware and
+  "the" lock. Which takes `WithoutOverlapping` job middleware and
   `rememberViaLock()` down with it.
 
 The `file` store shares the data but not the atomicity: its write queue is
@@ -350,8 +350,8 @@ correctness across processes.
 
 `SyncQueueDriver` runs the job inside the request that dispatched it. The
 work isn't deferred, doesn't retry, doesn't survive a crash, and adds its
-full runtime to your response time. It's a development convenience — it
-means dispatching works without running a worker — and it is not a
+full runtime to your response time. It's a development convenience, it
+means dispatching works without running a worker, and it is not a
 deployment strategy.
 
 The `database` driver is multi-process-safe: reserving is a single atomic
@@ -389,7 +389,7 @@ RedisServiceProvider,
 No call site changes, because every consumer already talks to the
 `CacheStore` / `QueueDriver` / `BroadcastDriver` interface. Set
 `REDIS_URL` (or `REDIS_HOST`/`REDIS_PORT`/`REDIS_PASSWORD`), and set a
-connection `keyPrefix` if anything else shares that Redis — it is what
+connection `keyPrefix` if anything else shares that Redis. It is what
 separates your application's keys, and your broadcast channel, from a
 co-tenant's. `RedisCacheStore.flush()` is additionally scoped to the
 cache's own `cache:` namespace, so it can never reach the queue's keys
@@ -416,7 +416,7 @@ node dist/bin/console.js queue:work --sleep 1
 |---|---|---|
 | `--connection <name>` | the default connection | Which connection to drain |
 | `--sleep <seconds>` | `3` | How long to sleep when the queue is empty |
-| `--once` | — | Process a single job (or wait once) and exit — for scripts and tests |
+| `--once` | — | Process a single job (or wait once) and exit, for scripts and tests |
 
 The loop is: pop a job, run it through its middleware, delete it on
 success, release it with a backoff on failure, and sleep when there's
@@ -438,7 +438,7 @@ worker unable to finish an in-flight job before being force-killed.
 
 The handler only flips a flag, and the loop tests it **after** finishing
 the current iteration (`} while (running)`). A signal received mid-job
-lets that job complete and then stops — it does not abort the work. Give the
+lets that job complete and then stops. It does not abort the work. Give the
 process manager a `stop` timeout longer than your slowest job:
 `TimeoutStopSec` in systemd, `stopwaitsecs` in supervisor,
 `terminationGracePeriodSeconds` in Kubernetes. Too short and `SIGKILL`
@@ -448,8 +448,8 @@ expires, but any non-idempotent side effect has already half-happened.
 Once the loop exits, `ConsoleKernel.run()` calls `app.terminate()` in a
 `finally`, which runs every provider's `shutdown()` hook and closes the
 database pool and any Redis client the worker opened. Without that the
-worker stops taking jobs and then **hangs** — an open pool keeps Node's
-event loop alive on its own — until the orchestrator's grace period
+worker stops taking jobs and then **hangs**, an open pool keeps Node's
+event loop alive on its own, until the orchestrator's grace period
 elapses and `SIGKILL` arrives. See
 [Application lifecycle](../lifecycle/#termination).
 
@@ -457,7 +457,7 @@ elapses and `SIGKILL` arrives. See
 
 A worker holds your application code in memory for its whole life. Deploy
 new code and the old workers keep running the old code indefinitely.
-**Restart them as part of every deploy** — there is no `queue:restart`
+**Restart them as part of every deploy**. There is no `queue:restart`
 signal command here, so use your process manager:
 
 ```bash
@@ -468,7 +468,7 @@ supervisorctl restart mahi-worker:*
 
 ### Supervision
 
-Workers exit — on an unhandled error, on an OOM kill, on a redeploy. They
+Workers exit, on an unhandled error, on an OOM kill, on a redeploy. They
 must be restarted automatically. Run several for throughput; each one is
 an independent consumer, and the drivers handle reservation.
 
@@ -492,7 +492,7 @@ and exits. That's the whole production story. Every task's own cron
 expression lives in your provider's `schedule()` hook; the crontab knows
 only "check every minute."
 
-`schedule:work` is a **development convenience** — a foreground loop that
+`schedule:work` is a **development convenience**, a foreground loop that
 polls every second and fires due tasks once per wall-clock minute. It
 exists so you don't need a crontab entry while developing. Unlike
 Laravel's version there's no per-tick child process; tasks run in-process
@@ -500,7 +500,7 @@ through the same `runDueTasks()` path `schedule:run` uses. It works as a
 long-running production process under a supervisor if a crontab isn't
 available to you, but a cron entry is simpler and restarts itself.
 
-### Run it on exactly one host — or share the lock
+### Run it on exactly one host, or share the lock
 
 By default `withoutOverlapping()` is backed by **lock files on local
 disk**:
@@ -527,14 +527,14 @@ Redis's `add()` is a `SET NX`, so the lock is genuinely exclusive across
 hosts. An in-memory store is refused (it can't lock across the processes
 cron spawns) and falls back to files with a warning.
 
-Either way, a lock past its expiry — 60 minutes by default, set per task
-with `withoutOverlapping(minutes)` — is treated as abandoned so a crashed
+Either way, a lock past its expiry, 60 minutes by default, set per task
+with `withoutOverlapping(minutes)`, is treated as abandoned so a crashed
 task doesn't block its slot forever. The flip side: a task that
 legitimately runs longer than its expiry can be started again
 concurrently. Size the expiry above the task's worst case.
 
 Two more behaviours to plan around: **a failing task is logged and
-swallowed**, so `schedule:run` exits `0` even when a task threw — monitor
+swallowed**, so `schedule:run` exits `0` even when a task threw, monitor
 the log or use `pingOnFailure()`. And **foreground tasks run
 sequentially**, so a slow one delays everything else due in the same
 minute unless it's marked `runInBackground()`.
@@ -547,12 +547,12 @@ See [Scheduling](../scheduling/).
 node dist/bin/console.js migrate
 ```
 
-Run it once per deploy, from one place, before the new code starts serving
-— a release job, an init container, a deploy hook. Not from every
+Run it once per deploy, from one place, before the new code starts serving,
+a release job, an init container, a deploy hook. Not from every
 container's entrypoint: concurrent `migrate` runs against the same
 database race on the migrations table.
 
-`migrate` runs everything pending across **every** migration directory —
+`migrate` runs everything pending across **every** migration directory,
 yours plus every provider's contributed `migrations()` directory. Check
 what's pending first if you want to know:
 
@@ -593,7 +593,7 @@ chown -R app:app storage
 ```
 
 `storage/cache/` is shared by every process on the host that uses the
-`file` store, so it must be writable by all of them — the web server, the
+`file` store, so it must be writable by all of them, the web server, the
 `queue:work` worker, and whatever user's crontab runs `schedule:run`. That
 sharing is the point: the file store's locks and rate limits are correct
 across those processes precisely because they are looking at one
@@ -608,7 +608,7 @@ your process manager (`WorkingDirectory=` in systemd, `directory=` in
 supervisor, `WORKDIR` in a Dockerfile).
 
 Start it from the wrong directory and `storage_path()`, `database_path()`,
-and a relative `DB_FILENAME` all point somewhere else — usually creating an
+and a relative `DB_FILENAME` all point somewhere else, usually creating an
 empty SQLite file rather than failing.
 
 If you run more than one host, note that the local storage disk is
@@ -641,14 +641,14 @@ let the runtime collect it:
 A container writing to a file inside its own ephemeral filesystem produces
 logs that vanish with the container and a disk that fills up in the
 meantime. `console` writes through Node's `console` methods, routed by
-severity — `error`/`critical`/`alert`/`emergency` to `console.error`,
-`warning`/`notice` to `console.warn` — so stderr and stdout separate the
+severity, `error`/`critical`/`alert`/`emergency` to `console.error`,
+`warning`/`notice` to `console.warn`, so stderr and stdout separate the
 way log collectors expect.
 
 **On a plain VM, use `daily` rather than `single`.** `daily` rotates to a
 dated file and prunes with `maxFiles`; `single` grows until the disk is
 full. If you have logrotate configured, `single` plus logrotate is fine
-too — just pick one.
+too, just pick one.
 
 Either way, log volume is a production concern nobody thinks about until
 the disk fills. See [Logging](../logging/).
@@ -669,7 +669,7 @@ export function httpConfig(env: Env): HttpConfig {
 }
 ```
 
-Nothing is registered unless the key is present — a present-but-empty
+Nothing is registered unless the key is present, a present-but-empty
 object enables it at the default path.
 
 | | `/up` | `/health` |
@@ -681,7 +681,7 @@ object enables it at the default path.
 | During maintenance | **200** (exempt) | **503** (not exempt) |
 
 `/up` answers "is this process serving HTTP", and does no dependency
-checks at all. **It is exempt from maintenance mode** — `HttpKernel` passes
+checks at all. **It is exempt from maintenance mode**, `HttpKernel` passes
 its path into the maintenance middleware's `alwaysExcept` list, so an
 orchestrator can still reach it while the app is down. Without that
 exemption, `artisan maintenance:down` would make every replica fail its
@@ -689,14 +689,14 @@ liveness probe and get restarted in a loop, turning a planned maintenance
 window into an outage.
 
 `/health` runs every check registered through a provider's `checks()`
-hook — `@mahiframework/health` ships cache, database and filesystem checks — and
+hook, `@mahiframework/health` ships cache, database and filesystem checks, and
 returns `200`, or `503` if any failed. It is deliberately **not**
 maintenance-exempt: a readiness probe answering "ready" while you have
 explicitly taken the app down would put traffic straight back on it.
 
 **Never move dependency checks onto `/up`.** A liveness failure means
 *restart the pod*, so a Redis blip on that endpoint restarts every pod in
-the deployment at once — converting a recoverable dependency outage into a
+the deployment at once, converting a recoverable dependency outage into a
 full outage plus a thundering-herd reconnect. That asymmetry is the entire
 reason there are two endpoints.
 
@@ -709,8 +709,8 @@ readinessProbe:
   periodSeconds: 10
 ```
 
-Set the readiness `periodSeconds` above your worst-case run — checks run
-sequentially by default, so that is roughly checks x `timeoutSeconds` — or
+Set the readiness `periodSeconds` above your worst-case run, checks run
+sequentially by default, so that is roughly checks x `timeoutSeconds`, or
 probes will overlap.
 
 In production, failure messages on `/health` are replaced with
@@ -722,7 +722,7 @@ and paths (`connect ECONNREFUSED 10.0.1.4:5432`). Send the configured
 curl -H "X-Health-Secret: $HEALTH_SECRET" https://example.com/health
 ```
 
-The same checks run from the CLI, which never redacts — use it as a
+The same checks run from the CLI, which never redacts, use it as a
 post-deploy smoke test:
 
 ```sh
@@ -735,7 +735,7 @@ See [Health checks](../health/).
 ## Trusted proxies
 
 Behind a load balancer, every request arrives from the balancer's IP. The
-real client IP is in `X-Forwarded-For` — a header **any client can
+real client IP is in `X-Forwarded-For`, a header **any client can
 forge**.
 
 `Request.ip()` therefore returns the **socket peer** and never reads that
@@ -768,7 +768,7 @@ export class AppServiceProvider extends ServiceProvider {
 Patterns are exact IPs, IPv4 CIDR blocks, or `"*"`. **`"*"` trusts every
 peer**, which is appropriate only when the app is *guaranteed* to be
 unreachable except through a proxy that overwrites client-supplied
-`X-Forwarded-For` — a container with no published port, on a private
+`X-Forwarded-For`, a container with no published port, on a private
 network, behind an ingress that rewrites the header. If a client can ever
 reach the process directly, `"*"` is equivalent to no protection.
 
@@ -777,7 +777,7 @@ because proxies append and only the rightmost entries are vouched for.
 When the peer can't be determined the middleware fails closed.
 
 Once the peer is trusted, `X-Forwarded-Proto` / `-Host` / `-Port` are also
-applied — which is what makes `request.secure()` true and password-reset
+applied. Which is what makes `request.secure()` true and password-reset
 and verification links come out `https://` behind a TLS terminator.
 
 `trustHosts()` validates the effective host against an allow-list and
@@ -808,7 +808,7 @@ While down, every request gets a 503 with a JSON body.
 node dist/bin/console.js maintenance:down --retry 60 --message "Upgrading the database" --secret $(uuidgen)
 ```
 
-The bypass secret is accepted **three ways** — as an
+The bypass secret is accepted **three ways**, as an
 `X-Maintenance-Secret` header (for machines), as the first path segment
 (for a human with a browser), or as the cookie the path form sets:
 
@@ -820,14 +820,14 @@ curl -c jar https://example.com/$SECRET      # 302 → /, sets the bypass cookie
 The path form is a one-time exchange: it responds `302` to `/` with an
 `HttpOnly`, `SameSite=Lax` cookie (12 hours, `Secure` when the request
 was), so every subsequent request works normally without the secret in
-the URL — and therefore out of the access logs of every proxy in front of
+the URL, and therefore out of the access logs of every proxy in front of
 you. Secrets are compared in constant time.
 
 **State is a marker file** at `storage/framework/down`, holding the
 payload as JSON. That is what makes it work at all: `maintenance:down`
 runs in a *different process* from the server, so cache-backed state on
 the default `array` driver wrote the flag into the CLI's own heap and
-then exited — the operator saw "Application is now in maintenance mode"
+then exited, the operator saw "Application is now in maintenance mode"
 and the app kept serving traffic.
 
 The operational consequences of a file:
@@ -973,7 +973,7 @@ worker decrypting a payload needs the same `APP_KEY`.
 
 **Redis is present because there is more than one process.** The `array`
 cache and `local` broadcast defaults would be wrong here even though only
-`app` serves HTTP — the worker and the scheduler share cache keys, locks,
+`app` serves HTTP, the worker and the scheduler share cache keys, locks,
 and rate-limiter counters with it.
 
 **The scheduler is pinned to one replica.** Its `withoutOverlapping()`
@@ -1040,7 +1040,7 @@ systemctl enable --now mahi-web
 systemctl enable --now mahi-worker@1 mahi-worker@2 mahi-worker@3
 ```
 
-`WorkingDirectory=/srv/app` is not optional — it's what `storage_path()`
+`WorkingDirectory=/srv/app` is not optional. It's what `storage_path()`
 and a relative `DB_FILENAME` resolve against. `EnvironmentFile` keeps
 `APP_KEY` out of the unit file and out of `systemctl show` for
 unprivileged users.
@@ -1089,7 +1089,7 @@ supervisorctl reread && supervisorctl update
 supervisorctl restart mahi-worker:*
 ```
 
-`stopsignal=TERM` is the important line — supervisor's default is `TERM`,
+`stopsignal=TERM` is the important line, supervisor's default is `TERM`,
 but set it explicitly, because that's the signal `queue:work` traps for
 graceful shutdown.
 
@@ -1113,16 +1113,16 @@ graceful shutdown.
 - [ ] Logs going to stdout in a container, or `daily` on a VM
 - [ ] `http.liveness` enabled and wired to the orchestrator's `livenessProbe`
 - [ ] `http.healthCheck` enabled and wired to the `readinessProbe`, with `HEALTH_SECRET` set
-- [ ] `TRUSTED_PROXIES` set if behind a proxy — and **empty if not**
+- [ ] `TRUSTED_PROXIES` set if behind a proxy, and **empty if not**
 - [ ] `TRUSTED_HOSTS` set (or `APP_URL` correct, which it's derived from)
 - [ ] `curl -H 'X-Forwarded-Proto: https'` shows `https://` links, not `http://`
 - [ ] Body limits suit your largest legitimate upload
-- [ ] `storage/framework/` writable — maintenance mode writes its marker there
+- [ ] `storage/framework/` writable: maintenance mode writes its marker there
 
 ## Gotchas
 
 **`artisan serve` walks ports.** Without an explicit port it silently
-binds 8001 when 8000 is taken — a healthy process receiving no traffic.
+binds 8001 when 8000 is taken, a healthy process receiving no traffic.
 
 **`artisan serve` binds `127.0.0.1` by default**, unreachable from another
 container.
@@ -1139,7 +1139,7 @@ than failing.
 
 **Path helpers use `process.cwd()` by default, not the module location.**
 Set `WorkingDirectory`/`WORKDIR`. An app that genuinely cannot be run from
-its own directory — an installed CLI, a compiled binary — pins its root
+its own directory, an installed CLI, a compiled binary, pins its root
 with `setBasePath()` instead; see
 [Configuration](../configuration/README.md#setbasepath--for-apps-that-arent-run-from-their-own-directory).
 
@@ -1150,7 +1150,7 @@ and chown it.
 every lock is a no-op, and `Cache.forget()` clears one process.
 
 **`local` broadcasting fails silently across processes.** No error, no
-log — the message just doesn't arrive.
+log. The message just doesn't arrive.
 
 **`sync` queue runs jobs inside the request.** No retries, no isolation,
 full runtime added to the response.
@@ -1174,7 +1174,7 @@ exits `0`.
 each host, share the volume, or drain at the load balancer.
 
 **Both health endpoints are opt-in.** No `http.liveness` key, no `/up`
-route; no `http.healthCheck` key, no `/health` route — and your probe 404s.
+route; no `http.healthCheck` key, no `/health` route, and your probe 404s.
 A 404 reads as a failure to most orchestrators, so an unconfigured probe is
 worse than no probe.
 
@@ -1186,7 +1186,7 @@ can reach the process directly.** Only use it when that's impossible.
 
 **Forgetting `TRUSTED_PROXIES` behind a load balancer doesn't fail
 loudly.** `request.ip()` becomes the balancer's address for every client,
-so per-IP rate limits silently become one global limit — and one abusive
+so per-IP rate limits silently become one global limit, and one abusive
 client locks out everyone. It also leaves `secure()` false, so
 password-reset links go out as `http://`.
 
@@ -1199,14 +1199,14 @@ Set it explicitly so the fail-safe never has to fire.
 
 ## Related
 
-- [Installation](../installation/) — creating and running an app locally
-- [Configuration](../configuration/) — the env schema, config files
-- [Application lifecycle](../lifecycle/) — what `bootstrap()` does
-- [Redis](../redis/) — the multi-process story in full
-- [Queues](../queues/) — jobs, retries, failed jobs, `queue:work`
-- [Scheduling](../scheduling/) — `schedule:run`, task locking
-- [Migrations](../migrations/) — schema changes on deploy
-- [Logging](../logging/) — channels, stacks, rotation
-- [Storage](../storage/) — disks and the per-host caveat
-- [Encryption & hashing](../encryption/) — `APP_KEY` and key rotation
-- [Console](../console/) — every `artisan` command
+- [Installation](../installation/): creating and running an app locally
+- [Configuration](../configuration/): the env schema, config files
+- [Application lifecycle](../lifecycle/): what `bootstrap()` does
+- [Redis](../redis/): the multi-process story in full
+- [Queues](../queues/): jobs, retries, failed jobs, `queue:work`
+- [Scheduling](../scheduling/): `schedule:run`, task locking
+- [Migrations](../migrations/): schema changes on deploy
+- [Logging](../logging/): channels, stacks, rotation
+- [Storage](../storage/): disks and the per-host caveat
+- [Encryption & hashing](../encryption/): `APP_KEY` and key rotation
+- [Console](../console/): every `artisan` command

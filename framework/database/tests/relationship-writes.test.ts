@@ -27,7 +27,7 @@ import type {
 } from "../src/markers.js";
 
 /**
- * Relationship writes — `attach`/`detach`/`sync`/`toggle` on pivots,
+ * Relationship writes, `attach`/`detach`/`sync`/`toggle` on pivots,
  * `associate`/`dissociate` on the inverse, and `save`/`create` through a
  * has-many. See `src/relationship-writes.ts`.
  */
@@ -79,7 +79,7 @@ class Tag extends Model<TagAttributes>()({
   timestamps: false,
 }) {
   static override relationships = {
-    /** The inverse of `Post.tags` — same pivot, read the other way. */
+    /** The inverse of `Post.tags`, same pivot, read the other way. */
     posts: belongsToMany(() => Post, {
       pivotTable: "post_tag",
       foreignPivotKey: "tag_id",
@@ -188,7 +188,7 @@ async function pivotRows(app: Application, postId: string): Promise<Record<strin
     .execute() as unknown as Promise<Record<string, any>[]>;
 }
 
-/** The tag ids currently linked to a post, sorted — the assertion most tests make. */
+/** The tag ids currently linked to a post, sorted, the assertion most tests make. */
 async function attachedTagIds(app: Application, postId: string): Promise<string[]> {
   const rows = await pivotRows(app, postId);
 
@@ -518,7 +518,7 @@ describe("Relationship writes", () => {
 
     it("does not re-attach a soft-deleted related row's pivot link", async () => {
       // The diff must read the PIVOT table, not the related model's
-      // scoped builder — otherwise the link to a trashed tag looks
+      // scoped builder, otherwise the link to a trashed tag looks
       // absent and sync() re-inserts it, hitting the unique constraint.
       const post = (await Post.find("p1"))!;
       await post.relations.tags().attach(["t1", "t2"]);

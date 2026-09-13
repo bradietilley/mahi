@@ -42,7 +42,7 @@ describe("StringCast", () => {
   it("writes a DateTime as UTC rather than String()'s zone-local form", () => {
     // A text-typed timestamp column (`email_verified_at: string`) still
     // receives a `DateTime` from callers. `String(dt)` calls `toString()`,
-    // which renders in the instance's own zone — storing
+    // which renders in the instance's own zone, storing
     // "...T07:29:12.868+08:00" alongside UTC values written everywhere
     // else, so the same column would hold two incompatible spellings.
     const perth = DateTime.fromISO("2026-08-23T14:30:00.000Z", "UTC").setTimezone(
@@ -102,7 +102,7 @@ describe("JsonCast", () => {
 
   /**
    * `json<T>()` exists so a column whose shape IS known keeps that shape on
-   * finder results — casts now replace the row's declared type rather than
+   * finder results, casts now replace the row's declared type rather than
    * intersecting with it, so `JsonCast`'s honest `unknown` would erase it.
    *
    * The behaviour is deliberately identical; only the type differs, which
@@ -127,8 +127,8 @@ describe("JsonCast", () => {
   });
 
   /**
-   * An already-parsed value survives a write without being double-encoded —
-   * the case that happens when an instance is saved twice without a read in
+   * An already-parsed value survives a write without being double-encoded.
+   * The case that happens when an instance is saved twice without a read in
    * between.
    */
   it("does not double-encode a value that is already a string", () => {
@@ -184,7 +184,7 @@ describe("DateTimeCast", () => {
   it("converts a ZONED DateTime to UTC on write", () => {
     // `DateTime.toISOString()` renders in the instance's own zone, so
     // without an explicit conversion this wrote
-    // "2026-08-23T22:30:00.000+08:00" — which `timestamp`, MySQL and
+    // "2026-08-23T22:30:00.000+08:00", which `timestamp`, MySQL and
     // SQLite all store as 22:30 UTC, silently shifting the instant by
     // the offset. The cast documents that only UTC is ever written.
     const perth = DateTime.fromISO("2026-08-23T14:30:00.000Z", "UTC").setTimezone(

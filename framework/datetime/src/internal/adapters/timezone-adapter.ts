@@ -24,7 +24,7 @@ import { decodeCivil, encodeCivil, MS_PER_DAY, MS_PER_SECOND } from "../civil.js
  * Every calendar operation in the package resolves a wall clock against a
  * zone, and each resolution needs several offset lookups (see
  * `instantFromCivilMs`). Constructing a formatter per lookup made zone-aware
- * arithmetic roughly three times more expensive than it needed to be — for
+ * arithmetic roughly three times more expensive than it needed to be, for
  * an object that is immutable and depends only on the zone. The map is
  * unbounded, which is fine: it is keyed by IANA identifier, and there are
  * fewer than a thousand of those in existence.
@@ -72,8 +72,8 @@ function formatterFor(zone: TimezoneIdentifier): Intl.DateTimeFormat {
  * looks:
  *
  * `date-fns-tz`'s `getTimezoneOffset` answers the opposite question. Despite
- * the name it takes "a date whose values represent the local time" — it reads
- * its argument's fields through the *host's* zone — so it both depends on
+ * the name it takes "a date whose values represent the local time", it reads
+ * its argument's fields through the *host's* zone, so it both depends on
  * `process.env.TZ` and returns the wrong answer on a transition day (UTC−4
  * for 04:00Z on a US spring-forward date, where the truth is UTC−5). Building
  * on it would have made every result in this package machine-dependent.
@@ -85,7 +85,7 @@ function formatterFor(zone: TimezoneIdentifier): Intl.DateTimeFormat {
 export function offsetFor(zone: TimezoneIdentifier, instant: number): number {
   // `Intl` treats an empty or whitespace-only zone as "unspecified" and
   // quietly substitutes the *host's* zone, so `DateTime.now("")` would return
-  // a different instant's wall clock on every machine — precisely the
+  // a different instant's wall clock on every machine, precisely the
   // non-determinism this package exists to prevent. Caught here rather than
   // at the public API because every zone lookup funnels through this
   // function.
@@ -218,7 +218,7 @@ export function componentsFromInstant(
  * "subtract the offset" one-liner, because the offset you'd subtract is the
  * offset *at the answer you don't have yet*. Concretely: 02:30 on a
  * US spring-forward date reads back an offset of UTC-4, and naively
- * subtracting it produces 06:30 local — a time the caller never asked for,
+ * subtracting it produces 06:30 local, a time the caller never asked for,
  * with no error raised.
  *
  * So: probe the offsets in force a day either side (a 48-hour window

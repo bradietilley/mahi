@@ -19,7 +19,7 @@ import type { Lock, LockOptions } from "../locking/lock.js";
 
 /** The on-disk shape of one cache entry. `expiresAt` is epoch ms, or `null` for "no expiry". */
 interface Entry {
-  /** The original cache key. Not read back by this store — kept so a cache directory is debuggable by hand. */
+  /** The original cache key. Not read back by this store, kept so a cache directory is debuggable by hand. */
   key: string;
   value: unknown;
   expiresAt: number | null;
@@ -31,17 +31,17 @@ interface Entry {
  *
  * That combination is the whole point. It is the only non-Redis store
  * that survives a restart, so it is what a multi-process app without
- * Redis reaches for — a web server plus `queue:work` plus a
+ * Redis reaches for, a web server plus `queue:work` plus a
  * `schedule:run` cron invocation, all pointed at the same directory. The
- * obvious alternative — a single JSON file rewritten in full on every
- * operation, serialized only by an **in-process** promise chain — fails
+ * obvious alternative, a single JSON file rewritten in full on every
+ * operation, serialized only by an **in-process** promise chain, fails
  * exactly those users:
  *
  *   - **lost updates.** Two processes each do an unsynchronised
  *     read-modify-write of the whole file; the last writer wins and the
  *     other's changes vanish. `increment()` under a `RateLimiter`
- *     undercounts, and `add()` returns `true` in two processes at once
- *     — so `Lock`, `WithoutOverlapping` and `rememberViaLock()` guard
+ *     undercounts, and `add()` returns `true` in two processes at once,
+ *     so `Lock`, `WithoutOverlapping` and `rememberViaLock()` guard
  *     nothing.
  *   - **a store one crash away from unreadable.** A plain `writeFile()`
  *     killed mid-write leaves truncated JSON, and every subsequent read
@@ -71,21 +71,21 @@ interface Entry {
  *
  *   - **`rename()` is atomic.** Every write goes to a temp file in the
  *     same directory and is then renamed over the target, so a reader
- *     sees either the whole old entry or the whole new one — never a
+ *     sees either the whole old entry or the whole new one, never a
  *     partial write, and a crash mid-write leaves the previous entry
  *     intact rather than a truncated file. One corrupt entry cannot take
  *     the whole cache down with it: there is no "whole cache" file to
  *     corrupt.
  *   - **`open(path, "wx")` is atomic create-if-absent.** That is exactly
  *     `add()`'s contract, so the common path is a single syscall with no
- *     lock at all — and it is genuinely exclusive across processes, which
+ *     lock at all, and it is genuinely exclusive across processes, which
  *     is what makes a `Lock` on this store work between the web server
  *     and a worker.
  *   - **an `O_EXCL` lock file** for the two operations that are
  *     unavoidably read-modify-write (`increment()`, and the `add()` case
  *     where a key exists but has expired). Held for microseconds, and
  *     reclaimed by the next caller if it is older than
- *     `STALE_LOCK_MS` — a process killed while holding one cannot wedge
+ *     `STALE_LOCK_MS`, a process killed while holding one cannot wedge
  *     a key permanently.
  *
  * **Reads never write.** `get()`/`has()` read one file. The only write on
@@ -95,7 +95,7 @@ interface Entry {
  *
  * `O_EXCL` and `rename()` are atomic on a local filesystem. On NFS they
  * historically are not, and on a network filesystem this store's
- * cross-process guarantees do not hold — use Redis. Nothing here detects
+ * cross-process guarantees do not hold, use Redis. Nothing here detects
  * that for you.
  */
 export class FileCacheStore implements CacheStore {
@@ -107,7 +107,7 @@ export class FileCacheStore implements CacheStore {
    *
    * Must stay comfortably ABOVE `LOCK_TIMEOUT_MS`. When the two were equal,
    * a waiter that had been descheduled for the whole timeout could decide a
-   * still-live holder was stale and unlink its lock — so both processes
+   * still-live holder was stale and unlink its lock, so both processes
    * believed they held it and `add()` returned true twice. The critical
    * section is microseconds of real work, so the gap only has to cover
    * scheduler starvation, not legitimate slowness.
@@ -115,8 +115,8 @@ export class FileCacheStore implements CacheStore {
   static readonly STALE_LOCK_MS = 30_000;
 
   /**
-   * @param directory Where entry files live. A **directory**, not a file
-   * — the pre-`one-file-per-key` layout took the path of a single
+   * @param directory Where entry files live. A **directory**, not a file,
+   * the pre-`one-file-per-key` layout took the path of a single
    * `cache.json`, and a config still pointing at one is rejected with an
    * actionable error rather than a bare `ENOTDIR` (see
    * `describeDirectoryFailure()`).
@@ -132,7 +132,7 @@ export class FileCacheStore implements CacheStore {
     }
 
     if (this.hasExpired(entry)) {
-      // Lazy expiry: reclaim the inode, report a miss. Best-effort —
+      // Lazy expiry: reclaim the inode, report a miss. Best-effort,
       // another process may have unlinked it already, or be mid-`add()`
       // on the same key, and neither is an error for a reader.
       await unlink(file).catch(() => undefined);
@@ -174,8 +174,8 @@ export class FileCacheStore implements CacheStore {
    * Deletes every entry whose TTL has already elapsed, plus any scratch
    * file a crash left behind. Returns how many files it removed.
    *
-   * Expiry is otherwise lazy — an entry is only removed when something
-   * reads it — so a key space that is written far more often than it is
+   * Expiry is otherwise lazy, an entry is only removed when something
+   * reads it, so a key space that is written far more often than it is
    * read (per-IP rate-limit counters, per-session data) accumulates dead
    * files that nothing will ever touch again. Nothing calls this
    * automatically: it is a full directory walk, whose cost belongs to a
@@ -187,9 +187,9 @@ export class FileCacheStore implements CacheStore {
    *
    * The scratch files are the other half. A process killed between
    * `writeFile()` and `rename()` leaves a `.tmp`, and one killed holding
-   * an entry lock leaves a `.lock`. Neither is a correctness problem —
+   * an entry lock leaves a `.lock`. Neither is a correctness problem,
    * the `.tmp` is inert, and the `.lock` is reclaimed as stale by the
-   * next writer of that key — but a `.lock` on a key nothing writes again
+   * next writer of that key, but a `.lock` on a key nothing writes again
    * is never reclaimed at all, so this is where they go.
    */
   async prune(): Promise<number> {
@@ -211,7 +211,7 @@ export class FileCacheStore implements CacheStore {
       const entry = await this.readEntry(file);
 
       // `undefined` covers an unreadable/corrupt entry as well as one
-      // that vanished mid-walk — a file this store cannot parse is dead
+      // that vanished mid-walk, a file this store cannot parse is dead
       // weight that every future read would discard anyway.
       if (entry !== undefined && !this.hasExpired(entry)) {
         continue;
@@ -221,7 +221,7 @@ export class FileCacheStore implements CacheStore {
     }
 
     for (const { file, mtimeMs } of scratch) {
-      // Only ones old enough to be certainly abandoned — a `.tmp` or
+      // Only ones old enough to be certainly abandoned, a `.tmp` or
       // `.lock` created a millisecond ago belongs to an operation that is
       // still running, quite possibly in another process.
       if (Date.now() - mtimeMs <= FileCacheStore.STALE_LOCK_MS) {
@@ -237,7 +237,7 @@ export class FileCacheStore implements CacheStore {
   /**
    * Atomic across processes via an `O_EXCL` lock file around the
    * read-modify-write. Preserves the existing entry's expiry rather than
-   * resetting it — matching `ArrayCacheStore.increment()` and Redis
+   * resetting it, matching `ArrayCacheStore.increment()` and Redis
    * `INCRBY`, which `RateLimiter` depends on (an incrementing counter
    * that also extended its own window would turn "5 per minute" into "5
    * per minute of silence").
@@ -264,14 +264,14 @@ export class FileCacheStore implements CacheStore {
   }
 
   /**
-   * Set only if absent (or expired), atomically — across processes, not
+   * Set only if absent (or expired), atomically, across processes, not
    * just within one. `Lock.acquire()` and `RateLimiter`'s window seeding
    * are both built directly on this.
    *
    * The common path is a single `open(path, "wx")`: the kernel either
    * creates the file or reports `EEXIST`, with no window in between for
    * another process to slip through. Only when a file already exists but
-   * has **expired** does this need the slower locked path — the check and
+   * has **expired** does this need the slower locked path, the check and
    * the overwrite must not interleave, or two processes could both
    * observe "expired" and both claim the key.
    */
@@ -284,7 +284,7 @@ export class FileCacheStore implements CacheStore {
     }
 
     // The file existed. Only an expired entry can be taken over, and only
-    // under the lock — re-reading inside it, because it may have been
+    // under the lock, re-reading inside it, because it may have been
     // rewritten by whoever held the lock before us.
     const existing = await this.readEntry(file);
 
@@ -306,7 +306,7 @@ export class FileCacheStore implements CacheStore {
   }
 
   /**
-   * Compare-and-delete under the entry's lock file — the atomic release
+   * Compare-and-delete under the entry's lock file, the atomic release
    * path `Lock.release()` uses in preference to `get()`-then-`forget()`.
    *
    * Without it, a lock whose TTL expires between those two calls can be
@@ -352,7 +352,7 @@ export class FileCacheStore implements CacheStore {
     return lock(this, options);
   }
 
-  /** `<directory>/ab/cd/<sha1>` — see the class docstring on why it is hashed and fanned out. */
+  /** `<directory>/ab/cd/<sha1>`. See the class docstring on why it is hashed and fanned out. */
   private pathFor(key: string): string {
     const hash = createHash("sha1").update(key).digest("hex");
 
@@ -366,7 +366,7 @@ export class FileCacheStore implements CacheStore {
   /**
    * Reads and parses one entry file. A missing file is a miss; so is an
    * unparseable one, which this store treats as a miss rather than an
-   * error on purpose — the blast radius of a damaged file is now exactly
+   * error on purpose, the blast radius of a damaged file is now exactly
    * the one key it holds, and reporting it as a cache miss lets the
    * caller recompute instead of taking a 500 for a *cache*.
    */
@@ -398,7 +398,7 @@ export class FileCacheStore implements CacheStore {
    * previous entry intact and one stray temp file.
    *
    * The temp file is created in the entry's own directory, because
-   * `rename()` is only atomic within a single filesystem — via `/tmp` it
+   * `rename()` is only atomic within a single filesystem, via `/tmp` it
    * could silently degrade to a copy.
    */
   private async writeEntry(file: string, entry: Entry): Promise<void> {
@@ -446,7 +446,7 @@ export class FileCacheStore implements CacheStore {
    * The lock is a sibling `.lock` file created with `O_EXCL`, which is
    * the portable cross-process mutex Node exposes (there is no portable
    * `flock`). A lock older than `STALE_LOCK_MS` is assumed to belong to a
-   * process that died holding it and is reclaimed — without that, a
+   * process that died holding it and is reclaimed, without that, a
    * `kill -9` at the wrong microsecond would make one cache key
    * permanently unwritable, which is a far worse failure than the brief
    * window of over-eager reclamation it trades for.
@@ -478,7 +478,7 @@ export class FileCacheStore implements CacheStore {
 
       const age = await stat(lockPath).then(
         (stats) => Date.now() - stats.mtimeMs,
-        // The holder released it between our EEXIST and this stat — retry
+        // The holder released it between our EEXIST and this stat, retry
         // immediately rather than sleeping for a lock that is now free.
         () => Number.NaN,
       );
@@ -508,7 +508,7 @@ export class FileCacheStore implements CacheStore {
 
   /**
    * `ENOTDIR`/`EEXIST` here means a component of the path is a regular
-   * file — overwhelmingly because `config/cache.ts` still points
+   * file, overwhelmingly because `config/cache.ts` still points
    * `stores.file.path` at the old single-file `storage/cache.json`. The
    * raw errno for that is unreadable, so say what actually happened.
    */

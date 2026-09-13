@@ -20,7 +20,7 @@ interface RegisteredStub {
 }
 
 /**
- * Owns the configuration and — while faking — the stub registry and
+ * Owns the configuration and, while faking, the stub registry and
  * recording tape shared by every `PendingRequest` it creates.
  *
  * `Http` is a thin static surface over a module-level instance of this;
@@ -39,7 +39,7 @@ export class HttpClientFactory {
   constructor(private readonly config: HttpClientConfig = {}) {}
 
   /**
-   * A `PendingRequest` carrying the factory's defaults — global options,
+   * A `PendingRequest` carrying the factory's defaults, global options,
    * global middleware, the fake transport when faking, and the event sink.
    * Every `Http.*` verb starts here.
    */
@@ -126,7 +126,7 @@ export class HttpClientFactory {
   }
 
   /**
-   * Let unmatched requests reach the real network — Laravel's default,
+   * Let unmatched requests reach the real network, Laravel's default,
    * which this package deliberately inverts. With `patterns`, only URLs
    * matching one of them are allowed through.
    *
@@ -190,8 +190,8 @@ export class HttpClientFactory {
    * while faking, the plain `fetch` transport otherwise.
    *
    * The stub is matched against the `ClientRequest` the `PendingRequest`
-   * passes alongside the platform `Request`, not a reconstruction of it —
-   * a `Request` has lost `data()` (the payload object as passed to
+   * passes alongside the platform `Request`, not a reconstruction of it.
+   * A `Request` has lost `data()` (the payload object as passed to
    * `post()`), which is exactly what a stub handler wants to branch on.
    */
   private transport(): Transport {
@@ -256,7 +256,7 @@ export class HttpClientFactory {
    * `PendingRequest` this factory creates.
    *
    * The stray conversion happens here, at the outermost send boundary,
-   * rather than where the miss occurred — see `strayResponse()` for why a
+   * rather than where the miss occurred. See `strayResponse()` for why a
    * response value is carried back out instead of a throw.
    */
   private observer(): SendObserver {

@@ -1,17 +1,17 @@
 /**
- * `@mahiframework/health` — a registry of named readiness probes, one runner, two
+ * `@mahiframework/health`, a registry of named readiness probes, one runner, two
  * frontends.
  *
  * An app declares "these are the things that must be working" via the
  * `checks()` provider hook, and gets both `GET /health` and
- * `./artisan health` for free, sharing one runner and one result shape:
+ * `./artisan health` automatically, sharing one runner and one result shape:
  *
  *     {"core":{"cache":true,"database":true,"filesystem":true},
  *      "app":{"daemon":true,"stripe":"Failed to connect"}}
  *
  * `true` = passed, a string = why it failed, `null` = skipped.
  *
- * ## Liveness vs readiness — do not collapse these
+ * ## Liveness vs readiness, do not collapse these
  *
  * `@mahiframework/http` registers an opt-in zero-I/O `GET /up` (`http.liveness`);
  * this package registers an opt-in `GET /health` (`http.healthCheck`)
@@ -23,7 +23,7 @@
  *
  * Collapsing them is a mistake in the expensive direction. If `/up`
  * started doing real I/O, a Redis blip would fail the *liveness* probe
- * and the orchestrator would **restart every pod in the deployment** —
+ * and the orchestrator would **restart every pod in the deployment**,
  * turning a recoverable dependency outage into a full outage plus a
  * thundering-herd reconnect. That failure mode is the entire reason the
  * two-probe split exists.

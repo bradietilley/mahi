@@ -21,7 +21,7 @@ export interface TokenGuardConfig {
 }
 
 export interface NewAccessToken {
-  /** The plaintext `"<id>|<secret>"` — shown to the user ONCE, never stored. */
+  /** The plaintext `"<id>|<secret>"`, shown to the user ONCE, never stored. */
   token: string;
   record: PersonalAccessTokenAttributes;
 }
@@ -33,7 +33,7 @@ export interface NewAccessToken {
  * without a revocation list, which reintroduces the very database lookup
  * JWTs exist to avoid).
  *
- * Stateless, per the `Guard` contract — every method takes what it needs
+ * Stateless, per the `Guard` contract. Every method takes what it needs
  * as arguments and nothing is memoized on the instance.
  */
 export class TokenGuard<TUser = unknown> implements Guard<TUser> {
@@ -81,7 +81,7 @@ export class TokenGuard<TUser = unknown> implements Guard<TUser> {
 
   /**
    * Issue a new token. The plaintext is returned once and never
-   * recoverable afterwards — only its digest is stored.
+   * recoverable afterwards, only its digest is stored.
    */
   async createToken(userId: string, name: string): Promise<NewAccessToken> {
     const secret = randomBytes(32).toString("base64url");
@@ -101,7 +101,7 @@ export class TokenGuard<TUser = unknown> implements Guard<TUser> {
     return { token: `${id}|${secret}`, record };
   }
 
-  /** Revoke a single token by id — e.g. the one used by the current request. */
+  /** Revoke a single token by id, e.g. the one used by the current request. */
   async revokeToken(id: string): Promise<void> {
     await PersonalAccessToken.delete(id);
   }
@@ -116,7 +116,7 @@ export class TokenGuard<TUser = unknown> implements Guard<TUser> {
    * `auth:gc`, the same way sessions and reset tokens are.
    *
    * Expiry is already enforced on read, so a stale row is never
-   * *honoured* — but nothing deleted them either, so the table grew
+   * *honoured*, but nothing deleted them either, so the table grew
    * forever in any app that configured `expiresInMinutes`. Rows with a
    * null `expires_at` never expire (the Sanctum default) and are left
    * alone.
@@ -128,7 +128,7 @@ export class TokenGuard<TUser = unknown> implements Guard<TUser> {
       .delete();
   }
 
-  /** The token id carried by this request, if any — for `logout`. */
+  /** The token id carried by this request, if any, for `logout`. */
   currentTokenId(request: Request): string | null {
     const plaintext = request.bearerToken() ?? null;
 

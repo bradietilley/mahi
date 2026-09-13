@@ -33,7 +33,7 @@ export default {
 
 /**
  * `migrate:fresh` drops every table in the database. Running it against
- * production is unrecoverable, so it must not be possible by accident —
+ * production is unrecoverable, so it must not be possible by accident,
  * and in particular must not be possible from an unattended process
  * that has no terminal to be asked on.
  */
@@ -99,7 +99,7 @@ describe("destructive commands are guarded in production", () => {
    * Migrate, then write a row.
    *
    * Checking that `widgets` *exists* after `migrate:fresh` proves
-   * nothing — fresh drops every table and immediately re-creates them,
+   * nothing. Fresh drops every table and immediately re-creates them,
    * so the table is there either way. The row is what distinguishes
    * "the guard stopped it" from "it ran and wiped production".
    */
@@ -128,7 +128,7 @@ describe("destructive commands are guarded in production", () => {
     await seedRow(app, driver);
     await new MigrateFreshCommand(app).handle({});
 
-    // Never even asked — there is no terminal to ask on — and the data
+    // Never even asked: there is no terminal to ask on, and the data
     // is still there.
     expect(confirm).not.toHaveBeenCalled();
     expect(await widgetIds(driver)).toEqual(["keep-me"]);
@@ -159,7 +159,7 @@ describe("destructive commands are guarded in production", () => {
   });
 
   it("db:wipe refuses to run unattended in production", async () => {
-    // The most destructive command here — it drops the migrations ledger
+    // The most destructive command here. It drops the migrations ledger
     // too, so there is not even a record of what the schema was.
     const { app, driver } = buildApp("production");
     setTTY(false);
@@ -217,7 +217,7 @@ describe("destructive commands are guarded in production", () => {
     expect(await widgetIds(driver)).toEqual([]);
   });
 
-  it("does not prompt outside production — a local migrate:fresh stays one keystroke", async () => {
+  it("does not prompt outside production: a local migrate:fresh stays one keystroke", async () => {
     const { app, driver } = buildApp("local");
     setTTY(true);
     const confirm = vi.spyOn(Tui, "confirm");

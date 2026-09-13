@@ -15,7 +15,7 @@ export type BodyFormat = "json" | "form" | "multipart" | "raw";
 
 /** Per-send overrides for the low-level `send()` verb. */
 export interface SendOptions {
-  /** The payload — serialized per the configured body format. */
+  /** The payload, serialized per the configured body format. */
   data?: unknown;
   /** Query parameters appended to the URL. */
   query?: Record<string, unknown>;
@@ -91,7 +91,7 @@ const defaultOptions: RequestOptions = {
 
 /**
  * Sentinel that converts a failed *response* into a thrown error so
- * `@mahiframework/core`'s exception-driven `retry()` can drive HTTP retries — a
+ * `@mahiframework/core`'s exception-driven `retry()` can drive HTTP retries. A
  * failed status is an ordinary return value here, which is the whole point
  * of `throw()` being opt-in.
  *
@@ -108,16 +108,16 @@ class RetrySignal extends Error {
 }
 
 /**
- * The fluent request builder — port of Laravel's
+ * The fluent request builder, port of Laravel's
  * `Illuminate\Http\Client\PendingRequest`.
  *
  * **Immutable**: every method below returns a *new* `PendingRequest`
  * sharing a frozen options record. Laravel mutates `$this` on send (it
  * nulls `pendingBody`/`pendingFiles` and assigns `request`/`cookies`/
  * `transferStats` onto the instance), which makes a configured client
- * unsafe to hold and reuse — and holding one is the entire point of
+ * unsafe to hold and reuse, and holding one is the entire point of
  * `baseUrl()`. Copy-on-write fixes that, and makes concurrent sends from
- * one client safe for free.
+ * one client safe without extra work.
  *
  *   const github = Http.baseUrl("https://api.github.com").withToken(token);
  *   const [user, repos] = await Promise.all([github.get("/user"), github.get("/repos")]);
@@ -160,7 +160,7 @@ export class PendingRequest {
 
   /**
    * Send `content` verbatim as the body, bypassing payload serialization.
-   * A `ReadableStream` streams — `duplex: "half"` is set for you.
+   * A `ReadableStream` streams. `duplex: "half"` is set for you.
    */
   withBody(
     content: string | Uint8Array | ReadableStream<Uint8Array>,
@@ -196,7 +196,7 @@ export class PendingRequest {
 
   /**
    * Set a base64 `Authorization: Basic` header. Digest and NTLM are not
-   * ported — they need a challenge-response round trip, which is a
+   * ported. They need a challenge-response round trip, which is a
    * middleware, not a header.
    */
   withBasicAuth(username: string, password: string): PendingRequest {
@@ -209,7 +209,7 @@ export class PendingRequest {
    * Merge `headers` over the existing ones, **replacing** on collision.
    *
    * Laravel uses `array_merge_recursive` here, so
-   * `withHeaders({X:'1'}).withHeaders({X:'2'})` yields `X: ['1','2']` — a
+   * `withHeaders({X:'1'}).withHeaders({X:'2'})` yields `X: ['1','2']`, a
    * bug people trip over, and the only reason its `replaceHeaders()`
    * exists. Replacing is what everyone expects; `appendHeader()` covers
    * the rare genuine multi-value case.
@@ -257,7 +257,7 @@ export class PendingRequest {
   }
 
   /**
-   * Abort the request after `ms`. Covers the **whole** exchange — `fetch`
+   * Abort the request after `ms`. Covers the **whole** exchange. `fetch`
    * has no separate connect timeout, so Laravel's `connectTimeout()` has
    * no equivalent and is not ported.
    */
@@ -289,7 +289,7 @@ export class PendingRequest {
   }
 
   /**
-   * Skip buffering the response body — `response.stream()` gives the raw
+   * Skip buffering the response body, `response.stream()` gives the raw
    * `ReadableStream`, and `body()`/`json()` throw. Laravel has no
    * first-class equivalent (it's `withOptions(['stream' => true])`).
    */
@@ -298,7 +298,7 @@ export class PendingRequest {
   }
 
   /**
-   * Merge raw `RequestInit` over everything this builder produced — the
+   * Merge raw `RequestInit` over everything this builder produced, the
    * analogue of dropping Guzzle options straight in, and the escape hatch
    * for anything `fetch` supports that this class doesn't wrap.
    *
@@ -308,13 +308,13 @@ export class PendingRequest {
    *   .withFetchOptions({ dispatcher: new ProxyAgent(url) })
    *
    * That requires `undici` as the **application's** dependency, not this
-   * package's — hence the untyped `Record<string, unknown>` half.
+   * package's, hence the untyped `Record<string, unknown>` half.
    */
   withFetchOptions(init: RequestInit & Record<string, unknown>): PendingRequest {
     return this.with({ fetchOptions: { ...this.options.fetchOptions, ...init } });
   }
 
-  /** Swap the transport — the seam fakes, mocks, and proxies hook into. */
+  /** Swap the transport, the seam fakes, mocks, and proxies hook into. */
   withTransport(transport: Transport): PendingRequest {
     return this.with({ transport });
   }
@@ -362,7 +362,7 @@ export class PendingRequest {
    * Retry up to `times` attempts (the first counts). `sleepMs` is a fixed
    * delay, an array of per-attempt delays, or a function of the attempt.
    *
-   * **Everything that failed is retryable by default** — any 4xx or 5xx,
+   * **Everything that failed is retryable by default**, any 4xx or 5xx,
    * including 401 and 422, plus `ConnectionError`. That is Laravel's
    * behaviour, and matching it is the point of a port: a status-based
    * allow-list would silently break the genuinely-retryable cases (a 401
@@ -370,7 +370,7 @@ export class PendingRequest {
    * an optimistic-locking API), and would look like the framework ignoring
    * your `retry(3)`.
    *
-   * To narrow it — "retry only 5xx" being the common intent:
+   * To narrow it, "retry only 5xx" being the common intent:
    *
    *   .retry(3, 100, (error, response) =>
    *     error instanceof ConnectionError || (response?.serverError() ?? false))
@@ -379,7 +379,7 @@ export class PendingRequest {
    * 60s). Laravel ignores it, which is the single most common reason a
    * retrying client gets rate-limit-banned.
    *
-   * On exhaustion the final failed response is **returned**, not thrown —
+   * On exhaustion the final failed response is **returned**, not thrown,
    * `throw()` still governs raising, so Laravel's `throw` flag is not
    * needed.
    */
@@ -509,7 +509,7 @@ export class PendingRequest {
 
     const { body, contentType } = await this.buildBody(method, options.data);
     // An explicit contentType() always wins; the format's implied type only
-    // fills a gap. Multipart deliberately sets neither — `fetch` generates
+    // fills a gap. Multipart deliberately sets neither, `fetch` generates
     // the boundary-bearing header itself.
     const explicit = this.options.contentType;
 
@@ -584,7 +584,7 @@ export class PendingRequest {
     }
 
     // A `ReadableStream` body is consumed by the first attempt and cannot be
-    // re-sent — a second `toFetchRequest()` would reject with the opaque
+    // re-sent, a second `toFetchRequest()` would reject with the opaque
     // "Response body object should not be disturbed or locked", which the
     // transport catch then mislabels as a `ConnectionError` and retries
     // again. Refuse up front with a message that names the actual problem.
@@ -636,7 +636,7 @@ export class PendingRequest {
           }
 
           // The callback throws on *any* failure and lets `when` decide,
-          // rather than pre-filtering — so a user predicate sees every
+          // rather than pre-filtering, so a user predicate sees every
           // failed attempt and a ConnectionError through one path. The
           // sentinel itself is never handed over: a failed response is
           // `(undefined, response)`, a transport failure `(error, undefined)`.
@@ -648,7 +648,7 @@ export class PendingRequest {
     } catch (error) {
       // Exhaustion rethrows the last error. A RetrySignal unwraps back to
       // its response, so a retried-to-exhaustion request returns the final
-      // failed response like any other — and the sentinel never escapes.
+      // failed response like any other, and the sentinel never escapes.
       if (error instanceof RetrySignal) {
         return error.response;
       }
@@ -740,7 +740,7 @@ export class PendingRequest {
 
 /**
  * The delay a server asked for via `Retry-After` on a 429/503, in
- * milliseconds — delta-seconds or an HTTP-date, capped at 60s so a hostile
+ * milliseconds, delta-seconds or an HTTP-date, capped at 60s so a hostile
  * or mistaken header can't stall a test suite. `undefined` when absent or
  * unparseable, in which case the configured backoff applies.
  */

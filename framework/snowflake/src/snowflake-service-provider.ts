@@ -9,7 +9,7 @@ import { SEQUENTIAL_IDENTIFIER_TOKEN, SNOWFLAKE_TOKEN } from "./tokens.js";
  * `SequentialIdentifierResolver` (used when `snowflake.testing` is true).
  *
  * ORDERING: list after `CacheServiceProvider` if you set
- * `sequencing.resolver` to `"cache"` — the generator resolves `CACHE_TOKEN`
+ * `sequencing.resolver` to `"cache"`, the generator resolves `CACHE_TOKEN`
  * on first `id()`. With the default in-process memory sequencer there is
  * no ordering dependency. Call `Snowflake.configureSignature()` from your
  * own provider's `register()` (before this provider's first `id()`) if

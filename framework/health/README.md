@@ -1,6 +1,6 @@
 # @mahiframework/health
 
-Health — application health checks and readiness reporting for Mahi.
+Health, application health checks and readiness reporting for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

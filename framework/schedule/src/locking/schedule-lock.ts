@@ -19,7 +19,7 @@ interface LockRecord {
   expiresAt: number;
   /** The original (unhashed) key, so a stray lock file can be traced back to a task. */
   key: string;
-  /** The PID that took it — diagnostics only; nothing keys off it. */
+  /** The PID that took it, diagnostics only; nothing keys off it. */
   pid: number;
 }
 
@@ -27,8 +27,8 @@ interface LockRecord {
  * File-based lock for `withoutOverlapping()`, and the default locker.
  *
  * `schedule:run` spawns a fresh process every minute (cron), so there's no
- * persistent worker to hold "is the previous run still going" in memory —
- * that state has to outlive the process, and a file on disk is the
+ * persistent worker to hold "is the previous run still going" in memory.
+ * That state has to outlive the process, and a file on disk is the
  * simplest zero-infrastructure thing that does.
  *
  * Two properties this deliberately has, both of which the original
@@ -38,8 +38,8 @@ interface LockRecord {
  * it does not exist, in one syscall, failing with `EEXIST` otherwise.
  * A separate `isLocked()` check followed by a `writeFile()` is a
  * check-then-act race: two `schedule:run` processes started in the same
- * minute — which happens the moment a run takes longer than a minute and
- * cron fires the next one — both saw "not locked" and both ran.
+ * minute, which happens the moment a run takes longer than a minute and
+ * cron fires the next one, both saw "not locked" and both ran.
  *
  * **Keys are hashed, not sanitised.** Replacing unsafe characters with `_`
  * mapped distinct keys onto one filename (`0 0 * * *` and `0-0 * * *` both
@@ -48,7 +48,7 @@ interface LockRecord {
  * the file so a leftover lock is still traceable.
  *
  * Still a **single-machine** lock: the directory is local. For a lock that
- * spans hosts, configure a cache-backed locker over a shared store — see
+ * spans hosts, configure a cache-backed locker over a shared store. See
  * `CacheScheduleLocker`.
  */
 export class ScheduleLock implements ScheduleLocker {
@@ -56,8 +56,8 @@ export class ScheduleLock implements ScheduleLocker {
     private directory: string,
     /**
      * Fallback expiry, in milliseconds, for locks taken without an
-     * explicit one. A lock past its expiry is treated as abandoned — the
-     * process holding it presumably crashed — and can be taken over.
+     * explicit one. A lock past its expiry is treated as abandoned, the
+     * process holding it presumably crashed, and can be taken over.
      */
     private maxRuntimeMs = 60 * 60 * 1000, // 1 hour
   ) {}
@@ -77,7 +77,7 @@ export class ScheduleLock implements ScheduleLocker {
   /**
    * Take the lock for `key` if it is free, returning whether we got it.
    *
-   * The fast path is a single `open(..., "wx")` — atomic, and the only
+   * The fast path is a single `open(..., "wx")`, atomic, and the only
    * path that runs when nothing has crashed. `EEXIST` means someone holds
    * it: if their record is still live we simply lose; if it has expired,
    * we go through `reclaim()`, which is where the subtlety is.
@@ -102,25 +102,25 @@ export class ScheduleLock implements ScheduleLocker {
   /**
    * Take over a lock whose holder crashed without releasing it.
    *
-   * The naive version — `rm()` the expired file, then `wx` a new one — is
+   * The naive version, `rm()` the expired file, then `wx` a new one, is
    * a race with a nastier shape than the one `wx` fixes. Two processes
    * both see the expired record; A removes and creates, and then B, still
    * acting on its stale observation, removes *A's fresh lock* and creates
    * its own. Both `wx` calls succeeded, so both believe they hold the
    * lock, and the task runs twice. `wx` alone cannot prevent this, because
-   * the hazard is the unconditional `rm` — and POSIX offers no
+   * the hazard is the unconditional `rm`, and POSIX offers no
    * compare-and-delete.
    *
    * So the removal is serialised behind a second, short-lived lock file,
    * taken with the same atomic `wx`. Exactly one process is inside the
    * critical section at a time, and it **re-reads the record there**,
-   * under exclusion, before deleting anything — so B, arriving after A has
+   * under exclusion, before deleting anything, so B, arriving after A has
    * finished, sees A's live lock and backs off instead of clobbering it.
    *
    * A reclaimer that crashes mid-section leaves its own marker behind;
    * that is cleared on age, which reintroduces a race only in the case
    * where a process crashed inside a microsecond-long critical section AND
-   * another two contend more than `RECLAIM_STALE_MS` later — at which
+   * another two contend more than `RECLAIM_STALE_MS` later, at which
    * point the outcome (a task running twice after a crash) is the one the
    * expiry mechanism already accepts by design.
    */
@@ -183,14 +183,14 @@ export class ScheduleLock implements ScheduleLocker {
     try {
       writtenAt = Number(await readFile(markerPath, "utf-8"));
     } catch {
-      // Gone already — the holder finished. Retrying is fine.
+      // Gone already, the holder finished. Retrying is fine.
       return true;
     }
 
     // `createMarker` creates the file with `wx` and writes the timestamp as
     // a SECOND operation, so a marker observed between the two reads as "".
     // `Number("")` is 0, which would date the marker to 1970 and make it
-    // look stale — letting a second reclaimer delete a marker that a live
+    // look stale, letting a second reclaimer delete a marker that a live
     // one is still inside. Anything we cannot parse is therefore treated as
     // a marker that was just created, i.e. live.
     if (!Number.isFinite(writtenAt) || writtenAt === 0) {
@@ -243,7 +243,7 @@ export class ScheduleLock implements ScheduleLocker {
 
       return typeof parsed?.expiresAt === "number" ? parsed : undefined;
     } catch {
-      // Missing, unreadable, or not JSON — in every case there is no
+      // Missing, unreadable, or not JSON, in every case there is no
       // usable record, and the caller treats that as "not a live lock".
       return undefined;
     }
@@ -252,7 +252,7 @@ export class ScheduleLock implements ScheduleLocker {
   /**
    * Whether a live (unexpired) lock exists for `key`.
    *
-   * Diagnostic only — `acquire()` does its own check atomically, and
+   * Diagnostic only. `acquire()` does its own check atomically, and
    * calling this before it would reintroduce exactly the race `acquire()`
    * exists to close.
    */

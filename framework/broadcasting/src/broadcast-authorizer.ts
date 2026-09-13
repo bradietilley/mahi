@@ -25,7 +25,7 @@ export interface BroadcastAuthorizer {
   /**
    * Resolve the user a websocket connection is authenticated as, from the
    * upgrade request. Called once per connection at upgrade time. Returns
-   * `null` for an unauthenticated (guest) connection — a guest is still
+   * `null` for an unauthenticated (guest) connection. A guest is still
    * allowed to connect and subscribe to public channels, just denied every
    * `private-`/`presence-` channel.
    */

@@ -62,7 +62,7 @@ describe("Period iteration", () => {
 
 describe("Period anchoring", () => {
   it("does not let month clamping accumulate", () => {
-    // Cumulative stepping would give 31 Jan, 28 Feb, 28 Mar, 28 Apr — the
+    // Cumulative stepping would give 31 Jan, 28 Feb, 28 Mar, 28 Apr. The
     // sequence would fall off the end of the month permanently.
     const period = Period.months(at("2026-01-31T00:00:00Z"), at("2026-05-01T00:00:00Z"));
 
@@ -188,7 +188,7 @@ describe("Period and Interval", () => {
   it("respects the interval's half-open end", () => {
     const interval = Interval.between(at("2026-08-01T00:00:00Z"), at("2026-08-04T00:00:00Z"));
 
-    // The interval excludes the 4th, so the period must too — otherwise the
+    // The interval excludes the 4th, so the period must too, otherwise the
     // two abstractions would disagree about the same span.
     expect(dates(Period.fromInterval(interval))).toEqual([
       "2026-08-01",
@@ -202,7 +202,7 @@ describe("Period safety", () => {
   // Exhausting the default 100k-step budget is real work: ~1.5s on an idle
   // machine, and well past vitest's 5s default when the rest of the suite is
   // saturating the CPU. The budget is the thing under test, so raise the
-  // timeout rather than shrink it — `maxSteps` is covered cheaply below.
+  // timeout rather than shrink it. `maxSteps` is covered cheaply below.
   it("refuses to run away when a filter rejects everything", () => {
     const period = Period.recurring(at("2026-08-01T00:00:00Z"), Duration.days(1), 5)
       .filter(() => false)

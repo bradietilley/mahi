@@ -139,13 +139,13 @@ await app.bootstrap();
 await listenHttpServer(app, { port: 8000 });
 ```
 
-Provider order matters — see [Service providers](../providers/) for the
+Provider order matters. See [Service providers](../providers/) for the
 constraints and [Application lifecycle](../lifecycle/) for what `bootstrap()`
 actually does.
 
 ## Running the application
 
-For day-to-day development, use the `dev` script — it runs the server under
+For day-to-day development, use the `dev` script. It runs the server under
 `tsx watch`, so it reloads on **any** source change, not just `.env`:
 
 ```bash
@@ -153,7 +153,7 @@ npm run dev                      # http://127.0.0.1:8000, reloads on file change
 ```
 
 `./artisan serve` runs the same server without the source-file watcher (it
-only watches `.env`). Reach for it when you want to pick a host/port or run
+only watches `.env`). Use it when you want to pick a host/port or run
 outside the `dev` loop:
 
 ```bash
@@ -162,7 +162,7 @@ outside the `dev` loop:
 ./artisan serve --host 0.0.0.0
 ```
 
-Both are development servers, **not** for production — see
+Both are development servers, **not** for production. See
 [Deployment](../deployment/). Pass `--no-reload` to `serve` to disable its
 `.env` watcher.
 
@@ -185,7 +185,7 @@ npm test
 ```
 
 Tests boot the real application against a throwaway SQLite database and
-dispatch requests in-process — no server, no port. See
+dispatch requests in-process, no server, no port. See
 [Testing](../testing/).
 
 ## Upgrading

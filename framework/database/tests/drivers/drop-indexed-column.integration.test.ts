@@ -4,7 +4,7 @@ import type { Blueprint } from "../../src/schema/blueprint.js";
 
 /**
  * Dropping a column together with an index that covers it, in one
- * `Schema.table()` call — the shape every mirror-image `down()` takes.
+ * `Schema.table()` call, the shape every mirror-image `down()` takes.
  *
  * Cross-engine because the failure mode differs and only one engine is
  * loud about it: SQLite validates surviving indexes while rebuilding the

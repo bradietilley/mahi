@@ -86,7 +86,7 @@ describe("attempt counts", () => {
 });
 
 describe("what is retryable by default", () => {
-  // Every failed status retries — no allow-list. A 401 is genuinely
+  // Every failed status retries, no allow-list. A 401 is genuinely
   // retryable when middleware refreshes a token between attempts, and a
   // 409 is against an optimistic-locking API; a client cannot tell those
   // from the status alone. Predictability beats saved round trips.
@@ -343,7 +343,7 @@ describe("Retry-After", () => {
 
   it("falls back to the configured backoff for an empty header (not an immediate retry)", async () => {
     // `Number("")` is 0, so a bare `Retry-After:` must not be allowed to
-    // override the backoff with a 0ms delay — a hot retry storm against a
+    // override the backoff with a 0ms delay, a hot retry storm against a
     // server already signalling overload.
     let attempt = 0;
     const transport: Transport = async () =>

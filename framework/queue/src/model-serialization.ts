@@ -20,7 +20,7 @@ export interface ModelReference {
  * Thrown by `decodeModels()` when a referenced model no longer resolves
  * *and* that model opted into `static deleteWhenMissingModels = true`.
  * Caught by `runJobThroughMiddleware()`, which treats it as "skip this
- * job successfully" — the job is removed from the queue without running
+ * job successfully". The job is removed from the queue without running
  * and without being marked failed. Not exported from the package: it's an
  * internal control-flow signal, never something a job author handles.
  */
@@ -50,16 +50,16 @@ function isModelReference(value: unknown): value is ModelReference {
  * Walks a job payload and replaces every live `Model` instance (and any
  * `Model` inside a `Collection` or array) with a `{ __model, __id }`
  * reference, leaving all other data untouched. Runs synchronously at
- * dispatch time — *before* the payload reaches a driver's `JSON.stringify`,
+ * dispatch time, *before* the payload reaches a driver's `JSON.stringify`,
  * so a durable driver persists the small reference, not the model's full
  * `toJSON()` attribute dump.
  *
  * A model whose class has no `static morphName` throws here (loudly, at
- * dispatch) rather than being silently serialized as opaque data — you
+ * dispatch) rather than being silently serialized as opaque data. You
  * can't accidentally enqueue an unserializable model.
  *
  * Only `Model`/`Collection` instances are transformed; other class
- * instances pass through untouched (predictable — no surprising deep
+ * instances pass through untouched (predictable, no surprising deep
  * traversal of arbitrary objects). Plain objects and arrays are recursed.
  */
 export function encodeModels(payload: unknown, registry: ModelRegistry): unknown {
@@ -132,8 +132,8 @@ function encodeValue(value: unknown, registry: ModelRegistry, seen: WeakSet<obje
  *
  *   - `false` (the default) throws `ModelNotFoundError`, and the worker
  *     treats that as a **failure of this job**: it goes to `failed_jobs`
- *     with the error, and the worker carries on. It is not retried —
- *     the row will still be missing next time.
+ *     with the error, and the worker carries on. It is not retried.
+ *     The row will still be missing next time.
  *   - `true` throws `SkipJobMissingModelError` and the worker deletes the
  *     job without running or failing it: "this work no longer applies".
  *
@@ -232,7 +232,7 @@ function rehydrateValue(value: unknown, loaded: Map<string, Map<string, Model>>)
 }
 
 /**
- * A "plain" data object — one worth recursing into. Excludes class
+ * A "plain" data object, one worth recursing into. Excludes class
  * instances (whose prototype isn't `Object.prototype`/`null`), so a
  * `Model` proxy, `DateTime`, `Collection`, etc. are never walked as if
  * they were anonymous data bags. `Model`/`Collection` are handled by

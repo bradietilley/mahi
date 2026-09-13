@@ -80,13 +80,13 @@ describe("ConsoleKernel", () => {
 
   /**
    * The program name appears in `Usage:` and in Commander's "unknown command"
-   * errors — the text a confused user retypes. Hardcoding it meant a shipped
+   * errors, the text a confused user retypes. Hardcoding it meant a shipped
    * binary called itself `console` whatever the user had named it.
    */
   it("names itself after the executable unless told otherwise", async () => {
     const app = new Application();
 
-    // Derived from the argv being parsed — NOT from this process's argv, which
+    // Derived from the argv being parsed, NOT from this process's argv, which
     // in a test is the test runner's.
     const derived = new ConsoleKernel(app);
     expect(derived.helpText(["bun", "/$bunfs/root/hivemind"])).toContain("Usage: hivemind");
@@ -131,14 +131,14 @@ describe("ConsoleKernel", () => {
   });
 
   /**
-   * Commander throws on a duplicate name, and it throws during `build()` —
+   * Commander throws on a duplicate name, and it throws during `build()`,
    * so before this, an application that named a command `serve` did not lose
    * that command, it failed to boot AT ALL, `--help` included.
    *
    * The framework cannot know which names an application needs. It keeps its
    * own surface namespaced (`route:list`, `queue:work`, `maintenance:down`)
-   * so a clash is unlikely, but the bare names it does ship — `serve`,
-   * `migrate`, `test` — are ordinary enough that an app may want them, and
+   * so a clash is unlikely, but the bare names it does ship, `serve`,
+   * `migrate`, `test`, are ordinary enough that an app may want them, and
    * reserving those would let the framework dictate an app's interface.
    */
   it("lets a later command replace an earlier one of the same name", () => {
@@ -225,7 +225,7 @@ describe("ConsoleKernel", () => {
     const app = new Application();
     const kernel = new ConsoleKernel(app, { mode: "user" });
     kernel.addCommand(ScaffoldCommand);
-    // A second, non-devOnly command so the program has subcommands at all —
+    // A second, non-devOnly command so the program has subcommands at all,
     // otherwise Commander treats the argument as a stray operand rather than
     // an unknown command, and the test would pass for the wrong reason.
     kernel.addCommand(RealCommand);

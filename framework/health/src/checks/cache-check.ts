@@ -6,8 +6,8 @@ import type { CacheManagerLike } from "./contracts.js";
  * Round-trips a unique value through the default cache store.
  *
  * A round trip, **not** a bare `put`. A `put` that succeeds against a
- * store whose reads are broken — a full disk under `FileCacheStore`, a
- * Redis replica that accepts writes and discards them — reports healthy.
+ * store whose reads are broken, a full disk under `FileCacheStore`, a
+ * Redis replica that accepts writes and discards them, reports healthy.
  * Reading back a value only this invocation could have written is the
  * only assertion that catches that.
  *

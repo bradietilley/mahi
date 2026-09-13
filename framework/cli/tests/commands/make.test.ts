@@ -237,7 +237,7 @@ describe("make:* generators", () => {
     expect(migration).toBeDefined();
     const contents = await read(migration!);
     expect(contents).not.toContain('"..."');
-    // No live DDL — only commented guidance.
+    // No live DDL, only commented guidance.
     expect(contents).not.toMatch(/^\s*await Schema\./m);
   });
 

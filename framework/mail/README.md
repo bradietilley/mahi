@@ -1,6 +1,6 @@
 # @mahiframework/mail
 
-Mail — mailables and transports for sending email from Mahi.
+Mail, mailables and transports for sending email from Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

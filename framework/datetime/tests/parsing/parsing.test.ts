@@ -26,7 +26,7 @@ describe("parsing", () => {
     it("parses fractional seconds and truncates below milliseconds", () => {
       expect(DateTime.parse("2026-08-20T14:30:00.123Z", "UTC").millisecond).toBe(123);
       expect(DateTime.parse("2026-08-20T14:30:00.1Z", "UTC").millisecond).toBe(100);
-      // Truncated, not rounded — rounding up could roll into the next second.
+      // Truncated, not rounded, rounding up could roll into the next second.
       expect(DateTime.parse("2026-08-20T14:30:00.999999Z", "UTC").millisecond).toBe(999);
     });
 

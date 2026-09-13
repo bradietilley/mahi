@@ -1,7 +1,7 @@
 import type { RenderedMail } from "./mail-transport.js";
 
 /**
- * The result of a transport accepting a message for delivery — the return
+ * The result of a transport accepting a message for delivery. The return
  * value of `MailTransport.send()` / `MailManager.send()`.
  *
  * `messageId` is the transport-assigned identifier (SMTP's `Message-ID`
@@ -20,7 +20,7 @@ export interface SentMessage {
   /**
    * `true` when the send was **deferred** until an enclosing
    * `DB.transaction()` commits (`Mailable.afterCommit()` / mail config
-   * `afterCommit`) — the transport hasn't run yet, so `messageId`/
+   * `afterCommit`). The transport hasn't run yet, so `messageId`/
    * `accepted`/`rejected` are placeholders and only `original` is
    * meaningful. Absent (falsy) for a message that was actually sent.
    */

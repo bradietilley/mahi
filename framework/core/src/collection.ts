@@ -1,14 +1,14 @@
 /**
- * Ordered-map collection wrapper — a near 1:1 port of Laravel's
+ * Ordered-map collection wrapper, a near 1:1 port of Laravel's
  * `Illuminate\Support\Collection` (`Collection.php` +
  * `Traits/EnumeratesValues.php` + `Traits/Conditionable.php`).
  *
  * PHP arrays are ordered maps (`array-key => value`), which is why
  * Laravel's Collection has key-based methods (`get`/`put`/`has`/`forget`/
  * `keys`/`keyBy`) alongside list-style ones (`push`/`map`/`filter`).
- * To support that faithfully — e.g. `Collection.make(users).keyBy("email")`
+ * To support that faithfully, e.g. `Collection.make(users).keyBy("email")`
  * returning a further-chainable `Collection<UserRow, string>`, not a
- * native `Map` — this class stores its items in an internal ordered
+ * native `Map`. This class stores its items in an internal ordered
  * `Map<K, V>`, not a plain array. `K` defaults to `number` so a
  * freshly-`.make()`d collection behaves like a normal 0-indexed list
  * (mirroring PHP's default array keys), and re-keying operations
@@ -25,11 +25,11 @@
  * returned by `.make()`, never the caller's original array/iterable.
  *
  * `push`/`unshift`/`add`/`pop`/`shift` are only available when
- * `K = number` (a "list-shaped" collection) — TypeScript enforces this
+ * `K = number` (a "list-shaped" collection), TypeScript enforces this
  * at the type level rather than silently reinterpreting keys the way
  * PHP does when you `array_push()` onto a string-keyed array.
  *
- * Not ported (no meaningful TS equivalent — see PR/plan discussion):
+ * Not ported (no meaningful TS equivalent. See PR/plan discussion):
  * `dd`/`dump` (use `console.log`), `__toString`/`escapeWhenCastingToString`
  * (Blade-specific), `getCachingIterator` (SPL internals), `ArrayAccess`
  * offset* methods (use `get`/`put`/`has`/`forget` instead), `Macroable`
@@ -38,7 +38,7 @@
  * `collapseWithKeys()`, `value()` (redundant with real TS types),
  * deprecated `containsOneItem`/`containsManyItems` aliases, `dot`/`undot`,
  * the `*Assoc`/`*Keys`/`intersectByKeys` set-op variants, and
- * `HigherOrderCollectionProxy` (dynamic `__call`-forwarding — same
+ * `HigherOrderCollectionProxy` (dynamic `__call`-forwarding, same
  * rejection category as facades). All strict/loose (`*Strict`) pairs are
  * collapsed into a single strict-only (`===`) implementation, since
  * idiomatic TS doesn't use PHP's loose `==`.
@@ -60,7 +60,7 @@ export class MultipleItemsFoundError extends Error {
   }
 }
 
-/** A value, or a thunk producing one — mirrors Laravel's `value($default)` helper for lazy defaults. */
+/** A value, or a thunk producing one, mirrors Laravel's `value($default)` helper for lazy defaults. */
 type MaybeThunk<T> = T | (() => T);
 
 function resolveThunk<T>(value: MaybeThunk<T>): T {
@@ -139,13 +139,13 @@ export class Collection<V, K extends PropertyKey = number> {
     this.nextIndex = nextIndex;
   }
 
-  /** Build a Collection from a plain array — items are keyed `0, 1, 2, ...`, matching PHP's default list-array keys. */
+  /** Build a Collection from a plain array. Items are keyed `0, 1, 2, ...`, matching PHP's default list-array keys. */
   static make<V>(items: readonly V[]): Collection<V, number>;
   /**
    * Clone an existing Collection, preserving both keys and value type.
    * Declared explicitly because a `Collection` iterates its *values*, not
-   * `[key, value]` entries, so it matches neither of the other overloads
-   * — even though the implementation has always special-cased it (the
+   * `[key, value]` entries, so it matches neither of the other overloads,
+   * even though the implementation has always special-cased it (the
    * `items instanceof Collection` branch below).
    */
   static make<V, K extends PropertyKey>(items: Collection<V, K>): Collection<V, K>;
@@ -270,7 +270,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return true;
   }
 
-  /** Get all items as a plain array (values only, keys discarded) — matches Laravel's `all()`/`toArray()` for list-shaped collections. */
+  /** Get all items as a plain array (values only, keys discarded), matches Laravel's `all()`/`toArray()` for list-shaped collections. */
   all(): V[] {
     return [...this.items.values()];
   }
@@ -279,7 +279,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return this.all();
   }
 
-  /** Serialize to a plain array of values — makes `JSON.stringify(collection)` work automatically. */
+  /** Serialize to a plain array of values, makes `JSON.stringify(collection)` work automatically. */
   toJSON(): V[] {
     return this.all();
   }
@@ -509,7 +509,7 @@ export class Collection<V, K extends PropertyKey = number> {
     const removed: V[] = [];
 
     // Laravel's `pop($count)` returns the removed items in the order they
-    // were popped — last item first — so `pop(2)` on `[1,2,3,4,5]` yields
+    // were popped, last item first, so `pop(2)` on `[1,2,3,4,5]` yields
     // `[5,4]`, not `[4,5]`. Walk the removed keys back-to-front.
     for (let i = removedKeys.length - 1; i >= 0; i--) {
       const k = removedKeys[i]!;
@@ -556,7 +556,7 @@ export class Collection<V, K extends PropertyKey = number> {
 
   /**
    * Splice a portion of the underlying collection, optionally replacing
-   * it — mutates `this` and **returns the removed portion**, exactly
+   * it, mutates `this` and **returns the removed portion**, exactly
    * like `array_splice`/Laravel's `splice()` (not a pure `toSpliced`).
    * Only available on list-shaped collections.
    */
@@ -613,8 +613,8 @@ export class Collection<V, K extends PropertyKey = number> {
   /**
    * Transform values while keeping every key exactly as it is.
    *
-   * `map()` renumbers — it always returns a list-shaped
-   * `Collection<U, number>` — which is what you want for a list and
+   * `map()` renumbers, it always returns a list-shaped
+   * `Collection<U, number>`, which is what you want for a list and
    * silently wrong for a keyed collection, since the keys are the point.
    * The alternative was `mapWithKeys((v, k) => [k, f(v)])`, which restates
    * the key only to say "unchanged" and quietly rebuilds the collection
@@ -622,8 +622,8 @@ export class Collection<V, K extends PropertyKey = number> {
    *
    *   const c = Collection.make(new Map(Object.entries({ a: 1, b: 2 })));
    *
-   *   c.mapValues((n) => n * 2);  // keys a, b — values 2, 4
-   *   c.map((n) => n * 2);        // keys 0, 1 — values 2, 4
+   *   c.mapValues((n) => n * 2);  // keys a, b, values 2, 4
+   *   c.map((n) => n * 2);        // keys 0, 1, values 2, 4
    *
    * Note the `new Map(...)`: `Object.entries()` returns an *array*, so
    * `make()` takes the array overload and produces a list of `[k, v]`
@@ -759,7 +759,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return result;
   }
 
-  /** Filter items by a predicate (or, with no args, drop falsy items — matches PHP's `array_filter`). */
+  /** Filter items by a predicate (or, with no args, drop falsy items, matches PHP's `array_filter`). */
   filter(callback?: (item: V, key: K) => boolean): Collection<V, K> {
     const test = callback ?? ((item: V) => Boolean(item));
     const map = new Map<K, V>();
@@ -824,7 +824,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return this.filter((item) => item[key] < min || item[key] > max);
   }
 
-  /** Filter the items, keeping only those that are instances of the given constructor(s) — narrows the item type. */
+  /** Filter the items, keeping only those that are instances of the given constructor(s), narrows the item type. */
   whereInstanceOf<U extends V>(ctor: new (...args: any[]) => U): Collection<U, K> {
     return this.filter((item) => item instanceof ctor) as unknown as Collection<U, K>;
   }
@@ -996,7 +996,7 @@ export class Collection<V, K extends PropertyKey = number> {
   /** Throw if any item fails the given type check (constructor, or a predicate). */
   ensure(check: (new (...args: any[]) => unknown) | ((item: V) => boolean)): this {
     // A class (has a non-empty `.prototype`) is an `instanceof` check; a
-    // plain function is a predicate. Never *call* a class — invoking one
+    // plain function is a predicate. Never *call* a class, invoking one
     // without `new` throws "Class constructor cannot be invoked without
     // 'new'", masking the real "item failed the check" error.
     const isClass =
@@ -1529,7 +1529,7 @@ export class Collection<V, K extends PropertyKey = number> {
     });
   }
 
-  /** Merge with the given items — later values win on key collision. Returns a new Collection. */
+  /** Merge with the given items, later values win on key collision. Returns a new Collection. */
   merge(items: Collection<V, K> | Iterable<readonly [K, V]> | readonly V[]): Collection<V, K> {
     const map = new Map(this.items);
 
@@ -1540,7 +1540,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return this.newInstance(map, nextIndexFor(map, this.nextIndex));
   }
 
-  /** Recursively merge with the given items — array/object values at the same key are merged deeply. */
+  /** Recursively merge with the given items, array/object values at the same key are merged deeply. */
   mergeRecursive(
     items: Collection<V, K> | Iterable<readonly [K, V]> | readonly V[],
   ): Collection<V, K> {
@@ -1554,7 +1554,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return this.newInstance(map, nextIndexFor(map, this.nextIndex));
   }
 
-  /** Union with the given items — existing keys are NOT overwritten (opposite bias from `merge`). */
+  /** Union with the given items, existing keys are NOT overwritten (opposite bias from `merge`). */
   union(items: Collection<V, K> | Iterable<readonly [K, V]> | readonly V[]): Collection<V, K> {
     const map = new Map(this.items);
 
@@ -1567,7 +1567,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return this.newInstance(map, nextIndexFor(map, this.nextIndex));
   }
 
-  /** Replace items at matching keys with the given items (like `merge`, but only for values already present would be identical — matches PHP's `array_replace`: adds new keys too). */
+  /** Replace items at matching keys with the given items (like `merge`, but only for values already present would be identical, matches PHP's `array_replace`: adds new keys too). */
   replace(items: Collection<V, K> | Iterable<readonly [K, V]> | readonly V[]): Collection<V, K> {
     return this.merge(items);
   }
@@ -1681,7 +1681,7 @@ export class Collection<V, K extends PropertyKey = number> {
     return Collection.make(out);
   }
 
-  /** Pad to `size` with `value` — positive `size` pads at the end, negative pads at the start. */
+  /** Pad to `size` with `value`, positive `size` pads at the end, negative pads at the start. */
   pad(size: number, value: V): Collection<V, number> {
     const values = this.all();
     const diff = Math.abs(size) - values.length;
@@ -1828,8 +1828,8 @@ export class Collection<V, K extends PropertyKey = number> {
 
   // `R` (callback) and `D` (default) are independent type parameters. With
   // a single shared `R`, the two branches are forced to agree, so the
-  // natural `when(cond, (c) => c.count(), () => "default")` — a number from
-  // one arm, a string from the other — fails to compile. The return type is
+  // natural `when(cond, (c) => c.count(), () => "default")`, a number from
+  // one arm, a string from the other, fails to compile. The return type is
   // the union of whichever arms can actually run.
   when<R = this, D = this>(
     value: unknown,
@@ -1936,7 +1936,7 @@ function defaultCompare(a: unknown, b: unknown): number {
     return an < bn ? -1 : an > bn ? 1 : 0;
   }
 
-  // One side numeric, the other not — order all numerics before non-numerics.
+  // One side numeric, the other not, order all numerics before non-numerics.
   if (an !== undefined) {
     return -1;
   }

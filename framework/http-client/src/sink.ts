@@ -8,7 +8,7 @@ export type Sink = string | WritableStream<Uint8Array>;
  * Drains `response` into `sink`.
  *
  * For a real network response the body is piped straight through, so a
- * large download never lands in memory, and `undefined` is returned —
+ * large download never lands in memory, and `undefined` is returned,
  * `body()` on the resulting `ClientResponse` is empty, which is the point
  * of asking for a sink.
  *

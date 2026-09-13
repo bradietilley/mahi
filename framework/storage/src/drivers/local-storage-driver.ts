@@ -9,20 +9,20 @@ import { FileNotFoundException } from "../exceptions.js";
 import type { StorageDriver, StreamSource } from "../storage-driver.js";
 
 /**
- * Filesystem-backed `StorageDriver` — the only built-in driver in the
+ * Filesystem-backed `StorageDriver`, the only built-in driver in the
  * first pass (S3/streaming uploads are deferred). All paths are resolved
- * relative to `root` and guarded against path traversal escaping it — a
+ * relative to `root` and guarded against path traversal escaping it, a
  * real security requirement, not just API surface.
  *
  * The guard is two-layered: a lexical `path.resolve` check rejects `..`
- * segments and absolute paths, and — because a lexical check alone is
+ * segments and absolute paths, and, because a lexical check alone is
  * fooled by a symlink inside the root pointing outside it (`link.txt ->
- * ../../secret`) — every read/write also `realpath`s the resolved target
+ * ../../secret`), every read/write also `realpath`s the resolved target
  * (or its nearest existing ancestor, for a not-yet-created file) and
  * re-checks it against the `realpath`'d root before touching the disk.
  *
  * Pass `urlPrefix` (the disk's `url` config key) to make `url()` return
- * an HTTP URL instead of a filesystem path — that's the Laravel "public"
+ * an HTTP URL instead of a filesystem path. That's the Laravel "public"
  * disk. Omit it for a private disk.
  */
 export class LocalStorageDriver implements StorageDriver {
@@ -32,7 +32,7 @@ export class LocalStorageDriver implements StorageDriver {
   ) {}
 
   /**
-   * Lexical containment check only — rejects `..`/absolute escapes but is
+   * Lexical containment check only, rejects `..`/absolute escapes but is
    * blind to symlinks. Callers that touch the filesystem must additionally
    * go through `resolveReal()`; this is the cheap synchronous guard used by
    * `url()`/`path()` (which return a location without dereferencing it).
@@ -59,7 +59,7 @@ export class LocalStorageDriver implements StorageDriver {
     const full = this.resolve(path);
     const rootReal = await fs.realpath(pathModule.resolve(this.root));
 
-    // Refuse a *dangling* symlink at the target — one pointing at a
+    // Refuse a *dangling* symlink at the target, one pointing at a
     // not-yet-existent file. Its `realpath` is ENOENT, so the walk below
     // would fall through to checking the (in-root) parent and wrongly allow
     // a `put()` to write through it to an outside path. A symlink whose
@@ -76,7 +76,7 @@ export class LocalStorageDriver implements StorageDriver {
 
     let existing = full;
 
-    // Walk up to the nearest ancestor that exists — the file itself may not
+    // Walk up to the nearest ancestor that exists. The file itself may not
     // (a `put()` of a new path); its parent chain still must not escape.
     for (;;) {
       try {

@@ -9,7 +9,7 @@ export interface ScheduleConfig {
    * Lock *files* are local to one machine, so two hosts running the
    * scheduler each take their own copy of "the" lock and both run the
    * task. Point this at a store that is shared and atomic across
-   * processes — Redis — and the lock becomes global, which is what makes
+   * processes, Redis, and the lock becomes global, which is what makes
    * running the scheduler on more than one host safe.
    *
    * Leave it unset for the usual single-host deployment. An in-memory

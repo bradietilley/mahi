@@ -128,7 +128,7 @@ describe("RateLimiter", () => {
       // TTL and reports it created (added=true), but the entry expires
       // before increment() reads it, so increment() recreates it with no
       // expiry. The old re-seed guard (`!added && ...`) skipped re-pinning
-      // exactly this case, leaving the counter — and the lockout — forever.
+      // exactly this case, leaving the counter, and the lockout, forever.
       const realAdd = store.add.bind(store);
       let raced = false;
       store.add = async (key, value, ttl) => {
@@ -242,7 +242,7 @@ describe("RateLimiter", () => {
 
     it("resolves duplicate keys across stacked limits to each limit's fallbackKey()", async () => {
       const limiter = buildLimiter();
-      // Two limits with no explicit .by() both default to key "" — a collision.
+      // Two limits with no explicit .by() both default to key "", a collision.
       const expectedFallbackA = Limit.perMinute(10).fallbackKey();
       const expectedFallbackB = Limit.perDay(1000).fallbackKey();
 

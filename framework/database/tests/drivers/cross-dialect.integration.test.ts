@@ -16,7 +16,7 @@ import type { Blueprint } from "../../src/schema/blueprint.js";
  *
  * The SQLite suites elsewhere in this directory cover behaviour; this
  * one exists to catch the things that are only wrong on a *different*
- * engine — SQL this framework spells for one dialect and no other.
+ * engine, SQL this framework spells for one dialect and no other.
  * Every case here was a real failure against live MySQL 8 / Postgres
  * 16 before the dialect work landed: MySQL rejecting ISO-`Z`
  * timestamps, Postgres returning no `insertId`, `"quoted"` correlation
@@ -76,7 +76,7 @@ for (const engine of ENGINES) {
     }
 
     /**
-     * A model whose every interesting column is cast — the fixture for
+     * A model whose every interesting column is cast, the fixture for
      * the builder-binding cases (C11 below). Deliberately separate from
      * `Post`, whose `created_at`/`updated_at` are cast to `string` so the
      * timestamp cases can assert on the raw spelling.
@@ -296,7 +296,7 @@ for (const engine of ENGINES) {
 
       expect(post.id).toBeDefined();
       expect(post.id).not.toBeNull();
-      // Same representation on every engine — PG's int8 would otherwise
+      // Same representation on every engine, PG's int8 would otherwise
       // hand back the string "1".
       expect(typeof post.id).toBe("number");
 
@@ -540,7 +540,7 @@ for (const engine of ENGINES) {
       // The bug this pins down only ever appeared under a non-UTC
       // process timezone: both drivers parsed a zone-less column into a
       // JS `Date` in LOCAL time, so a value stored as 07:31:37 UTC came
-      // back 8 hours out under Asia/Shanghai — and saving it wrote the
+      // back 8 hours out under Asia/Shanghai, and saving it wrote the
       // shifted value back, drifting the row on every update.
       //
       // The suite is normally run under the machine's own zone, so the
@@ -571,7 +571,7 @@ for (const engine of ENGINES) {
       // The test above writes a pre-formatted string, so it never
       // exercises the cast's own `toDatabaseType`. H8's actual repro was
       // `TZ=Asia/Shanghai` with a real `DateTime` going through the
-      // cast in both directions — write, read back, and compare the
+      // cast in both directions, write, read back, and compare the
       // instant. A driver that formats in local time drifts by 8 hours
       // here while the UTC-only assertion above stays green.
       const original = process.env.TZ;
@@ -603,7 +603,7 @@ for (const engine of ENGINES) {
           "2026-09-02T07:31:37.000Z",
         );
 
-        // Re-saving must not drift it — the bug re-shifted on every update.
+        // Re-saving must not drift it, the bug re-shifted on every update.
         reread.active = false;
         await reread.save();
         const afterSave = await Widget.query().where("name", "TzRoundTrip").firstOrFail();
@@ -640,7 +640,7 @@ for (const engine of ENGINES) {
     it("whereNotIn() with an empty list matches everything", async () => {
       // The mirror of the case above, and the easier one to get wrong:
       // "not in the empty set" is true for every row, so the clause must
-      // compile to a tautology rather than to `NOT IN ()` — a syntax
+      // compile to a tautology rather than to `NOT IN ()`, a syntax
       // error on MySQL and Postgres alike.
       await Post.create({ title: "A", views: 1 });
       await Post.create({ title: "B", views: 2 });
@@ -676,7 +676,7 @@ for (const engine of ENGINES) {
     });
 
     it("an outer rollback discards a committed inner savepoint (C2)", async () => {
-      // A released savepoint is not durable on its own — the outer
+      // A released savepoint is not durable on its own. The outer
       // rollback must still take the inner work with it.
       await expect(
         transaction(h.driver.kysely, async () => {
@@ -807,7 +807,7 @@ for (const engine of ENGINES) {
     });
 
     it("toggle() flips membership both ways (X8)", async () => {
-      // Both halves in one call — an attach and a detach in the same
+      // Both halves in one call, an attach and a detach in the same
       // statement pair, against the same pivot. The diff is computed
       // from driver-returned keys, so this is the same per-engine key
       // type hazard `sync()` has.
@@ -830,7 +830,7 @@ for (const engine of ENGINES) {
       // while every engine here hands auto-increment keys back as
       // numbers. The pivot diff compares the two, so a strict `===`
       // would see no overlap and attach a duplicate instead of
-      // detaching — on every engine, silently.
+      // detaching, on every engine, silently.
       const ada = await Author.create({ name: "Ada" });
       const a = await Tag.create({ label: "a" });
       const b = await Tag.create({ label: "b" });
@@ -935,12 +935,12 @@ for (const engine of ENGINES) {
       expect(Number(reloaded!.author_id)).toBe(Number(grace.id));
     });
 
-    // C11 — the query builder applies the model's casts to its bindings
+    // C11. The query builder applies the model's casts to its bindings
     //
     // `EloquentBuilder` used to pass values straight through to
     // `QueryBuilder`, which is model-unaware. A `DateTime` or a JSON
     // object therefore bound as itself: SQLite and MySQL reject both
-    // outright, while Postgres's `pg` serialises them silently — so the
+    // outright, while Postgres's `pg` serialises them silently, so the
     // same code threw on two engines and "worked" on the third.
     //
     // Booleans are why this hid for so long: the SQLite driver coerces
@@ -1077,7 +1077,7 @@ for (const engine of ENGINES) {
 
     it("binds a DateTime on an UNCAST column, which casts cannot reach", async () => {
       // `xd_posts` declares no datetime cast, so this exercises the
-      // normalisation layer alone — the `PersonalAccessToken` shape.
+      // normalisation layer alone, the `PersonalAccessToken` shape.
       // The bound comparand is relative to `created_at`'s own stamping,
       // so it has to be anchored to now rather than a fixed date.
       await Post.create({ title: "dated", views: 1 });

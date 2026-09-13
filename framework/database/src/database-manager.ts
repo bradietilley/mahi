@@ -8,12 +8,12 @@ import { getActiveTransaction } from "./transaction-context.js";
 
 /**
  * A single connection's config. The only field the framework itself reads
- * is `driver` — which built-in (or plugin-registered) driver builds this
+ * is `driver`, which built-in (or plugin-registered) driver builds this
  * connection. Everything else (`filename`, `host`, `database`, ...) is
  * passed straight to that driver's constructor.
  *
  * `driver` may be omitted when the connection's *name* is the driver
- * type — the `connections: { sqlite: { ... } }` shorthand, the same
+ * type, the `connections: { sqlite: { ... } }` shorthand, the same
  * convention `AuthManager.guardDriver()` follows for guards.
  */
 export interface ConnectionConfig {
@@ -29,12 +29,12 @@ export interface DatabaseConfig {
 /**
  * Resolves named database connections. The "default" connection is just
  * the one used when `driver()`/`connection()` is called without an
- * explicit name — other named connections can be resolved and used
+ * explicit name, other named connections can be resolved and used
  * simultaneously (e.g. a secondary analytics sqlite file).
  *
  * Built-in drivers are registered via `extend()` by
  * DatabaseServiceProvider, exactly the same way a plugin would register an
- * additional connection type — no string-to-method dispatch magic.
+ * additional connection type, no string-to-method dispatch magic.
  */
 export class DatabaseManager extends Manager<DatabaseDriver> {
   constructor(
@@ -48,7 +48,7 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
     return this.config.default;
   }
 
-  /** Domain-flavored alias for `driver()` — reads more naturally for DB code. */
+  /** Domain-flavored alias for `driver()`, reads more naturally for DB code. */
   connection(name?: string): DatabaseDriver {
     return this.driver(name);
   }
@@ -76,7 +76,7 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
   }
 
   /**
-   * The driver *type* for a connection — its `driver` field, or the
+   * The driver *type* for a connection, its `driver` field, or the
    * connection name itself when `driver` is omitted (the name-equals-driver
    * shorthand).
    */
@@ -85,11 +85,11 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
   }
 
   /**
-   * A `QueryBuilder` bound to `name` — the model-free entry point into the
+   * A `QueryBuilder` bound to `name`, the model-free entry point into the
    * low-level builder, Laravel's `DB::table()`. No `Model` involved, so no
    * hydration into instances, no casts, no lifecycle events, no relations
-   * (`with()`/`whereHas()`), and **no global scopes** — a `SoftDeletes`
-   * model's rows come back including the soft-deleted ones. Reach for
+   * (`with()`/`whereHas()`), and **no global scopes**, a `SoftDeletes`
+   * model's rows come back including the soft-deleted ones. Use
    * `Model.query()` whenever a model for the table exists; reach here for
    * tables that have no model (pivots, reporting views, ad-hoc reads).
    *
@@ -112,14 +112,14 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
   }
 
   /**
-   * A `QueryBuilder` with **no table bound yet** — Laravel's `DB::query()`.
+   * A `QueryBuilder` with **no table bound yet**, Laravel's `DB::query()`.
    * Call `.table(name)` before any terminal, or that terminal throws
    * ("no table bound"). `DB.table(name)` is the direct form and is what
    * you want unless the table genuinely isn't known at construction.
    *
    * Note `QueryBuilder.table()` returns `QueryBuilder<Record<string, any>>`
    * rather than `this` (switching tables invalidates the row type), so a
-   * `TRow` passed here is discarded by the `.table()` call that follows —
+   * `TRow` passed here is discarded by the `.table()` call that follows.
    * `DB.table<UserTable>("users")` is the typed path, not
    * `DB.query<UserTable>().table("users")`.
    */
@@ -140,7 +140,7 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
    * `transaction-context.ts`), identical to `Model.resolveConnection()`.
    * So `DB.table("users").insert(...)` inside a `DB.transaction()`
    * participates in that transaction and rolls back with it, exactly
-   * like a static `Model` call would — and `DB.table("events",
+   * like a static `Model` call would, and `DB.table("events",
    * "analytics")` inside `DB.transaction(cb, "analytics")` joins the
    * analytics transaction, while a *default*-connection query inside it
    * correctly does not.
@@ -158,7 +158,7 @@ export class DatabaseManager extends Manager<DatabaseDriver> {
    * resolving the driver (default, or `driverName` if given) for you.
    * Equivalent to `transaction(this.driver(driverName).kysely, callback)`.
    * Static `Model` calls (`Todo.create(...)`, etc.) made inside the
-   * callback automatically participate — see `transaction()`'s docstring.
+   * callback automatically participate. See `transaction()`'s docstring.
    */
   async transaction<T>(
     callback: (trx: Transaction<any>) => Promise<T>,

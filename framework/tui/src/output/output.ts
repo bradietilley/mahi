@@ -1,5 +1,5 @@
 /**
- * Output abstraction — port of `laravel/prompts`' `Output/ConsoleOutput.php`
+ * Output abstraction, port of `laravel/prompts`' `Output/ConsoleOutput.php`
  * trailing-newline tracking, needed for the "always exactly 2 blank
  * lines between prompts" spacing rule. `writeDirectly` is for raw
  * cursor-movement/erase escape codes that shouldn't count toward the

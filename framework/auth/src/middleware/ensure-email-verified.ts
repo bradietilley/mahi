@@ -7,7 +7,7 @@ import { hasVerifiedEmail } from "../verification/email-verification.js";
 /**
  * Require the authenticated user to have a verified email, else 403.
  *
- * Per-route opt-in, the same shape as `authenticate()` — place it AFTER
+ * Per-route opt-in, the same shape as `authenticate()`, place it AFTER
  * `authenticate()` in the pipe list, since it reads the user that
  * middleware resolves into the ambient auth scope. A guest (no user)
  * 401s, matching the "authenticate differently could fix a 401,

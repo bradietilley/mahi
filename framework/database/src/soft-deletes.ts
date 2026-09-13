@@ -1,5 +1,5 @@
 /**
- * Soft deletes are configuration now — `Model<A>()({ softDeletes: true })`
+ * Soft deletes are configuration now, `Model<A>()({ softDeletes: true })`
  * (or `{ column }`) installs the global scope and enables the builder /
  * instance soft-delete behaviour. This module re-exports the scope class
  * for `withoutGlobalScope(SoftDeleteScope)` and documents the surface.
@@ -11,7 +11,7 @@
  *
  *   class Todo extends Model<TodoAttributes>()({ table: "todos", softDeletes: true }) {}
  *
- *   await todo.delete();               // soft delete — sets deleted_at
+ *   await todo.delete();               // soft delete, sets deleted_at
  *   await Todo.all();                  // excludes soft-deleted rows automatically
  *   await Todo.withTrashed().get();    // includes them
  *   await todo.restore();              // un-deletes

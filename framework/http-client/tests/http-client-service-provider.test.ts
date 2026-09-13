@@ -190,7 +190,7 @@ describe("events", () => {
     bootApp();
     Http.fake({ "*": { ok: true } });
 
-    // @mahiframework/events stays an optional peer — a missing dispatcher must not
+    // @mahiframework/events stays an optional peer. A missing dispatcher must not
     // fail the request.
     await expect(Http.get("https://x.test/")).resolves.toBeDefined();
   });

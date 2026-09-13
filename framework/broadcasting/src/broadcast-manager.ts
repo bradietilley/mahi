@@ -28,7 +28,7 @@ function isWebSocketInjectable(driver: unknown): driver is WebSocketInjectable {
 /**
  * Resolves named broadcast connections, synchronously, exactly like
  * `CacheManager`/`QueueManager`. Built-in drivers are registered via
- * `extend()` by `BroadcastServiceProvider` — the same mechanism a plugin
+ * `extend()` by `BroadcastServiceProvider`, the same mechanism a plugin
  * uses to add e.g. a `"redis"` driver later, which is the documented
  * answer to `LocalBroadcastDriver`'s single-process limitation.
  */
@@ -60,7 +60,7 @@ export class BroadcastManager extends Manager<BroadcastDriver> {
 
   /**
    * Hand the running Node server to the default (or named) driver, if it
-   * needs one — see `WebSocketInjectable`. Called from the app's
+   * needs one. See `WebSocketInjectable`. Called from the app's
    * entrypoint right after `serve()`:
    *
    *   const server = serve({ fetch: kernel.raw().fetch, port });

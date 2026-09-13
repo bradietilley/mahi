@@ -241,7 +241,7 @@ describe("immutability", () => {
     expect(last().headers.get("authorization")).toBe("Bearer secret");
 
     // The base never saw withToken, and its body/payload state was not
-    // consumed by the send — Laravel nulls pendingBody on send, making a
+    // consumed by the send, Laravel nulls pendingBody on send, making a
     // configured client unsafe to reuse.
     await base.post("/b", { n: 2 });
     expect(last().headers.get("authorization")).toBeNull();
@@ -366,7 +366,7 @@ describe("transport behaviour", () => {
     const http = new PendingRequest().withTransport(async (_request, init) => {
       seenSignal = init.signal ?? undefined;
 
-      // Never resolves on its own — only an abort ends this request, so a
+      // Never resolves on its own, only an abort ends this request, so a
       // dropped timeout would hang forever instead of throwing.
       return new Promise<Response>((_resolve, reject) => {
         init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
@@ -393,7 +393,7 @@ describe("transport behaviour", () => {
       return new Response(null, { status: 200 });
     });
 
-    // `dispatcher` is undici's non-standard proxy/pool hook — the reason
+    // `dispatcher` is undici's non-standard proxy/pool hook, the reason
     // init travels alongside the Request rather than through it. What is
     // under test is that the value survives the trip untouched, so a
     // sentinel is used rather than a real `Dispatcher`; `@types/node` types

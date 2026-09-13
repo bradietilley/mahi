@@ -7,10 +7,10 @@ import { Str } from "@mahiframework/core";
  * Shared scaffolding helper for the `make:*` generators. Turns a
  * user-supplied name into a `StudlyCase` class name (honouring a required
  * suffix, e.g. `Provider`/`Resource`), renders a template, and writes the
- * file — the `mkdir` + `writeFile` + "Created X" plumbing every generator
+ * file, the `mkdir` + `writeFile` + "Created X" plumbing every generator
  * would otherwise duplicate. Templates stay inline template-literal
  * functions in each command (matching `make-provider.ts`'s existing
- * pattern — no separate `.stub` files).
+ * pattern, no separate `.stub` files).
  */
 export interface ScaffoldOptions {
   /** The raw name argument from the CLI (e.g. `post`, `create-post`). */

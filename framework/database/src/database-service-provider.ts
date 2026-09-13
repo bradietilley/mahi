@@ -15,8 +15,8 @@ import { afterCommit, inTransaction } from "./transaction-context.js";
 
 /**
  * Built-in driver factories, keyed by driver *type* (`connection.driver`).
- * A plugin adds a new engine by registering another factory the same way —
- * see `BUILTIN_DRIVERS` usage in `register()`.
+ * A plugin adds a new engine by registering another factory the same way.
+ * See `BUILTIN_DRIVERS` usage in `register()`.
  */
 type DriverFactory = (config: Record<string, any>) => DatabaseDriver;
 
@@ -40,14 +40,14 @@ export const MODEL_REGISTRY_TOKEN = "db.models";
 /**
  * Registers the DatabaseManager singleton with the built-in "sqlite"
  * driver pre-registered via `extend()` (same mechanism a plugin would use
- * to add e.g. a "postgres" driver later — no special-casing).
+ * to add e.g. a "postgres" driver later, no special-casing).
  *
  * On boot, connects the resolved default driver if it implements
  * `Connectable` (sqlite's better-sqlite3 driver does not, since it's fully
- * synchronous — this matters for future async drivers).
+ * synchronous. This matters for future async drivers).
  *
- * On shutdown, disconnects every connection that was actually resolved —
- * see `shutdown()`. Without that, a process using MySQL or Postgres never
+ * On shutdown, disconnects every connection that was actually resolved.
+ * See `shutdown()`. Without that, a process using MySQL or Postgres never
  * exits: a live pool keeps Node's event loop alive whether or not anyone
  * is still querying it.
  */
@@ -75,7 +75,7 @@ export class DatabaseServiceProvider extends ServiceProvider {
 
       // Register one factory per configured connection, dispatching on the
       // connection's `driver` type (falling back to its name). This is how
-      // a plugin would add a "clickhouse" connection too — nothing here is
+      // a plugin would add a "clickhouse" connection too, nothing here is
       // special-cased to the built-ins beyond the `BUILTIN_DRIVERS` table.
       for (const name of manager.connectionNames()) {
         manager.extend(name, () => {
@@ -130,7 +130,7 @@ export class DatabaseServiceProvider extends ServiceProvider {
    * Goes through the manager's resolved drivers rather than the
    * *configured* connection list, so a named connection nothing ever
    * touched is not constructed here purely to be torn down (constructing
-   * a MySQL driver builds a pool — resolving it during shutdown would
+   * a MySQL driver builds a pool, resolving it during shutdown would
    * open connections while trying to close them).
    *
    * Skipped entirely when `DATABASE_TOKEN` was never resolved (a boot

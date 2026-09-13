@@ -22,7 +22,7 @@ function build() {
   return { hono, router };
 }
 
-describe("throttle() — inline form", () => {
+describe("throttle(): inline form", () => {
   beforeEach(() => installApp());
   afterEach(() => clearCurrentApp());
 
@@ -152,7 +152,7 @@ describe("throttle() — inline form", () => {
   });
 });
 
-describe("throttle() — named limiter form", () => {
+describe("throttle(): named limiter form", () => {
   beforeEach(() => installApp());
   afterEach(() => clearCurrentApp());
 

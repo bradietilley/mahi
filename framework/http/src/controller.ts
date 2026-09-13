@@ -10,7 +10,7 @@ export type RouteHandler = (request: Request) => ResponseInput | Promise<Respons
 
 /**
  * Lightweight base for class-based controllers. Ships with **no
- * behaviour** — it exists purely so applications can build inheritance
+ * behaviour**. It exists purely so applications can build inheritance
  * chains (e.g. `CreatePostController extends ApiController extends
  * Controller`) and share whatever a project needs on its own base. All the
  * framework requires of a subclass is a `handle()` method.
@@ -37,7 +37,7 @@ export type RouteHandler = (request: Request) => ResponseInput | Promise<Respons
  *   }
  *
  * Controllers reach services through the existing facades (`Auth`,
- * `authorize`, `Events`, …) — there is no constructor DI, keeping the base
+ * `authorize`, `Events`, …). There is no constructor DI, keeping the base
  * dependency-free. A fresh instance is constructed per request.
  */
 export abstract class Controller<R extends Request = Request> {
@@ -67,7 +67,7 @@ export function isControllerClass(value: unknown): value is ControllerClass<any>
  * `prepareForValidation()` runs FIRST, matching Laravel's
  * `ValidatesWhenResolvedTrait`. Running it after `authorize()` would break
  * the ordinary case of a request that merges a route param or the current
- * user into the input and then authorizes against it — `authorize()` would
+ * user into the input and then authorizes against it. `authorize()` would
  * see the un-prepared bag and deny a request it should allow.
  */
 export function controllerToHandler(ControllerClass: ControllerClass<any>): RouteHandler {

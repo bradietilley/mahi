@@ -5,13 +5,13 @@ import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsFailedJobs } from "../failed-job-repository.js";
 
 /**
- * `queue:flush` — bulk-delete failed jobs, optionally only those older than
+ * `queue:flush`, bulk-delete failed jobs, optionally only those older than
  * `--hours <n>`. Mirrors Laravel's `queue:flush` (whose `--hours` option
  * prunes by age).
  *
  * Guarded in production by `confirmToProceed()`. The `failed_jobs` table is
- * the forensic record of every job that has ever broken — the thing you
- * read *after* an incident to find out what happened — so an unattended
+ * the forensic record of every job that has ever broken, the thing you
+ * read *after* an incident to find out what happened, so an unattended
  * `queue:flush` destroys evidence, not just rows. `--hours` narrows the
  * blast radius but does not remove the need to confirm.
  */

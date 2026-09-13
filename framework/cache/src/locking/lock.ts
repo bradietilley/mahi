@@ -5,7 +5,7 @@ import { LockTimeoutError } from "./lock-timeout-error.js";
 
 export interface LockOptions {
   /**
-   * The lock's key within the owning `CacheStore` — automatically
+   * The lock's key within the owning `CacheStore`, automatically
    * suffixed with `_lock` (e.g. `key: "todos:rebuild"` locks under
    * `"todos:rebuild_lock"`) so it can never collide with a plain cached
    * value stored under the same base key, which matters for
@@ -15,7 +15,7 @@ export interface LockOptions {
   key: string;
   /**
    * How long (in **seconds**) the lock is held before it's automatically
-   * released, even if `release()` is never called — a safety net against
+   * released, even if `release()` is never called, a safety net against
    * a crashed/hung holder leaving the lock stuck forever. Implemented as
    * the underlying `CacheStore` entry's TTL, which also takes seconds,
    * so the units line up. Matches Laravel's
@@ -25,7 +25,7 @@ export interface LockOptions {
   /**
    * How long (in **seconds**) `acquire()` will keep retrying before
    * giving up and throwing `LockTimeoutError`. Defaults to
-   * `Number.POSITIVE_INFINITY` — wait indefinitely (retrying every
+   * `Number.POSITIVE_INFINITY`, wait indefinitely (retrying every
    * `retryEvery` ms) until acquired. Pass a finite value to bound the
    * wait instead. Matches Laravel's `block($seconds)`.
    *
@@ -38,11 +38,11 @@ export interface LockOptions {
 
 /**
  * A mutual-exclusion lock backed by a `CacheStore`'s atomic `add()` (see
- * `CacheStore.add()`'s docstring — this is exactly the "set only if
+ * `CacheStore.add()`'s docstring. This is exactly the "set only if
  * absent" primitive a lock needs). How exclusive a `Lock` actually is
  * depends on how atomic the underlying store's `add()` really is: both
- * built-in stores (`ArrayCacheStore` — synchronous `Map` check-then-set,
- * `FileCacheStore` — a serialized write queue) are atomic within a
+ * built-in stores (`ArrayCacheStore`, synchronous `Map` check-then-set,
+ * `FileCacheStore`, a serialized write queue) are atomic within a
  * single Node.js process. A store shared *across* processes needs two
  * things for a `Lock` on it to be safe there: a genuinely atomic
  * `SETNX`-style `add()`, and an atomic compare-and-delete
@@ -52,7 +52,7 @@ export interface LockOptions {
  *
  * Deliberately more explicit than Laravel's `Cache::lock()` (no implicit
  * "owner" identity string to manage yourself, no separate `block()`/
- * `get()` methods with different waiting semantics) — one `acquire()`
+ * `get()` methods with different waiting semantics), one `acquire()`
  * that always waits up to `maximumWaitForSeconds` (default: indefinitely) and
  * always throws `LockTimeoutError` on timeout, one `release()`, and a
  * `get(callback)` convenience wrapping both:
@@ -71,7 +71,7 @@ export interface LockOptions {
 export class Lock {
   private readonly lockKey: string;
   private readonly owner = randomUUID();
-  /** Auto-release TTL in seconds — what `CacheStore.add()` takes directly. */
+  /** Auto-release TTL in seconds, what `CacheStore.add()` takes directly. */
   private readonly automaticReleaseAfterSeconds: number;
   /** Maximum wait budget in **milliseconds** (the retry loop works in ms). */
   private readonly maximumWaitForMs: number;
@@ -110,7 +110,7 @@ export class Lock {
     const deadline = Date.now() + this.maximumWaitForMs;
     // Floor of 1 second. `Math.ceil()` alone turns a TTL of `0` (or a
     // negative one) into `0`, which every store reads as "no expiry" on
-    // `put`/`add` — except Redis, which rejects `EX 0` outright. Neither
+    // `put`/`add`, except Redis, which rejects `EX 0` outright. Neither
     // is what a caller asking for a zero-length lock means, and the
     // permanent-lock reading is the dangerous one: a `WithoutOverlapping`
     // job configured with `expireAfterSeconds: 0` would wedge that job
@@ -142,19 +142,19 @@ export class Lock {
 
   /**
    * Releases the lock, but only if this `Lock` instance is the one
-   * currently holding it (checked via its random `owner` token) — a
+   * currently holding it (checked via its random `owner` token), a
    * `release()` call after the lock has already expired and been
    * re-acquired by someone else is a safe no-op, not an accidental
    * release of a lock this instance no longer owns.
    *
    * Two implementations, and which one runs is up to the store:
    *
-   *   - **`store.releaseLock(key, owner)`** when the store has it — one
+   *   - **`store.releaseLock(key, owner)`** when the store has it, one
    *     atomic compare-and-delete. This is the correct path on any store
    *     shared across processes, and `RedisCacheStore` provides it.
    *   - **`get()` then `forget()`** otherwise. Correct on a store whose
-   *     operations can't interleave with another process's — which the
-   *     two built-in stores' are — and *not* correct on one that can:
+   *     operations can't interleave with another process's, which the
+   *     two built-in stores' are, and *not* correct on one that can:
    *     the TTL can expire between the two calls, a second holder can
    *     acquire the lock in that window, and the `forget()` then deletes
    *     *their* lock. That is why `CacheStore.releaseLock()` exists.
@@ -181,17 +181,17 @@ export class Lock {
 
   /**
    * Release the lock **unconditionally**, regardless of which instance or
-   * process acquired it and without an owner check — Laravel's
+   * process acquired it and without an owner check, Laravel's
    * `Lock::forceRelease()`. This is the cross-process release path a
    * unique job needs: the lock is acquired in the dispatching process and
    * released in whichever worker later finishes the job, so there is no
-   * shared `owner` token and no `held` flag to consult — the worker
+   * shared `owner` token and no `held` flag to consult, the worker
    * reconstructs the lock from the same key and clears it by name.
    *
    * The tradeoff (same as Laravel): if the lock's TTL expired mid-job and
    * a concurrent dispatch acquired a *fresh* lock under the same key, this
    * release clears that new lock too. `uniqueFor` is the knob that makes
-   * that vanishingly unlikely — set it comfortably above the job's
+   * that vanishingly unlikely, set it comfortably above the job's
    * worst-case runtime.
    */
   async forceRelease(): Promise<void> {

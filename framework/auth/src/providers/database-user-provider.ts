@@ -5,7 +5,7 @@ import type { Credentials, UserProvider } from "../user-provider.js";
 /**
  * Read a runtime-named column off a user object. The user's type is only
  * constrained to `object` (see the note on `DatabaseUserProvider`), so the
- * indexed read goes through `unknown` — the caller narrows the result.
+ * indexed read goes through `unknown`, the caller narrows the result.
  */
 function columnOf(user: object, column: string): unknown {
   return (user as Record<string, unknown>)[column];
@@ -25,12 +25,12 @@ export interface DatabaseUserProviderConfig {
  * app's `Hasher` (argon2).
  *
  * Lookups go through `Model.query()`, NOT `queryWithoutScopes()`, so
- * global scopes apply — a `SoftDeletes` user model therefore stops
+ * global scopes apply, a `SoftDeletes` user model therefore stops
  * authenticating deleted users with no extra code here.
  */
 // `TUser extends object`, not `Record<string, unknown>`: an `interface` has
-// no implicit index signature, so `interface UserAttributes { ... }` — the
-// form the model docs teach — can never satisfy a `Record` constraint,
+// no implicit index signature, so `interface UserAttributes { ... }`, the
+// form the model docs teach, can never satisfy a `Record` constraint,
 // while an otherwise identical `type` alias can. The constraint exists only
 // so a runtime-chosen column can be read off the user, which the local
 // `columnOf()` helper does instead.
@@ -76,7 +76,7 @@ export class DatabaseUserProvider<
       // null column: SSO-only, invited-but-not-yet-registered) is
       // indistinguishable by timing from one whose password was simply
       // wrong. Returning early here made "this account has no password"
-      // measurably faster than "wrong password" — an oracle for which
+      // measurably faster than "wrong password", an oracle for which
       // accounts can be attacked by other means.
       await this.hasher.make(credentials.password ?? "");
 

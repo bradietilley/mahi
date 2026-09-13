@@ -1,6 +1,6 @@
 /**
  * Plan §12. Every transition instant below was read off the host's own tzdata
- * before being written down, rather than assumed from the usual rules — the
+ * before being written down, rather than assumed from the usual rules. The
  * usual rules are exactly what goes stale.
  *
  * Reference transitions used here:

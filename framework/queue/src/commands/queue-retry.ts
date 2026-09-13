@@ -5,7 +5,7 @@ import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsFailedJobs } from "../failed-job-repository.js";
 
 /**
- * `queue:retry <id...>` — push failed jobs back onto the live queue, with
+ * `queue:retry <id...>`, push failed jobs back onto the live queue, with
  * `attempts` reset to 0 and their failed-jobs rows removed. `--all` retries
  * every failed job. Mirrors Laravel's `queue:retry`.
  */

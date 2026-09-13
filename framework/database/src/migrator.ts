@@ -22,7 +22,7 @@ export interface MigrationStatus {
 /**
  * A migration paired with the name it is recorded under in the
  * `migrations` table. That name is also the ordering key, so it carries
- * the leading timestamp/sequence prefix (`"0001_create_jobs_table"`) —
+ * the leading timestamp/sequence prefix (`"0001_create_jobs_table"`),
  * exactly the filename-without-extension a discovered migration gets.
  */
 export interface RegisteredMigration {
@@ -43,7 +43,7 @@ export interface RegisteredMigration {
  * The explicit form exists because the directory form cannot survive
  * bundling: a single-file executable has no `database/migrations`
  * directory to read and no path to `import()`, so discovery finds nothing
- * and `migrate` cheerfully reports "Nothing to migrate" — a silent no-op
+ * and `migrate` cheerfully reports "Nothing to migrate", a silent no-op
  * against an empty database. An app that intends to be compiled keeps a
  * static registry (a module that imports every migration and exports them
  * as an array) and passes that instead. The two forms can be mixed
@@ -54,7 +54,7 @@ export type MigrationSource = string | RegisteredMigration;
 /** Options accepted by `MigrationRunner.up()`. */
 export interface UpOptions {
   /**
-   * Report what *would* run and change nothing — Laravel's
+   * Report what *would* run and change nothing, Laravel's
    * `migrate --pretend`, the standard pre-deploy check. No migration's
    * `up()` is called, no `migrations` row is written, and the lock is
    * not taken (there is nothing to serialise against).
@@ -65,7 +65,7 @@ export interface UpOptions {
    * the migration runs; doing that here would mean *running* the
    * migration's code against a pretend connection, and a migration that
    * branches on a query result (`if (await schema.hasColumn(...))`)
-   * would take a different path — or, worse, do real non-DDL work.
+   * would take a different path, or, worse, do real non-DDL work.
    * Reporting the names is the part that is both useful and truthful.
    */
   pretend?: boolean;
@@ -74,7 +74,7 @@ export interface UpOptions {
 /** Options accepted by `MigrationRunner.rollback()`. */
 export interface RollbackOptions {
   /**
-   * How many **batches** to roll back, most recent first — Laravel's
+   * How many **batches** to roll back, most recent first, Laravel's
    * `migrate:rollback --step`. Defaults to 1 (the most recent batch
    * only). `Infinity` rolls back everything, which is what
    * `migrate:reset` means.
@@ -94,7 +94,7 @@ const MIGRATIONS_TABLE = "migrations";
  * The single-row table used as a mutual-exclusion lock around a
  * migration run. Its `id` is a fixed constant, so `INSERT` succeeds for
  * exactly one contender and every other one collides with the primary
- * key — a portable compare-and-set that needs no dialect-specific
+ * key, a portable compare-and-set that needs no dialect-specific
  * advisory-lock API.
  */
 const LOCK_TABLE = "migrations_lock";
@@ -107,8 +107,8 @@ function isRegistered(source: MigrationSource): source is RegisteredMigration {
 /**
  * Filenames a migration directory scan will `import()`.
  *
- * Migrations are conventionally named `{timestamp-or-sequence}_{描述}.ts`
- * — a leading digit run, an underscore, then a name. Requiring that
+ * Migrations are conventionally named `{timestamp-or-sequence}_{描述}.ts`.
+ * A leading digit run, an underscore, then a name. Requiring that
  * shape (rather than importing *every* `.ts`/`.js` in the directory)
  * matters because the directory is an application's own source folder:
  * a `helpers.ts` of shared blueprint code, an `index.ts` re-export, or
@@ -116,7 +116,7 @@ function isRegistered(source: MigrationSource): source is RegisteredMigration {
  * module has a default export at all, silently "run" as a migration
  * under its own filename.
  *
- * `.d.ts` is excluded separately by the caller — it matches this pattern
+ * `.d.ts` is excluded separately by the caller. It matches this pattern
  * only when the migration it describes does, and it's a type-only file
  * either way.
  */
@@ -134,7 +134,7 @@ const MIGRATION_EXT = /\.(ts|js|mts|mjs|cts|cjs)$/;
 const TS_EXT = /\.(ts|mts|cts)$/;
 
 /**
- * Whether the process was launched from a COMPILED entrypoint — `node
+ * Whether the process was launched from a COMPILED entrypoint, `node
  * dist/bin/console.js` rather than `tsx bin/console.ts`. Used only to
  * decide whether a discovered `.ts` migration is worth warning about: a
  * compiled deploy that still resolves its migrations directory to a
@@ -160,7 +160,7 @@ function launchedFromCompiledEntrypoint(): boolean {
  *
  * A compiled app's migrations directory (`dist/database/migrations`) holds
  * only `.js`, and a source one (`database/migrations` under `tsx`) holds
- * only `.ts` — so the two normally don't collide. They do the moment a
+ * only `.ts`, so the two normally don't collide. They do the moment a
  * directory is a source tree that has ALSO been compiled in place, or a
  * `dist/` that a build left a stray `.ts` in: importing both would run the
  * same migration twice under two names. Preferring the `.js` keeps the
@@ -185,7 +185,7 @@ function preferCompiled(files: string[]): string[] {
 }
 
 /**
- * Byte-wise name comparison — the migration ordering.
+ * Byte-wise name comparison, the migration ordering.
  *
  * NOT `localeCompare()`, which is locale-dependent by definition:
  * under ICU it ignores/reorders punctuation, so `2024_01_01_a` and
@@ -201,9 +201,9 @@ function byNameKey(a: string, b: string): number {
 /**
  * Runs migrations supplied either as directories to scan (dynamic
  * `import()`, expecting a default export implementing `Migration`) or as
- * explicit, statically-imported `{ name, migration }` entries — see
+ * explicit, statically-imported `{ name, migration }` entries. See
  * `MigrationSource`. Tracks which have run in a `migrations` table (name,
- * batch, migrated_at) — same shape as Laravel's migrations table.
+ * batch, migrated_at), same shape as Laravel's migrations table.
  */
 export class MigrationRunner {
   constructor(
@@ -213,15 +213,15 @@ export class MigrationRunner {
 
   /**
    * The connection this runner's own bookkeeping (`migrations`,
-   * `migrations_lock`) executes on — the active transaction on it when
+   * `migrations_lock`) executes on, the active transaction on it when
    * one is open, exactly as `SchemaBuilder` and `QueryBuilder` resolve
    * theirs.
    *
    * This matters for `runOne()`: a migration's `migrations` row is
    * written inside that migration's transaction, so reaching for the
    * root connection here would (a) leave the row outside the atomic
-   * unit it exists to pair with, and (b) on SQLite block outright —
-   * the transaction holds the single write lock, and the root
+   * unit it exists to pair with, and (b) on SQLite block outright.
+   * The transaction holds the single write lock, and the root
    * connection's insert would sit there until `busy_timeout` expired.
    */
   private get db(): Kysely<any> {
@@ -265,8 +265,8 @@ export class MigrationRunner {
    * Runs `work` while holding the migration lock, releasing it (even on
    * failure) before returning.
    *
-   * Two `migrate` processes racing — a deploy that starts two app
-   * instances at once, a CI job overlapping a manual run — otherwise
+   * Two `migrate` processes racing, a deploy that starts two app
+   * instances at once, a CI job overlapping a manual run, otherwise
    * both read the same "pending" list and the same `max(batch)`, then
    * both run every migration. The second one's DDL fails halfway
    * ("table already exists"), leaving the schema in a state neither
@@ -274,15 +274,15 @@ export class MigrationRunner {
    *
    * The lock is a single-row `INSERT` on a fixed primary key: portable
    * across all three dialects, visible to a human (`select * from
-   * migrations_lock` says who holds it and since when), and — unlike a
-   * connection-scoped advisory lock — survivable in the sense that a
+   * migrations_lock` says who holds it and since when), and, unlike a
+   * connection-scoped advisory lock, survivable in the sense that a
    * crashed run leaves a row somebody can inspect and delete rather than
    * a lock that vanished with the connection while the schema stayed
    * half-migrated.
    *
    * The trade-off is the other side of that: a hard crash leaves the row
    * behind and the next run refuses to start, with an error saying
-   * exactly which row to delete. That's the safer failure — a stale lock
+   * exactly which row to delete. That's the safer failure, a stale lock
    * costs a manual `DELETE`, a wrongly-released one costs a corrupted
    * schema.
    */
@@ -327,7 +327,7 @@ export class MigrationRunner {
    * **MySQL does not.** Every `CREATE`/`ALTER TABLE` there causes an
    * implicit commit, so wrapping a migration in a transaction buys
    * nothing and actively misleads (it looks atomic and isn't). Rather
-   * than pretend, MySQL runs each migration unwrapped — a failed
+   * than pretend, MySQL runs each migration unwrapped, a failed
    * migration there leaves partial DDL that has to be cleaned up by
    * hand, exactly as it does in Laravel.
    */
@@ -357,7 +357,7 @@ export class MigrationRunner {
     const found: RegisteredMigration[] = [];
 
     for (const source of sources) {
-      // Statically-supplied migrations need no filesystem at all — this
+      // Statically-supplied migrations need no filesystem at all. This
       // is the branch a compiled binary takes.
       if (isRegistered(source)) {
         found.push(source);
@@ -369,15 +369,15 @@ export class MigrationRunner {
       try {
         entries = await readdir(dir);
       } catch {
-        continue; // directory doesn't exist yet — not an error, just nothing to discover
+        continue; // directory doesn't exist yet: not an error, just nothing to discover
       }
 
-      // Only files that look like migrations (see `MIGRATION_FILE`) —
+      // Only files that look like migrations (see `MIGRATION_FILE`),
       // a helper module or an `index.ts` sitting in the same directory
       // would otherwise be imported and, given any default export, run
       // as a migration under its own filename.
       //
-      // `.d.ts` also ends in ".ts" — excluded explicitly. This matters
+      // `.d.ts` also ends in ".ts", excluded explicitly. This matters
       // once a *published package's* `migrations()` directory is resolved
       // via its own compiled `dist/` (which has both `.js` and `.d.ts`
       // side by side for every file), not just an app's own `src/`
@@ -431,13 +431,13 @@ export class MigrationRunner {
   }
 
   /**
-   * Run every pending migration across the given sources — directories to
+   * Run every pending migration across the given sources, directories to
    * scan, statically-imported entries, or a mix (see `MigrationSource`).
    * Returns the names that ran.
    *
    * `onEach`, if given, wraps the execution of each individual
    * migration (e.g. to print a per-migration RUNNING/DONE status line
-   * from the CLI's `migrate` command) — it must call and await `run()`
+   * from the CLI's `migrate` command). It must call and await `run()`
    * itself; the default (no `onEach`) just awaits `run()` directly.
    *
    * The whole run holds the migration lock (see `withLock()`), and each
@@ -445,7 +445,7 @@ export class MigrationRunner {
    * dialect supports it (see `runOne()`).
    *
    * With `{ pretend: true }` this returns exactly the same list without
-   * running anything — see `UpOptions.pretend`.
+   * running anything. See `UpOptions.pretend`.
    */
   async up(
     sources: MigrationSource[],
@@ -504,15 +504,15 @@ export class MigrationRunner {
   }
 
   /**
-   * Roll back the most recent batch — or the most recent `step` batches
+   * Roll back the most recent batch, or the most recent `step` batches
    * (see `RollbackOptions.step`). Returns the names that were rolled
    * back, in the order they were undone.
    *
-   * `onEach` behaves like `up()`'s — wraps the execution of each
+   * `onEach` behaves like `up()`'s, wraps the execution of each
    * individual migration's `down()`.
    *
    * With `{ pretend: true }` this returns exactly the same list without
-   * running anything — see `UpOptions.pretend`.
+   * running anything. See `UpOptions.pretend`.
    */
   async rollback(
     sources: MigrationSource[],
@@ -548,7 +548,7 @@ export class MigrationRunner {
         .execute();
 
       // Newest batch first, and within a batch the reverse of the order
-      // it was applied in — a migration's `down()` can depend on
+      // it was applied in, a migration's `down()` can depend on
       // anything applied before it still existing.
       return [...rows].sort((a, b) => {
         const byBatch = (b.batch as number) - (a.batch as number);
@@ -557,7 +557,7 @@ export class MigrationRunner {
       }) as Array<{ name: string }>;
     };
 
-    // See `up()` — a dry run mutates nothing, so it does not take the lock.
+    // See `up()`. A dry run mutates nothing, so it does not take the lock.
     if (options.pretend) {
       return (await plan()).map((row) => row.name);
     }
@@ -594,7 +594,7 @@ export class MigrationRunner {
   }
 
   /**
-   * Roll back **every** migration, newest batch first — Laravel's
+   * Roll back **every** migration, newest batch first, Laravel's
    * `migrate:reset`. Sugar for `rollback(sources, onEach, { step:
    * Infinity })`, and unlike `fresh()` it goes through each migration's
    * `down()` rather than dropping tables outright.
@@ -609,7 +609,7 @@ export class MigrationRunner {
 
   /**
    * Drops every table in the database (bypassing each migration's
-   * `down()` entirely — a direct schema wipe), then re-runs every
+   * `down()` entirely, a direct schema wipe), then re-runs every
    * migration from scratch. Mirrors Laravel's `migrate:fresh`. Unlike
    * `rollback()`, this works even if a migration's `down()` is missing or
    * broken, since it never calls it.

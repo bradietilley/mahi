@@ -2,7 +2,7 @@
  * A model class, as a value: an ordinary constructor function.
  *
  * `abstract new` so both concrete models and abstract bases are
- * assignable — deliberately not `Function`, which would accept any
+ * assignable, deliberately not `Function`, which would accept any
  * callable at all and let `gate.policy(someHelperFn, ...)` type-check.
  */
 export type ModelClass = abstract new (...args: any[]) => unknown;
@@ -12,14 +12,14 @@ import type { AuthorizationResponse } from "./response.js";
 /**
  * What an ability may return: a bare boolean, or an
  * `AuthorizationResponse` for a richer denial (custom message/status,
- * e.g. `denyAsNotFound()`) — sync or async either way.
+ * e.g. `denyAsNotFound()`), sync or async either way.
  */
 export type PolicyResult = boolean | AuthorizationResponse;
 
 /**
  * A single ability implementation on a policy.
  *
- * `TRow` types the target the ability acts on — create-style abilities
+ * `TRow` types the target the ability acts on, create-style abilities
  * take no row, hence the optional first element.
  */
 export type PolicyMethod<TUser = unknown, TRow = unknown> = (
@@ -30,9 +30,9 @@ export type PolicyMethod<TUser = unknown, TRow = unknown> = (
 /**
  * Per-model authorization.
  *
- * Every method takes the user FIRST — nullable, because unauthenticated
+ * Every method takes the user FIRST, nullable, because unauthenticated
  * requests reach policies too (see `requireAuth`/`requireGuest` in
- * `guards.ts` for the two common ways to handle that) — then the target
+ * `guards.ts` for the two common ways to handle that), then the target
  * row. Create-style abilities have no row yet, so they take just the user.
  *
  * Method names map to ability names verbatim: `Gate.authorize("update",
@@ -40,7 +40,7 @@ export type PolicyMethod<TUser = unknown, TRow = unknown> = (
  * snake_case/camelCase translation, so the mapping stays greppable.
  *
  * STATELESS BY CONTRACT: policies are instantiated once and cached, so
- * they must not hold per-request state — same contract as `Guard` in
+ * they must not hold per-request state, same contract as `Guard` in
  * `@mahiframework/auth`, and for the same reason (one long-lived
  * `Application` serves every concurrent request).
  *

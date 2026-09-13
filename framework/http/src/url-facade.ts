@@ -8,7 +8,7 @@ import {
 } from "./url-generator.js";
 
 /**
- * Facade over the `UrlGenerator` singleton — Laravel's
+ * Facade over the `UrlGenerator` singleton, Laravel's
  * `Illuminate\Support\Facades\URL` and the `route()` helper, in one place.
  *
  *   URL.route("posts.show", { post: 42 });

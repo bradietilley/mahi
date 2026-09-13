@@ -25,7 +25,7 @@ const OID = {
  *
  * The default parsing is lossy in exactly the way that breaks
  * timestamps: `timestamp without time zone` has no offset, so
- * node-postgres interprets it in the **process's local timezone** — a
+ * node-postgres interprets it in the **process's local timezone**, a
  * row stored as `07:31:37` UTC reads back as `2026-09-01T23:31:37Z`
  * under `TZ=Asia/Shanghai`, and saving it again persists the shift.
  * A `Date` also breaks `DateTimeCast`, which parses ISO *strings*, and
@@ -42,7 +42,7 @@ const KEEP_AS_STRING: readonly number[] = [OID.date, OID.time, OID.timestamp, OI
  * Normalises Postgres's date/time text into the ISO-8601 UTC spelling
  * the framework stores everywhere else (`2026-09-02T07:31:37.499Z`).
  *
- * Postgres returns `timestamp` as `2026-09-02 07:31:37.499` (no zone —
+ * Postgres returns `timestamp` as `2026-09-02 07:31:37.499` (no zone,
  * the framework only ever writes UTC into these columns, so it is read
  * back as UTC) and `timestamptz` as `2026-09-02 07:31:37.499+00`
  * (already normalised to UTC by the session's `TimeZone`, which
@@ -63,7 +63,7 @@ function normalizeTimestamp(value: string): string {
     return new Date(`${withoutOffset.replace(" ", "T")}${sign}`).toISOString();
   }
 
-  // No offset (timestamp without time zone) — read as UTC.
+  // No offset (timestamp without time zone), read as UTC.
   return new Date(`${trimmed.replace(" ", "T")}Z`).toISOString();
 }
 
@@ -74,7 +74,7 @@ function normalizeTimestamp(value: string): string {
  *
  * The `int8` case matters for primary keys. Postgres's `bigserial` is
  * `int8`, which node-postgres returns as a **string** (`'1'`) to avoid
- * silently truncating values past 2^53 — so `post.id` would be `"1"` on
+ * silently truncating values past 2^53, so `post.id` would be `"1"` on
  * Postgres but `1` on SQLite/MySQL, and `find(post.id)` comparisons
  * would differ per engine. Narrowing to a number when it is exactly
  * representable, and leaving the string when it is not, makes the
@@ -156,8 +156,8 @@ export class PostgresDriver<DB = any> implements DatabaseDriver<DB> {
       // without this the offset suffix would follow the server's
       // configuration and differ between deployments. Set through the
       // startup `options` string rather than a `SET` in `connect()`
-      // because the pool opens connections lazily and continuously —
-      // a one-off `SET` would only reach the first one.
+      // because the pool opens connections lazily and continuously.
+      // A one-off `SET` would only reach the first one.
       options: [
         ...(config.searchPath ? [`-c search_path=${config.searchPath}`] : []),
         "-c timezone=UTC",

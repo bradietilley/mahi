@@ -5,13 +5,13 @@ import { RedisConnection, type RedisConnectionConfig } from "../src/redis-connec
  * These tests talk to a real Redis (ioredis has no faithful in-memory
  * substitute for pub/sub across connections or blocking/atomic semantics).
  *
- * When no Redis is reachable they self-skip via `describe.skipIf` — except
+ * When no Redis is reachable they self-skip via `describe.skipIf`, except
  * under `CI_STRICT_MODE=true`, where they **fail** instead. A suite that silently
  * skips is worse than no suite on CI: the pipeline stays green while the
  * only tests covering cross-process locking, `flush()` scoping and
  * broadcast fanout never run, so a regression in exactly the code Redis
  * exists for ships unnoticed. Locally, skipping is still the right
- * default — see `docker-compose.yml` at the repo root for a one-command
+ * default. See `docker-compose.yml` at the repo root for a one-command
  * Redis if you want them running.
  */
 
@@ -56,7 +56,7 @@ export async function redisAvailable(): Promise<boolean> {
 const available = await redisAvailable();
 
 // Keyed off `CI_STRICT_MODE` rather than `CI`, which GitHub Actions
-// sets on every runner — including the service-free job that is supposed to
+// sets on every runner, including the service-free job that is supposed to
 // skip these tests.
 if (!available && process.env.CI_STRICT_MODE === "true") {
   throw new Error(
@@ -75,7 +75,7 @@ export function testPrefix(): string {
 /**
  * A connected `RedisConnection` against the test server.
  *
- * Isolated by a random key prefix **unless one is passed in** — several
+ * Isolated by a random key prefix **unless one is passed in**, several
  * tests need two connections sharing a prefix, because that is what two
  * processes of the *same* application look like, and a random prefix each
  * would make them two different applications instead (which, since the

@@ -4,7 +4,7 @@
  *
  * WHY THIS EXISTS: several packages deliberately avoid a compile-time
  * dependency on the package that owns a service, resolving it by string
- * token at runtime instead — `@mahiframework/authorization` reads the
+ * token at runtime instead. `@mahiframework/authorization` reads the
  * current user via `"auth"` without depending on `@mahiframework/auth`,
  * `@mahiframework/schedule` dispatches jobs via `"queue"` without depending
  * on `@mahiframework/queue`, `@mahiframework/http` fans broadcasts out via
@@ -18,12 +18,12 @@
  * Every package already depends on `@mahiframework/core` (it's where
  * `Application`/`ServiceProvider` live), so hoisting these token strings
  * here gives both the owning package AND every soft-dependent a single
- * literal to import — a typo is now a compile error, not a runtime one,
+ * literal to import. A typo is now a compile error, not a runtime one,
  * and the value can never drift between the two sides.
  *
  * Each owning package still re-exports its token under the historical
  * name (`AUTH_TOKEN` from `@mahiframework/auth`, `QUEUE_TOKEN` from
- * `@mahiframework/queue`, …) so existing imports keep working — those
+ * `@mahiframework/queue`, …) so existing imports keep working. Those
  * re-exports now just point back here.
  *
  * Only genuinely cross-package tokens belong here. Package-private tokens
@@ -32,26 +32,26 @@
  * that package.
  */
 
-/** `DatabaseManager` — owned by `@mahiframework/database`. */
+/** `DatabaseManager`, owned by `@mahiframework/database`. */
 export const DATABASE_TOKEN = "db";
 
-/** `AuthManager` — owned by `@mahiframework/auth`. */
+/** `AuthManager`, owned by `@mahiframework/auth`. */
 export const AUTH_TOKEN = "auth";
 
-/** `GateRegistry` — owned by `@mahiframework/authorization`. */
+/** `GateRegistry`, owned by `@mahiframework/authorization`. */
 export const GATE_TOKEN = "gate";
 
-/** `QueueManager` — owned by `@mahiframework/queue`. */
+/** `QueueManager`, owned by `@mahiframework/queue`. */
 export const QUEUE_TOKEN = "queue";
 
-/** `CacheManager` — owned by `@mahiframework/cache`. */
+/** `CacheManager`, owned by `@mahiframework/cache`. */
 export const CACHE_TOKEN = "cache";
 
-/** `EventDispatcher` — owned by `@mahiframework/events`. */
+/** `EventDispatcher`, owned by `@mahiframework/events`. */
 export const EVENTS_TOKEN = "events";
 
-/** `BroadcastManager` — owned by `@mahiframework/broadcasting`. */
+/** `BroadcastManager`, owned by `@mahiframework/broadcasting`. */
 export const BROADCAST_TOKEN = "broadcast";
 
-/** `StorageManager` — owned by `@mahiframework/storage`. */
+/** `StorageManager`, owned by `@mahiframework/storage`. */
 export const STORAGE_TOKEN = "storage";

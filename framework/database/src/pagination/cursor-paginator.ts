@@ -9,7 +9,7 @@ export interface CursorPaginationResult<T> {
 }
 
 export interface CursorPaginateOptions<T, K extends keyof T & string> {
-  /** The sort/cursor column — must be unique and orderable (e.g. `"id"` or a `created_at` timestamp with no ties). */
+  /** The sort/cursor column, must be unique and orderable (e.g. `"id"` or a `created_at` timestamp with no ties). */
   column: K;
   direction?: "asc" | "desc";
   perPage: number;
@@ -23,7 +23,7 @@ export interface CursorPaginateOptions<T, K extends keyof T & string> {
  * paginator's canonical `direction`; `"before"` cursors (from
  * `prevCursor`) fetch rows before it. Encoding this in the cursor itself
  * (rather than trying to infer it from context) is what makes walking
- * backward correct — see the module docstring below.
+ * backward correct. See the module docstring below.
  */
 interface CursorPayload {
   value: unknown;
@@ -31,24 +31,24 @@ interface CursorPayload {
 }
 
 /**
- * Cursor pagination — an opaque cursor (encoding the last-seen sort key,
+ * Cursor pagination, an opaque cursor (encoding the last-seen sort key,
  * not a page number), returns `nextCursor`/`prevCursor` instead of page
  * numbers. Correct and fast at any depth, immune to length-aware
  * pagination's "shifting results under concurrent writes" problem, but
- * can't jump to "page 7" — only "next"/"previous". Matches Laravel's
+ * can't jump to "page 7", only "next"/"previous". Matches Laravel's
  * `CursorPaginator`.
  *
- * The cursor column **must** be unique and monotonically orderable — a
+ * The cursor column **must** be unique and monotonically orderable, a
  * non-unique cursor column can skip or repeat rows when values tie.
  * Compound cursors (tie-breaking on a second column) are intentionally
- * not supported in this first pass — use a unique column (typically the
+ * not supported in this first pass, use a unique column (typically the
  * primary key, or a `created_at` you've made unique) instead.
  *
  * ## `prevCursor` design
  *
  * Walking "backward" requires a reversed query (`orderBy` flipped,
  * comparison operator flipped, then the fetched rows re-reversed before
- * returning) — naively echoing the incoming cursor back as `prevCursor`
+ * returning), naively echoing the incoming cursor back as `prevCursor`
  * doesn't work. This implementation encodes **which direction a given
  * cursor walks** directly in the cursor payload (`op: "after" | "before"`)
  * rather than trying to infer it from call-site context:
@@ -68,7 +68,7 @@ export async function cursorPaginate<
   TCasts = Record<never, never>,
   // Constrained by `Pick<T, K>` rather than left free: the cursor is built
   // from `row[options.column]`, so whatever the builder terminates in has to
-  // carry that column. A model instance does — it is the row plus methods.
+  // carry that column. A model instance does. It is the row plus methods.
   TInstance extends Pick<T, K> = Hydrated<T, TRel, TCasts> & Pick<T, K>,
 >(
   builder: EloquentBuilder<T, TRel, TCasts, TInstance>,
@@ -130,7 +130,7 @@ function encodeCursor(payload: CursorPayload): string {
  * Cursors arrive straight off a query string, so this is untrusted input
  * and must never throw: a bare `JSON.parse()` here meant `?cursor=garbage`
  * raised a `SyntaxError` that fell through the HTTP error handler as a
- * **500** on every paginated endpoint — a client typo crashing the
+ * **500** on every paginated endpoint, a client typo crashing the
  * request. A cursor that doesn't decode to the exact `{ value, op }`
  * shape `encodeCursor()` produces is therefore treated as "no cursor" and
  * the caller simply gets the first page.
@@ -139,7 +139,7 @@ function encodeCursor(payload: CursorPayload): string {
  * to a non-object (`[]`, `"str"`), or missing `value`, would otherwise
  * sail through as a real cursor and produce a silently EMPTY page, while
  * a `value` that was itself an object would blow up down in the SQL
- * layer. Only primitives are valid cursor values — they're compared
+ * layer. Only primitives are valid cursor values. They're compared
  * against a single orderable column.
  */
 function decodeCursor(cursor: string): CursorPayload | undefined {
@@ -177,7 +177,7 @@ function decodeCursor(cursor: string): CursorPayload | undefined {
  * `perPage` typically originates from a query string (`?per_page=`), so a
  * zero, negative or fractional value is a client mistake rather than a
  * meaningful request. Left alone, `perPage <= 0` produced `LIMIT 1`/
- * `LIMIT 0`-style queries that returned an empty page — indistinguishable
+ * `LIMIT 0`-style queries that returned an empty page, indistinguishable
  * from "this list really is empty".
  *
  * Only the LOWER bound is enforced here: a maximum page size is an

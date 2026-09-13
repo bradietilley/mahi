@@ -13,7 +13,7 @@ import { toWebResponse, type ResponseInput } from "./response.js";
  * 1. **Framework cookies are drained.** Mahi handlers return platform
  *    `Response` objects, which Hono does not merge its context-queued
  *    headers into. Cookies are therefore queued on the `Request` and
- *    written here — see `cookies.ts`.
+ *    written here. See `cookies.ts`.
  *
  * 2. **Hono's own queued headers are preserved.** Third-party Hono
  *    middleware (`hono/cors` is mounted by `HttpKernel`, and an app may
@@ -23,8 +23,8 @@ import { toWebResponse, type ResponseInput } from "./response.js";
  *    so they are merged in explicitly.
  *
  * `Set-Cookie` is appended rather than set throughout: it is the one
- * header that legitimately repeats, and `Headers.set()` — or copying a
- * `Headers` bag entry by entry — silently collapses several cookies into
+ * header that legitimately repeats, and `Headers.set()`, or copying a
+ * `Headers` bag entry by entry, silently collapses several cookies into
  * one malformed value.
  */
 export async function finalizeResponse(
@@ -46,7 +46,7 @@ export async function finalizeResponse(
   // `Set-Cookie` that merge is a *replacement*: it deletes the incoming
   // cookies and re-appends the old bag's. Assigning directly would
   // therefore throw away every cookie this function just wrote, in favour
-  // of whatever `mergeContextHeaders` already merged in — silently
+  // of whatever `mergeContextHeaders` already merged in, silently
   // undoing the fix. Setting `undefined` first drops the old bag so the
   // assignment is a plain store. (`Context['res']` accepts `undefined`
   // for exactly this purpose.)
@@ -62,8 +62,8 @@ export async function finalizeResponse(
  * Reading `c.res` is what materialises the context's pre-response header
  * bag (Hono keeps it private until then), so this both observes and
  * finalises what upstream Hono middleware asked for. The response's own
- * headers win on collision — the handler is more specific than a blanket
- * `use("*")` — except for `Set-Cookie`, where both are kept.
+ * headers win on collision, the handler is more specific than a blanket
+ * `use("*")`, except for `Set-Cookie`, where both are kept.
  *
  * Returns `response` untouched when there is nothing queued, which is the
  * overwhelmingly common case (no Hono middleware, no CORS).
@@ -81,7 +81,7 @@ function mergeContextHeaders(c: Context, response: Response): Response {
   try {
     queued = c.res.headers;
   } catch {
-    // A context with no response bag to speak of (some adapters) — there
+    // A context with no response bag to speak of (some adapters). There
     // is simply nothing to merge.
     return response;
   }

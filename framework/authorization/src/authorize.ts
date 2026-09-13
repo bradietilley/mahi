@@ -5,7 +5,7 @@ import { GATE_TOKEN } from "./tokens.js";
 /**
  * In-controller authorization helpers.
  *
- * Take no `Context` — like `Auth.user()`, they read the ambient
+ * Take no `Context`, like `Auth.user()`, they read the ambient
  * AsyncLocalStorage auth scope. Prefer these over the `can()` middleware
  * when the row is needed by the handler anyway (the middleware would load
  * it a second time), or when the check is conditional:

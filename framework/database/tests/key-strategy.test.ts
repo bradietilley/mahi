@@ -16,14 +16,14 @@ interface UuidWidgetAttributes {
   name: string;
 }
 
-// keyType: "increment" (the default) — DB-generated integer key.
+// keyType: "increment" (the default), DB-generated integer key.
 class AutoWidget extends Model<AutoWidgetAttributes>()({
   table: "auto_widgets",
   primaryKey: "id",
   timestamps: false,
 }) {}
 
-// keyType: "uuid" — client-generated string key, filled before insert.
+// keyType: "uuid", client-generated string key, filled before insert.
 class UuidWidget extends Model<UuidWidgetAttributes>()({
   table: "uuid_widgets",
   primaryKey: "id",

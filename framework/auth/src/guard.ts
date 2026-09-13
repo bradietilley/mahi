@@ -7,10 +7,10 @@ import type { Request } from "@mahiframework/http";
  * every concurrent request (one `Application`, resolved once by
  * `AuthManager`), so it must never memoize per-request state on itself.
  * Everything it needs comes from the `Request` argument, and the resolved
- * user is stored in the AsyncLocalStorage scope — see `auth-context.ts`.
+ * user is stored in the AsyncLocalStorage scope. See `auth-context.ts`.
  *
  * Deliberately one method. Laravel's Guard also carries check()/guest()/
- * id(), but those are pure derivations of user() — implementing them
+ * id(), but those are pure derivations of user(), implementing them
  * per-guard is duplicated boilerplate. They live on `AuthManager` and the
  * `Auth` facade instead.
  */
@@ -21,7 +21,7 @@ export interface Guard<TUser = unknown> {
 
 /**
  * A guard that can also *establish* and *end* a session, not just read
- * one — the cookie-session shape (Laravel's `StatefulGuard`).
+ * one, the cookie-session shape (Laravel's `StatefulGuard`).
  *
  * Split out rather than folded into `Guard` because the token guard
  * genuinely cannot implement it: a bearer token is minted out-of-band and
@@ -30,7 +30,7 @@ export interface Guard<TUser = unknown> {
  * force a throwing stub onto it.
  *
  * The point of the interface is that callers stop reaching for
- * `as unknown as SessionGuard` to get at `login()` — a cast that would
+ * `as unknown as SessionGuard` to get at `login()`. A cast that would
  * silently survive the guard being swapped for one that has no such
  * method. `AuthManager.statefulGuard()` returns this type and checks.
  */

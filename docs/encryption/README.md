@@ -6,8 +6,8 @@ the whole game:
 | Class | Operation | Reversible | Use for |
 |---|---|---|---|
 | `Encrypter` | AES-256-GCM | **Yes**, with the key | "Store this securely, get the exact value back later" |
-| `Hasher` | argon2id | **Never** | Passwords — verify without ever storing a reversible form |
-| `Signer` | HMAC-SHA256 | N/A — the payload is public | "This value really came from us and hasn't been edited" |
+| `Hasher` | argon2id | **Never** | Passwords, verify without ever storing a reversible form |
+| `Signer` | HMAC-SHA256 | N/A. The payload is public | "This value really came from us and hasn't been edited" |
 
 ```ts
 import { Crypt, Hash } from "@mahiframework/encryption";
@@ -20,7 +20,7 @@ const matches = await Hash.check("user-password", hash);
 ```
 
 All three are registered by `EncryptionServiceProvider`, which has no
-ordering dependency on any other provider — but
+ordering dependency on any other provider, but
 [`@mahiframework/auth`](../authentication/) depends on it, so list it earlier than
 `AuthServiceProvider`.
 
@@ -50,8 +50,8 @@ the result is **exactly 32 bytes**. Anything else throws:
 - Wrong decoded length →
   `"APP_KEY must decode to exactly 32 bytes (got N)."`
 
-The `base64:` prefix is optional on input — a bare base64 string parses
-fine — but `key:generate` always writes it, matching Laravel, so the value
+The `base64:` prefix is optional on input, a bare base64 string parses
+fine, but `key:generate` always writes it, matching Laravel, so the value
 is self-describing in a `.env` file.
 
 Failing at boot is deliberate. A short key would still "work" for AES only
@@ -76,7 +76,7 @@ new Signer(deriveKey(masterKey, "signing"), /* ... */);
 
 **Why separate keys rather than handing the raw `APP_KEY` to both?**
 Reusing one key across two different primitives means a compromise of one
-also exposes the other — leak the ciphertext key and you've leaked the
+also exposes the other, leak the ciphertext key and you've leaked the
 signing key, so an attacker can now forge session cookies and signed URLs
 too, not merely read encrypted columns. Deriving per-purpose subkeys is
 real defense-in-depth, and it costs the operator nothing: `APP_KEY`
@@ -91,14 +91,14 @@ nothing about the master key or the signing subkey.
 export function parsePreviousAppKeys(raw: string | undefined): Buffer[]
 ```
 
-Parses `APP_PREVIOUS_KEYS` — a comma-separated list of previously-active
+Parses `APP_PREVIOUS_KEYS`, a comma-separated list of previously-active
 `APP_KEY` values, each optionally `base64:`-prefixed:
 
 ```bash
 APP_PREVIOUS_KEYS=base64:oldkey1...,base64:oldkey2...
 ```
 
-Unlike `parseAppKey()`, an unset or empty value is **not** an error — it
+Unlike `parseAppKey()`, an unset or empty value is **not** an error. It
 just means no previous keys, which is the common case. Individual
 malformed entries **do** throw, on the theory that a typo'd previous key
 should fail loudly at boot rather than silently making some old
@@ -156,13 +156,13 @@ So the safe sequence is:
 ```
 
 After that, new writes use the new key and old ciphertexts/signatures
-still resolve. Once you're confident nothing old is left — see
-[re-encryption](#no-automatic-re-encryption) — drop the entry from
+still resolve. Once you're confident nothing old is left, see
+[re-encryption](#no-automatic-re-encryption), drop the entry from
 `APP_PREVIOUS_KEYS`.
 
 ## `Encrypter`
 
-AES-256-GCM, built into `node:crypto` — no new dependency. **Authenticated
+AES-256-GCM, built into `node:crypto`, no new dependency. **Authenticated
 encryption**, so tampering with the ciphertext is detected on decrypt
 (throws) rather than silently producing garbage or, worse,
 plausible-looking incorrect plaintext.
@@ -175,8 +175,8 @@ class Encrypter {
 }
 ```
 
-The constructor asserts **every** key is exactly 32 bytes — the current
-one and each previous one — so a bad rotation entry fails at boot, not on
+The constructor asserts **every** key is exactly 32 bytes, the current
+one and each previous one, so a bad rotation entry fails at boot, not on
 the first decrypt that needs it.
 
 ### Wire format
@@ -188,12 +188,12 @@ base64url( version[1] || iv[12] || authTag[16] || ciphertext )
 | Segment | Bytes | Source |
 |---|---|---|
 | Version | 1 | Always `0x01` |
-| IV | 12 | `randomBytes(12)` — GCM's standard nonce size, fresh per call |
+| IV | 12 | `randomBytes(12)`: GCM's standard nonce size, fresh per call |
 | Auth tag | 16 | `cipher.getAuthTag()` |
 | Ciphertext | rest | The encrypted UTF-8 payload |
 
 One base64url string, no JSON envelope. Because the IV is random per
-call, encrypting the same value twice produces different output — that's
+call, encrypting the same value twice produces different output. That's
 correct and required; a fixed IV under GCM is catastrophic.
 
 The minimum valid payload is therefore **29 bytes** (an encrypted empty
@@ -223,7 +223,7 @@ const decipher = createDecipheriv("aes-256-gcm", candidateKey, iv, { authTagLeng
 ```
 
 Without `authTagLength`, **Node accepts 4, 8, 12 and 13–16-byte GCM
-tags** — a payload carrying a 4-byte tag decrypts successfully. Against a
+tags**, a payload carrying a 4-byte tag decrypts successfully. Against a
 decrypt oracle that drops forgery cost from 2⁻¹²⁸ to 2⁻³² per attempt,
 and a handful of successes recovers the GHASH subkey outright
 (Ferguson's short-tag attack). The length guard is needed alongside it
@@ -234,7 +234,7 @@ with a stub tag. **Do not remove either.**
 ### Binding ciphertext to a context (`aad`)
 
 Both methods take an optional additional-authenticated-data string. It is
-authenticated but *not* encrypted, and **not stored in the payload** —
+authenticated but *not* encrypted, and **not stored in the payload**,
 whatever `encrypt()` was given must be passed to `decrypt()` again by the
 caller.
 
@@ -280,7 +280,7 @@ The GCM auth tag is what makes trying keys in sequence safe: a wrong key
 doesn't produce wrong plaintext, it throws. Only a genuinely correct key
 authenticates.
 
-Every failure mode collapses into one error — wrong key, corrupted bytes,
+Every failure mode collapses into one error, wrong key, corrupted bytes,
 deliberate tampering. That's intentional: distinguishing them tells an
 attacker probing your endpoint which of those they achieved.
 
@@ -313,14 +313,14 @@ The facade over the `ENCRYPTER_TOKEN` singleton.
 | `Crypt.decrypt(payload, aad?)` | `string` |
 
 Prefer constructor-injecting `Encrypter` via `ENCRYPTER_TOKEN` where
-that's practical — inside a `ServiceProvider` or `Command` that already
-receives `app`. Reach for the facade only where threading
+that's practical, inside a `ServiceProvider` or `Command` that already
+receives `app`. Use the facade only where threading
 `app`/`Encrypter` through is genuinely inconvenient, the same guidance as
 `app()` itself.
 
 ## `Hasher`
 
-One-way password hashing via argon2 — OWASP-recommended, winner of the
+One-way password hashing via argon2, OWASP-recommended, winner of the
 Password Hashing Competition. Fundamentally different from `Encrypter`:
 **never decryptable**, only comparable via `check()`.
 
@@ -343,8 +343,8 @@ private argonOptions(): argon2.Options {
 ```
 
 The `argon2` package's current default is also argon2id, but **a default
-is not a contract**. argon2id is the OWASP-recommended variant — hybrid
-resistance to both GPU and side-channel attacks — so it's the one thing
+is not a contract**. argon2id is the OWASP-recommended variant, hybrid
+resistance to both GPU and side-channel attacks, so it's the one thing
 here worth being auditable at the call site rather than implied.
 
 ### Cost parameters
@@ -359,7 +359,7 @@ export interface HasherOptions {
 
 Read from a `hashing` config namespace. **The base app ships no
 `config/hashing.ts`**, so an absent namespace yields `{}` and the library
-defaults apply — with argon2id still pinned. Cost keys are only included
+defaults apply, with argon2id still pinned. Cost keys are only included
 when set, so an unconfigured `Hasher` never overrides a default it doesn't
 mean to.
 
@@ -378,8 +378,8 @@ async check(value: string, hash: string): Promise<boolean> {
 }
 ```
 
-A malformed hash, a hash from a different algorithm, an empty string —
-all return `false`. "Doesn't match" is the correct answer for a stored
+A malformed hash, a hash from a different algorithm, an empty string.
+All return `false`. "Doesn't match" is the correct answer for a stored
 value we can't parse; throwing would turn a bad row into a 500 on a login
 route.
 
@@ -406,13 +406,13 @@ nothing can reason about.
 #### It checks the algorithm too, not just cost
 
 `needsRehash()` compares four things: **argon2 variant**, `version`,
-`memoryCost`, and `timeCost` — plus `parallelism` when you have
+`memoryCost`, and `timeCost`, plus `parallelism` when you have
 configured it explicitly.
 
 The variant and parallelism checks are the framework's, not the `argon2`
 library's. `argon2.needsRehash()` compares only version/memory/time, so
-an `argon2i` hash — the GPU-weak variant `make()` pins `argon2id`
-specifically to avoid — reported "no rehash needed" while `check()`
+an `argon2i` hash, the GPU-weak variant `make()` pins `argon2id`
+specifically to avoid, reported "no rehash needed" while `check()`
 happily kept accepting it. A silent downgrade that survived every
 subsequent login. Hashes with a different `p=` had the same problem.
 
@@ -444,7 +444,7 @@ would happily store a hash of whatever an attacker submitted.
 
 The effect is that raising cost parameters in `config/hashing.ts` migrates
 your user base gradually, as people log in, with no batch job and no
-forced password reset — because you can't re-derive a stronger hash from a
+forced password reset, because you can't re-derive a stronger hash from a
 weaker one, only from the plaintext.
 
 ### `Hash`
@@ -458,7 +458,7 @@ The facade over `HASHER_TOKEN`.
 | `Hash.needsRehash(hash)` | `boolean` |
 
 `Hash.make()` is what registration should use, and the hash is what the
-model stores — never the plaintext, and the base app's `User` model lists
+model stores, never the plaintext, and the base app's `User` model lists
 `password` in `static hidden` as defense-in-depth so it can't reach the
 wire even if an instance is returned directly.
 
@@ -496,8 +496,8 @@ signer.verify(signed);       // "session-id-here"
 signer.verify(tampered);     // null
 ```
 
-`verify()` returns the **payload** on success and `null` on failure — not
-a boolean — so a caller can't accidentally use an unverified value. The
+`verify()` returns the **payload** on success and `null` on failure, not
+a boolean, so a caller can't accidentally use an unverified value. The
 session guard relies on this: `readSessionId()` is just
 `this.signer.verify(rawCookie)`, and `null` (tampered, or signed with a
 key no longer trusted) short-circuits before the store is ever queried.
@@ -513,7 +513,7 @@ const signature = signedPayload.slice(lastDot + 1);
 ```
 
 **`lastIndexOf`, not `indexOf`.** The signature is base64url and never
-contains a dot, but the payload might — `"user.42"`, a dotted filename, a
+contains a dot, but the payload might, `"user.42"`, a dotted filename, a
 serialized path. Splitting on the *first* dot would corrupt any such
 payload, and the HMAC would then be computed over the wrong string, so
 every legitimate value with a dot in it would fail to verify.
@@ -531,7 +531,7 @@ function signaturesMatch(a: string, b: string): boolean {
 This is the one genuinely security-critical detail in the class. Naive
 `a === b` string comparison short-circuits at the first differing byte, so
 the time it takes to fail correlates with how many leading bytes an
-attacker guessed correctly — enough, over many requests, to reconstruct a
+attacker guessed correctly, enough, over many requests, to reconstruct a
 valid signature byte by byte. **Do not "simplify" this back to `===`.**
 
 The length check first is required, not an optimization:
@@ -547,12 +547,12 @@ afterwards, as long as the old key is retained in `APP_PREVIOUS_KEYS`.
 ### Key length
 
 The constructor rejects any key (current or previous) shorter than **32
-bytes** — HMAC-SHA256 will technically accept a shorter or even empty
+bytes**. HMAC-SHA256 will technically accept a shorter or even empty
 key, but that's a silent downgrade of the whole scheme, so it fails loudly
 instead. In practice every key comes from `deriveKey()` and is already 32
 bytes.
 
-### Purpose separation — `signer.for(purpose)`
+### Purpose separation: `signer.for(purpose)`
 
 `for()` returns a `Signer` whose keys are HKDF-derived under
 `signing:<purpose>`, giving each consumer its own key space:
@@ -570,15 +570,15 @@ signer.for("session").verify(token);   // null
 ```
 
 That's the point. Both consumers previously shared the raw `SIGNER_TOKEN`
-key, and their payload shapes are the only thing that kept them apart —
+key, and their payload shapes are the only thing that kept them apart,
 session ids are bare UUIDs, URL payloads start with `/`. Any feature that
 signed a user-controlled string could be used as an oracle: get it to sign
 something shaped like a session id, and the resulting signature is a
 valid session cookie for that session. Distinct derived keys remove the
 overlap entirely rather than relying on payloads never colliding.
 
-Both wirings are internal — `SessionGuard` narrows to `"session"` in its
-constructor and `resolveSigner()` narrows to `"url"` — so callers get the
+Both wirings are internal, `SessionGuard` narrows to `"session"` in its
+constructor and `resolveSigner()` narrows to `"url"`, so callers get the
 separation without doing anything. Apply `for()` to any new consumer that
 signs its own payloads.
 
@@ -589,10 +589,10 @@ issued before the rotation.
 ## Signed URLs
 
 `@mahiframework/http` wraps `Signer` into tamper-evident, optionally-expiring
-links — the equivalent of Laravel's `URL::signedRoute()` plus the
+links, the equivalent of Laravel's `URL::signedRoute()` plus the
 `ValidateSignature` middleware. It uses `Signer` (HMAC) rather than
 `Encrypter` because the payload doesn't need to stay secret, only
-tamper-evident; key rotation comes for free.
+tamper-evident, and key rotation is handled by `Signer`.
 
 ```
 /verify-email?id=427185966743560456&expires=1774000000&signature=<hmac>
@@ -623,8 +623,8 @@ const link = URL.signedRoute("verification.verify", { id: user.id }, { expiresIn
 | `signer` | Override the resolved `Signer` (tests) |
 | `now` | Absolute unix-seconds override for "now" (tests) |
 
-`signedRoute()` throws if `signature` or `expires` appear in your params —
-they're reserved. It signs the **relative** path regardless of
+`signedRoute()` throws if `signature` or `expires` appear in your params.
+They're reserved. It signs the **relative** path regardless of
 `absolute`, because that's what the receiving end rebuilds.
 
 ### Verifying
@@ -663,7 +663,7 @@ const result = await timebox(() => broker.sendResetLink(body.email), 250);
 ```
 
 This is the general-purpose form of the constant-time trick
-`AuthManager.attempt()` open-codes — hashing a throwaway value so a
+`AuthManager.attempt()` open-codes, hashing a throwaway value so a
 missing user costs the same as a wrong password. Flows like password reset
 need the same property but have no natural "hash something" step to lean
 on: a "no such account" path returns almost instantly, while "account
@@ -675,7 +675,7 @@ Two behaviours worth knowing:
 
 - If `fn` already takes longer than `minMs`, **no extra delay is added**.
   It's a floor, not a fixed duration.
-- **A thrown error is delayed too**, then rethrown — so the error path
+- **A thrown error is delayed too**, then rethrown, so the error path
   can't be distinguished by timing either. That's the part a hand-rolled
   version usually gets wrong.
 
@@ -714,13 +714,13 @@ common mistake here:
 
 | You want to... | Use |
 |---|---|
-| Store a password | `Hash.make()` — never `Crypt.encrypt()` |
+| Store a password | `Hash.make()`: never `Crypt.encrypt()` |
 | Store an API key you must display again later | `Crypt.encrypt()` |
-| Store an API key you only ever *verify* | A digest — see [token guard](../authentication/#why-sha-256-not-argon2) |
+| Store an API key you only ever *verify* | A digest. See [token guard](../authentication/#why-sha-256-not-argon2) |
 | Encrypt a sensitive column | `Crypt.encrypt()` |
 | Prove a webhook body came from you | `Signer.sign()` |
 | Issue a link that must not be edited | `signedUrl()` / `URL.signedRoute()` |
-| Keep a session id in a cookie unforgeable | `Signer` — already done by the session guard |
+| Keep a session id in a cookie unforgeable | `Signer`: already done by the session guard |
 
 If the value must be recoverable, it's `Encrypter`. If it must only be
 *checked*, it's `Hasher` (for low-entropy human input) or a plain digest
@@ -729,10 +729,10 @@ it's `Signer`.
 
 ## Related
 
-- [Authentication](../authentication/) — where `Hash` and `Signer` are used
-- [Authorization](../authorization/) — the permission half
-- [Routing](../routing/) — URL generation, `validateSignature()`
-- [Configuration](../configuration/) — `.env`, `APP_KEY`, the `hashing` namespace
-- [Service providers](../providers/) — `EncryptionServiceProvider` ordering
-- [Console](../console/) — `key:generate`
-- [Deployment](../deployment/) — key management in production
+- [Authentication](../authentication/): where `Hash` and `Signer` are used
+- [Authorization](../authorization/): the permission half
+- [Routing](../routing/): URL generation, `validateSignature()`
+- [Configuration](../configuration/): `.env`, `APP_KEY`, the `hashing` namespace
+- [Service providers](../providers/): `EncryptionServiceProvider` ordering
+- [Console](../console/): `key:generate`
+- [Deployment](../deployment/): key management in production

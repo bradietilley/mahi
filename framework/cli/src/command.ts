@@ -11,7 +11,7 @@ import {
 
 /**
  * Base class for CLI commands. Subclasses declare a `signature` (the
- * command name, as understood by Commander — may include `<required>`
+ * command name, as understood by Commander, may include `<required>`
  * and `[optional]` argument placeholders) and implement `handle()`.
  *
  * For anything beyond simple positional args (flags/options), override
@@ -20,20 +20,20 @@ import {
  *
  * The protected `ask`/`confirm`/`secret`/`choice`/`table`/`info`/etc.
  * methods below are thin forwarding wrappers over `@mahiframework/tui`'s
- * `Tui` facade — Laravel-`Command`-familiar ergonomics (`this.ask(...)`
+ * `Tui` facade, Laravel-`Command`-familiar ergonomics (`this.ask(...)`
  * instead of `Tui.ask(...)`) with zero new architecture, since `Tui`
  * already has no dependency on `@mahiframework/core`/the container.
  * Subclasses are free to call `Tui.*` directly instead; both are
  * equivalent.
  *
  * **Invoking one command from another** (Laravel's `$this->call(...)`):
- * there's no formal `call()`/`callSilently()` helper here — `Command`
+ * there's no formal `call()`/`callSilently()` helper here, `Command`
  * instances are cheap, explicit-DI objects (`new SomeCommand(this.app)`),
  * not container-resolved singletons, so the accepted idiom is simply
  * constructing and running the other command directly, e.g.
  * `await new DbSeedCommand(this.app).handle()` (see `migrate-fresh.ts`/
  * `migrate-refresh.ts`). A formal wrapper would mostly be sugar over
- * this — not built, on purpose.
+ * this, not built, on purpose.
  */
 export abstract class Command {
   /**
@@ -47,7 +47,7 @@ export abstract class Command {
    * and then fails on a missing file the user has no reason to expect.
    *
    * Static, because the kernel filters the command *classes* before
-   * constructing any of them — construction is what gives a command the
+   * constructing any of them. Construction is what gives a command the
    * Application, and a command that will not run should not get one.
    *
    * See `ConsoleKernel.registeredCommands()` and `RuntimeMode`.
@@ -130,7 +130,7 @@ export abstract class Command {
 
   /**
    * The guard every destructive command asks before touching a
-   * production database — Laravel's `ConfirmableTrait::confirmToProceed()`.
+   * production database, Laravel's `ConfirmableTrait::confirmToProceed()`.
    *
    *   if (!(await this.confirmToProceed(options))) return;
    *
@@ -142,7 +142,7 @@ export abstract class Command {
    * operator answers yes to an interactive prompt. **Non-interactive
    * production runs therefore fail closed**: a CI job or a deploy script
    * with no TTY cannot be prompted, so it must pass `--force` to say so
-   * explicitly. That is the entire safety property — an unattended
+   * explicitly. That is the entire safety property. An unattended
    * pipeline should never be able to drop a production schema because
    * nobody was watching the terminal.
    *
@@ -152,7 +152,7 @@ export abstract class Command {
    * `Tui.interactive()` override that tests use.
    *
    * The two refusal paths differ in exit code, deliberately. No TTY sets
-   * `process.exitCode = 1` — nobody was asked, so the work silently not
+   * `process.exitCode = 1`. Nobody was asked, so the work silently not
    * happening is a failure the pipeline must see. A human answering "no"
    * leaves it 0, because that is a decision, not a fault.
    */
@@ -188,7 +188,7 @@ export abstract class Command {
     }
 
     // A human said no. That is a deliberate decision rather than a failure,
-    // so the exit code stays 0 — unlike the no-TTY branch above, where
+    // so the exit code stays 0, unlike the no-TTY branch above, where
     // nobody was asked.
     return false;
   }

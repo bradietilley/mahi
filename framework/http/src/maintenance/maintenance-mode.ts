@@ -13,7 +13,7 @@ export const MAINTENANCE_MODE_TOKEN = "maintenance-mode";
  * Not the cache store. `maintenance:down` runs in a **separate process**
  * from the server: with the default `array` driver that process would
  * write the flag into its own heap and exit, so the server never observes
- * it — the operator sees "Application is now in maintenance mode" while
+ * it, the operator sees "Application is now in maintenance mode" while
  * the app keeps serving traffic. With a shared driver it works until
  * `cache:clear` silently brings the app back up, or until the cache is
  * the thing being maintained.
@@ -28,20 +28,20 @@ export function maintenanceFilePath(): string {
 
 /**
  * The payload written when the application is placed into maintenance
- * mode — mirrors the fields Laravel's `php artisan down` accepts, minus
+ * mode, mirrors the fields Laravel's `php artisan down` accepts, minus
  * the ones tied to Blade view rendering (`render`/`redirect`, which have
  * no analog in a JSON-only API).
  */
 export interface MaintenanceData {
   /** `Retry-After` header value (seconds). */
   retryAfter?: number;
-  /** Bypass secret — a request presenting it (see the middleware) is let through. */
+  /** Bypass secret, a request presenting it (see the middleware) is let through. */
   secret?: string;
   /** Human-readable message returned in the 503 body's `message` field. */
   message?: string;
   /** HTTP status to respond with (defaults to 503). */
   status?: number;
-  /** Paths (glob-style, `*` wildcard) that stay reachable while down — e.g. the health check. */
+  /** Paths (glob-style, `*` wildcard) that stay reachable while down, e.g. the health check. */
   except?: string[];
 }
 
@@ -55,8 +55,8 @@ export interface MaintenanceData {
  *
  * The read path is cached in memory with a short TTL. The middleware
  * runs ahead of everything on every request, and a `stat`+`read` per
- * request — on the overwhelmingly common path where the app is UP and
- * the file does not exist — is a syscall pair bought for nothing. One
+ * request, on the overwhelmingly common path where the app is UP and
+ * the file does not exist, is a syscall pair bought for nothing. One
  * second of staleness at the start of a maintenance window is not a
  * meaningful cost; a filesystem hit on every request forever is.
  */
@@ -103,7 +103,7 @@ export class MaintenanceMode {
 
   /**
    * Drop the cached read, so the next `data()` hits disk. Called after
-   * this process changes the state itself — an operator running
+   * this process changes the state itself, an operator running
    * `maintenance:up` must not be told the app is still down for another
    * second.
    */
@@ -117,7 +117,7 @@ export class MaintenanceMode {
       contents = await readFile(maintenanceFilePath(), "utf8");
     } catch {
       // No file (the normal case), or unreadable. Either way the app is
-      // up: failing OPEN here is deliberate — a permissions problem on
+      // up: failing OPEN here is deliberate, a permissions problem on
       // the marker file must not take a healthy application offline.
       return undefined;
     }
@@ -128,7 +128,7 @@ export class MaintenanceMode {
       return parsed !== null && typeof parsed === "object" ? (parsed as MaintenanceData) : {};
     } catch {
       // The file exists but is empty or corrupt. Existence is the
-      // signal; the payload is decoration. Stay down with defaults —
+      // signal; the payload is decoration. Stay down with defaults,
       // the opposite (coming back up because the JSON was truncated
       // mid-write) is the far worse failure.
       this.app.logger.warning("maintenance: marker file is not valid JSON; using defaults.");

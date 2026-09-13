@@ -7,7 +7,7 @@ import { finalizeResponse } from "../boundary.js";
 /**
  * A global HTTP middleware stage, written against `@mahiframework/pipeline`'s
  * `Pipe` shape. The passable is the framework `Request`, not Hono's
- * `Context` — app and provider code never import Hono.
+ * `Context`, app and provider code never import Hono.
  *
  *   const requestId: HttpPipe = async (request, next) => {
  *     request.share("requestId", crypto.randomUUID());
@@ -19,7 +19,7 @@ import { finalizeResponse } from "../boundary.js";
 export type HttpPipe = Pipe<Request, ResponseInput>;
 
 /**
- * The closure half of `HttpPipe` — what the middleware *factories*
+ * The closure half of `HttpPipe`, what the middleware *factories*
  * (`trustProxies()`, `trustHosts()`, `throttle()`) actually return.
  *
  * They are declared with this rather than the wider `HttpPipe` union so a
@@ -53,7 +53,7 @@ export function toHonoMiddleware(pipes: HttpPipe[] | (() => HttpPipe[])): Middle
   return async (c: Context, honoNext: HonoNext) => {
     const stages = resolve();
 
-    // Nothing to run — don't pay for a `Request` (and its eager body parse)
+    // Nothing to run, don't pay for a `Request` (and its eager body parse)
     // just to hand it to an empty pipeline.
     if (stages.length === 0) {
       return honoNext();

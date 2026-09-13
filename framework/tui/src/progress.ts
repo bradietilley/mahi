@@ -12,9 +12,9 @@ type ProgressState = "active" | "error" | "cancel" | "submit";
 
 /**
  * Port of `laravel/prompts`' `Progress.php` + `ProgressRenderer.php`.
- * Not keypress-driven — no raw mode, no `RawTerminal`. Ctrl+C during a
+ * Not keypress-driven, no raw mode, no `RawTerminal`. Ctrl+C during a
  * progress bar arrives as a real `SIGINT` (progress never enables raw
- * mode, so Node's default signal delivery just works) — mirrors PHP's
+ * mode, so Node's default signal delivery just works), mirrors PHP's
  * `pcntl_signal(SIGINT, ...)` handling.
  */
 export class ProgressBar {
@@ -140,7 +140,7 @@ export function createProgress(
 }
 
 /**
- * Auto-map overload — matches Laravel's `progress($label, $steps,
+ * Auto-map overload, matches Laravel's `progress($label, $steps,
  * $callback)`: iterates `items`, calling `callback` once per item and
  * advancing the bar automatically, returning the collected results.
  */

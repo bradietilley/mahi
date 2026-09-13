@@ -5,7 +5,7 @@ import type { DateTime } from "@mahiframework/datetime";
  * The framework-owned `password_reset_tokens` table backing
  * `PasswordBroker`. `email` is the primary key (one live reset per email),
  * so re-requesting overwrites the previous row and the reset lookup is a
- * single indexed PK read. `timestamps: false` — write-once, delete-on-use,
+ * single indexed PK read. `timestamps: false`, write-once, delete-on-use,
  * with `created_at` hand-stamped by the broker.
  *
  * `created_at` is a cast `DateTime`, matching the `table.timestamp()`
@@ -13,9 +13,9 @@ import type { DateTime } from "@mahiframework/datetime";
  * datetime arithmetic rather than millisecond maths on parsed text.
  */
 export interface PasswordResetTokenAttributes {
-  /** The account's login identifier — also the primary key. */
+  /** The account's login identifier, also the primary key. */
   email: string;
-  /** argon2 hash of the reset token — never the plaintext. */
+  /** argon2 hash of the reset token, never the plaintext. */
   token: string;
   created_at: DateTime;
 }

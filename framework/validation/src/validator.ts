@@ -12,7 +12,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[89ab][0-9a-f]{3}-[0-9a-f]
  *
  * That leading constraint matters. A ULID's first 10 characters
  * encode a 48-bit millisecond timestamp, and base32 char 1 carries its
- * high bits — so anything above `7` describes a timestamp larger than
+ * high bits, so anything above `7` describes a timestamp larger than
  * 2^48-1, which cannot be decoded. `ZZZZZZZZZZZZZZZZZZZZZZZZZZ` is 26
  * legal characters and still not a ULID.
  */
@@ -23,7 +23,7 @@ const ALPHA_DASH_RE = /^[A-Za-z0-9_-]+$/;
  *
  * Deliberately just the two web schemes. `mailto:`, `tel:` and friends are
  * legitimate but are not what a bare `url()` means, and admitting them by
- * default would also admit the dangerous ones by the same logic — there is
+ * default would also admit the dangerous ones by the same logic. There is
  * no principled line between `mailto:` and `javascript:` other than an
  * explicit list.
  */
@@ -341,7 +341,7 @@ export class Validator {
 
     const missing = isMissing(value) || (!present && value === undefined);
 
-    // exclude* — drop the field from validated() entirely (no errors) when
+    // exclude*, drop the field from validated() entirely (no errors) when
     // the condition holds. Evaluated first so an excluded field never runs
     // any other rule.
     for (const step of rule.getSteps()) {
@@ -364,7 +364,7 @@ export class Validator {
       }
     }
 
-    // prohibited* — the field must be missing/empty when the condition
+    // prohibited*. The field must be missing/empty when the condition
     // holds; a present, non-empty value is an error.
     for (const step of rule.getSteps()) {
       const prohibited =
@@ -964,7 +964,7 @@ export class Validator {
         const values = step.params?.["values"] as unknown[];
 
         // Non-scalars (arrays/objects) can never legitimately be "in" a
-        // list of scalars — String([…]) coercion would let ["admin"] pass
+        // list of scalars, String([…]) coercion would let ["admin"] pass
         // in(["admin"]) and reach validated(). Reject them outright.
         if (!isScalar(value)) {
           return { status: "fail" };
@@ -972,7 +972,7 @@ export class Validator {
 
         // Strict identity, matching `enum`. The old bidirectional
         // String() coercion let a number 1 satisfy in(["1"]) and a string
-        // "1" satisfy in([1]) — with typed JSON bodies that quietly admits
+        // "1" satisfy in([1]), with typed JSON bodies that quietly admits
         // the wrong type. Declare the type step (.numeric()/.integer())
         // first if the value needs coercing before this compares.
         if (!values.includes(value)) {
@@ -1051,7 +1051,7 @@ export class Validator {
 
         // Parsing alone is not enough. `new URL()` happily accepts
         // `javascript:alert(1)`, `data:text/html,<script>` and
-        // `file:///etc/passwd` — every one of which is a valid absolute
+        // `file:///etc/passwd`, every one of which is a valid absolute
         // URL and none of which is safe to put in an `href` or to fetch.
         // A validated URL that a template then renders is the textbook
         // stored-XSS delivery path, so the allow-list is the default and
@@ -1228,7 +1228,7 @@ const ISO_DATE_RE =
  *
  * Strings must be strict ISO-8601 (see `ISO_DATE_RE`). The old
  * implementation handed the raw string to `Date.parse`, which is
- * implementation-defined and wildly permissive — `Date.parse("2024")`,
+ * implementation-defined and wildly permissive: `Date.parse("2024")`,
  * `Date.parse("garbage 2024")` and assorted locale strings all "succeed",
  * so the `date`/`after`/`before` rules passed inputs Laravel rejects.
  * Gating on the ISO shape first makes the rule deterministic across
@@ -1307,7 +1307,7 @@ function isScalar(value: unknown): value is string | number | boolean {
   return t === "string" || t === "number" || t === "boolean";
 }
 
-/** Loose scalar comparison — `"1"` matches `1`, `true` matches `"true"`. */
+/** Loose scalar comparison. `"1"` matches `1`, `true` matches `"true"`. */
 function looseEquals(a: unknown, b: unknown): boolean {
   if (a === b) {
     return true;

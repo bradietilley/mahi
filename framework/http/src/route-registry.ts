@@ -20,7 +20,7 @@ export class RouteRegistry {
   private byName = new Map<string, NamedRoute>();
 
   /**
-   * Register a named route. Throws if the name is already taken — route
+   * Register a named route. Throws if the name is already taken, route
    * names must be unique so `URL.route(name)` is unambiguous, matching
    * Laravel's duplicate-name detection.
    */

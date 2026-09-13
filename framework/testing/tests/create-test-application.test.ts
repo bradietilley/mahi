@@ -32,7 +32,7 @@ class Widget extends Model<WidgetAttributes>()({
   timestamps: false,
 }) {}
 
-/** Minimal single-provider fixture app — this package can't depend on a real app. */
+/** Minimal single-provider fixture app. This package can't depend on a real app. */
 class WidgetsProvider extends ServiceProvider {
   migrations(): string {
     return FIXTURE_MIGRATIONS_DIR;
@@ -182,8 +182,8 @@ describe("createTestApplication()", () => {
   /**
    * `process.env` is process-global and outlives the Application, so a
    * test file that pointed `DB_FILENAME` at its own temp database left it
-   * pointing there for every file that ran afterwards in the same worker
-   * — at a path `cleanup()` had already deleted.
+   * pointing there for every file that ran afterwards in the same worker,
+   * at a path `cleanup()` had already deleted.
    */
   describe("cleanup() restores the process.env keys it mutated", () => {
     it("deletes keys that were previously unset", async () => {
@@ -195,7 +195,7 @@ describe("createTestApplication()", () => {
 
       await cleanup();
 
-      // Deleted, not set to the string "undefined" — which is what
+      // Deleted, not set to the string "undefined". Which is what
       // `env[key] = undefined` would have produced.
       expect("DB_FILENAME" in process.env).toBe(false);
       expect("NODE_ENV" in process.env).toBe(false);

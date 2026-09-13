@@ -28,7 +28,7 @@ describe("transaction()", () => {
       .addColumn("name", "text", (col) => col.notNull())
       .execute();
 
-    // Static Model access resolves its connection via app() — wire up a
+    // Static Model access resolves its connection via app(), wire up a
     // minimal Application whose DatabaseManager points at this driver, so
     // Widget.xxx() calls outside of a transaction() have somewhere to go.
     const app = new Application();
@@ -146,7 +146,7 @@ describe("transaction() nesting", () => {
       ).rejects.toThrow("inner boom");
 
       // The outer transaction is still usable after the inner one rolled
-      // back to its savepoint — that's the whole point of nesting.
+      // back to its savepoint. That's the whole point of nesting.
       await Widget.create({ id: "after", name: "After" });
     });
 

@@ -6,8 +6,8 @@ import { ReleaseJobError } from "./release-job-error.js";
  * Job middleware that rate-limits how often a job may run, using a named
  * limiter registered on `@mahiframework/cache`'s `RateLimiter` (the very
  * same primitive the `throttle()` HTTP middleware uses). When the limit is
- * exceeded the job is **released** back onto the queue — via
- * `ReleaseJobError` — to be retried once the window frees up, rather than
+ * exceeded the job is **released** back onto the queue, via
+ * `ReleaseJobError`, to be retried once the window frees up, rather than
  * failed.
  *
  * The `RateLimiter` is passed in **explicitly** by the app (not
@@ -46,7 +46,7 @@ export class RateLimited implements JobMiddleware {
     const resolve = this.limiter.limiter(this.limiterName);
 
     if (!resolve) {
-      // No such limiter registered — treat as unlimited (fail open),
+      // No such limiter registered, treat as unlimited (fail open),
       // matching Laravel's behaviour when a named limiter is absent.
       await next(passable);
 
@@ -68,7 +68,7 @@ export class RateLimited implements JobMiddleware {
       }
     }
 
-    // Under every limit — count this run against each before proceeding.
+    // Under every limit, count this run against each before proceeding.
     for (const limit of limits) {
       if (limit instanceof Unlimited) {
         continue;

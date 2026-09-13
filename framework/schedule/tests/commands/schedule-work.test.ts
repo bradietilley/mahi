@@ -28,7 +28,7 @@ describe("ScheduleWorkCommand", () => {
 
   afterEach(async () => {
     // Unconditional, so a test that fails or times out cannot leave fake
-    // timers installed for the next one — `withLoop()`'s own
+    // timers installed for the next one. `withLoop()`'s own
     // `useRealTimers()` is in a `finally` that a timed-out body reaches
     // late, or never.
     vi.useRealTimers();
@@ -78,8 +78,8 @@ describe("ScheduleWorkCommand", () => {
      * Which `withLoop()` call is the live one.
      *
      * Vitest rejects a timed-out test's promise but does NOT abort the
-     * async function behind it, so a timed-out body keeps executing —
-     * detached — and eventually reaches its own cleanup while the NEXT
+     * async function behind it, so a timed-out body keeps executing,
+     * detached, and eventually reaches its own cleanup while the NEXT
      * test is already in flight. That zombie cleanup used to
      * `process.emit("SIGINT")` (a global broadcast that stopped the new
      * test's loop, so it saw one tick instead of two) and advance fake
@@ -89,7 +89,7 @@ describe("ScheduleWorkCommand", () => {
      *
      * A generation counter lets a stale cleanup detect that it has been
      * superseded and do nothing. Belt and braces alongside the raised
-     * `testTimeout` — that removes the trigger, this contains the blast
+     * `testTimeout`. That removes the trigger, this contains the blast
      * radius if some future test is slow again.
      */
     let generation = 0;
@@ -110,7 +110,7 @@ describe("ScheduleWorkCommand", () => {
       // Snapshot the process-global SIGINT listeners so the ones this
       // command installs can be invoked DIRECTLY at cleanup. Emitting the
       // signal would fan out to every listener on the process, including
-      // another test's — which is precisely the leak described above.
+      // another test's. Which is precisely the leak described above.
       const before = new Set(process.listeners("SIGINT"));
 
       const command = new ScheduleWorkCommand(app);
@@ -136,7 +136,7 @@ describe("ScheduleWorkCommand", () => {
         }
 
         if (generation === mine) {
-          // Let the loop observe the flag, exit, and drain in-flight ticks —
+          // Let the loop observe the flag, exit, and drain in-flight ticks,
           // including any task timer still pending, which the shutdown
           // deliberately awaits. Generous, because these are fake timers:
           // advancing costs nothing in real time.

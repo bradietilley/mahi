@@ -19,7 +19,7 @@ import { providers } from "../config/app.js";
  * the config repository, register providers, then run the two-stage
  * `register()`/`boot()` lifecycle.
  *
- * Shared by every entrypoint — `bin/console.ts` (the CLI, and therefore
+ * Shared by every entrypoint, `bin/console.ts` (the CLI, and therefore
  * `./artisan`), `bin/server.ts` (production HTTP), and the test suite via
  * `createTestApplication(bootstrap)`. Keeping it in one function is what
  * makes a test run against the same wiring as production.

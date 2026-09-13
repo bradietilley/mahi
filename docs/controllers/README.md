@@ -32,7 +32,7 @@ export abstract class Controller<R extends Request = Request> {
 }
 ```
 
-That's the entire class. It ships with **no behaviour** — no helper
+That's the entire class. It ships with **no behaviour**, no helper
 methods, no injected services, no constructor. It exists so applications
 can build their own inheritance chains and put whatever they want on their
 own base:
@@ -56,7 +56,7 @@ export class ShowController extends ApiController {
 platform `Response`. See [Responses](../responses/).
 
 `isControllerClass(value)` is how the router tells a controller class from
-a plain handler function — it checks `value.prototype instanceof Controller`.
+a plain handler function. It checks `value.prototype instanceof Controller`.
 That's why extending `Controller` is required rather than merely having a
 `handle` method.
 
@@ -80,7 +80,7 @@ export class CreatePostController extends Controller<CreatePostRequest> {
 
 The generic parameter is what types `handle()`'s argument and, through it,
 `request.validated()`. Writing `Controller<CreatePostRequest>` without
-`request = CreatePostRequest` compiles but does nothing at runtime — the
+`request = CreatePostRequest` compiles but does nothing at runtime. The
 property is the runtime signal; the generic is the compile-time one. Keep
 them in sync.
 
@@ -107,14 +107,14 @@ return async (request: Request) => {
 
 ### 1. Construct a fresh instance
 
-`new ControllerClass()` — no arguments, every request.
+`new ControllerClass()`, no arguments, every request.
 
 **There is no constructor dependency injection.** The `ControllerClass`
 type is `new () => Controller<R>`, so the container never has to guess what
 a constructor parameter means. Controllers reach services through the
 existing facades and helpers (`Auth`, `authorize()`, `Events`, `Bus`,
 `URL`), or `app().make(TOKEN)` for anything else. This keeps the base
-class dependency-free and resolution readable — see the "explicit
+class dependency-free and resolution readable. See the "explicit
 resolution, no decorators" principle in the [overview](../).
 
 ### 2. Upgrade the request
@@ -164,13 +164,13 @@ if (allowed === false) throw HttpError.forbidden();
 await typed.validateOrFail();
 ```
 
-Validation is **skipped entirely** when `rules()` is empty — no `Validator`
+Validation is **skipped entirely** when `rules()` is empty. No `Validator`
 is constructed. A failure throws `ValidationException`, which the central
 error handler renders as `422` with a per-field `errors` bag.
 
 ### Why prepare runs before authorize
 
-`prepareForValidation()` is where a request normalizes its own input —
+`prepareForValidation()` is where a request normalizes its own input,
 lowercasing an email, merging a route param or the current user. Running
 it after `authorize()` (as the pipeline previously did, because it was
 buried inside `validate()`) means authorization inspects the *raw* bag,
@@ -182,7 +182,7 @@ it should be allowed. Laravel prepares first for the same reason.
 This is Laravel's order, and it's the right one. A request that isn't
 allowed to perform the action gets a `403` regardless of whether its payload
 was well-formed. Validating first would tell an unauthorized caller which
-fields your endpoint accepts and which of their values were malformed —
+fields your endpoint accepts and which of their values were malformed,
 free schema reconnaissance for someone who was never going to be permitted
 through.
 
@@ -207,15 +207,15 @@ The container never caches controller instances. Every request constructs
 its own.
 
 Node keeps a single process alive across every concurrent request. A
-long-lived controller instance would share mutable state between them — a
+long-lived controller instance would share mutable state between them, a
 `private currentUser` assigned in one request is visible to another that
 interleaves at the next `await`. That's not a theoretical race; it's the
 default outcome, and the bug it produces (one user's data in another user's
 response) is the worst class of bug an application framework can make easy.
 
-Construction is cheap: an empty object with a prototype. The alternative —
+Construction is cheap: an empty object with a prototype. The alternative,
 singleton controllers with a discipline of "never store request state on
-`this`" — trades a free allocation for a rule that only holds until someone
+`this`", trades a free allocation for a rule that only holds until someone
 forgets it.
 
 If a controller genuinely needs expensive per-instance setup, that's a
@@ -250,7 +250,7 @@ export class DeletePostController extends Controller {
 ```
 
 The second form runs after the model fetch, which the request-level hook
-can't easily do without duplicating the query — though the model cache
+can't easily do without duplicating the query, though the model cache
 means it wouldn't actually cost a second round trip if you did.
 
 ## A worked example
@@ -297,7 +297,7 @@ router.group("/auth", (auth) => {
 });
 ```
 
-`request.validated()` is fully typed from `RegisterRequest.rules()` — no
+`request.validated()` is fully typed from `RegisterRequest.rules()`, no
 casts, no `as`, no separate DTO interface. See
 [typed output](../validation/#typed-output) for how.
 
@@ -311,15 +311,15 @@ router.get("/health", () => HttpResponse.json({ ok: true }));
 router.get("/storage/*", servePublicDisk("public"));
 ```
 
-Function handlers get none of the pipeline — no form-request upgrade, no
+Function handlers get none of the pipeline, no form-request upgrade, no
 `authorize()`, no validation. They're right for trivial endpoints and for
 handlers a package hands you pre-built.
 
 ## Related
 
-- [Requests](../requests/) — form requests, `authorize()`, `validated()`
-- [Validation](../validation/) — rules and typed output
-- [Responses](../responses/) — return values and error handling
-- [Routing](../routing/) — mounting controllers on routes
-- [Authorization](../authorization/) — gates, policies, `authorize()`
-- [Service providers](../providers/) — where to bind services controllers resolve
+- [Requests](../requests/): form requests, `authorize()`, `validated()`
+- [Validation](../validation/): rules and typed output
+- [Responses](../responses/): return values and error handling
+- [Routing](../routing/): mounting controllers on routes
+- [Authorization](../authorization/): gates, policies, `authorize()`
+- [Service providers](../providers/): where to bind services controllers resolve

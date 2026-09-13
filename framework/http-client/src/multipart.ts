@@ -45,7 +45,7 @@ export async function buildMultipart(
 /**
  * Normalises attachment contents into a `File`, recording its text in
  * `attachedText` so `ClientRequest.hasFile(name, contents)` can compare
- * synchronously — `File.text()` is async, and assertion callbacks are not.
+ * synchronously. `File.text()` is async, and assertion callbacks are not.
  *
  * A `ReadableStream` is drained here: `FormData` has no streaming part, so
  * a streamed attachment has to be materialised regardless. Streaming a

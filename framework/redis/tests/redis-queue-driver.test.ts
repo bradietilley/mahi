@@ -21,8 +21,8 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisQueueDriver (integration)", () => {
     for (const connection of connections.splice(0)) {
       // Delete only this run's keys, by prefix. `FLUSHDB` empties the
       // whole logical DB, which is fine against a throwaway container and
-      // destructive against the dev Redis a developer runs these against
-      // — and it is exactly the "one command wipes a co-tenant" behaviour
+      // destructive against the dev Redis a developer runs these against,
+      // and it is exactly the "one command wipes a co-tenant" behaviour
       // `RedisCacheStore.flush()` goes out of its way not to have.
       const prefix = connection.keyPrefix();
       const keys = await connection.client().keys(`${prefix}*`);
@@ -115,7 +115,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisQueueDriver (integration)", () => {
       const d = await driver(undefined, { retryAfterSeconds: 90 });
       await d.push("Job", { n: 1 });
 
-      // Reserved and never acked — but the worker holding it is still
+      // Reserved and never acked, but the worker holding it is still
       // presumed alive.
       expect(await d.pop()).toBeDefined();
       expect(await d.pop()).toBeUndefined();

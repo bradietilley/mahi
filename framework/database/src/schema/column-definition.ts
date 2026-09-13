@@ -5,7 +5,7 @@ import { inferTableFromForeignId } from "./types.js";
  * Fluent per-column modifiers, mirroring
  * `Illuminate\Database\Schema\ColumnDefinition`.
  *
- * The concrete DDL type is NOT computed here — it depends on the target
+ * The concrete DDL type is NOT computed here. It depends on the target
  * dialect and on modifiers set after construction (`length`, `unsigned`,
  * `decimal` precision, `enum` values). The grammar resolves it at compile
  * time via `compileColumnType(def, dialect)`.
@@ -36,7 +36,7 @@ export class ColumnDefinition {
    *
    * `undefined` means the caller didn't ask, and each grammar applies
    * its own default (0 on MySQL/Postgres, matching Laravel; SQLite
-   * stores text and ignores it). Set it to keep sub-second data — a
+   * stores text and ignores it). Set it to keep sub-second data, a
    * `timestamp(col)` column truncates to whole seconds on both server
    * engines, so a millisecond value written to it comes back rounded.
    */

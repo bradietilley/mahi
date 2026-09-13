@@ -1,7 +1,7 @@
 /**
  * Locale-aware number formatting plus a handful of hand-rolled helpers
  * (`fileSize`/`abbreviate`/`clamp`) with no `Intl` equivalent.
- * Thin wrapper over Node's built-in `Intl.NumberFormat` — Laravel's
+ * Thin wrapper over Node's built-in `Intl.NumberFormat`, Laravel's
  * `Illuminate\Support\Number`, minus `spell`/`ordinal` (low value,
  * locale-table-heavy).
  *
@@ -48,7 +48,7 @@ export const Num = {
 
   /**
    * Format `value` as a percentage string. `value` is already in percent
-   * form — `percentage(10)` is `"10%"`, matching Laravel's
+   * form. `percentage(10)` is `"10%"`, matching Laravel's
    * `Number::percentage(10)`, not `Intl`'s 0–1 fraction convention.
    */
   percentage(value: number, options?: NumberFormatOptions): string {

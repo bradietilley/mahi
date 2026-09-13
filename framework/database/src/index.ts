@@ -88,7 +88,7 @@ export type {
   RelationMarker,
   RelationKind,
   // Exported so a downstream package's declaration emit can NAME the
-  // phantom that `ModelInstance` carries — without it, `tsc` on a
+  // phantom that `ModelInstance` carries, without it, `tsc` on a
   // consuming package fails with TS2742 ("cannot be named without a
   // reference to .../markers.js").
   HasAttributes,

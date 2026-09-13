@@ -13,8 +13,8 @@ import type { StorageManagerLike } from "./contracts.js";
  *
  * The `health-check/` prefix rather than the disk root keeps probe
  * artifacts in one directory an operator can identify and delete. Unlike
- * cache there is no TTL, so the `delete` in `finally` is the only cleanup
- * — hence the subdirectory: if deletes are what's broken, the accumulating
+ * cache there is no TTL, so the `delete` in `finally` is the only cleanup,
+ * hence the subdirectory: if deletes are what's broken, the accumulating
  * files are at least contained and diagnostic. A failed delete does not
  * fail the check.
  */

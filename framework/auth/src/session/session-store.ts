@@ -6,7 +6,7 @@ export interface SessionRecord {
 
 /**
  * Server-side session storage. The session *data* never leaves the
- * server — the cookie carries only a signed id — which is what makes a
+ * server, the cookie carries only a signed id, which is what makes a
  * session revocable by deleting its row. That revocability is the same
  * argument that rules out JWT for this framework's auth.
  */
@@ -33,7 +33,7 @@ export interface SessionStore {
 
   /**
    * Delete expired sessions; returns how many were removed. Driven by the
-   * `auth:gc` command — a database-backed store has no automatic expiry,
+   * `auth:gc` command. A database-backed store has no automatic expiry,
    * so without this the table grows forever.
    */
   gc(): Promise<number>;

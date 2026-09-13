@@ -1,10 +1,10 @@
 /**
  * Bracket-notation encoder for query strings, urlencoded form bodies, and
- * multipart fields — the producer side of `@mahiframework/http`'s query parser, and
+ * multipart fields, the producer side of `@mahiframework/http`'s query parser, and
  * the behaviour PHP's `http_build_query()` (and `qs.stringify`) give you.
  *
  * A plain `String(value)` over every field turns a nested value like
- * `{ a: { b: 1 } }` into the literal `a=[object Object]` — never what the
+ * `{ a: { b: 1 } }` into the literal `a=[object Object]`, never what the
  * caller meant, and it corrupts the request silently rather than failing.
  *
  * The emitted syntax:
@@ -16,7 +16,7 @@
  *
  * Scalar arrays stay repeated keys rather than becoming indexed
  * (`a[0]=…`): that is the shape every server and the paired parser read.
- * Object nesting must be walked explicitly — naive stringification turns
+ * Object nesting must be walked explicitly, naive stringification turns
  * `{ a: { b: 1 } }` into the literal `a=[object Object]`.
  *
  * (These packages share a wire format, not code: `@mahiframework/http-client` sits
@@ -30,7 +30,7 @@ export type EncodedField = [string, string];
  * Flattens a payload object into bracket-notation `[key, value]` pairs.
  *
  * `null`/`undefined` values are skipped rather than serialized as the
- * strings `"null"`/`"undefined"` — matching the query and form code this
+ * strings `"null"`/`"undefined"`, matching the query and form code this
  * replaces, and matching Laravel, which drops empty values from a query.
  * Every leaf is coerced with `String()`, so shape (nesting) is decided
  * here while type (string form) stays the caller's, exactly as the inbound
@@ -52,7 +52,7 @@ function appendField(fields: EncodedField[], key: string, value: unknown): void 
   }
 
   if (Array.isArray(value)) {
-    // Repeated key, not `key[index]` — an array item may itself be an
+    // Repeated key, not `key[index]`. An array item may itself be an
     // object (`{ a: [{ b: 1 }] }` → `a[b]=1`), which recurses under the
     // same key.
     for (const item of value) {

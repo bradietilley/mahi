@@ -2,7 +2,7 @@ import type { Notification } from "./notification.js";
 import type { NotificationRoutable } from "./notifiable.js";
 
 /**
- * The one interface every notification channel implements — the
+ * The one interface every notification channel implements, the
  * notifications analogue of `MailTransport`/`CacheStore`/`QueueDriver`.
  * Resolved by name through `ChannelManager` (`mail`/`database`/`broadcast`
  * built in, more via `ChannelManager.extend()`).

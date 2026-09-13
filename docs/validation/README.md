@@ -2,7 +2,7 @@
 
 `@mahiframework/validation` provides a fluent `Rule` builder, a `Validator` that
 runs it, and a `ValidationException` the HTTP layer renders as a 422. The
-package has no dependency on HTTP or the database — it runs in jobs, CLI
+package has no dependency on HTTP or the database. It runs in jobs, CLI
 commands, and tests as readily as in a request.
 
 ```ts
@@ -28,7 +28,7 @@ string; password: string }` with no cast and no separate DTO.
 ## Building rules
 
 `rule()` starts a chain. Every call appends a step and returns the rule, so
-order is preserved — but at the **type** level, the last type-setting call
+order is preserved, but at the **type** level, the last type-setting call
 wins, and presence is tracked in a separate type parameter so
 `.optional()` / `.required()` stay reversible.
 
@@ -42,7 +42,7 @@ Four shortcut factories skip the first call:
 
 | Factory | Equivalent to |
 |---|---|
-| `rule()` | `Rule.make()` — `Rule<unknown, "required">` |
+| `rule()` | `Rule.make()`: `Rule<unknown, "required">` |
 | `stringRule(message?)` | `rule().string(message)` |
 | `numberRule(message?)` | `rule().number(message)` |
 | `booleanRule(message?)` | `rule().boolean(message)` |
@@ -58,7 +58,7 @@ These set the value type and coerce the validated output.
 
 | Method | Output type | Accepts |
 |---|---|---|
-| `string(message?)` | `string` | Only an actual `string` — no coercion |
+| `string(message?)` | `string` | Only an actual `string`: no coercion |
 | `number(message?)` | `number` | A finite number, or a numeric string |
 | `numeric(message?)` | `number` | Alias for `number()` |
 | `integer(message?)` | `number` | An integer, or a `/^-?\d+$/` string |
@@ -73,7 +73,7 @@ Coercion is real: `numberRule()` on `"5"` puts the **number** `5` into
 `validated()`, and `rule().boolean()` on `"on"` puts `true`.
 
 > `string()` does **not** coerce. A JSON number `5` fails
-> `stringRule()` with "The s field must be a string." That's intentional —
+> `stringRule()` with "The s field must be a string." That's intentional,
 > silently stringifying means a client sending the wrong type never finds
 > out.
 
@@ -85,13 +85,13 @@ Coercion is real: `numberRule()` on `"5"` puts the **number** `5` into
 | `optional()` | `T \| undefined` | Skipped entirely when missing; omitted from `validated()` |
 | `nullable()` | `T \| null` | An explicit `null` short-circuits the remaining steps and is kept |
 | `nullish()` | `T \| null \| undefined` | Both of the above |
-| `sometimes()` | `T \| undefined` | Skipped when missing, but **order-independent** — unlike `optional()`, see below |
+| `sometimes()` | `T \| undefined` | Skipped when missing, but **order-independent**, unlike `optional()`, see below |
 | `filled(message?)` | `this` | When the key **is** present, it must not be empty |
 | `present(message?)` | `this` | The key must exist, but may be empty |
 
 > **`optional()` defeats `present()`.** `optional()` skips every remaining
 > step when the key is missing, so `present()` never runs and the pair
-> asserts nothing at all — in either order. It is a contradiction ("may be
+> asserts nothing at all, in either order. It is a contradiction ("may be
 > absent" + "must be present") that fails open rather than erroring. Use
 > `nullable().present()` if you want "the key must appear, but its value
 > may be empty".
@@ -113,7 +113,7 @@ if (bio !== undefined) updates.bio = bio;  // null clears it, undefined skips it
 ```
 
 > **`nullable()` is not Laravel's `nullable`.** In Laravel, `nullable|string`
-> passes when the key is **absent** — `nullable` there means "null *or*
+> passes when the key is **absent**, `nullable` there means "null *or*
 > missing is fine". In Mahi, presence is a type-carrying dimension, so the
 > four presence rules split that into two axes:
 >
@@ -123,7 +123,7 @@ if (bio !== undefined) updates.bio = bio;  // null clears it, undefined skips it
 > | `nullable()` | **fails required** | kept, skips remaining rules | `T \| null` |
 > | `nullish()` | skipped | kept, skips remaining rules | `T \| null \| undefined` |
 >
-> The Laravel `nullable` you're reaching for is Mahi's **`nullish()`** — it
+> The Laravel `nullable` you're reaching for is Mahi's **`nullish()`**, it
 > allows both a missing key and an explicit `null`. `nullable()` keeps the
 > stricter, type-honest meaning "the key must be present, but its value may
 > be `null`", matching its inferred `T | null`. If you port `nullable|string`
@@ -132,8 +132,8 @@ if (bio !== undefined) updates.bio = bio;  // null clears it, undefined skips it
 > **`sometimes()` is order-independent.** `sometimes().required()` and
 > `required().sometimes()` behave identically: a missing key is skipped, a
 > present key runs every other rule (including `required`, so a present-but-
-> empty value fails). It matches Laravel's `sometimes` — "validate only when
-> present" — regardless of chain position.
+> empty value fails). It matches Laravel's `sometimes`, "validate only when
+> present", regardless of chain position.
 
 ### Size constraints
 
@@ -160,8 +160,8 @@ rule().array(fileRule().image()).max(4);      // ≤ 4 items
 | `max(value, message?)` | |
 | `between(min, max, message?)` | |
 
-The default message picks the right wording — "at least 5 characters"
-versus "at least 5 kilobytes" — from the resolved value type.
+The default message picks the right wording, "at least 5 characters"
+versus "at least 5 kilobytes", from the resolved value type.
 
 ### String constraints
 
@@ -177,9 +177,9 @@ versus "at least 5 kilobytes" — from the resolved value type.
 | `endsWith(suffix \| suffixes, message?)` | Any listed suffix |
 | `lowercase(message?)` | `value === value.toLowerCase()` |
 | `uppercase(message?)` | `value === value.toUpperCase()` |
-| `uuid(message?)` | RFC 4122 v-agnostic with an `[89ab]` variant nibble — so the nil and max UUIDs are **rejected** |
+| `uuid(message?)` | RFC 4122 v-agnostic with an `[89ab]` variant nibble, so the nil and max UUIDs are **rejected** |
 | `ulid(message?)` | 26 Crockford base32 characters, first one `0-7` (a larger value is an undecodable timestamp) |
-| `url(schemes?, message?)` | An absolute URL whose scheme is allowed — `http`/`https` by default |
+| `url(schemes?, message?)` | An absolute URL whose scheme is allowed, `http`/`https` by default |
 | `json(message?)` | Parses as `JSON.parse(…)` |
 | `ip(message?)` | A valid IPv4 or IPv6 address |
 | `ipv4(message?)` | A valid IPv4 address |
@@ -196,7 +196,7 @@ username: rule()
 
 > **`url()` allow-lists schemes, and you usually want that.** `new URL()`
 > alone accepts `javascript:alert(1)`, `data:text/html,…` and
-> `file:///etc/passwd` — all valid absolute URLs, none safe in an `href` or
+> `file:///etc/passwd`, all valid absolute URLs, none safe in an `href` or
 > as a fetch target. A bare `url()` therefore permits only `http` and
 > `https`; name your own to widen or narrow it:
 >
@@ -217,16 +217,16 @@ username: rule()
 > conversion**, so a string with no case at all (`"123"`, `"日本語"`, an
 > emoji) satisfies **both**. They use the locale-invariant
 > `toLowerCase()`/`toUpperCase()`, so behaviour does not shift with the host
-> locale — but note a lowercase `ß` can never satisfy `uppercase()`, since
+> locale, but note a lowercase `ß` can never satisfy `uppercase()`, since
 > its uppercase form is the two-character `"SS"`.
 
 ### Date constraints
 
 | Method | Checks |
 |---|---|
-| `date(message?)` | A `Date`, an epoch number, or a **strict ISO-8601 string** — not `Date.parse`, which accepts `"2024"` and other partials |
+| `date(message?)` | A `Date`, an epoch number, or a **strict ISO-8601 string**, not `Date.parse`, which accepts `"2024"` and other partials |
 | `dateFormat(format, message?)` | Matches a token format built from `YYYY`, `MM`, `DD`, `HH`, `mm`, `ss` (anything else is a literal) |
-| `after(date, message?)` | Later than `date` — a literal date string **or another field name** |
+| `after(date, message?)` | Later than `date`: a literal date string **or another field name** |
 | `afterOrEqual(date, message?)` | Later than or equal to `date` |
 | `before(date, message?)` | Earlier than `date` |
 | `beforeOrEqual(date, message?)` | Earlier than or equal to `date` |
@@ -242,7 +242,7 @@ back to parsing it as a literal date.
 }
 ```
 
-`dateFormat` is deliberately dependency-free — it covers the common
+`dateFormat` is deliberately dependency-free. It covers the common
 `YYYY-MM-DD` / `HH:mm:ss` shapes without pulling in a date library. For
 anything more exotic, validate with a custom rule.
 
@@ -257,7 +257,7 @@ anything more exotic, validate with a custom rule.
 | `different(other, message?)` | Doesn't |
 | `confirmed(message?)` | Equals the sibling `<field>_confirmation` (resolved relative to the parent, so it works inside `object()`/`array()`) |
 | `multipleOf(value, message?)` | `n % divisor === 0` |
-| `size(value, message?)` | Exact size — number value, string length, array length, or file KB |
+| `size(value, message?)` | Exact size, number value, string length, array length, or file KB |
 | `gt(other, message?)` | Size greater than the `other` field's size |
 | `gte(other, message?)` | Greater than or equal |
 | `lt(other, message?)` | Less than |
@@ -268,7 +268,7 @@ anything more exotic, validate with a custom rule.
 | `requiredArrayKeys(...keys)` | An object that contains every listed key |
 
 > **`in()` rejects non-scalars.** An array or object value never passes
-> `in()` / `notIn()` — previously `["admin"]` could slip through `in(["admin"])`
+> `in()` / `notIn()`, previously `["admin"]` could slip through `in(["admin"])`
 > via `String()` coercion and reach `validated()`. Coerce to a scalar with a
 > type rule first if you need loose matching.
 
@@ -276,8 +276,8 @@ anything more exotic, validate with a custom rule.
 > `values.includes(value)`, so `in([1])` and a numeric `enum()` each
 > **reject** the string `"1"`. Put a coercing type rule first
 > (`rule().integer().in([1, 2])`, `rule().integer().enum(Priority)`) when
-> the input arrives form-encoded. `in()` was once loose — matching on
-> `String(candidate) === String(value)` — but that let a number `1` satisfy
+> the input arrives form-encoded. `in()` was once loose, matching on
+> `String(candidate) === String(value)`, but that let a number `1` satisfy
 > `in(["1"])` and vice versa, so the coercion now has to be asked for.
 
 > **`enum()` matches values, not keys.** Invisible for a string enum,
@@ -290,12 +290,12 @@ anything more exotic, validate with a custom rule.
 > ```
 >
 > `Object.values(Priority)` is therefore `["Low", "High", 0, 1]`. `enum()`
-> strips the reverse entries and accepts only `0` and `1` — the strings
+> strips the reverse entries and accepts only `0` and `1`, the strings
 > `"Low"` and `"High"` are rejected, as they must be, since they fall
 > outside the `E[keyof E]` type the rule narrows to.
 
 `confirmed()` looks for the `_confirmation` suffix in the raw data bag, not
-the rules — you don't declare `password_confirmation` as a field, and it
+the rules. You don't declare `password_confirmation` as a field, and it
 won't appear in `validated()`.
 
 ### Conditional presence
@@ -328,7 +328,7 @@ plus an optional message: `requiredWith(["a", "b"], "Needed together.")`.
 | `excludeUnless(other, value)` | Drop unless `data[other]` loosely equals `value` |
 
 `prohibited*` errors when the field carries a value; `exclude*` silently
-strips it from the validated output — useful for fields you accept but never
+strips it from the validated output, useful for fields you accept but never
 want to persist under certain conditions.
 
 ### File constraints
@@ -348,8 +348,8 @@ document: fileRule().mimes("pdf", "docx").max(10240),
 images: rule().array(fileRule().image().max(5120)).max(4).optional(),
 ```
 
-Files reach the validator through its second constructor argument — a form
-request passes `this.allFiles()` — so a file field validates even though
+Files reach the validator through its second constructor argument, a form
+request passes `this.allFiles()`, so a file field validates even though
 it never appears in `all()`.
 
 ### Database presence
@@ -361,7 +361,7 @@ it never appears in `all()`.
 | `ignore(id, column = "id")` | Exclude a row from the most recent `unique()` |
 
 The first argument is a table name or a model class (anything with
-`{ table, primaryKeyColumn? }` — `primaryKeyColumn` is the read-only alias
+`{ table, primaryKeyColumn? }`. `primaryKeyColumn` is the read-only alias
 every model exposes for its configured `primaryKey`). The column defaults
 to the model's primary key, or `"id"`.
 
@@ -395,7 +395,7 @@ A branch may be a `Rule`, an array of rules, or a `(rule) => void` callback.
 Splicing a `Rule` in copies its steps (and its `as()` name and `bail()`
 flag) into this one.
 
-`as()` changes only the `:attribute` substitution — the **error bag key
+`as()` changes only the `:attribute` substitution, the **error bag key
 stays the field name**:
 
 ```ts
@@ -461,8 +461,8 @@ A top-level rule key may itself use dot notation to reach into nested input:
 
 The validator resolves the path for reading and rebuilds the nesting in
 `validated()`, creating an array when the next segment is numeric. Prefer
-`object()` when you're validating a whole nested structure — it gives a
-better inferred type — and dotted keys for reaching a single deep field.
+`object()` when you're validating a whole nested structure, it gives a
+better inferred type, and dotted keys for reaching a single deep field.
 
 ## The `Validator`
 
@@ -476,9 +476,9 @@ new Validator(
 
 | Method | Returns |
 |---|---|
-| `passes()` | `Promise<boolean>` — **memoized**, a second call returns the first result |
+| `passes()` | `Promise<boolean>`: **memoized**, a second call returns the first result |
 | `errors()` | `Record<string, string[]>` |
-| `validated()` | `Record<string, unknown>` — **throws** if called before `passes()` or after a failure |
+| `validated()` | `Record<string, unknown>`: **throws** if called before `passes()` or after a failure |
 
 `validated()` is strict by design: calling it before awaiting `passes()`
 throws (you'd otherwise read an empty object), and calling it after a
@@ -504,13 +504,13 @@ Two behaviours to note:
 
 - **Unknown keys are stripped.** `validated()` contains only fields you
   declared rules for. Passing it straight to `Model.create()` is safe by
-  construction — an attacker adding `{ "isAdmin": true }` to the payload
+  construction, an attacker adding `{ "isAdmin": true }` to the payload
   gets it dropped, not persisted.
 - **Missing optional fields are omitted**, not set to `undefined`. So
   `"age" in validated()` is `false`, which is what makes the
   `if (name !== undefined)` partial-update pattern work.
 
-Inside HTTP you rarely construct this yourself —
+Inside HTTP you rarely construct this yourself.
 `Request.validate()` does it with `new Validator(this.all(),
 this.allFiles(), rules)`. See [form requests](../requests/#form-requests).
 
@@ -523,7 +523,7 @@ export class ValidationException extends Error {
 }
 ```
 
-Thrown by `Request.validateOrFail()` — which is what the
+Thrown by `Request.validateOrFail()`. Which is what the
 [controller pipeline](../controllers/#the-per-request-pipeline) calls. The
 central error handler renders it as `422`:
 
@@ -537,7 +537,7 @@ central error handler renders it as `422`:
 }
 ```
 
-The top-level `message` is always the literal `"Validation failed"` — the
+The top-level `message` is always the literal `"Validation failed"`. The
 per-field detail lives entirely in `errors`. Every value is an array, even
 for a single message, so clients never have to branch on the shape.
 
@@ -582,7 +582,7 @@ const { body, images } = request.validated();
 > the per-key rule types are lost, collapsing `validated()` to something
 > useless. End every `rules()` with `as const`.
 
-Note the chain order doesn't matter for the type — `.required()` and
+Note the chain order doesn't matter for the type, `.required()` and
 `.optional()` set `P` wherever they appear, and the last type-setting call
 sets `T`. `rule().string().required()` and `rule().required().string()`
 both give `Rule<string, "required">`.
@@ -608,7 +608,7 @@ min: {
 ```
 
 `:attribute` defaults to the field name with `_` and `.` replaced by
-spaces — `first_name` becomes "first name", `meta.title` becomes "meta
+spaces. `first_name` becomes "first name", `meta.title` becomes "meta
 title".
 
 ### Per-rule override
@@ -639,7 +639,7 @@ Rule.setDefaultAttributes({
 
 `setDefaultErrors` **merges over** the built-in map, so you only supply what
 you're changing. `setDefaultAttributes` **replaces** the attribute map
-wholesale. Both are process-global — call them once from a provider's
+wholesale. Both are process-global, call them once from a provider's
 `boot()`. `resetDefaults()` restores the built-ins, which is what test
 suites want in a `beforeEach`.
 
@@ -673,13 +673,13 @@ class ValidPostTitle extends ValidationRule {
 three historical rule shapes with one interface. Each `Validator` clones
 the rules it's handed (including custom `ValidationRule` instances), and the
 validator calls `reset()` before each `run()`, so a single module-scope rule
-is safe to reuse across fields **and across concurrent requests** — one
+is safe to reuse across fields **and across concurrent requests**, one
 request's `await` inside `run()` can't observe another's pass/fail state.
 
 ## The presence resolver
 
 `exists()` and `unique()` need database access, which `@mahiframework/validation`
-deliberately doesn't have — it would make every consumer of the package
+deliberately doesn't have. It would make every consumer of the package
 depend on the ORM. Instead there's a single injection point:
 
 ```ts
@@ -707,7 +707,7 @@ Using either rule with no resolver registered **throws**:
 exists() requires a presence resolver. Register one via Rule.setPresenceResolver().
 ```
 
-Not a validation failure — a thrown error, so it surfaces as a 500 rather
+Not a validation failure, a thrown error, so it surfaces as a 500 rather
 than silently rejecting every value as invalid. If you see this in a test,
 the test isn't booting `DatabaseServiceProvider`; register a stub:
 
@@ -730,8 +730,8 @@ endpoint; unremarkable on registration.
 
 ## Related
 
-- [Requests](../requests/) — form requests, `rules()`, `validated()`, `prepareForValidation()`
-- [Controllers](../controllers/) — where validation runs in the request pipeline
-- [Responses](../responses/) — the 422 body shape
-- [Models](../models/) — the `table` and `primaryKeyColumn` that `unique`/`exists` read
-- [Database](../database/) — the presence resolver's connection
+- [Requests](../requests/): form requests, `rules()`, `validated()`, `prepareForValidation()`
+- [Controllers](../controllers/): where validation runs in the request pipeline
+- [Responses](../responses/): the 422 body shape
+- [Models](../models/): the `table` and `primaryKeyColumn` that `unique`/`exists` read
+- [Database](../database/): the presence resolver's connection

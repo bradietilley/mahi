@@ -3,7 +3,7 @@ import { Controller, HttpResponse, type Request } from "@mahiframework/http";
 import type { User } from "../../models/user.model.js";
 
 /**
- * POST /auth/logout — revokes only the token that made this request, so
+ * POST /auth/logout, revokes only the token that made this request, so
  * logging out on a phone doesn't sign you out on a laptop.
  */
 export class LogoutController extends Controller {

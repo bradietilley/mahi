@@ -9,7 +9,7 @@ declare module "@mahiframework/core" {
      * registration order.
      *
      * A single hook covers both rather than a separate `policies()`
-     * returning tuples — matching `schedule?(schedule: Schedule)`'s shape
+     * returning tuples, matching `schedule?(schedule: Schedule)`'s shape
      * (receive the registry, call methods on it) and avoiding the
      * question of what a provider does when it wants both.
      */

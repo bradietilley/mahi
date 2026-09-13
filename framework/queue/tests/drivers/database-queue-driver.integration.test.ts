@@ -81,7 +81,7 @@ for (const engine of engines) {
 
       /**
        * A driver on the live connection. The dialect is deliberately not
-       * passed — the driver reads it off the connection, so these tests
+       * passed. The driver reads it off the connection, so these tests
        * exercise that resolution rather than being told the answer.
        */
       function makeDriver(options: Partial<{ retryAfterSeconds: number; queue: string }> = {}) {
@@ -110,7 +110,7 @@ for (const engine of engines) {
         // ISO-8601 `...Z` strings, which MySQL's DATETIME rejects
         // outright ("Incorrect datetime value"). That is a real bug, but
         // it is the migrator's, not the queue's, and it is owned by the
-        // MySQL/Postgres plan — running the migrations directly keeps
+        // MySQL/Postgres plan, running the migrations directly keeps
         // this suite testing what it is about (the driver) instead of
         // being blocked by an unrelated defect.
         await createJobsTable.up();
@@ -133,7 +133,7 @@ for (const engine of engines) {
         await db.kysely.deleteFrom("failed_jobs").execute();
       });
 
-      it("push() then pop() round-trips — the timestamps actually compare", async () => {
+      it("push() then pop() round-trips, the timestamps actually compare", async () => {
         // MySQL's DATETIME comparison rejects the trailing `Z` of an
         // ISO-8601 string; if the timestamps were written that way,
         // `available_at <= now` would match nothing and every queue would

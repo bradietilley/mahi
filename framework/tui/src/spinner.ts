@@ -11,13 +11,13 @@ const INTERVAL_MS = 80; // PHP's spinner uses an accidental 75ms; 80ms is the de
 
 /**
  * Port of `laravel/prompts`' `Spinner.php` + `SpinnerRenderer.php` +
- * `Concerns/HasSpinner.php` — with a materially different animation
+ * `Concerns/HasSpinner.php`, with a materially different animation
  * mechanism: PHP forks an OS process (`pcntl_fork()`) to run the render
  * loop in parallel with the callback; Node has no equivalent (single-
- * threaded event loop) and doesn't need one — `setInterval` around an
+ * threaded event loop) and doesn't need one, `setInterval` around an
  * `await`ed callback achieves the same interleaved-animation effect for
  * async work. **Caveat**: a synchronous, CPU-bound callback pauses the
- * animation for its duration — same tradeoff every Node CLI spinner
+ * animation for its duration, same tradeoff every Node CLI spinner
  * library (e.g. `ora`) documents.
  */
 export async function spin<T>(message: string, callback: () => T | Promise<T>): Promise<T> {
@@ -54,7 +54,7 @@ export async function spin<T>(message: string, callback: () => T | Promise<T>): 
 
 /**
  * Clears the spinner's last rendered frame from the terminal once the
- * callback finishes — port of `Spinner::eraseRenderedLines()` (moves
+ * callback finishes, port of `Spinner::eraseRenderedLines()` (moves
  * the cursor to column 1, up to the top of the rendered frame, then
  * erases down).
  */

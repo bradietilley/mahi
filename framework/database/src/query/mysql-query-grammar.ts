@@ -1,7 +1,7 @@
 import { sql, type Expression } from "kysely";
 import type { DatePart, GrammarBinding, JsonColumn, QueryGrammar } from "./grammar.js";
 
-/** `{ field: "meta", segments: ["a", "b"] }` → `"$.a.b"` — the JSONPath MySQL's `json_*` functions take. */
+/** `{ field: "meta", segments: ["a", "b"] }` → `"$.a.b"`, the JSONPath MySQL's `json_*` functions take. */
 function jsonPath(column: JsonColumn): string {
   return column.segments.length > 0 ? `$.${column.segments.join(".")}` : "$";
 }
@@ -21,11 +21,11 @@ function jsonPath(column: JsonColumn): string {
  *
  * JSON goes through `json_contains()`/`json_contains_path()`/
  * `json_length()`. `json_contains()` takes its candidate as a **JSON
- * document**, so the scalar is `JSON.stringify`d — an unquoted `x`
+ * document**, so the scalar is `JSON.stringify`d. An unquoted `x`
  * is not valid JSON and MySQL rejects it.
  *
- * Upserts use `ON DUPLICATE KEY UPDATE`, which — unlike Postgres/SQLite
- * — names no conflict target (any unique index triggers it) and reads
+ * Upserts use `ON DUPLICATE KEY UPDATE`, which, unlike Postgres/SQLite,
+ * names no conflict target (any unique index triggers it) and reads
  * the pending row through `VALUES(col)` rather than `excluded.col`.
  */
 export const mysqlQueryGrammar: QueryGrammar = {

@@ -99,7 +99,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisCacheStore (integration)", () => {
     await s.put("greeting", "kia ora");
 
     // ioredis strips nothing from KEYS' output, so this is the literal
-    // stored key — both prefixes, in order.
+    // stored key. Both prefixes, in order.
     const keys = await connection.client().keys(`${prefix}*`);
     expect(keys).toEqual([`${prefix}${DEFAULT_CACHE_PREFIX}greeting`]);
   });
@@ -119,15 +119,15 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisCacheStore (integration)", () => {
     /**
      * The template sets the *connection's* `keyPrefix` (`"mahi:"`) and
      * leaves `stores.redis` empty. A store that read its prefix from a
-     * separate config key would get `""`, scan `MATCH *` — every key in
-     * the logical DB, the queue's included — and then `DEL` each match
+     * separate config key would get `""`, scan `MATCH *`, every key in
+     * the logical DB, the queue's included, and then `DEL` each match
      * with the connection prefix applied a second time by ioredis,
      * matching nothing: `cache:clear` would silently do nothing, and the
      * obvious "fix" (drop the connection prefix) would turn it into a
      * command that deletes every queued and in-flight job.
      *
      * Both halves are asserted here: the cache is really gone, and the
-     * queue — same connection, same prefix, different namespace — is
+     * queue, same connection, same prefix, different namespace, is
      * untouched.
      */
     it("never touches the queue's keys on the same connection", async () => {
@@ -135,7 +135,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisCacheStore (integration)", () => {
       const queue = new RedisQueueDriver(connection, "default");
 
       await queue.push("App\\Jobs\\SendInvoice", { id: 7 });
-      // A second job, reserved rather than ready — losing an in-flight
+      // A second job, reserved rather than ready, losing an in-flight
       // job is the worse half of this bug, and it lives under a different
       // key from the ready list.
       await queue.push("App\\Jobs\\SendReceipt", { id: 8 });
@@ -189,7 +189,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisCacheStore (integration)", () => {
   });
 
   describe("locking", () => {
-    /** Two stores on separate connections but the SAME prefixes — i.e. two processes of one app. */
+    /** Two stores on separate connections but the SAME prefixes, i.e. two processes of one app. */
     async function contenders(): Promise<[RedisCacheStore, RedisCacheStore]> {
       const prefix = testPrefix();
       const a = await testConnection({ keyPrefix: prefix });
@@ -217,7 +217,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisCacheStore (integration)", () => {
       await expect(lock2.acquire()).rejects.toThrow();
       await lock1.release();
 
-      // Now free — the other contender can take it.
+      // Now free. The other contender can take it.
       await expect(lock2.acquire()).resolves.toBeUndefined();
       await lock2.release();
     });

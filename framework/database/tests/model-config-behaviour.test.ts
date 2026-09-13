@@ -67,7 +67,7 @@ class AnalyticsEvent extends Model<EventAttributes>()({
   connection: "analytics",
 }) {}
 
-/** Same table, default connection — the control. */
+/** Same table, default connection, the control. */
 class PrimaryEvent extends Model<EventAttributes>()({
   table: "events",
   primaryKey: "id",
@@ -180,7 +180,7 @@ describe("config: connection", () => {
     setCurrentApp(app);
 
     // Two genuinely separate in-memory databases, each with an `events`
-    // table — so a write landing on the wrong one is visible, not merely
+    // table, so a write landing on the wrong one is visible, not merely
     // undetectable.
     await createSchema(manager.driver("primary").kysely);
     await createSchema(manager.driver("analytics").kysely);
@@ -317,7 +317,7 @@ describe("runtime config validation", () => {
     expect(build({ table: "t", softDeletes: {} })).toThrow(/requires a `column`/);
     expect(build({ table: "t", softDeletes: "yes" })).toThrow(/`softDeletes` must be/);
 
-    // `null` disables one half of the pair — a supported form.
+    // `null` disables one half of the pair, a supported form.
     expect(build({ table: "t", timestamps: { createdAt: null } })).not.toThrow();
     expect(build({ table: "t", softDeletes: { column: "archived_at" } })).not.toThrow();
   });

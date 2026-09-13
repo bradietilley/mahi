@@ -38,7 +38,7 @@ type IdentifierResolverInput = IdentifierResolver | IdentifierResolverFn | null;
  * | sequence (3) ]`. Sequence bits are always derived as
  * `13 - workerIdBits - clusterIdBits` and must remain ≥ 3.
  *
- * IDs are returned as decimal strings — they exceed
+ * IDs are returned as decimal strings. They exceed
  * `Number.MAX_SAFE_INTEGER`, so JSON and JS number arithmetic would
  * round them. Use `parse()` to unpack the fields, and `BigInt(id)` when
  * you need numeric comparison/sorting.

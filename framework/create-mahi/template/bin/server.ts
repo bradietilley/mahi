@@ -13,7 +13,7 @@ const listening = await listenHttpServer(app, {
 });
 
 // The address the server ACTUALLY bound, not an assumed "localhost".
-// Those differ whenever `HOST` is set — a container binds `0.0.0.0`, and
+// Those differ whenever `HOST` is set, a container binds `0.0.0.0`, and
 // a log line claiming `localhost` there points at the one interface the
 // server is not reachable on from outside the container.
 app.logger.info(`Server listening on ${formatServeUrl(listening.hostname, listening.port)}`);
@@ -30,7 +30,7 @@ app.logger.info(`Server listening on ${formatServeUrl(listening.hostname, listen
  * So: stop accepting connections and drain the open ones (`close()`),
  * then release everything the application itself opened (`terminate()`,
  * which runs every provider's `shutdown()` hook). Once both are done the
- * event loop has nothing left in it and Node exits on its own — there is
+ * event loop has nothing left in it and Node exits on its own. There is
  * deliberately no `process.exit()`, which would truncate whatever is
  * still flushing.
  */

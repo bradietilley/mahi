@@ -1,7 +1,7 @@
 import { ProcessFailedError } from "./process-failed-error.js";
 
 /**
- * The outcome of a completed process — port of Laravel's
+ * The outcome of a completed process, port of Laravel's
  * `Illuminate\Process\ProcessResult` (itself a thin wrapper around
  * Symfony's `Process` object), minus the parts that only make sense
  * with a Symfony `Process` behind them (`seeInOutput()`/
@@ -9,9 +9,9 @@ import { ProcessFailedError } from "./process-failed-error.js";
  * consumer can do directly).
  */
 export interface ProcessResult {
-  /** The command as it was invoked — the joined argv for array-form commands, or the raw string for shell-form commands. Mainly useful for logging/debugging and `Process.assertRan()`. */
+  /** The command as it was invoked, the joined argv for array-form commands, or the raw string for shell-form commands. Mainly useful for logging/debugging and `Process.assertRan()`. */
   command: string;
-  /** The process's exit code. `1` if the process was killed by a signal (including a `timeoutMs` timeout) or failed to spawn at all (e.g. command not found) — Node reports both of those as a `null` exit code, and there's no more specific POSIX convention worth inventing here. */
+  /** The process's exit code. `1` if the process was killed by a signal (including a `timeoutMs` timeout) or failed to spawn at all (e.g. command not found), Node reports both of those as a `null` exit code, and there's no more specific POSIX convention worth inventing here. */
   exitCode: number;
   stdout: string;
   stderr: string;

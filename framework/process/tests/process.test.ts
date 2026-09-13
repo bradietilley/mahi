@@ -17,7 +17,7 @@ describe("wildcardMatch", () => {
   });
 });
 
-describe("Process.run — real spawning", () => {
+describe("Process.run: real spawning", () => {
   afterEach(() => {
     Process.restore();
   });
@@ -77,7 +77,7 @@ describe("Process.run — real spawning", () => {
     const result = await Process.run(["node", "-e", "process.stdout.write(process.cwd())"], {
       cwd: "/tmp",
     });
-    // macOS /tmp is a symlink to /private/tmp — accept either form.
+    // macOS /tmp is a symlink to /private/tmp, accept either form.
     expect(result.stdout.replace(/^\/private/, "")).toBe("/tmp");
   });
 

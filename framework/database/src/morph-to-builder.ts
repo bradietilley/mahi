@@ -4,14 +4,14 @@ import type { Model, ModelClass, AnyModelClass } from "./model.js";
 import { resolveMorphType } from "./model.js";
 import { SoftDeleteScope } from "./soft-deletes.js";
 
-/** A per-type constraining callback, keyed by discriminant value — see `MorphToBuilder.constrain()`. */
+/** A per-type constraining callback, keyed by discriminant value. See `MorphToBuilder.constrain()`. */
 export type MorphConstraints = Record<string, (query: any) => void>;
 
 /** Which soft-delete variant a deferred `withTrashed()`/`onlyTrashed()` selects. */
 type TrashedMode = "default" | "with" | "only";
 
 /**
- * The query-side handle for a declared `morphTo` relation —
+ * The query-side handle for a declared `morphTo` relation,
  * `comment.relations.commentable()`.
  *
  * ## Why this isn't an `EloquentBuilder`
@@ -23,7 +23,7 @@ type TrashedMode = "default" | "with" | "only";
  * single table to build a query against.
  *
  * This is the only genuine divergence from the other relations. It is
- * **not** a `Promise` either — that would break the uniform
+ * **not** a `Promise` either. That would break the uniform
  * `relations.x()` call shape every other relation has. Instead it's a
  * real builder that defers: constraints accumulate here, and the first
  * terminal call resolves the discriminant, picks the target model, and
@@ -40,12 +40,12 @@ type TrashedMode = "default" | "with" | "only";
  *
  * `whereHas("x", (q) => q.where("published", 1))` works because there's
  * one related model and `published` is known to be its column. Across a
- * morph union there is no such column — `Post` has `published`, `Video`
+ * morph union there is no such column. `Post` has `published`, `Video`
  * might not. So constraints are keyed by discriminant, mirroring
  * Laravel's `MorphTo::constrain()`. A type with no entry is unconstrained.
  *
  * `constrain()` and `morphWith()` both come from `MorphToSpec`, which the
- * batched eager loader also uses — so the callback in
+ * batched eager loader also uses, so the callback in
  * `with({ commentable: (m) => … })` sees exactly the same API whether it
  * ends up running against one row or a whole page of them. Only the
  * terminals below (`first()`/`exists()`, which need a specific parent
@@ -84,7 +84,7 @@ export class MorphToBuilder<TTarget = Model> extends MorphToSpec {
     return this;
   }
 
-  /** Exclude soft-deleted parents — the default, so this only undoes a prior `withTrashed()`/`onlyTrashed()`. */
+  /** Exclude soft-deleted parents, the default, so this only undoes a prior `withTrashed()`/`onlyTrashed()`. */
   withoutTrashed(): this {
     this.trashed = "default";
 
@@ -120,7 +120,7 @@ export class MorphToBuilder<TTarget = Model> extends MorphToSpec {
   /**
    * The target model's real `EloquentBuilder`, scoped to this row's
    * parent and with any matching `constrain()` callback and soft-delete
-   * variant applied — or `undefined` when the discriminant resolves to
+   * variant applied, or `undefined` when the discriminant resolves to
    * nothing.
    *
    * The escape hatch for anything `first()` doesn't cover (`exists()`,
@@ -153,7 +153,7 @@ export class MorphToBuilder<TTarget = Model> extends MorphToSpec {
   }
 
   /**
-   * Resolves the parent — `undefined` when the discriminant names
+   * Resolves the parent, `undefined` when the discriminant names
    * nothing, either column is null, or no matching row exists. Matches
    * `belongsTo()`'s "missing owner resolves to undefined".
    */
@@ -175,7 +175,7 @@ export class MorphToBuilder<TTarget = Model> extends MorphToSpec {
   }
 
   /**
-   * Points this row at `target`, writing **both** polymorphic columns —
+   * Points this row at `target`, writing **both** polymorphic columns,
    * the discriminant (from the target's `morphAlias()`) and the key.
    *
    *   comment.relations.commentable().associate(post);
@@ -184,7 +184,7 @@ export class MorphToBuilder<TTarget = Model> extends MorphToSpec {
    * Does not save, matching `belongsTo`'s `associate()`: it sets
    * attributes on the parent and leaves persisting to the caller.
    *
-   * Unlike a `belongsTo`, this takes an **instance only** — a bare key
+   * Unlike a `belongsTo`, this takes an **instance only**. A bare key
    * cannot work here, because the discriminant is derived from the
    * target's class and a key alone doesn't name one.
    *

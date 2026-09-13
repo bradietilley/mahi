@@ -1,6 +1,6 @@
 /**
  * Wraps a single model row and exposes a `toJson()` method defining the
- * API-facing shape explicitly, decoupled from the DB row shape — Laravel's
+ * API-facing shape explicitly, decoupled from the DB row shape, Laravel's
  * `JsonResource` equivalent. A plain class, not a decorator or magic
  * serialization layer: every subclass writes its own explicit `toJson()`.
  *
@@ -13,7 +13,7 @@
  *   return c.json(new TodoResource(todo).toJson());
  *   return c.json(TodoResource.collection(rows));
  */
-/** Awaited return of a value's `toJson()` — a resource's serialized shape. */
+/** Awaited return of a value's `toJson()`, a resource's serialized shape. */
 type ResourceShapeOf<R> = R extends { toJson(): infer S } ? Awaited<S> : never;
 
 /**
@@ -67,15 +67,15 @@ export abstract class Resource<TModel, TShape = unknown> {
   }
 
   /**
-   * The API-facing shape. May be synchronous or return a `Promise` — a
+   * The API-facing shape. May be synchronous or return a `Promise`, a
    * resource whose shape needs async work (e.g. awaiting a per-row gate
    * `can()` method) declares `async toJson()`; callers `await` it (and
    * `collection()` resolves them in parallel).
    *
    * The value a subclass returns is post-processed: any `Model` instance
    * still present in the shape is replaced by its default resource's JSON
-   * (`model.toJsonResource()`) — or the model's own `toJSON()` when it
-   * declares no default resource — recursing through `Collection`s, arrays,
+   * (`model.toJsonResource()`), or the model's own `toJSON()` when it
+   * declares no default resource, recursing through `Collection`s, arrays,
    * and nested object values. So `author: this.whenLoaded("author")` (no
    * mapper) emits the `User`'s `UserResource` shape automatically; supply a
    * mapper to override. The normalization preserves sync-ness: a resource
@@ -96,7 +96,7 @@ export abstract class Resource<TModel, TShape = unknown> {
   // Laravel's `JsonResource::when()`/`whenLoaded()`/`whenNotNull()` /
   // `mergeWhen()`. All of them rely on the same wire-format trick: a field
   // whose value is `undefined` disappears from the JSON entirely (unlike
-  // `null`), because `JSON.stringify` omits `undefined`-valued keys — which
+  // `null`), because `JSON.stringify` omits `undefined`-valued keys. Which
   // is exactly what `c.json(...)` / `Response.json(...)` runs. So a field
   // written as `author: this.whenLoaded("author", ...)` really vanishes
   // from the response when the relation was never loaded, rather than
@@ -106,7 +106,7 @@ export abstract class Resource<TModel, TShape = unknown> {
   /**
    * Include a field only when `condition` is truthy, otherwise omit it.
    * `value` may be a plain value or a lazy `() => value` (only evaluated
-   * when the condition holds — matching Laravel, and useful when producing
+   * when the condition holds, matching Laravel, and useful when producing
    * the value is expensive or would throw on absent data).
    *
    *   avatarUrl: this.when(this.model.avatar_path !== null, () => this.buildAvatarUrl()),
@@ -131,8 +131,8 @@ export abstract class Resource<TModel, TShape = unknown> {
    * through `normalizeResourceValue` (see the constructor): a related
    * `Model` with a default resource emits that resource's JSON, a
    * `Collection` maps its members through theirs, etc. So the no-mapper
-   * form's type is `NormalizedRelation<TModel[K]>` — the shape after that
-   * conversion — not the raw model type.
+   * form's type is `NormalizedRelation<TModel[K]>`, the shape after that
+   * conversion, not the raw model type.
    */
   protected whenLoaded<K extends keyof TModel & string>(
     relationName: K,
@@ -156,7 +156,7 @@ export abstract class Resource<TModel, TShape = unknown> {
 
   /**
    * Include a mapped appended value only when one was attached onto the
-   * model (via `Model.append()`/`setAppended()`), otherwise omit it — the
+   * model (via `Model.append()`/`setAppended()`), otherwise omit it, the
    * appended-attribute counterpart to `whenLoaded()`. Distinguishes "never
    * appended" (omitted) from "appended as `undefined`/`null`" (kept) by
    * asking the model's `hasAppended()`, so a deliberately-`null` appended
@@ -215,13 +215,13 @@ export abstract class Resource<TModel, TShape = unknown> {
   }
 }
 
-/** Duck-typed `Model` — carries `toJsonResource()`/`toJSON()` (see `@mahiframework/database`). */
+/** Duck-typed `Model`, carries `toJsonResource()`/`toJSON()` (see `@mahiframework/database`). */
 interface ModelInstance {
   toJsonResource(): { toJson(): unknown | Promise<unknown> } | undefined;
   toJSON(): unknown;
 }
 
-/** Duck-typed `Collection` — carries `toArray()` (see `@mahiframework/core`). */
+/** Duck-typed `Collection`, carries `toArray()` (see `@mahiframework/core`). */
 interface CollectionLike {
   toArray(): unknown[];
 }
@@ -270,7 +270,7 @@ function normalizeEach(items: unknown[]): unknown[] | Promise<unknown[]> {
  *   - **Array** -> each element, normalized;
  *   - **plain object** -> each own enumerable value, normalized (keys with
  *     `undefined` values are preserved so `JSON.stringify` still omits
- *     them — the `whenLoaded`/`when` omission trick keeps working);
+ *     them, the `whenLoaded`/`when` omission trick keeps working);
  *   - anything else (primitives, `Date`, etc.) -> returned unchanged.
  *
  * Models and Collections are detected structurally (duck-typed) rather than

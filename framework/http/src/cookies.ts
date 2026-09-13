@@ -4,7 +4,7 @@
  * WHY THIS EXISTS: Mahi handlers and pipes return **platform `Response`
  * objects**. Hono only merges its context-queued headers (`c.header()`,
  * and therefore `hono/cookie`'s `setCookie()`) into a response built
- * through `c.json()`/`c.body()`/`c.newResponse()` — so a cookie queued on
+ * through `c.json()`/`c.body()`/`c.newResponse()`, so a cookie queued on
  * the Hono context by framework code was silently dropped on the floor.
  * That is not a cosmetic bug: it made `SessionGuard.login()` write a
  * session row the browser never learned the id of, so every subsequent
@@ -12,8 +12,8 @@
  *
  * The fix is to stop going through Hono at all. Cookies are queued on the
  * Mahi `Request` (`request.queueCookie(...)`) and drained onto the
- * outgoing response at the HTTP boundary, where the framework — not Hono
- * — decides what the final headers are. `Set-Cookie` is the one header
+ * outgoing response at the HTTP boundary, where the framework, not Hono,
+ * decides what the final headers are. `Set-Cookie` is the one header
  * that legitimately repeats, so it is always *appended*, never `set`.
  */
 
@@ -23,7 +23,7 @@ export interface CookieOptions {
   maxAge?: number;
   expires?: Date;
   domain?: string;
-  /** Defaults to `"/"` — the whole site — matching every other framework. */
+  /** Defaults to `"/"`, the whole site, matching every other framework. */
   path?: string;
   /** Send only over HTTPS. */
   secure?: boolean;
@@ -90,7 +90,7 @@ function applyPrefix(
  * Serialize one `Set-Cookie` header value.
  *
  * The value is percent-encoded, so arbitrary payloads (a signed session
- * id, a base64url token) survive the round trip — `parseCookies()` decodes
+ * id, a base64url token) survive the round trip, `parseCookies()` decodes
  * symmetrically.
  */
 export function serializeCookie(name: string, value: string, options: CookieOptions = {}): string {
@@ -189,7 +189,7 @@ function capitalize(value: string): string {
 
 /**
  * Parse an inbound `Cookie` header into a name → value map, decoding
- * percent-encoding. A malformed pair is skipped rather than throwing — a
+ * percent-encoding. A malformed pair is skipped rather than throwing, a
  * junk cookie from some unrelated tool must not 500 the request.
  */
 export function parseCookies(header: string | undefined | null): Record<string, string> {
@@ -242,7 +242,7 @@ export function parseCookies(header: string | undefined | null): Record<string, 
  * Deletion is expiry: an empty value with `Max-Age=0` and a past
  * `Expires`. `Path`/`Domain` must match the cookie being deleted or the
  * browser will treat it as a different cookie and leave the original in
- * place — the single most common cookie-deletion bug.
+ * place, the single most common cookie-deletion bug.
  */
 export function expiredCookie(name: string, options: CookieOptions = {}): string {
   return serializeCookie(name, "", {
@@ -257,7 +257,7 @@ export function expiredCookie(name: string, options: CookieOptions = {}): string
  * already on it.
  *
  * `Headers.set()` would collapse multiple cookies into one, and copying a
- * `Headers` bag entry-by-entry has the same effect — `Set-Cookie` is the
+ * `Headers` bag entry-by-entry has the same effect. `Set-Cookie` is the
  * one header where that matters. Returns the same response when there is
  * nothing to add, so the common path allocates nothing.
  */

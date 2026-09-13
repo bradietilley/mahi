@@ -1,5 +1,5 @@
 /**
- * `@mahiframework/redis` — one shared Redis connection backing three thin
+ * `@mahiframework/redis`, one shared Redis connection backing three thin
  * driver adapters: a `RedisCacheStore` (`CacheManager`), a
  * `RedisQueueDriver` (`QueueManager`), and a `RedisBroadcastDriver`
  * (`BroadcastManager`). This is the framework's multi-process production

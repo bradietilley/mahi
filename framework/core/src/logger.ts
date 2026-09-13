@@ -2,7 +2,7 @@ import { DateTime } from "@mahiframework/datetime";
 import type { ContextRepository } from "./context.js";
 
 /**
- * The eight PSR-3 / RFC 5424 severity levels, most-severe first — the
+ * The eight PSR-3 / RFC 5424 severity levels, most-severe first. The
  * same set Laravel's `Illuminate\Log\Logger` exposes one method per
  * (`emergency`…`debug`). `warning` (not `warn`) is the canonical name.
  */
@@ -21,7 +21,7 @@ export interface Logger {
 
   /**
    * Log at an arbitrary runtime-chosen level. Laravel's/PSR-3's
-   * `log($level, $message, $context)` — handy when the level itself is a
+   * `log($level, $message, $context)`, handy when the level itself is a
    * variable (e.g. mapping an HTTP status class to a severity).
    */
   log(level: LogLevel, message: string, context?: Record<string, unknown>): void;
@@ -30,7 +30,7 @@ export interface Logger {
 /**
  * Implements all eight PSR-3 level methods and the generic `log()` in
  * terms of a single `write(level, message, context)` primitive each
- * concrete logger supplies — so a new backend (console, file, daily,
+ * concrete logger supplies, so a new backend (console, file, daily,
  * array, …) only writes one method instead of nine. Mirrors Laravel's
  * `Illuminate\Log\Logger` funnelling every level method through one
  * `writeLog()`.
@@ -78,7 +78,7 @@ export abstract class AbstractLogger implements Logger {
  * and the global context repository whose data is appended to every line.
  * `Application` structurally satisfies this (it has `environment()` and a
  * `context` field), so loggers are constructed with the `Application`
- * instance itself — explicit injection rather than a hidden global
+ * instance itself, explicit injection rather than a hidden global
  * `app()` call inside the formatter, per this framework's "explicit DI"
  * philosophy.
  */
@@ -89,7 +89,7 @@ export interface LogSource {
 
 /**
  * Formats a single log line as
- * `"[timestamp] env.LEVEL: message {context} {globalContext}"` — shared
+ * `"[timestamp] env.LEVEL: message {context} {globalContext}"`, shared
  * by every `Logger` implementation in this package (`ConsoleLogger`,
  * `FileLogger`, `DailyLogger`) so all channels produce visually
  * consistent output. Exported (not private to this module) specifically
@@ -102,7 +102,7 @@ export interface LogSource {
  *   [2026-08-24 12:00:05] production.ERROR: Something broke {"per":"call"} {"global":"context"}
  *
  * - Timestamp is `yyyy-MM-dd HH:mm:ss` in UTC (Laravel's `Y-m-d H:i:s`).
- * - The `env.` prefix comes from `source.environment()` — Laravel's
+ * - The `env.` prefix comes from `source.environment()`, Laravel's
  *   fallback Monolog channel name is the app environment, which is where
  *   `production.DEBUG` comes from. When no `source` is supplied (a
  *   standalone logger constructed outside any `Application`), the prefix
@@ -147,8 +147,8 @@ const MAX_SERIALIZE_DEPTH = 8;
  *
  * - an `Error` serialises to `{}` (its `message`/`stack` are
  *   non-enumerable), silently discarding the one thing you were logging;
- * - a circular reference throws `Converting circular structure to JSON`
- *   — from inside the log call, masking the original exception being
+ * - a circular reference throws `Converting circular structure to JSON`,
+ *   from inside the log call, masking the original exception being
  *   reported;
  * - a `BigInt` throws `Do not know how to serialize a BigInt`.
  *
@@ -235,7 +235,7 @@ function normalize(value: unknown, seen: WeakSet<object>, depth: number): unknow
     }
 
     // Honour user-defined toJSON (Date already handled above) before
-    // walking own enumerable keys — matches JSON.stringify semantics.
+    // walking own enumerable keys, matches JSON.stringify semantics.
     const maybeToJSON = (object as { toJSON?: () => unknown }).toJSON;
 
     if (typeof maybeToJSON === "function") {

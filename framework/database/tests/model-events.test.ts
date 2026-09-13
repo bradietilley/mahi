@@ -179,7 +179,7 @@ describe("Model events", () => {
       expect(fired).toEqual(["deleting:1", "deleted:1"]);
       // Laravel-faithful: the payload is the real, fully-attributed
       // instance (so a listener can read any column), not a bare
-      // { id } object — see Model.delete()'s docstring.
+      // { id } object. See Model.delete()'s docstring.
       expect(payloads[0]).toBeInstanceOf(BaseModel);
       expect((payloads[0] as any).name).toBe("Sprocket");
     });
@@ -220,7 +220,7 @@ describe("Model events", () => {
       expect(fired).toEqual(["creating", "created:1"]);
     });
 
-    it("only overridden methods fire — unset methods are silently skipped", async () => {
+    it("only overridden methods fire, unset methods are silently skipped", async () => {
       await setupApp(false);
       let calls = 0;
 
@@ -279,7 +279,7 @@ describe("Model events", () => {
       expect(fired).toEqual([]);
     });
 
-    it("is scoped to this model's table only — a different model's events are unaffected", async () => {
+    it("is scoped to this model's table only, a different model's events are unaffected", async () => {
       await setupApp(false);
       const widgetFired: string[] = [];
       const gadgetFired: string[] = [];
@@ -341,7 +341,7 @@ describe("Model events", () => {
       expect(widgetHandled).toHaveLength(1);
     });
 
-    it("nests correctly with a broader Event.suppress() call — both stay in effect", async () => {
+    it("nests correctly with a broader Event.suppress() call. Both stay in effect", async () => {
       await setupApp(false);
       const widgetFired: string[] = [];
       const gadgetFired: string[] = [];

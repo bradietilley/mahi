@@ -28,7 +28,7 @@ describe("auth:gc", () => {
 
     const hasher = new Hasher();
 
-    // Guards named the Laravel way — `web`/`api`, not `session`/`token`.
+    // Guards named the Laravel way, `web`/`api`, not `session`/`token`.
     // The command must find guards by driver, not by name: looking up
     // `guard("session")` in an app shaped like this resolves nothing and
     // sweeps nothing.

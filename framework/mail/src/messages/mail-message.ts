@@ -17,8 +17,8 @@ let resolver: ThemeResolver | undefined;
  * Bind the process-wide theme resolver. Called by `MailServiceProvider`.
  *
  * A module-level binding rather than a constructor argument because
- * `new MailMessage()` must stay callable with zero arguments from anywhere
- * — a notification's `toMail()`, a controller, a test. It mirrors how
+ * `new MailMessage()` must stay callable with zero arguments from anywhere,
+ * a notification's `toMail()`, a controller, a test. It mirrors how
  * `EventDispatcher.useQueuedListenerHandler()` lets the queue package fill
  * a slot the events package declared, and how facades resolve off the
  * current app: convenient by default, explicitly overridable via the
@@ -48,8 +48,8 @@ export function useThemeResolver(next: ThemeResolver | undefined): void {
  * notification's `toMail()` returns, `Mailable` is what `Mail::send()`
  * takes, and the two have overlapping-but-different APIs for the same
  * concepts. Here `MailMessage` IS a `Mailable`, so it goes anywhere a
- * mailable goes — `Mail.send()`, a notification's `toMail()`, a test's
- * `render()` — with no adapter and one set of addressing methods.
+ * mailable goes, `Mail.send()`, a notification's `toMail()`, a test's
+ * `render()`, with no adapter and one set of addressing methods.
  *
  * ## Choosing a theme
  *
@@ -187,9 +187,9 @@ export class MailMessage extends Mailable {
   /**
    * The accumulated, theme-agnostic description of this message.
    *
-   * Public so a test can assert on structure —
-   * `expect(message.data().blocks).toContainEqual({ type: "button", ... })`
-   * — instead of string-matching rendered HTML, which would couple the
+   * Public so a test can assert on structure,
+   * `expect(message.data().blocks).toContainEqual({ type: "button", ... })`,
+   * instead of string-matching rendered HTML, which would couple the
    * test to the active theme.
    */
   data(): MailMessageData {
@@ -225,7 +225,7 @@ export class MailMessage extends Mailable {
    * Render the accumulated blocks through the theme.
    *
    * Overriding `content()` is what makes the inherited `html()`/`text()`/
-   * `view()`/`textView()` setters unreachable — the documented hazard of
+   * `view()`/`textView()` setters unreachable, the documented hazard of
    * overriding `content()`. Rather than let them silently no-op, they are
    * overridden below to throw, because a caller who reaches for `.html()`
    * on a `MailMessage` has a genuine misunderstanding about which of the

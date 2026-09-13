@@ -20,7 +20,7 @@ export interface SmtpTransportConfig {
    * With `secure: false` the default behaviour is opportunistic: STARTTLS
    * is used when the server offers it and **silently skipped when it does
    * not**, so a misconfigured relay downgrades to plaintext without
-   * complaint — credentials and message body included. Set this on a
+   * complaint, credentials and message body included. Set this on a
    * submission port (587) to make that a hard failure instead.
    */
   requireTLS?: boolean;
@@ -30,15 +30,15 @@ export interface SmtpTransportConfig {
    * The one that matters is `rejectUnauthorized`. It defaults to `true`,
    * which is correct; setting it to `false` disables certificate
    * verification and makes the connection trivially interceptable. It
-   * exists for self-signed certificates on an internal relay — and for
-   * this package's own tests — not for silencing a certificate error in
+   * exists for self-signed certificates on an internal relay, and for
+   * this package's own tests, not for silencing a certificate error in
    * production.
    */
   tls?: { rejectUnauthorized?: boolean; servername?: string; ciphers?: string };
 }
 
 /**
- * The one universally-needed real-world sender — SMTP via `nodemailer`
+ * The one universally-needed real-world sender, SMTP via `nodemailer`
  * (mature, connection-pooling, zero-config-friendly), `@mahiframework/mail`'s
  * single real runtime dependency (matching `better-sqlite3` in
  * `@mahiframework/database` as the "one focused dependency per package"
@@ -47,7 +47,7 @@ export interface SmtpTransportConfig {
  * The nodemailer `Transporter` is created lazily on first `send()` rather
  * than in the constructor, so merely *resolving* the `smtp` mailer (which
  * `MailManager`/`Manager.driver()` does synchronously) never opens a
- * connection or pool — I/O happens only when a message is actually sent,
+ * connection or pool, I/O happens only when a message is actually sent,
  * consistent with the `Manager` module's driver-resolution contract.
  */
 export class SmtpTransport implements MailTransport {
@@ -108,7 +108,7 @@ export class SmtpTransport implements MailTransport {
    * Tear down the underlying transporter, closing any pooled connections.
    *
    * Only meaningful with `pool: true`, where nodemailer keeps sockets open
-   * for reuse and those sockets hold the event loop open — a short-lived
+   * for reuse and those sockets hold the event loop open, a short-lived
    * process (a queue worker draining, a test run) would otherwise hang
    * until they idle out. Safe and cheap to call when no transporter was
    * ever created, so callers need not track whether a send happened.

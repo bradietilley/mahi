@@ -42,7 +42,7 @@ export interface DatabaseQueueDriverOptions {
    * eligible for `pop()` again. **This is the crash-recovery mechanism**:
    * a worker killed with `-9` mid-job leaves `reserved_at` set and
    * nothing else would ever clear it, so without a visibility timeout the
-   * job is stranded forever — not in `failed_jobs`, invisible to
+   * job is stranded forever, not in `failed_jobs`, invisible to
    * `queue:failed`, simply gone.
    *
    * Default 90s, matching Laravel's `retry_after`. It must be **longer
@@ -56,7 +56,7 @@ export interface DatabaseQueueDriverOptions {
    * this poll. Only relevant on SQLite, where the reserve is
    * select-then-conditional-update and a lost race moves to the next
    * candidate; MySQL/Postgres reserve with `SKIP LOCKED` and never
-   * contend. Default 10 — enough that a few concurrent workers all get a
+   * contend. Default 10, enough that a few concurrent workers all get a
    * job on the first poll, small enough that it can't degrade into
    * reading the backlog.
    */
@@ -68,7 +68,7 @@ export interface DatabaseQueueDriverOptions {
    * select-then-conditional-update on SQLite (whose single writer makes
    * row locks meaningless anyway).
    *
-   * Normally omitted — it is read from the connection itself via
+   * Normally omitted. It is read from the connection itself via
    * `dialectOf()`, so it cannot drift from reality. Pass it only for a
    * `Kysely` this framework didn't build, where `dialectOf()` has nothing
    * to look up and conservatively answers `"sqlite"`.
@@ -83,7 +83,7 @@ export interface DatabaseQueueDriverOptions {
 
 /**
  * Persists jobs in a `jobs` table via the app's existing Kysely
- * connection — no new infrastructure beyond the database the app already
+ * connection, no new infrastructure beyond the database the app already
  * has, mirroring Laravel's `database` queue driver. See
  * `../migrations/0001_create_jobs_table.ts` and
  * `../migrations/0002_queue_reliability.ts` for the schema.
@@ -94,16 +94,16 @@ export interface DatabaseQueueDriverOptions {
  * unreserved or reserved longer ago than `retryAfterSeconds`. The second
  * half is the visibility timeout: it is what lets a job survive the
  * worker holding it being killed, at the cost of at-least-once delivery
- * (a job whose worker merely *stalled* past `retryAfter` runs twice —
+ * (a job whose worker merely *stalled* past `retryAfter` runs twice,
  * make `handle()` idempotent).
  *
  * How the reservation is made depends on the dialect:
  *
- *   - **MySQL 8+/Postgres** — `SELECT ... FOR UPDATE SKIP LOCKED LIMIT 1`
+ *   - **MySQL 8+/Postgres**, `SELECT ... FOR UPDATE SKIP LOCKED LIMIT 1`
  *     inside a transaction, then `UPDATE`. Concurrent workers skip each
  *     other's locked rows instead of contending, so throughput scales
  *     with worker count.
- *   - **SQLite** — read a small batch of candidates, then reserve one
+ *   - **SQLite**, read a small batch of candidates, then reserve one
  *     with `UPDATE ... WHERE id = ? AND reserved_at IS [what we read]`.
  *     The conditional is the race guard: if another worker won, the
  *     update matches zero rows and this one tries the next candidate.
@@ -151,7 +151,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
 
   /**
    * The connection this statement runs on: the active transaction when
-   * one is open, else the root. Resolved per-call, never captured — the
+   * one is open, else the root. Resolved per-call, never captured, the
    * same rule `Model.resolveConnection()` and `SchemaBuilder` follow.
    */
   private get db(): Kysely<any> {
@@ -179,7 +179,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
   }
 
   /**
-   * Push once the enclosing transaction commits — or immediately when
+   * Push once the enclosing transaction commits, or immediately when
    * there is none. What `Bus.dispatch(job, { afterCommit: true })` calls.
    *
    * Scoped to *this driver's* connection: a transaction open on some
@@ -203,7 +203,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
   /**
    * MySQL 8+/Postgres: lock one eligible row with `SKIP LOCKED` (so
    * concurrent workers pass over each other's rows rather than blocking),
-   * mark it reserved, and commit — all in one short transaction.
+   * mark it reserved, and commit, all in one short transaction.
    *
    * `transaction()` here nests as a savepoint if the caller already has
    * one open, which keeps this correct (if pointless) inside a wrapping
@@ -271,7 +271,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
 
       if (Number(result?.numUpdatedRows ?? 0) === 0) {
         continue;
-      } // lost the race — next candidate
+      } // lost the race, next candidate
 
       return this.toQueuedJob(candidate, reclaimed ? candidate.attempts + 1 : candidate.attempts);
     }
@@ -285,7 +285,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
    * worker holding it is presumed dead.
    *
    * Ordered by `available_at` so the queue is FIFO by due time, with
-   * `id` as a deterministic tiebreak — without it two rows sharing a
+   * `id` as a deterministic tiebreak, without it two rows sharing a
    * timestamp (very common: a burst dispatched in one request) come back
    * in whatever order the engine feels like, which makes concurrent
    * workers collide on the same row far more often than they need to.
@@ -328,7 +328,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
    * duplicate failed row each time) or lose it entirely.
    *
    * The chain, connection and queue are recorded alongside so
-   * `queue:retry` can restore the job exactly as it was — a retry that
+   * `queue:retry` can restore the job exactly as it was. A retry that
    * drops the chain silently cancels every job queued behind it.
    */
   async fail(job: QueuedJob, error: Error): Promise<void> {
@@ -343,7 +343,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
           payload_json: JSON.stringify(job.state ?? null),
           chain_json: encodeChain(job.chain),
           // Store the full stack trace when available (Laravel's `error`
-          // column keeps the whole trace) — falls back to the message for a
+          // column keeps the whole trace), falls back to the message for a
           // thrown non-Error or a stackless Error.
           error: error.stack ?? error.message,
           failed_at: this.timestamp(Date.now()),
@@ -366,7 +366,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
   }
 
   /**
-   * Delete every job on a queue without running it — Laravel's
+   * Delete every job on a queue without running it, Laravel's
    * `queue:clear`. Returns how many were removed.
    */
   async clear(queue?: string): Promise<number> {
@@ -401,7 +401,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
   /**
    * Push a failed job's stored payload back onto the live `jobs` table
    * with a fresh id and `attempts` reset to 0, then delete the
-   * failed-jobs row — in one transaction, so a crash mid-retry can't
+   * failed-jobs row, in one transaction, so a crash mid-retry can't
    * both requeue the job and keep the failed row (or lose both).
    *
    * The job goes back onto the queue it failed on, carrying its chain, so
@@ -465,7 +465,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
   }
 
   /**
-   * A timestamp string every dialect can both store and *compare* —
+   * A timestamp string every dialect can both store and *compare*,
    * always **truncated to whole seconds**, and space-separated for MySQL.
    *
    * Both halves matter:
@@ -478,7 +478,7 @@ export class DatabaseQueueDriver implements QueueDriver, FailedJobRepository {
    * precision (`timestamp(0)` on Postgres, `DATETIME` on MySQL), and
    * Postgres *rounds* rather than truncates: `…:02.642` is stored as
    * `…:03`. A job pushed with no delay therefore landed up to half a
-   * second in the future and `available_at <= now` was false — the queue
+   * second in the future and `available_at <= now` was false, the queue
    * looked permanently empty, on the engine most likely to be in
    * production. Truncating here means what we store is exactly what we
    * later compare against.

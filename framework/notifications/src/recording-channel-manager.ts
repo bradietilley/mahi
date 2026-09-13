@@ -18,7 +18,7 @@ interface RecordedNotification {
  * The notifications equivalent of Laravel's `Notification::fake()`.
  *
  * A drop-in `ChannelManager` subclass that **records** every `send()` call
- * and then **suppresses** the real fan-out — no channel is resolved, no
+ * and then **suppresses** the real fan-out. No channel is resolved, no
  * mail leaves, no `notifications` row is written. It keeps the
  * `(notifiable, notification)` pair so `assertSentTo(user, InvoicePaid)`
  * can match the target notifiable and the notification class together.
@@ -41,7 +41,7 @@ export class RecordingChannelManager extends ChannelManager {
    * Record the delivery and return without resolving any channel. A
    * notification whose `afterCommit()` is `true` has its recording
    * deferred until the enclosing transaction commits (and dropped on
-   * rollback), the same way the real manager defers delivery — so a test
+   * rollback), the same way the real manager defers delivery, so a test
    * can prove a rolled-back transaction sent nothing.
    */
   override async send(notifiable: NotificationRoutable, notification: Notification): Promise<void> {
@@ -152,7 +152,7 @@ export class RecordingChannelManager extends ChannelManager {
     }
   }
 
-  /** Discard all recorded notifications — handy from a `beforeEach()` for per-test isolation. */
+  /** Discard all recorded notifications, handy from a `beforeEach()` for per-test isolation. */
   reset(): void {
     this.recorded = [];
   }

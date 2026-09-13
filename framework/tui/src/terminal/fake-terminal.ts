@@ -2,7 +2,7 @@ import type { KeySource } from "./raw-terminal.js";
 
 /**
  * A `KeySource` that yields a pre-supplied list of keys one at a time
- * instead of reading real `process.stdin` — what `Tui.fake([...keys])`
+ * instead of reading real `process.stdin`, what `Tui.fake([...keys])`
  * wires up so `ask()`/`select()` can be driven deterministically in
  * tests, matching PHP's `Prompt::fake([...keys])` (`FakesInputOutput`).
  * `start()`/`stop()` are no-ops since there's no real stdin to toggle
@@ -16,7 +16,7 @@ export class FakeTerminal implements KeySource {
   }
 
   start(): void {
-    // no-op — nothing to wire up against a fake key source
+    // no-op, nothing to wire up against a fake key source
   }
 
   stop(): void {
@@ -27,7 +27,7 @@ export class FakeTerminal implements KeySource {
     const key = this.queue.shift();
 
     if (key === undefined) {
-      // Out of scripted keys — block forever rather than throwing, so a
+      // Out of scripted keys, block forever rather than throwing, so a
       // prompt that (incorrectly, in a test) doesn't submit on the
       // scripted keys hangs visibly instead of silently returning
       // garbage. Matches PHP's `fakeKeyPresses` foreach loop simply

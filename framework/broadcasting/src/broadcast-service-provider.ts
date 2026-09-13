@@ -73,8 +73,8 @@ interface BroadcastConfigWithAuth extends BroadcastConfig {
 }
 
 /**
- * Build the `LocalBroadcastDriverOptions` every websocket driver shares —
- * authorizer, origin allow-list, limits, logger — from the app's
+ * Build the `LocalBroadcastDriverOptions` every websocket driver shares,
+ * authorizer, origin allow-list, limits, logger, from the app's
  * `broadcasting` config. Exported so `@mahiframework/redis`'s `RedisBroadcastDriver`
  * gets identical authorization/hardening without re-deriving any of it.
  */
@@ -120,7 +120,7 @@ export function resolveBroadcastDriverOptions(
  * `EventDispatcher` so any event implementing `ShouldBroadcast` is
  * forwarded to connected clients.
  *
- * Ordering in `config/app.ts`'s `providers[]` — both are hard
+ * Ordering in `config/app.ts`'s `providers[]`. Both are hard
  * requirements, since both tokens are resolved in this provider's own
  * `boot()`:
  *   - after `EventsServiceProvider` (needs `EVENTS_TOKEN`)
@@ -185,15 +185,15 @@ export class BroadcastServiceProvider extends ServiceProvider {
 
   /**
    * Mounts the driver's websocket endpoint onto the kernel's own Hono
-   * instance — one server, one port, no second listener. Only drivers
+   * instance, one server, one port, no second listener. Only drivers
    * that actually have routes to register (i.e. `local`) do anything
    * here.
    *
    * The kernel's `websocketSupport()` is passed in rather than letting the
    * driver build its own, so that an application adding a websocket route
    * of its own shares this one helper. Two `createNodeWebSocket()` helpers
-   * on a single Node server crash the process on the first connection —
-   * see `WebSocketSupport` in `@mahiframework/http`.
+   * on a single Node server crash the process on the first connection.
+   * See `WebSocketSupport` in `@mahiframework/http`.
    */
   private registerSocketRoutes(broadcaster: BroadcastManager): void {
     const driver = broadcaster.connection();
@@ -214,8 +214,8 @@ export class BroadcastServiceProvider extends ServiceProvider {
    * on its `subscribe` frame's `auth` field.
    *
    * Registered on the kernel's raw Hono directly (like the socket route)
-   * so it participates in the global pipe chain — including the auth scope
-   * — even though it's mounted from a provider `boot()`.
+   * so it participates in the global pipe chain, including the auth scope,
+   * even though it's mounted from a provider `boot()`.
    */
   private registerAuthEndpoint(broadcaster: BroadcastManager): void {
     const driver = broadcaster.connection();
@@ -316,7 +316,7 @@ export class BroadcastServiceProvider extends ServiceProvider {
       // rollback); otherwise it fires now. `afterCommit()` runs the
       // callback immediately when no transaction is open, so the message
       // is resolved (`broadcastMessageFor`) at dispatch time either way.
-      // Fire-and-forget as before — a slow/failed broadcast must never
+      // Fire-and-forget as before, a slow/failed broadcast must never
       // delay or fail the dispatch.
       if (shouldBroadcastAfterCommit(event)) {
         void afterCommit(push);

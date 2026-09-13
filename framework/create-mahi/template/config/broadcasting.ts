@@ -25,7 +25,7 @@ export function broadcastingConfig(env: Env): BroadcastingConfig {
     connections: {
       local: { path: "/broadcasting/socket" },
       // Cross-process fanout via Redis pub/sub (requires @mahiframework/redis).
-      // This is the fix for `local`'s silent single-process message loss —
+      // This is the fix for `local`'s silent single-process message loss,
       // point `default` here when scaling horizontally. Keeps the same
       // websocket endpoint (`path`); `channel` is the Redis pub/sub channel
       // every process publishes to and subscribes on.

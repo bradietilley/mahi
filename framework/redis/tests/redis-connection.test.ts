@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { RedisConnection } from "../src/redis-connection.js";
 import { REDIS_UNAVAILABLE, testConnection } from "./redis-test-helpers.js";
 
-describe("RedisConnection (config, no server needed)", () => {
+describe("RedisConnection (config: no server needed)", () => {
   it("parses a redis:// url into host/port/db", () => {
     const connection = new RedisConnection({ url: "redis://localhost:6390/3" });
     const client = connection.client();
@@ -39,7 +39,7 @@ describe("RedisConnection (config, no server needed)", () => {
 
   it("does not open a socket eagerly (lazyConnect)", () => {
     const connection = new RedisConnection({ host: "127.0.0.1" });
-    // Never connected — status stays 'wait' until connect() is called.
+    // Never connected. Status stays 'wait' until connect() is called.
     expect(connection.client().status).toBe("wait");
     connection.client().disconnect();
   });

@@ -2,7 +2,7 @@ import type { Application } from "@mahiframework/core";
 import type { Job } from "../job.js";
 
 /**
- * The passable threaded through a job's middleware pipeline — the running
+ * The passable threaded through a job's middleware pipeline, the running
  * `Application` plus the live job instance (whose fields carry the
  * payload). Middleware read/act on these and then either call `next()` to
  * continue toward `job.handle()` or throw a {@link ReleaseJobError} to bail
@@ -14,14 +14,14 @@ export interface JobMiddlewarePassable {
 }
 
 /**
- * A single job middleware — wraps the eventual call to `job.handle()`,
+ * A single job middleware, wraps the eventual call to `job.handle()`,
  * exactly like an HTTP middleware wraps the eventual call to a route
  * handler. Call `next(passable)` to proceed; skip it (or throw
  * {@link ReleaseJobError}) to short-circuit.
  *
  * Modelled as a `@mahiframework/pipeline` `PipeObject`, so `Job.middleware()`
  * results compose straight into a `Pipeline` in `QueueWorkCommand`/
- * `SyncQueueDriver` with no adapter layer — see `runJobThroughMiddleware`.
+ * `SyncQueueDriver` with no adapter layer. See `runJobThroughMiddleware`.
  */
 export interface JobMiddleware {
   handle(

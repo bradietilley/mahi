@@ -9,7 +9,7 @@ import { expiredCookie, serializeCookie, type CookieOptions } from "./cookies.js
  * `Illuminate\Http\Response`).
  *
  * Note the framework class is exported as **`HttpResponse`**, not
- * `Response` — see `index.ts`. The global name is deliberately left
+ * `Response`. See `index.ts`. The global name is deliberately left
  * alone for consumers, so a handler can still `return Response.json(...)`
  * and mean the Web standard one. When you have an `HttpResponse` and
  * need the raw Web response, call `.toWeb()`.
@@ -39,7 +39,7 @@ export function toWebResponse(value: ResponseInput): WebResponse | Promise<WebRe
 }
 
 /**
- * Outgoing HTTP response — the object handlers return and middleware
+ * Outgoing HTTP response. The object handlers return and middleware
  * receives on the way back out. A builder (NOT a subclass of the global
  * `Response`, whose body is immutable once constructed), giving mutable
  * `setContent`/`getContent`, fluent `header()`/`status()`, and typed
@@ -68,7 +68,7 @@ export class HttpResponse {
     this.headers = new Headers(headers);
   }
 
-  /** Plain response — Laravel's `response($content, $status, $headers)`. */
+  /** Plain response, Laravel's `response($content, $status, $headers)`. */
   static make(
     content: BodyContent = "",
     status = 200,
@@ -146,14 +146,14 @@ export class HttpResponse {
    *
    * Appends rather than sets, so several cookies on one response each get
    * their own `Set-Cookie` header instead of being collapsed into one
-   * malformed value — the failure `Headers.set()` produces silently.
+   * malformed value, the failure `Headers.set()` produces silently.
    *
    *   return HttpResponse.json({ ok: true })
    *     .cookie("theme", "dark", { maxAge: 31_536_000 });
    *
    * For a cookie that must be set from a *pipe or guard* rather than a
-   * handler, queue it on the request instead (`request.queueCookie()`) —
-   * that survives whatever response the handler ultimately returns.
+   * handler, queue it on the request instead (`request.queueCookie()`).
+   * That survives whatever response the handler ultimately returns.
    */
   cookie(name: string, value: string, options: CookieOptions = {}): this {
     this.headers.append("Set-Cookie", serializeCookie(name, value, options));
@@ -300,8 +300,8 @@ function mimeTypeForPath(path: string): string {
  * Build an RFC 6266 `Content-Disposition` value.
  *
  * The ASCII fallback strips everything outside a conservative printable
- * range — including the quote and backslash that would otherwise let a
- * crafted filename break out of the quoted string — and collapses path
+ * range, including the quote and backslash that would otherwise let a
+ * crafted filename break out of the quoted string, and collapses path
  * separators, so a name like `../../etc/passwd` cannot suggest a path to
  * a client that naively joins it.
  */
@@ -320,7 +320,7 @@ export function contentDisposition(type: "attachment" | "inline", filename?: str
 
   const encoded = encodeURIComponent(filename);
 
-  // Emit `filename*` only when it says something `filename` doesn't —
+  // Emit `filename*` only when it says something `filename` doesn't,
   // for a plain ASCII name the two are identical and the duplicate is
   // noise.
   return ascii === filename
@@ -374,7 +374,7 @@ export class FileResponse extends HttpResponse {
   }
 
   /**
-   * Send as a download — `Content-Disposition: attachment`, with an
+   * Send as a download, `Content-Disposition: attachment`, with an
    * optional filename.
    *
    * The filename is emitted twice, per RFC 6266: a sanitised ASCII
@@ -395,7 +395,7 @@ export class FileResponse extends HttpResponse {
     return this;
   }
 
-  /** Send inline — `Content-Disposition: inline` (the default behaviour). */
+  /** Send inline, `Content-Disposition: inline` (the default behaviour). */
   inline(): this {
     this.headers.set("Content-Disposition", "inline");
 
@@ -404,7 +404,7 @@ export class FileResponse extends HttpResponse {
 
   /**
    * Delete the backing file once its bytes have been read for the response.
-   * Only valid for path-backed files — a no-op for `Blob`/`Buffer` sources
+   * Only valid for path-backed files, a no-op for `Blob`/`Buffer` sources
    * (there is nothing on disk to unlink).
    */
   deleteAfterSend(shouldDelete = true): this {
@@ -414,7 +414,7 @@ export class FileResponse extends HttpResponse {
   }
 
   override async toWeb(): Promise<WebResponse> {
-    // Streaming sources are piped straight through — never buffered, so a
+    // Streaming sources are piped straight through, never buffered, so a
     // multi-gigabyte download costs no heap. `Content-Length` is not known
     // here, so it is left to the caller to set (or omitted for chunked).
     const stream = this.asStream();
@@ -441,7 +441,7 @@ export class FileResponse extends HttpResponse {
 
     if (this.shouldDeleteAfterSend && typeof this.source === "string") {
       // Buffered read is complete; fire-and-forget the unlink. Swallow
-      // errors (file may already be gone) — deletion is best-effort.
+      // errors (file may already be gone). Deletion is best-effort.
       void unlink(this.source).catch(() => {});
     }
 

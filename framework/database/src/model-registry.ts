@@ -2,7 +2,7 @@ import type { Model, AnyModelClass } from "./model.js";
 
 /**
  * A `Model` subclass that has opted into job serialization by declaring a
- * `static morphName`. The registry only ever holds these — the constraint
+ * `static morphName`. The registry only ever holds these. The constraint
  * is expressed structurally (rather than as `AnyModelClass`) so `register()`
  * can reject a class whose `morphName` is still `undefined` at the type
  * level too, not just at runtime.
@@ -13,9 +13,9 @@ export type SerializableModelClass = AnyModelClass & { morphName: string };
  * Maps a model's `morphName` (a stable string, safe to persist to disk and
  * survive across deploys/process restarts) to the `Model` subclass it
  * names. The mirror of `JobRegistry` for the model-serialization feature:
- * a queued payload stores `{ __model: morphName, __id }`, and a worker —
+ * a queued payload stores `{ __model: morphName, __id }`, and a worker,
  * a *separate process* that may never have imported the model class
- * directly — resolves it back through this registry before `handle()`.
+ * directly, resolves it back through this registry before `handle()`.
  *
  * Populated during `DatabaseServiceProvider` boot from every provider's
  * `models()` hook (same collection pattern the queue package uses for

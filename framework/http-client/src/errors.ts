@@ -2,7 +2,7 @@ import type { ClientRequest } from "./client-request.js";
 import type { ClientResponse } from "./client-response.js";
 
 /**
- * A transport-level failure — DNS, connection refused, TLS, timeout, or an
+ * A transport-level failure, DNS, connection refused, TLS, timeout, or an
  * aborted `AbortSignal`. Port of Laravel's
  * `Illuminate\Http\Client\ConnectionException`.
  *
@@ -23,7 +23,7 @@ export class ConnectionError extends Error {
 
 /**
  * Thrown by `response.throw()` / `PendingRequest.throw()` on a failed
- * (4xx/5xx) response — port of `Illuminate\Http\Client\RequestException`.
+ * (4xx/5xx) response, port of `Illuminate\Http\Client\RequestException`.
  * Never thrown unless the caller opted in.
  *
  * The response body is included in the message (truncated to
@@ -53,7 +53,7 @@ export class RequestFailedError extends Error {
       return `${summary}.`;
     }
 
-    // `body()` throws on a streamed response — there is nothing buffered
+    // `body()` throws on a streamed response. There is nothing buffered
     // to quote, and a failure to build an error message must not replace
     // the error being reported.
     let body: string;
@@ -78,7 +78,7 @@ export class RequestFailedError extends Error {
 
 /**
  * Thrown when a request matches no registered stub while `Http.fake()` is
- * active — the request is refused rather than falling through to the real
+ * active. The request is refused rather than falling through to the real
  * network.
  *
  * Laravel makes this opt-in (`preventStrayRequests()`); here it is the
@@ -87,7 +87,7 @@ export class RequestFailedError extends Error {
  * opts back out.
  *
  * Extends `Error` directly rather than sharing a base with `ConnectionError`
- * / `RequestFailedError` — deliberately, and matching Laravel's choice to
+ * / `RequestFailedError`, deliberately, and matching Laravel's choice to
  * extend `RuntimeException` rather than `HttpClientException`. Application
  * code that catches its own client errors must **not** swallow a
  * test-harness failure.

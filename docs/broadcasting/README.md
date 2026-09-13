@@ -32,9 +32,9 @@ The shipped `local` driver keeps its subscription table in the memory of
 **one Node process**. A broadcast only ever reaches clients whose
 websocket is connected to *that* process.
 
-The moment you run two or more server processes — two instances behind a
+The moment you run two or more server processes, two instances behind a
 load balancer, a `cluster`/PM2 fork setup, a rolling deploy where old and
-new processes briefly overlap — a broadcast from process A **silently
+new processes briefly overlap, a broadcast from process A **silently
 never reaches** a client connected to process B. Nothing errors. Nothing
 logs. The message simply doesn't arrive.
 
@@ -45,7 +45,7 @@ notices until a user says "sometimes the feed doesn't update".
 
 `local` is correct for exactly one server process. For anything
 horizontally scaled, use a driver that fans out through shared
-infrastructure. `@mahiframework/redis` ships one — see
+infrastructure. `@mahiframework/redis` ships one. See
 [Redis](../redis/#redisbroadcastdriver), and the
 [section below](#the-multi-process-fix).
 
@@ -67,7 +67,7 @@ One method, one-directional, fire-and-forget from the framework's point
 of view. Subscription and connection management is a **driver-internal
 concern**, not part of this contract.
 
-That isn't an oversight — it's what keeps the interface honest for
+That isn't an oversight. It's what keeps the interface honest for
 drivers other than `local`. A Redis driver's broadcast side genuinely is
 just "publish to a channel", with no awareness of who (if anyone) is
 subscribed. Knowing about sockets is the *subscribing* process's job, and
@@ -75,7 +75,7 @@ in a multi-process deployment that isn't even the same process. Anything
 socket-shaped on this interface would be `LocalBroadcastDriver`'s
 implementation detail leaking into the abstraction.
 
-`event` is the wire-level name clients match on — by default the
+`event` is the wire-level name clients match on, by default the
 dispatched event's `constructor.name`, overridable per event.
 
 ## `ShouldBroadcast`
@@ -90,7 +90,7 @@ interface ShouldBroadcast {
 
 | Member | Required | Default when omitted |
 |---|---|---|
-| `broadcastChannel()` | yes | — |
+| `broadcastChannel()` | yes |: |
 | `broadcastEventName()` | no | the event's `constructor.name` |
 | `broadcastPayload()` | no | the event instance itself, `JSON.stringify`d |
 
@@ -114,7 +114,7 @@ export function shouldBroadcast(event: unknown): event is AbstractEvent & Should
 An event opts in by *having* a `broadcastChannel()` method. It doesn't
 have to import or `implements` anything. That's what lets
 `@mahiframework/notifications` define a `NotificationBroadcast` event that
-broadcasts without depending on this package at all — see
+broadcasts without depending on this package at all. See
 [Notifications](../notifications/#broadcast).
 
 `implements ShouldBroadcast` on your own events is still worth writing:
@@ -134,7 +134,7 @@ export function broadcastMessageFor(event: AbstractEvent & ShouldBroadcast) {
 ```
 
 **Implement `broadcastPayload()` in practice.** The default sends the
-whole event instance, which means every field on it goes over the wire —
+whole event instance, which means every field on it goes over the wire,
 including anything you attached for listeners' benefit and never intended
 a browser to see. Narrow it explicitly:
 
@@ -177,7 +177,7 @@ That's the entire "opt in from the event class, change nothing at the
 dispatch call site" mechanism, in one place. Every dispatched event is
 checked for the marker; the ones that have it are forwarded.
 
-**Broadcasting is fire-and-forget with logged errors — it is not awaited
+**Broadcasting is fire-and-forget with logged errors. It is not awaited
 inside `dispatch()`.** Look at the `void` and the `.catch()`.
 
 A websocket push is a side channel. A slow or failing broadcast must
@@ -231,7 +231,7 @@ interface WebSocketInjectable {
 ```
 
 Drivers that own a websocket endpoint on the app's own HTTP server need a
-hook into the running Node server — which only exists after
+hook into the running Node server, which only exists after
 `@hono/node-server`'s `serve()` has returned. Implementing this interface
 is what makes a driver eligible for `BroadcastManager.injectWebSocket()`.
 
@@ -243,8 +243,8 @@ swapping to one doesn't have to change its entrypoint.
 ## `LocalBroadcastDriver`
 
 An in-process websocket broadcaster. It mounts an upgrade endpoint onto
-the app's **existing** Hono instance — not a second server on a second
-port — tracks which sockets subscribed to which channels, and pushes to
+the app's **existing** Hono instance, not a second server on a second
+port, tracks which sockets subscribed to which channels, and pushes to
 the matching ones.
 
 ```ts
@@ -317,7 +317,7 @@ A dead socket must never break delivery to the live ones.
 **Closed sockets are dropped from every channel.** `onClose` and `onError`
 both call a private `forget(ws)` that walks every channel and removes the
 socket, deleting channels that become empty. Without it the
-`subscriptions` map grows forever as clients come and go — a slow memory
+`subscriptions` map grows forever as clients come and go, a slow memory
 leak.
 
 `subscriberCount(channel)` and `channels()` exist for inspection, mostly
@@ -363,7 +363,7 @@ Anything else gets an error frame:
 {"error":"Expected {\"type\":\"subscribe\"|\"unsubscribe\",\"channel\":\"...\"}."}
 ```
 
-A malformed frame is **answered, not fatal** — the connection stays open.
+A malformed frame is **answered, not fatal**. The connection stays open.
 One bad message from a client shouldn't tear down a connection that may
 have valid subscriptions on it. A frame is rejected if it isn't a string,
 isn't valid JSON, isn't an object, has a `type` other than the two
@@ -400,24 +400,24 @@ socket.addEventListener("message", (event) => {
 There is no bundled client library or `Echo` equivalent, but the wire
 protocol and channel-name conventions mirror Laravel/Pusher closely, so a
 thin client is easy to write (and `pusher-js`-style libraries port with
-minor changes). Presence and private channels are supported — see the next
+minor changes). Presence and private channels are supported. See the next
 section.
 
 ## Channel authorization
 
-Public channels — any name **without** a `private-` or `presence-` prefix
-— behave exactly as before: any connected client may subscribe. That tier
+Public channels, any name **without** a `private-` or `presence-` prefix,
+behave exactly as before: any connected client may subscribe. That tier
 is unchanged.
 
 Two prefixes opt a channel into authorization:
 
-- `private-*` — a client may subscribe only if the channel's
+- `private-*`: a client may subscribe only if the channel's
   authorization callback returns truthy for the connecting user.
-- `presence-*` — same gate, plus membership: the callback returns the
+- `presence-*`: same gate, plus membership: the callback returns the
   member info published to everyone else on the channel as
   `here`/`joining`/`leaving` frames.
 
-A protected channel with **no** matching callback **fails closed** — an
+A protected channel with **no** matching callback **fails closed**, an
 unregistered `private-` channel denies everyone, so a typo is a locked
 door, not an open one.
 
@@ -448,14 +448,14 @@ export class BroadcastChannelsProvider extends ServiceProvider {
 `{param}` placeholders are captured from the channel name (with its
 prefix stripped) and passed to the callback after the user. The user is
 whatever the app's auth guard resolved for the connecting socket, or
-`null` for a guest — a guest is denied every protected channel whose
+`null` for a guest. A guest is denied every protected channel whose
 callback checks the user.
 
 ### How a client authenticates
 
 - **Same-origin browser.** The websocket upgrade carries the session
   cookie, so the server authenticates the connection at upgrade time (via
-  the `session` guard by default) and no extra step is needed — just
+  the `session` guard by default) and no extra step is needed, just
   subscribe to the `private-`/`presence-` channel.
 - **Cross-origin SPA.** The browser won't send the cookie on the upgrade,
   so the client first `POST`s to `/broadcasting/auth` (a normal
@@ -493,7 +493,7 @@ socket's channels, inbound frame size, and unflushed outbound buffer
 
 Channel authorization controls *who* subscribes; `broadcastPayload()`
 controls *what* they receive. The default payload is the **entire event
-object** — if an event carries a full model, every subscriber gets every
+object**, if an event carries a full model, every subscriber gets every
 column. Always implement `broadcastPayload()` to narrow the wire shape
 when an event holds anything you wouldn't publish openly. The two
 protections are complementary.
@@ -504,7 +504,7 @@ A broadcastable event dispatched inside a `DB.transaction()` is pushed to
 clients immediately by default. Mark the event class `static
 broadcastAfterCommit = true` (or implement the `ShouldBroadcastAfterCommit`
 marker with a truthy `broadcastAfterCommit` property) and the broadcast is
-held until the transaction commits — and dropped on rollback:
+held until the transaction commits, and dropped on rollback:
 
 ```ts
 class OrderShipped extends AbstractEvent implements ShouldBroadcast {
@@ -590,13 +590,13 @@ whose HTTP is fine, this is the first thing to check.
 `injectWebSocket()` is a no-op for drivers without a socket server of
 their own, so the line is safe to leave in place regardless of which
 driver you're configured for. It is also **idempotent** on the shared
-helper — calling it after `listenHttpServer()` already has changes
+helper, calling it after `listenHttpServer()` already has changes
 nothing, which is what makes the snippet above safe to keep.
 
 ### Adding your own websocket route
 
 A broadcast socket is not the only thing an app might want a websocket
-for — a terminal bridge, a collaborative document, a live log tail. Ask
+for, a terminal bridge, a collaborative document, a live log tail. Ask
 the kernel for the helper and register as many routes as you like:
 
 ```ts
@@ -615,12 +615,12 @@ kernel.raw().get(
 > [!WARNING]
 > **Never call `createNodeWebSocket()` yourself when the kernel already
 > has a helper.** It is not a case of the second one quietly not
-> working — it takes the process down.
+> working. It takes the process down.
 >
 > `injectWebSocket()` attaches an `upgrade` listener to the Node server,
 > and Node calls *every* `upgrade` listener for *every* upgrade. The
 > second helper therefore handles connections destined for the first,
-> finds no waiter for them, and runs its reject branch — `socket.end()`
+> finds no waiter for them, and runs its reject branch, `socket.end()`
 > on a socket the winning helper has already taken over. That raises
 > `ERR_STREAM_WRITE_AFTER_END` on the server's `error` event, which is
 > unhandled, and the process exits. It happens on the very first
@@ -661,9 +661,9 @@ path; nothing else moves.
 `BroadcastServiceProvider` resolves two tokens in its own `boot()`, so in
 `config/app.ts` it must come **after both**:
 
-- `EventsServiceProvider` — it decorates the dispatcher with
+- `EventsServiceProvider`: it decorates the dispatcher with
   `afterDispatch()`
-- `HttpServiceProvider` — it mounts the upgrade route onto the
+- `HttpServiceProvider`: it mounts the upgrade route onto the
   already-constructed `HttpKernel`'s Hono instance, and wants the
   kernel's global middleware installed first so the socket route sits
   behind it
@@ -700,7 +700,7 @@ websocket endpoint and the local `channel → sockets` map, and adds fanout:
 
 1. `broadcast(msg)` does not touch local sockets. It `PUBLISH`es to a
    shared Redis channel.
-2. Every process — **including the publisher** — runs a subscriber
+2. Every process, **including the publisher**, runs a subscriber
    `SUBSCRIBE`d to that channel, and on each message calls the inherited
    `LocalBroadcastDriver.broadcast()` to deliver to its own sockets.
 
@@ -713,7 +713,7 @@ entirely.
 `instanceof LocalBroadcastDriver` still holds, so
 `BroadcastServiceProvider` mounts the route and injects the server
 exactly as before. **Switching from `local` to `redis` requires no
-entrypoint change and no client change** — the socket path stays whatever
+entrypoint change and no client change**. The socket path stays whatever
 you configured.
 
 Full details, including the connect-before-publish ordering requirement:
@@ -722,7 +722,7 @@ Full details, including the connect-before-publish ordering requirement:
 No fanout driver ships in this package on purpose, for the same reason
 the cache, queue and storage defaults are all in-process: the framework
 doesn't add an infrastructure dependency speculatively. It does, however,
-document the limitation everywhere it can — in the package's `index.ts`,
+document the limitation everywhere it can, in the package's `index.ts`,
 in the driver's docstring, in the generated `config/broadcasting.ts`, and
 here.
 
@@ -768,14 +768,14 @@ export class PusherServiceProvider extends ServiceProvider {
 }
 ```
 
-One method to implement. No `WebSocketInjectable` — a hosted service has
+One method to implement. No `WebSocketInjectable`. A hosted service has
 no local socket server, so `injectWebSocket()` in the app's entrypoint is
 a no-op and nothing needs to change.
 
 If your driver needs an async connection (a Redis subscriber, an
 authenticated handshake), implement `Connectable` and call `connect()`
 from your provider's `boot()`. `Manager.driver()` never awaits for you.
-And connect **before** the server starts accepting traffic — a publish
+And connect **before** the server starts accepting traffic. A publish
 that happens before the subscriber is up is a lost message.
 
 ## Testing
@@ -832,23 +832,23 @@ doesn't.
 
 **`registerRoutes()` must run before `injectWebSocket()`,** or the latter
 throws. `BroadcastServiceProvider.boot()` does the first; the entrypoint
-does the second — which is why boot ordering matters.
+does the second. Which is why boot ordering matters.
 
-**A second `createNodeWebSocket()` crashes the process.** Not "conflicts"
-— crashes, on the first connection, with an unhandled
+**A second `createNodeWebSocket()` crashes the process.** Not "conflicts",
+crashes, on the first connection, with an unhandled
 `ERR_STREAM_WRITE_AFTER_END`. Use `kernel.websocketSupport()` for your own
 websocket routes; see [Adding your own websocket
 route](#adding-your-own-websocket-route).
 
 **Public channels are open by design; protected ones fail closed.** Any
-client can subscribe to any *public* (unprefixed) channel — that's the
+client can subscribe to any *public* (unprefixed) channel. That's the
 contract. `private-`/`presence-` channels require a matching
 `Broadcast.channel()` callback and deny everyone when none is registered.
 See [Channel authorization](#channel-authorization).
 
 **The default `broadcastPayload()` sends the whole event instance.**
 Every field, including ones you never meant a browser to see. Channel
-authorization gates *who* subscribes; it does not narrow *what* they get —
+authorization gates *who* subscribes; it does not narrow *what* they get,
 implement `broadcastPayload()` for that.
 
 **`constructor.name` is the default event name.** A minifier that renames
@@ -864,10 +864,10 @@ tokens are resolved in its own `boot()`.
 
 ## Related
 
-- [Redis](../redis/) — `RedisBroadcastDriver`, the multi-process fix
-- [Events](../events/) — `AbstractEvent`, `afterDispatch()`, the dispatcher
-- [Notifications](../notifications/) — the `broadcast` channel
-- [Routing](../routing/) — `Router.raw()`, the escape hatch this package uses
-- [Deployment](../deployment/) — what "more than one process" actually means
-- [Providers](../providers/) — boot ordering, `extend()`
-- [Configuration](../configuration/) — `config/broadcasting.ts`
+- [Redis](../redis/): `RedisBroadcastDriver`, the multi-process fix
+- [Events](../events/): `AbstractEvent`, `afterDispatch()`, the dispatcher
+- [Notifications](../notifications/): the `broadcast` channel
+- [Routing](../routing/): `Router.raw()`, the escape hatch this package uses
+- [Deployment](../deployment/): what "more than one process" actually means
+- [Providers](../providers/): boot ordering, `extend()`
+- [Configuration](../configuration/): `config/broadcasting.ts`

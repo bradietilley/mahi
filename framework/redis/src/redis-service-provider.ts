@@ -25,7 +25,7 @@ interface RedisCacheStoreConfig {
   /**
    * The cache's own namespace *within* the connection's `keyPrefix`.
    * Defaults to `DEFAULT_CACHE_PREFIX` (`"cache:"`), which is what keeps
-   * `flush()` away from the queue's keys — see `RedisCacheStore`.
+   * `flush()` away from the queue's keys. See `RedisCacheStore`.
    *
    * This is not the connection's `keyPrefix`: that is read off the live
    * connection, and this one only ever names the sub-namespace.
@@ -38,7 +38,7 @@ interface RedisQueueConnectionConfig {
   connection?: string;
   queue?: string;
   /**
-   * Seconds before a reserved job is presumed abandoned and reclaimed —
+   * Seconds before a reserved job is presumed abandoned and reclaimed,
    * the crash-recovery window. Must exceed the longest a job can run.
    * Default 90.
    */
@@ -54,9 +54,9 @@ interface RedisBroadcastConnectionConfig {
 
 /**
  * Registers the shared `RedisManager` and wires a `redis` driver into
- * whichever of the three infra managers are present — `CacheManager`
+ * whichever of the three infra managers are present, `CacheManager`
  * (`"redis"` store), `QueueManager` (`"redis"` connection), and
- * `BroadcastManager` (`"redis"` connection) — via each manager's own
+ * `BroadcastManager` (`"redis"` connection), via each manager's own
  * `extend()`. One `RedisConnection` backs all three, so the whole
  * multi-process story (shared cache, cross-process broadcast fanout, a
  * faster queue) comes from a single connection design and three thin
@@ -65,7 +65,7 @@ interface RedisBroadcastConnectionConfig {
  * Ordering in `config/app.ts`'s `providers[]` (all hard requirements,
  * since each `extend()` resolves that manager's token):
  *   - after `CacheServiceProvider`, `QueueServiceProvider`, and
- *     `BroadcastServiceProvider` — their tokens must be bound before this
+ *     `BroadcastServiceProvider`, their tokens must be bound before this
  *     provider's `register()` extends them;
  *   - before nothing new is required, but note `BroadcastServiceProvider`
  *     `boot()` mounts the websocket route for whatever driver is default,
@@ -73,7 +73,7 @@ interface RedisBroadcastConnectionConfig {
  *     `boot()`) has extended the broadcast manager, `redis` is a valid
  *     `default` there.
  *
- * Only managers actually present are touched — an app without, say, the
+ * Only managers actually present are touched, an app without, say, the
  * queue package simply doesn't get a `redis` queue connection, no error.
  * The `redis` drivers are registered but never *resolved* unless config
  * points a `default` (or an explicit lookup) at them, so merely listing
@@ -104,8 +104,8 @@ export class RedisServiceProvider extends ServiceProvider {
     // contract ("merely listing this provider costs nothing until Redis
     // is actually selected") and had a concrete cost: an open ioredis
     // socket keeps the event loop alive, so every short-lived process
-    // that boots the app — `./artisan migrate`, `key:generate`, any CLI
-    // command, a test run — would hang after finishing its work instead
+    // that boots the app, `./artisan migrate`, `key:generate`, any CLI
+    // command, a test run, would hang after finishing its work instead
     // of exiting. The base app lists this provider by default so that
     // switching to Redis is a config change, which made "listed but
     // unused" the common case rather than the rare one.
@@ -138,7 +138,7 @@ export class RedisServiceProvider extends ServiceProvider {
   }
 
   /**
-   * Quit every Redis client this app opened — the exact mirror of
+   * Quit every Redis client this app opened, the exact mirror of
    * `boot()`, and the reason a `schedule:run` cron invocation with
    * `CACHE_STORE=redis` now exits instead of accumulating a zombie
    * process per minute: an open ioredis socket keeps Node's event loop
@@ -146,7 +146,7 @@ export class RedisServiceProvider extends ServiceProvider {
    *
    * Order matters. The broadcast driver's subscriber is unsubscribed
    * first, because it was created through `RedisConnection.duplicate()`
-   * and is therefore also tracked by the connection — quitting the
+   * and is therefore also tracked by the connection, quitting the
    * connection first would leave the driver quitting an already-closed
    * client. Both paths are individually best-effort anyway (see
    * `RedisConnection.disconnect()`), so the ordering is about clean logs,

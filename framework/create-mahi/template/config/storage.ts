@@ -2,7 +2,7 @@ import { storage_path } from "@mahiframework/core";
 import type { StorageConfig } from "@mahiframework/storage";
 
 /**
- * `default` is `local` — a PRIVATE disk under `storage/app/private`, served
+ * `default` is `local`, a PRIVATE disk under `storage/app/private`, served
  * to nobody unless a route deliberately streams a file from it (see
  * `serveStoredFile`). This matches Laravel: `Storage.put()` with no disk
  * argument must not land somewhere the whole internet can read.

@@ -13,7 +13,7 @@ class Video extends Model<{ id: string }>()({
   morphName: "Video",
 }) {}
 
-/** Shares `Post`'s table — the collision the alias chain's third rung can't prevent. */
+/** Shares `Post`'s table, the collision the alias chain's third rung can't prevent. */
 class Draft extends Model<{ id: string }>()({
   table: "posts",
   primaryKey: "id",
@@ -131,7 +131,7 @@ describe("Morph map", () => {
   describe("getMorphAlias()", () => {
     it("finds a class whose thunk has never been resolved", () => {
       Relation.morphMap({ post: () => Post, video: () => Video });
-      // Nothing has forced either thunk yet — the reverse index is empty
+      // Nothing has forced either thunk yet. The reverse index is empty
       // and the lookup has to fall back to forcing them.
       expect(Relation.getMorphAlias(Video)).toBe("video");
     });

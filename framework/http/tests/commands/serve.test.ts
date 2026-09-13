@@ -164,8 +164,8 @@ describe("serveWorkerArgs", () => {
    * A compiled binary IS the interpreter, so `spawn(process.execPath, ...)`
    * re-runs it and everything before the command word must be dropped.
    *
-   * The old fallback (`argv.slice(1)`) passed `argv[1]` through — which for
-   * such a binary is a path inside its virtual filesystem — and Commander read
+   * The old fallback (`argv.slice(1)`) passed `argv[1]` through, which for
+   * such a binary is a path inside its virtual filesystem, and Commander read
    * it as a subcommand:
    *
    *     error: unknown command '/$bunfs/root/hivemind'

@@ -43,8 +43,8 @@ export function loadEnv<TSchema extends z.ZodTypeAny>(
   }
 
   // Variables set in the REAL environment (shell, CI, Docker, the
-  // orchestrator injecting a secret) must win over every committed file —
-  // that is the whole point of 12-factor config. So the files override each
+  // orchestrator injecting a secret) must win over every committed file.
+  // That is the whole point of 12-factor config. So the files override each
   // other but never a key that was already present before we started. We
   // snapshot those keys up front and let dotenv `override` freely, then
   // restore the real values afterwards.

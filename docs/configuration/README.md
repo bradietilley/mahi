@@ -3,7 +3,7 @@
 Configuration is a dot-notation store on the `Application`, populated from
 plain TypeScript functions in `config/`, which read a validated
 environment object. There is no config caching step, no `.php`-style
-array files, and no magic discovery — `bin/bootstrap.ts` calls
+array files, and no magic discovery, `bin/bootstrap.ts` calls
 `app.config.set()` once per namespace and that is the whole mechanism.
 
 ```ts
@@ -24,7 +24,7 @@ app.config.get<number>("http.port", 8000);            // with a fallback
 | `get<T>(key, fallback?)` | Dot-notation read. Returns `fallback` (default `undefined`) if any segment is missing. Returns a deep clone of object values. |
 | `has(key)` | Whether a dot-notation key exists (even when its value is `null`). |
 | `push(key, value)` / `prepend(key, value)` | Append/prepend to the array at `key`, creating it if absent. |
-| `all()` | A deep clone of the whole store — mutating it never mutates the repository. |
+| `all()` | A deep clone of the whole store, mutating it never mutates the repository. |
 
 `set()` understands dot notation: `set("database.default", "sqlite")` writes
 the nested `{ database: { default: "sqlite" } }`, creating intermediate
@@ -34,7 +34,7 @@ as its first argument.
 
 ### get() and dot notation
 
-`get()` delegates to `data_get`, so the full path syntax applies —
+`get()` delegates to `data_get`, so the full path syntax applies,
 including wildcards:
 
 ```ts
@@ -49,7 +49,7 @@ throwing:
 config.get<HasherOptions>("hashing", {});   // base app ships no hashing config
 ```
 
-That is `EncryptionServiceProvider`'s actual call — the `hashing`
+That is `EncryptionServiceProvider`'s actual call. The `hashing`
 namespace is optional, and an absent one yields `{}` so argon2 uses its
 own defaults.
 
@@ -107,8 +107,8 @@ The ordering makes this work: the app's `set()` calls all run in
 `merge()` then fills in keys the app didn't specify without clobbering the
 ones it did.
 
-`SnowflakeServiceProvider` uses a third variant — a presence check, then
-`set()` — because its config is an all-or-nothing structure rather than a
+`SnowflakeServiceProvider` uses a third variant, a presence check, then
+`set()`, because its config is an all-or-nothing structure rather than a
 set of independent leaves:
 
 ```ts
@@ -135,7 +135,7 @@ What it does, in order:
 
 1. If the file at `path` (default `".env"`, relative to the current
    working directory) **exists**, load it via dotenv. A missing `.env` is
-   **not an error** — production deployments usually inject real
+   **not an error**, production deployments usually inject real
    environment variables instead.
 2. `safeParse` the whole of `process.env` against the schema.
 3. On failure, throw an `Error` listing **every** issue at once:
@@ -149,7 +149,7 @@ Invalid environment configuration:
 4. On success, return `result.data`.
 
 Two properties of step 4 matter. The return is the **parsed** data, not
-`process.env` — so `z.coerce.number()` gives you an actual `number`, and
+`process.env`, so `z.coerce.number()` gives you an actual `number`, and
 `.default(...)` fills in values that were never set. And it is **typed**:
 `z.infer<typeof envSchema>`, so `env.PORT` is `number` and `env.APP_KEY`
 is `string | undefined`.
@@ -195,7 +195,7 @@ export type Env = z.infer<typeof envSchema>;
 ```
 
 Add your own keys here as the app grows. A key that isn't in the schema
-isn't on the typed `Env` object — which is the point. There is no
+isn't on the typed `Env` object. Which is the point. There is no
 `env("SOME_VAR")` helper that reads arbitrary strings; if you want it,
 declare it.
 
@@ -239,7 +239,7 @@ package exports. A typo in a key is a compile error.
 
 ### config/app.ts
 
-The odd one out — it exports a provider **list**, not a config object, and
+The odd one out. It exports a provider **list**, not a config object, and
 is never passed to `config.set()`:
 
 ```ts
@@ -284,9 +284,9 @@ export function databaseConfig(env: Env): DatabaseConfig & { migrationsPath: str
 | `connections` | Named connection configs. The key is the driver name registered via `extend()`. |
 | `migrationsPath` | Where `./artisan migrate` looks for **your** migrations. Resolved relative to the running file so it points at compiled `.js` under `dist/`. |
 
-`migrationsPath` covers your app's migrations only. Framework tables —
+`migrationsPath` covers your app's migrations only. Framework tables,
 `personal_access_tokens`, `sessions`, `jobs`, `failed_jobs`,
-`notifications` — come from their packages' `migrations()` provider hooks
+`notifications`, come from their packages' `migrations()` provider hooks
 and are picked up automatically. Don't list them.
 
 See [Database](../database/) and [Migrations](../migrations/).
@@ -308,8 +308,8 @@ export function httpConfig(env: Env): HttpConfig {
 
 | Key | Meaning |
 |---|---|
-| `url` | Canonical root URL. Used by the URL generator when there's no in-flight request to borrow a host from — queue jobs, CLI, scheduled tasks. A live request's own scheme/host wins over this. |
-| `cors` | If set, `hono/cors` is installed on every route. **Omit it and there is no CORS at all** — it's opt-in. |
+| `url` | Canonical root URL. Used by the URL generator when there's no in-flight request to borrow a host from, queue jobs, CLI, scheduled tasks. A live request's own scheme/host wins over this. |
+| `cors` | If set, `hono/cors` is installed on every route. **Omit it and there is no CORS at all**. It's opt-in. |
 | `liveness` | If set, registers a zero-I/O liveness route (default `GET /up`) returning `200 {"status":"ok"}`, exempt from maintenance mode. `{}` is enough. Formerly `health`, which is still read as a fallback. |
 | `healthCheck` | If set, registers a readiness route (default `GET /health`) that runs every registered check and returns `200`/`503`. Requires `@mahiframework/health`. Takes `path`, `failureStatus`, and `secret`. **Not** maintenance-exempt. |
 
@@ -332,7 +332,7 @@ export function cacheConfig(): CacheConfig {
 }
 ```
 
-`default` is `"array"` — in-process, per-process, gone on restart. Correct
+`default` is `"array"`, in-process, per-process, gone on restart. Correct
 for a single process and for tests.
 
 `file` keeps one file per key under `path`, which is a **directory**, not
@@ -363,7 +363,7 @@ export function queueConfig(): QueueConfig {
 }
 ```
 
-`sync` runs jobs inline at dispatch — no worker, no async, exceptions
+`sync` runs jobs inline at dispatch, no worker, no async, exceptions
 propagate to the caller. `database` persists to the `jobs` table;
 `redis` buys throughput over it, and brings cross-process locks that the
 array/file cache stores can't provide.
@@ -372,7 +372,7 @@ array/file cache stores can't provide.
 may be held before another worker assumes its holder died and takes it.
 **It must exceed the longest a job can run**, or a slow job gets a second
 worker. `afterCommit` holds every dispatch on that connection until the
-enclosing `DB.transaction()` commits — recommended, since it removes the
+enclosing `DB.transaction()` commits, recommended, since it removes the
 "worker popped the job before the row it references was committed" race.
 `queue` is the default named queue for the connection.
 
@@ -411,17 +411,17 @@ export function authConfig(env: Env): AuthConfig {
 
 Which guard to use is topology-dependent, not a preference:
 
-- **`token`** — bearer tokens in an `Authorization` header. Correct for a
+- **`token`**: bearer tokens in an `Authorization` header. Correct for a
   detached frontend on another origin, and for third-party API consumers.
   Needs no CSRF protection, because browsers never attach an
   `Authorization` header automatically. `expiresInMinutes: null` means
   never expires (matching Sanctum); the `expires_at` column already
   exists, so switching to a finite lifetime is a config change and nothing
   more.
-- **`session`** — signed cookie plus a server-side session. Correct when
+- **`session`**, signed cookie plus a server-side session. Correct when
   the frontend is served from the **same origin** as the API. Cross-origin
   cookies require `sameSite: "None"` **and** `secure: true`, and `secure`
-  means they will not work over plain HTTP — so a cross-origin SPA in
+  means they will not work over plain HTTP, so a cross-origin SPA in
   local development silently gets no session at all. That's a browser
   rule, not a framework limitation. Pair this guard with `csrf()`.
 
@@ -429,7 +429,7 @@ Which guard to use is topology-dependent, not a preference:
 column holds the identifier, which holds the password hash.
 `identifierColumn` defaults to `"email"` if omitted.
 
-Note `model: User` is a real class reference, not a string — config files
+Note `model: User` is a real class reference, not a string, config files
 are TypeScript. See [Authentication](../authentication/).
 
 There is no `config/authorization.ts`. A gate has no drivers, no
@@ -451,7 +451,7 @@ export function storageConfig(): StorageConfig {
 
 Disk names are the `extend()` keys. `root` is an absolute filesystem path;
 `url` is the public prefix `Storage.url(path)` builds against. A disk
-without a `url` isn't publicly addressable — that's the whole difference
+without a `url` isn't publicly addressable. That's the whole difference
 between `local` and `public` here. See [Storage](../storage/).
 
 ### config/logging.ts
@@ -474,7 +474,7 @@ export function loggingConfig(): LogConfig {
 ```
 
 `LogChannelConfig` is a discriminated union on `driver`, so each channel
-is checked against the right shape — `single` requires a `path`, `stack`
+is checked against the right shape, `single` requires a `path`, `stack`
 requires `channels`.
 
 | Driver | Behaviour |
@@ -482,11 +482,11 @@ requires `channels`.
 | `console` | stdout/stderr |
 | `single` | One fixed file |
 | `daily` | Rotates to a dated file; `maxFiles` prunes old ones |
-| `array` | In memory — for tests |
+| `array` | In memory: for tests |
 | `null` | Discards everything |
 | `stack` | Fans out to other named channels |
 
-`emergency` is the fallback used when resolving a channel *throws* — an
+`emergency` is the fallback used when resolving a channel *throws*, an
 unregistered driver, bad config, an unwritable log directory. Defaults to
 `storage_path("logs/mahi.log")` if omitted.
 
@@ -517,7 +517,7 @@ export function mailConfig(env: Env): MailConfig {
 ```
 
 `default` is `"log"` (via `MAIL_MAILER`), so local development and tests
-never open an SMTP connection — the log mailer writes the rendered message
+never open an SMTP connection. The log mailer writes the rendered message
 through `app.logger`. Set `MAIL_MAILER=smtp` in production, or `"array"`
 in tests to capture messages in memory.
 
@@ -545,7 +545,7 @@ export function redisConfig(env: Env): RedisConfig {
 
 One connection is shared by the `redis` cache store, queue connection, and
 broadcast driver. Declaring it costs nothing until something actually
-resolves a `redis` driver — `RedisServiceProvider.boot()` checks whether
+resolves a `redis` driver, `RedisServiceProvider.boot()` checks whether
 `cache.default`, `queue.default`, or `broadcasting.default` is `"redis"`
 before opening a socket, specifically so short-lived CLI processes still
 exit.
@@ -572,7 +572,7 @@ The `local` driver runs the websocket server inside this Node process and
 keeps its subscription table in that process's memory. Correct for a
 single-process deployment and **silently lossy** for any other: with two
 or more processes, a broadcast from one never reaches clients connected to
-another. No error, no warning — the message just doesn't arrive.
+another. No error, no warning. The message just doesn't arrive.
 
 Switch `default` to `"redis"` (or register a Pusher/Ably driver via
 `BroadcastManager.extend()`) before scaling horizontally. The websocket
@@ -599,7 +599,7 @@ export function scheduleConfig(): ScheduleConfig {
 | Key | Default | Purpose |
 |---|---|---|
 | `lockDirectory` | `"storage/schedule-locks"` | Where `withoutOverlapping()` writes its lock files. |
-| `lockStore` | — | Cache store to hold overlap locks in instead, so they span hosts. |
+| `lockStore` |: | Cache store to hold overlap locks in instead, so they span hosts. |
 | `pingTimeoutMs` | `5000` | Timeout for `pingBefore()`/`thenPing()`/… webhooks. |
 
 Every key is read with a default, so the whole namespace is optional. The
@@ -617,7 +617,7 @@ export function healthConfig(): HealthConfig {
 | Key | Meaning |
 |---|---|
 | `timeoutSeconds` | Default per-check deadline. Defaults to `5`; a check can override it. |
-| `concurrency` | How many checks run at once. Defaults to `1` (sequential) — parallel probing bursts connections at a dependency that is already suspected of being unwell. |
+| `concurrency` | How many checks run at once. Defaults to `1` (sequential), parallel probing bursts connections at a dependency that is already suspected of being unwell. |
 
 Entirely optional; read with a `?? {}` fallback, so an app that never sets
 the namespace gets both defaults. The endpoint's own settings live under
@@ -646,14 +646,14 @@ export function snowflakeConfig(env: Env): SnowflakeConfig {
 
 | Key | Meaning |
 |---|---|
-| `testing` | Emit sequential `9000000000000000001`, `…002` IDs grouped by model class — predictable in tests, still 19 digits wide. |
+| `testing` | Emit sequential `9000000000000000001`, `…002` IDs grouped by model class, predictable in tests, still 19 digits wide. |
 | `sequencing.resolver` | `"memory"` (in-process), `"file"` (lockfile), `"cache"`, or `null` to keep the core memory resolver. |
 | `constants.epoch` | Timestamp origin. A recent epoch keeps the generator valid ~35 years. |
 | `constants.cluster` / `worker` | Must fit the configured bit widths (0–31 by default). |
 
 **The epoch and bit signature must never change once IDs exist in the
 database.** Prefer a unique `worker` per process, which makes the default
-in-memory sequencer sufficient; only reach for `"file"` or `"cache"` when
+in-memory sequencer sufficient; only use `"file"` or `"cache"` when
 processes share a worker id. Opt in per model with `keyType: snowflake()`
 in the model's config.
 
@@ -691,7 +691,7 @@ storage_path("app", null, "public");       // "<cwd>/storage/app/public"
 
 ### Why process.cwd() and not the Application
 
-The helpers resolve against `process.cwd()`, deliberately — not against
+The helpers resolve against `process.cwd()`, deliberately, not against
 any state on an `Application` instance.
 
 Config files call these helpers **while building the config** that gets
@@ -722,10 +722,10 @@ production supervisor starts your app from `/`, every path helper resolves
 against `/`. Set the working directory in your process manager. See
 [Deployment](../deployment/).
 
-### setBasePath() — for apps that aren't run from their own directory
+### setBasePath(): for apps that aren't run from their own directory
 
-Some apps have no meaningful cwd. A CLI installed on `PATH` — or compiled
-to a single-file binary — gets run from wherever the user happens to be,
+Some apps have no meaningful cwd. A CLI installed on `PATH`, or compiled
+to a single-file binary, gets run from wherever the user happens to be,
 so `database_path()` resolving to `~/Downloads/database` is not just
 wrong, it is *silently* wrong: a relative sqlite `filename` under it
 creates a fresh, empty database rather than failing.
@@ -752,7 +752,7 @@ helpers already delegate to `base_path()`:
 | `database_path("app.sqlite")` | `~/.config/myapp/database/app.sqlite` |
 
 **Ordering is the only way this goes wrong.** It must be the first
-statement of `bootstrap()` — before `loadEnv()` and before any
+statement of `bootstrap()`, before `loadEnv()` and before any
 `config/*.ts` function runs, since those call `storage_path()` while
 building the config object. A path helper called before `setBasePath()`
 silently uses cwd.
@@ -762,9 +762,9 @@ reason above: config functions run before an `Application` exists.
 
 Two companions, both mainly for tests and diagnostics:
 
-- `resolvedBasePath()` — the root currently in effect, so a `doctor`-style
+- `resolvedBasePath()`: the root currently in effect, so a `doctor`-style
   command can report which root it picked.
-- `clearBasePath()` — restores the `process.cwd()` default. A module-level
+- `clearBasePath()`: restores the `process.cwd()` default. A module-level
   root would otherwise leak between test files sharing a module registry.
 
 **Project-style apps should not call this at all.** Leave it unset and
@@ -784,7 +784,7 @@ it back.
 
 **A missing `.env` is not an error.** `loadEnv()` skips loading when the
 file doesn't exist and validates `process.env` as-is. That's correct for
-production, and it means a locally missing `.env` fails later — at schema
+production, and it means a locally missing `.env` fails later, at schema
 validation, on whichever required key you didn't set.
 
 **`loadEnv()` returns parsed data, not `process.env`.** Use the returned
@@ -794,7 +794,7 @@ uncoerced, with no defaults applied.
 **`Application`'s environment default is `"production"`, the base app's
 schema default is `"development"`.** They differ because they're
 fail-safes for different situations. `app.useEnvironment(env.NODE_ENV)`
-reconciles them — call it. See
+reconciles them, call it. See
 [Application lifecycle](../lifecycle/#environment).
 
 **Config must be set before `bootstrap()`.** Providers read config in
@@ -808,8 +808,8 @@ anchored to the app's installed location.
 
 ## Related
 
-- [Application lifecycle](../lifecycle/) — where config is set, and when
-- [Service providers](../providers/) — contributing defaults with `merge()`
-- [Service container](../container/) — how factories read config
-- [Installation](../installation/) — what the installer writes into `.env`
-- [Deployment](../deployment/) — environment variables in production
+- [Application lifecycle](../lifecycle/): where config is set, and when
+- [Service providers](../providers/): contributing defaults with `merge()`
+- [Service container](../container/): how factories read config
+- [Installation](../installation/): what the installer writes into `.env`
+- [Deployment](../deployment/): environment variables in production

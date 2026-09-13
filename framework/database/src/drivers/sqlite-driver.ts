@@ -13,7 +13,7 @@ export interface SqliteConnectionConfig {
    *
    * Defaults to 5000. **Sqlite's own default is 0**, which means a second
    * process attempting to write while another holds the lock fails
-   * immediately with `SQLITE_BUSY` rather than waiting — and since WAL still
+   * immediately with `SQLITE_BUSY` rather than waiting, and since WAL still
    * permits only one writer at a time, that is not an exotic condition, it is
    * what two concurrent writes look like.
    *
@@ -26,8 +26,8 @@ export interface SqliteConnectionConfig {
 
 /**
  * better-sqlite3 is a fully synchronous driver (no async API at all), so
- * construction here is synchronous and there is no `connect()` —
- * the handle is open the moment the constructor returns, so there is
+ * construction here is synchronous and there is no `connect()`.
+ * The handle is open the moment the constructor returns, so there is
  * nothing to warm up and nothing for `DatabaseServiceProvider.boot()` to
  * await.
  *
@@ -46,7 +46,7 @@ export class SqliteDriver<DB = any> implements DatabaseDriver<DB> {
     this.db = new BetterSqlite3(config.filename);
     this.db.pragma("journal_mode = WAL");
     this.db.pragma("foreign_keys = ON");
-    // WAL lets readers and a writer coexist, but still only ONE writer — so
+    // WAL lets readers and a writer coexist, but still only ONE writer, so
     // without a busy timeout a second concurrent write fails instantly.
     this.db.pragma(`busy_timeout = ${config.busyTimeout ?? 5000}`);
 
@@ -59,7 +59,7 @@ export class SqliteDriver<DB = any> implements DatabaseDriver<DB> {
    * Close the underlying better-sqlite3 handle (via Kysely's `destroy()`,
    * which the SqliteDialect wires to `database.close()`), checkpointing
    * and releasing the WAL. Every query after this throws
-   * "The database connection is closed" — which is the point: a
+   * "The database connection is closed". Which is the point: a
    * terminated application should be discarded, not reused.
    *
    * Idempotent, because shutdown is best-effort and a second

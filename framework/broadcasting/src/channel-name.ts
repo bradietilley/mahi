@@ -4,19 +4,19 @@
  *
  * A channel name's PREFIX decides whether it is authorized:
  *
- *   - `private-*`  — authorized. A client may only subscribe if the
+ *   - `private-*`, authorized. A client may only subscribe if the
  *     channel-authorization callback registered for it returns truthy for
  *     the connecting user.
- *   - `presence-*` — authorized AND membership-aware. The callback returns
+ *   - `presence-*`, authorized AND membership-aware. The callback returns
  *     the member payload published to everyone else on the channel
  *     (`here`/`joining`/`leaving`); returning a falsy value denies the
  *     subscription.
- *   - anything else — public. Any connected client may subscribe. This is
+ *   - anything else, public. Any connected client may subscribe. This is
  *     the only tier that existed before channel authorization, and the one
  *     the driver still serves without any auth callback at all.
  *
  * The prefix is part of the wire channel name (`private-orders.5`) but NOT
- * part of the pattern an application registers (`orders.{orderId}`) — the
+ * part of the pattern an application registers (`orders.{orderId}`). The
  * registry matches against the name with its prefix stripped, exactly like
  * `Broadcast::channel('orders.{orderId}', …)` matching both
  * `private-orders.5` and `presence-orders.5`.
@@ -37,7 +37,7 @@ export function isPresenceChannel(channel: string): boolean {
 }
 
 /**
- * Whether a channel requires authorization at all — i.e. it carries a
+ * Whether a channel requires authorization at all, i.e. it carries a
  * `private-`/`presence-` prefix. Public channels return `false` and are
  * served without any callback.
  */
@@ -46,7 +46,7 @@ export function isProtectedChannel(channel: string): boolean {
 }
 
 /**
- * The channel name with its `private-`/`presence-` prefix removed — the
+ * The channel name with its `private-`/`presence-` prefix removed, the
  * form a channel-authorization pattern is registered and matched against.
  * A public channel is returned unchanged.
  */

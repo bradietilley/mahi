@@ -52,7 +52,7 @@ export interface TokenRevoker {
 
 /**
  * Outcome of `sendResetLink()`. On success the raw `token` is handed back
- * to the CALLER, which decides how to deliver it (email, SMS, ...) — the
+ * to the CALLER, which decides how to deliver it (email, SMS, ...). The
  * framework owns the mechanism, the app owns the UX. Compare
  * `authorize()` vs `can()`: same "framework decides pass/fail, app
  * decides presentation" split.
@@ -77,20 +77,20 @@ export type ResetResult =
  * stated multi-user-table goal, so one broker over one `UserProvider` is
  * enough.
  *
- * The token is stored as an argon2 hash (via the shared `Hasher`) — the
+ * The token is stored as an argon2 hash (via the shared `Hasher`), the
  * same slow hash used for passwords. A reset token is a short-lived
  * credential a human may paste, and hashing it means a leaked
  * `password_reset_tokens` dump yields nothing usable. Verification is a
  * single PK lookup by email plus one `Hasher.check()`.
  *
  * RATE LIMITING is per-EMAIL and lives here (`throttleSeconds`), on top
- * of — not instead of — the `throttle()` HTTP middleware on the route.
+ * of, not instead of, the `throttle()` HTTP middleware on the route.
  * The two answer different questions: middleware limits how often one
  * CLIENT may ask, this limits how often one MAILBOX may be written to. An
  * attacker rotating IPs to flood a victim's inbox defeats the first and
  * not the second.
  */
-// `TUser extends object` rather than `Record<string, unknown>` — see the
+// `TUser extends object` rather than `Record<string, unknown>`. See the
 // note on `DatabaseUserProvider`: a `Record` constraint silently excludes
 // every `interface`-declared attribute type, which is the form the model
 // docs teach.
@@ -139,7 +139,7 @@ export class PasswordBroker<TUser extends object = Record<string, unknown>> {
    * Create (or overwrite) a reset token for the account matching
    * `email`, and return the raw token for the caller to deliver.
    *
-   * When no user matches, returns `{ status: "sent" }` with NO token —
+   * When no user matches, returns `{ status: "sent" }` with NO token,
    * the same shape as success, so a caller relaying the status can't tell
    * the two apart. No row is written and no token is minted in that case.
    */
@@ -166,7 +166,7 @@ export class PasswordBroker<TUser extends object = Record<string, unknown>> {
     // One live reset per email, written as an UPSERT rather than
     // delete-then-insert. Two concurrent requests through the old pair
     // could both delete, then both insert, and the second insert violated
-    // the primary key — a 500 on a password-reset form, triggerable by a
+    // the primary key, a 500 on a password-reset form, triggerable by a
     // double-click.
     await PasswordResetToken.query().upsert([{ email, token: hashed, created_at: now }], "email", [
       "token",
@@ -200,7 +200,7 @@ export class PasswordBroker<TUser extends object = Record<string, unknown>> {
       // Burn a hash on the miss path so "no pending reset" costs the same
       // as "wrong token". Without it, an unknown address returns
       // instantly while a known one pays for an argon2 verify (~50–100ms
-      // at 64 MiB) — a timing oracle for which accounts have a reset
+      // at 64 MiB), a timing oracle for which accounts have a reset
       // pending, and an unthrottled way to make the server do that work.
       // `AuthManager.attempt()` already does the same on its miss path.
       await this.hasher.make(token);
@@ -239,8 +239,8 @@ export class PasswordBroker<TUser extends object = Record<string, unknown>> {
     await PasswordResetToken.delete(email);
 
     // REVOKE EVERYTHING ELSE. Password reset is the account-recovery
-    // path — the thing a user does *because* they believe they were
-    // compromised — so leaving the attacker's existing session and API
+    // path, the thing a user does *because* they believe they were
+    // compromised, so leaving the attacker's existing session and API
     // tokens alive defeats the entire exercise. These sessions are
     // server-side and long-lived (a "remember me" session runs to ~400
     // days), so without this a hijacked session outlives the recovery
@@ -259,7 +259,7 @@ export class PasswordBroker<TUser extends object = Record<string, unknown>> {
    *
    * Best-effort per store: a cache-backed session store cannot revoke by
    * user at all (it throws by design), and that must not turn a
-   * successful password reset into a 500 — the password IS changed by the
+   * successful password reset into a 500. The password IS changed by the
    * time this runs. Failures are surfaced by rethrowing only if BOTH
    * stores are absent... which they can't be, since absence is the
    * no-op case.

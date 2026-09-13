@@ -30,7 +30,7 @@ export function can(
     if (resolve !== undefined) {
       const resolved = await resolve(request);
 
-      // A resolver that found nothing means the row doesn't exist — 404,
+      // A resolver that found nothing means the row doesn't exist, 404,
       // as Laravel's implicit binding does. Passing `undefined` into the
       // policy instead produced a `TypeError` on the first property
       // access and a 500, turning "no such post" into "the server is
@@ -44,7 +44,7 @@ export function can(
     }
 
     // Goes through authorize() (not a bare allows()) so a policy's rich
-    // denial — custom message, or denyAsNotFound()'s 404 — is honoured
+    // denial, custom message, or denyAsNotFound()'s 404, is honoured
     // here too, not just when calling authorize() from a controller.
     await gate.authorize(ability, ...args);
 

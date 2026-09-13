@@ -1,5 +1,5 @@
 /**
- * Minimal `*`-wildcard glob matcher — port of the matching behavior
+ * Minimal `*`-wildcard glob matcher, port of the matching behavior
  * behind Laravel's `Process::fake(['ls *' => ...])`/`assertRan('ls *')`
  * (Laravel delegates to `Illuminate\Support\Str::is()`). Hand-rolled
  * rather than pulling in a glob-matching dependency, consistent with
@@ -11,7 +11,7 @@ export function wildcardMatch(pattern: string, subject: string): boolean {
   }
 
   // Escape every regex metacharacter except `*` (which becomes `.*`
-  // below). `?` in particular must be treated as a literal — Laravel's
+  // below). `?` in particular must be treated as a literal, Laravel's
   // `Str::is` only gives `*` special meaning, so `"git?"` matches the
   // literal string `git?`, not `gi`.
   const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*");

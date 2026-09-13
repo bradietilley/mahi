@@ -45,7 +45,7 @@ describe("FileLogger", () => {
     expect(lines[1]).toContain("WARNING: second");
   });
 
-  it("an unwritable path does not throw — the line falls back to stderr", () => {
+  it("an unwritable path does not throw, the line falls back to stderr", () => {
     // A directory where a file is expected: appendFileSync will EISDIR.
     // Point the logger at tmpDir itself (a directory), so the write fails.
     const logger = new FileLogger(tmpDir);
@@ -61,7 +61,7 @@ describe("FileLogger", () => {
     // Constructing under a path whose parent is a file (not a dir) makes
     // mkdirSync throw; the constructor must swallow it.
     const notADir = path.join(tmpDir, "logs", "app.log");
-    new FileLogger(notADir); // succeeds (dir creatable) — sanity
+    new FileLogger(notADir); // succeeds (dir creatable): sanity check
     const nested = path.join(notADir, "deeper", "x.log"); // parent is a file
     expect(() => new FileLogger(nested)).not.toThrow();
   });

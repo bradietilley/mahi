@@ -1,5 +1,5 @@
 /**
- * Where users come from — deliberately decoupled from how a request is
+ * Where users come from, deliberately decoupled from how a request is
  * authenticated (`Guard`), so the token guard and the session guard share
  * one user source, and so an app can swap SQLite for an external identity
  * service without touching guard code.
@@ -30,7 +30,7 @@ export interface UserProvider<TUser = unknown> {
   /**
    * Persist a new (already-hashed) password for `user`.
    *
-   * Optional because not every user source is writable — an external
+   * Optional because not every user source is writable, an external
    * identity service might own credentials elsewhere. `PasswordBroker`
    * requires it and fails loudly if the configured provider doesn't
    * implement it, rather than silently no-op'ing a password change.

@@ -84,8 +84,8 @@ describe("auth context", () => {
       await runWithAuth({ user: null, guard: null }, async () => {
         currentAuthState()!.user = identity;
         await new Promise((resolve) => setTimeout(resolve, delayMs));
-        // After yielding — and after the *other* request has run and
-        // mutated its own scope — we must still see our own user.
+        // After yielding, and after the *other* request has run and
+        // mutated its own scope, we must still see our own user.
         seen.push(user<{ id: string }>().id);
       });
     };

@@ -44,7 +44,7 @@ export default {
 };
 `;
 
-/** A migration whose down() throws — reset must surface this, wipe must not care. */
+/** A migration whose down() throws. Reset must surface this, wipe must not care. */
 const MIGRATION_BAD_DOWN = `
 import { Schema } from "@mahiframework/database";
 
@@ -94,7 +94,7 @@ describe("MigrateResetCommand / DbWipeCommand", () => {
   describe("migrate:reset", () => {
     it("rolls back every batch, not just the most recent", async () => {
       const { app, driver } = buildApp();
-      // Two separate runs, so two separate batches — the thing that
+      // Two separate runs, so two separate batches, the thing that
       // distinguishes reset from rollback.
       await new MigrationRunner(driver.kysely).up([dir]);
 
@@ -113,7 +113,7 @@ describe("MigrateResetCommand / DbWipeCommand", () => {
 
     it("keeps the migrations table, so history survives", async () => {
       // The difference from db:wipe. reset() empties the schema via
-      // down(), but the ledger itself remains — the migrations are simply
+      // down(), but the ledger itself remains. The migrations are simply
       // marked un-run.
       const { app, driver } = buildApp();
       await new MigrationRunner(driver.kysely).up([dir]);
@@ -133,7 +133,7 @@ describe("MigrateResetCommand / DbWipeCommand", () => {
       await new MigrateResetCommand(app).handle({ pretend: true });
 
       expect(fake.strippedOutput()).toContain("would roll back");
-      // Still there — pretend changed nothing.
+      // Still there, pretend changed nothing.
       expect(await tableNames(driver)).toContain("widgets");
       fake.restore();
     });
@@ -150,7 +150,7 @@ describe("MigrateResetCommand / DbWipeCommand", () => {
 
     it("surfaces a broken down(), where db:wipe would not", async () => {
       // The reason both commands exist. reset() runs each down(), so a
-      // broken one fails loudly — which is the value, since a down()
+      // broken one fails loudly. Which is the value, since a down()
       // nobody runs is a down() nobody knows is broken.
       await writeFile(path.join(dir, "0003_broken.js"), MIGRATION_BAD_DOWN);
       const { app, driver } = buildApp();
@@ -179,7 +179,7 @@ describe("MigrateResetCommand / DbWipeCommand", () => {
       expect(fake.strippedOutput()).toContain("Database wiped.");
       fake.restore();
 
-      // Nothing left at all — no schema, and no record anything ever ran.
+      // Nothing left at all, no schema, and no record anything ever ran.
       expect(await tableNames(driver)).toEqual([]);
     });
 

@@ -5,12 +5,12 @@ import type { Output } from "./output/output.js";
 
 /**
  * Port of `laravel/prompts`' `Note.php` + `NoteRenderer.php`. No box,
- * no TTY/raw-mode interaction — the simplest feature: build the colored
+ * no TTY/raw-mode interaction, the simplest feature: build the colored
  * lines, write once.
  *
  * Laravel's type set is `note | error | warning | alert | info | intro
  * | outro`. This port adds `success` (green, the natural counterpart to
- * `error` — matches the common JS-CLI convention, e.g. `ora`) and drops
+ * `error`, matches the common JS-CLI convention, e.g. `ora`) and drops
  * `alert` (a second red/block variant with no clear distinct use case
  * over `error`, easy to add back if ever needed).
  */

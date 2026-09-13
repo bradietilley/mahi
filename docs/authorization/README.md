@@ -1,7 +1,7 @@
 # Authorization
 
 `@mahiframework/authorization` answers *"may this user do this to this thing"*.
-[Authentication](../authentication/) answers the other half — *who* is
+[Authentication](../authentication/) answers the other half. *who* is
 making the request.
 
 ```ts
@@ -13,13 +13,13 @@ if (await Gate.allows("create", Post)) { /* ... */ }
 
 The package deliberately takes **no compile-time dependency on
 `@mahiframework/auth`**. It resolves the current user through a runtime
-`AUTH_TOKEN` lookup — the same soft-dependency shape `@mahiframework/schedule` uses
-for queues — so authorization also works against a user from anywhere
+`AUTH_TOKEN` lookup, the same soft-dependency shape `@mahiframework/schedule` uses
+for queues, so authorization also works against a user from anywhere
 else: an external identity provider, a queue job, a test. If auth isn't
 installed at all, every check sees a guest rather than crashing.
 
 There is **no `config/authorization.ts`**. Unlike every other package in
-this framework, a gate has nothing configurable — no drivers, no
+this framework, a gate has nothing configurable, no drivers, no
 connections, no defaults. Its absence is intentional.
 
 ## Setup
@@ -84,7 +84,7 @@ export class PostPolicy extends Policy<UserTable, PostTable> {
 }
 ```
 
-Every method takes the **user first**, and it is **nullable** —
+Every method takes the **user first**, and it is **nullable**,
 unauthenticated requests reach policies too. The target row comes second.
 Create-style abilities have no row yet, so they take just the user.
 
@@ -98,7 +98,7 @@ export type PolicyMethod<TUser = unknown, TRow = unknown> = (
 `PolicyResult` is `boolean | AuthorizationResponse`.
 
 **Policies are stateless by contract.** They're instantiated once and
-cached on the registry, so they must not hold per-request state — the same
+cached on the registry, so they must not hold per-request state, the same
 contract as `Guard` in `@mahiframework/auth`, and for the same reason: one
 long-lived `Application` serves every concurrent request.
 
@@ -133,7 +133,7 @@ owner-check body needs its own `user === null` branch, and the one that
 gets forgotten is a null-dereference at best or an authorization bypass at
 worst.
 
-`requireGuest` is the mirror image — the callback never receives a user at
+`requireGuest` is the mirror image, the callback never receives a user at
 all, and authenticated users are denied.
 
 Both styles behave identically at the call site. These are a convenience,
@@ -151,7 +151,7 @@ gate.define("view-admin-panel", (user: UserTable | null) => user?.role === "admi
 await Gate.allows("view-admin-panel");
 ```
 
-An `Ability` receives `(user, ...args)` — every argument you passed, with
+An `Ability` receives `(user, ...args)`, every argument you passed, with
 no model-class stripping.
 
 ## Registration
@@ -170,7 +170,7 @@ export class PostsServiceProvider extends ServiceProvider {
 ```
 
 A single hook covers both policies and abilities rather than a separate
-`policies()` returning tuples — matching `schedule(schedule: Schedule)`'s
+`policies()` returning tuples, matching `schedule(schedule: Schedule)`'s
 shape (receive the registry, call methods on it) and avoiding the question
 of what a provider does when it wants both.
 
@@ -188,7 +188,7 @@ have.
 
 ### The model is named by class, not by string
 
-Rows in this framework are plain objects — `Model` reads return hydrated
+Rows in this framework are plain objects. `Model` reads return hydrated
 instances, but a row passed to a policy is attribute data, and
 `post instanceof Post` is not something the gate relies on. The model has
 to be named at the call site:
@@ -199,7 +199,7 @@ await Gate.authorize("delete", Post, post);
 ```
 
 A class reference is compile-checked and survives renames. A string would
-fail **closed and silently** on a typo — because resolution is
+fail **closed and silently** on a typo, because resolution is
 fail-closed, a misspelled model name just falls through to "no such
 ability" and denies. That is the worst failure mode an authorization
 system can have, because it looks like it's working.
@@ -210,7 +210,7 @@ functions, so there's no heuristic guessing about what "looks like" a
 model.
 
 `ModelClass` is typed `abstract new (...args: any[]) => unknown` so both
-concrete models and abstract bases are assignable — deliberately not
+concrete models and abstract bases are assignable, deliberately not
 `Function`, which would accept any callable at all and let
 `gate.policy(someHelperFn, ...)` type-check.
 
@@ -226,7 +226,7 @@ Every entry point funnels through `inspect()`:
 4. Otherwise, **deny**.
 5. **`after()` hooks**, which may override the result.
 
-`check()` is the boolean form — it calls `inspect()` and collapses the
+`check()` is the boolean form. It calls `inspect()` and collapses the
 response to its `allowed` flag.
 
 ### Fail-closed, throughout
@@ -235,7 +235,7 @@ Steps 2 and 4 deny rather than throw. An unknown ability denies; a policy
 missing the requested method denies. Neither is an error.
 
 Throwing on an unknown ability would surface typos more loudly, but **a
-typo that 403s in production is better than one that 500s** — and step 2
+typo that 403s in production is better than one that 500s**, and step 2
 must not throw regardless, because policies legitimately implement only a
 subset of abilities (`PostPolicy` has no `update`: posts aren't editable
 once published).
@@ -249,8 +249,8 @@ function normalize(result: PolicyResult): AuthorizationResponse {
 }
 ```
 
-A stray truthy non-boolean — a promise you forgot to `await`, an object,
-the string `"yes"` — is treated as **denial**, not permission.
+A stray truthy non-boolean, a promise you forgot to `await`, an object,
+the string `"yes"`, is treated as **denial**, not permission.
 
 ### `before()` / `after()`
 
@@ -269,7 +269,7 @@ gate.after<UserTable>((user, ability, result) => (result ? null : maybeOverride(
 ```
 
 Both hooks speak **plain booleans** (plus `null` to abstain). Their
-override semantics predate rich responses and are unchanged — only the
+override semantics predate rich responses and are unchanged, only the
 policy or ability body in the middle may return an
 `AuthorizationResponse`.
 
@@ -281,7 +281,7 @@ status.
 
 | Static | Result | `status` |
 |---|---|---|
-| `AuthorizationResponse.allow(message?)` | allowed | — |
+| `AuthorizationResponse.allow(message?)` | allowed |: |
 | `AuthorizationResponse.deny(message?, status?)` | denied | `status`, or 403 at throw time |
 | `AuthorizationResponse.denyAsNotFound(message?)` | denied | **404** (`message` defaults to `"Not Found"`) |
 
@@ -304,7 +304,7 @@ export class BookmarkPolicy extends Policy<UserTable, BookmarkTable> {
 ```
 
 Without this, the "404 on reads" decision has to be hand-rolled
-per-controller, **outside** the gate — because a policy method returning
+per-controller, **outside** the gate, because a policy method returning
 `boolean` has no way to say "deny this as a 404".
 
 `allows()` / `denies()` still collapse the result to a boolean. Only
@@ -329,19 +329,19 @@ These lines are drawn deliberately, and mixing them up leaks information.
 | **403** | Authenticated, but not permitted. Different credentials won't help. | `authorize()` / `can()` on a plain deny |
 | **404** | The row exists but isn't yours, and admitting it exists would leak. | `denyAsNotFound()` |
 
-**404 on reads.** Someone else's private data — a bookmark list, a draft —
+**404 on reads.** Someone else's private data, a bookmark list, a draft,
 should read as missing, so the endpoint can't be used as an oracle for
 which ids exist. If `GET /bookmarks/{id}` returns 403 for a real id
 belonging to someone else and 404 for a nonexistent one, an attacker can
 enumerate valid ids without ever reading their contents.
 
-**403 on writes.** You already had to know the id to attempt the write —
-deleting a post, for instance — so there's nothing left to leak, and a
+**403 on writes.** You already had to know the id to attempt the write,
+deleting a post, for instance, so there's nothing left to leak, and a
 404 would be actively misleading about *why* it failed.
 
 **401 is not an authorization decision.** The gate never produces one. A
 guest who reaches a policy gets denied (403), which is why routes that
-require a user should carry `authenticate()` — so a missing credential
+require a user should carry `authenticate()`, so a missing credential
 surfaces as "log in", not "you may not".
 
 ## Checking from a controller
@@ -366,7 +366,7 @@ export class DeletePostController extends Controller {
 }
 ```
 
-Prefer this when the handler needs the row regardless — one query instead
+Prefer this when the handler needs the row regardless, one query instead
 of two, since `request.model()` caches on the instance.
 
 Three free functions ship alongside it, all reading the ambient auth
@@ -374,10 +374,10 @@ scope and taking no `Context`:
 
 | Function | Returns |
 |---|---|
-| `authorize(ability, ...args)` | `Promise<void>` — throws when denied |
+| `authorize(ability, ...args)` | `Promise<void>`: throws when denied |
 | `allows(ability, ...args)` | `Promise<boolean>` |
 | `denies(ability, ...args)` | `Promise<boolean>` |
-| `gate()` | `GateRegistry` — the resolved singleton |
+| `gate()` | `GateRegistry`: the resolved singleton |
 
 ### The `can()` middleware
 
@@ -408,14 +408,14 @@ Prefer `can()` for uniform CRUD, where having the check visible in the
 route table is genuinely valuable when auditing what protects an endpoint.
 
 It goes through `gate.authorize()`, not a bare `allows()`, so a policy's
-rich denial — a custom message, or `denyAsNotFound()`'s 404 — is honoured
+rich denial, a custom message, or `denyAsNotFound()`'s 404, is honoured
 here too.
 
 ### Form requests
 
 Authorization lives on the `Request` (Laravel-style). When a controller
 declares `request = SomeRequest`, the framework runs `authorize()` first
-and validation second — **authorize → 403, then validate → 422**:
+and validation second, **authorize → 403, then validate → 422**:
 
 ```ts
 // app/src/http/requests/create-post.request.ts
@@ -443,9 +443,9 @@ accepts or what shape they take.
 
 Two ways to signal denial from `authorize()`, and they differ:
 
-- **Return `false`** — the controller pipeline throws a bare
+- **Return `false`**: the controller pipeline throws a bare
   `HttpError.forbidden()` with no message.
-- **`await authorize(...)`** — the gate throws, so a policy's custom
+- **`await authorize(...)`**: the gate throws, so a policy's custom
   message or `denyAsNotFound()` status survives.
 
 `authorize()` defaults to allow, so requests that don't override it fall
@@ -455,8 +455,8 @@ straight through. See [Requests](../requests/#authorize) and
 ## The `Gate` facade
 
 A hand-written class with real static methods proxying `GATE_TOKEN`. The
-class is `GateRegistry`; the facade is `Gate` — the name written at call
-sites — mirroring how `Hash`/`Crypt` front `Hasher`/`Encrypter`.
+class is `GateRegistry`; the facade is `Gate`, the name written at call
+sites, mirroring how `Hash`/`Crypt` front `Hasher`/`Encrypter`.
 
 | Static | Returns |
 |---|---|
@@ -479,7 +479,7 @@ await Gate.forUser(someUser).authorize("delete", Post, post);
 await Gate.forUser(null).allows("view", Post, post);      // as a guest
 ```
 
-`UserGate` carries `allows()`, `denies()`, and `authorize()` — the same
+`UserGate` carries `allows()`, `denies()`, and `authorize()`, the same
 three, bound to an explicit user, bypassing the ambient scope entirely.
 
 The alternative is `Auth.runAs()`, which establishes a real scope so
@@ -490,7 +490,7 @@ reads the current user.
 Note what the gate does **not** do: `currentUser()` returns `null` when
 `AUTH_TOKEN` isn't bound at all, so a gate works in an app with no
 authentication (every check sees a guest). But it does **not** swallow
-`MissingAuthContextError` — being outside a request scope entirely is a
+`MissingAuthContextError`, being outside a request scope entirely is a
 programming error that should surface, and `forUser()` is the supported
 way to authorize without one.
 
@@ -558,8 +558,8 @@ the model's. `PostResource` calls `await post.can()` inside its own
 
 **It passes `toObject()`, not `this`.** The policy only needs the row
 data, and handing it a plain object keeps it independent of the model
-class. (Reading `this.user_id` inside the method works fine — the
-attribute proxy binds `this` to the receiver — so this is a choice about
+class. (Reading `this.user_id` inside the method works fine, the
+attribute proxy binds `this` to the receiver, so this is a choice about
 the policy's interface, not a workaround.)
 
 **The return type is derived from `POST_ABILITIES`.** `Record<(typeof
@@ -580,16 +580,16 @@ The wire result:
 ### It is a rendering hint only
 
 The `can` block tells the UI what to draw. **It enforces nothing.** The
-API re-checks every write through `authorize()` or `can()` — that is what
+API re-checks every write through `authorize()` or `can()`. That is what
 actually protects anything. A client that ignores the block and issues the
 `DELETE` anyway gets a 403 from the policy, not a successful delete.
 
 ## Related
 
-- [Authentication](../authentication/) — who the user is, `authenticate()`, `Auth.runAs()`
-- [Requests](../requests/) — form requests and their `authorize()` hook
-- [Controllers](../controllers/) — the authorize → validate → handle pipeline
-- [Responses](../responses/) — API resources, where the `can` block is shaped
-- [Routing](../routing/) — attaching `can()` to a route
-- [Service providers](../providers/) — the `gates()` hook and boot ordering
-- [Models](../models/) — `toObject()`, the casting proxy
+- [Authentication](../authentication/): who the user is, `authenticate()`, `Auth.runAs()`
+- [Requests](../requests/): form requests and their `authorize()` hook
+- [Controllers](../controllers/): the authorize → validate → handle pipeline
+- [Responses](../responses/): API resources, where the `can` block is shaped
+- [Routing](../routing/): attaching `can()` to a route
+- [Service providers](../providers/): the `gates()` hook and boot ordering
+- [Models](../models/): `toObject()`, the casting proxy

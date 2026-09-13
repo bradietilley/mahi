@@ -63,7 +63,7 @@ describe("DateTime comparison", () => {
 
     it("answers calendar questions in the receiver's zone", () => {
       // 2026-08-20T20:00Z is the 20th in London and the 21st in Perth, so
-      // "same day" depends on whose calendar is asked — which is why the
+      // "same day" depends on whose calendar is asked. Which is why the
       // receiver's zone wins.
       const instant = "2026-08-20T20:00:00Z";
       const londonView = DateTime.parse(instant, "Europe/London");

@@ -1,16 +1,16 @@
 /**
  * HMAC-based sign/verify for short-lived tokens or payloads (e.g. "this
  * webhook body really came from us," "this password-reset link hasn't
- * been tampered with") — distinct from `Encrypter` since the payload
+ * been tampered with"), distinct from `Encrypter` since the payload
  * itself doesn't need to stay secret, just verifiably unmodified.
  *
  * Supports key rotation, same shape as `Encrypter`: `sign()` always uses
  * the current key, `verify()` tries the current key then each of
- * `previousKeys` in order — so tokens signed before a rotation still
+ * `previousKeys` in order, so tokens signed before a rotation still
  * verify successfully afterward, as long as the old key is retained in
  * `previousKeys`.
  *
- * Distinct consumers must not share one signer instance — use
+ * Distinct consumers must not share one signer instance, use
  * `Signer.for(purpose)` (see below) so a signature minted for one purpose
  * can never be replayed as another.
  */
@@ -67,14 +67,14 @@ export class Signer {
   }
 
   /**
-   * A `Signer` whose keys are HKDF-derived for one specific `purpose` —
+   * A `Signer` whose keys are HKDF-derived for one specific `purpose`,
    * domain separation between consumers that would otherwise share the
    * root signing key.
    *
    * Without this, the *same* HMAC key signs session cookies (a bare
    * session id) and signed URLs (`/path?query`). Any feature that signs
    * user-influenced strings could then be used as an oracle to mint a
-   * signature that a different consumer accepts — e.g. producing a valid
+   * signature that a different consumer accepts, e.g. producing a valid
    * session cookie for a known session id. The purposes are disjoint
    * key spaces, so a signature from `for("url")` simply doesn't verify
    * under `for("session")`.

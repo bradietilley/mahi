@@ -7,14 +7,14 @@ import { HealthCommand } from "./commands/health.js";
 /**
  * Resolved only from inside `@mahiframework/health` (its own command, and the
  * route registered by `@mahiframework/http`'s kernel when this token is bound), so
- * it stays local rather than joining `well-known-tokens.ts` — that file's
+ * it stays local rather than joining `well-known-tokens.ts`. That file's
  * own stated bar.
  */
 export const HEALTH_TOKEN = "health";
 
 /**
  * Binds the `HealthRegistry` and, during boot, collects every provider's
- * `checks()` hook — the same shape as `ScheduleServiceProvider`: bind in
+ * `checks()` hook, the same shape as `ScheduleServiceProvider`: bind in
  * `register()`, collect hooks in `boot()`, contribute commands.
  *
  * The three built-ins are registered *inside the factory*, before any
@@ -24,8 +24,8 @@ export const HEALTH_TOKEN = "health";
  *
  * **Ordering in `config/app.ts`:** after `CacheServiceProvider`,
  * `DatabaseServiceProvider`, and `StorageServiceProvider`. Not because
- * this provider resolves them — the checks resolve their tokens lazily, at
- * probe time — but so `app.has(TOKEN)` is answered against a fully
+ * this provider resolves them, the checks resolve their tokens lazily, at
+ * probe time, but so `app.has(TOKEN)` is answered against a fully
  * registered container. (In practice every `register()` runs before any
  * `boot()`, so this is belt and braces.)
  */

@@ -11,7 +11,7 @@ export { SCHEDULE_TOKEN };
 /**
  * Registers the Schedule singleton and, during boot, collects every
  * provider's `schedule()` hook (all providers are already instantiated by
- * this point, regardless of boot order) — same collection pattern
+ * this point, regardless of boot order), same collection pattern
  * `EventsServiceProvider` uses for `listeners()`.
  *
  * Contributes the `schedule:run`/`schedule:list`/`schedule:test`/
@@ -30,7 +30,7 @@ export class ScheduleServiceProvider extends ServiceProvider {
     }
 
     // Every provider has contributed, so the schedule is complete and can
-    // be checked as a whole. Failing here — at boot, loudly — is the point:
+    // be checked as a whole. Failing here, at boot, loudly, is the point:
     // an unnamed `withoutOverlapping()` task or a duplicated name is a
     // silent "task mysteriously never runs" in production otherwise, and
     // the mistake is in code that has just been deployed.

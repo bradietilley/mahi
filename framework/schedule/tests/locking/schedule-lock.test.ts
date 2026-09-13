@@ -120,7 +120,7 @@ describe("ScheduleLock", () => {
 
     it("a reclaimer does not clobber a lock another reclaimer just took", async () => {
       // The specific hazard: both see the SAME expired record, A removes
-      // and recreates, then B — acting on its stale observation —
+      // and recreates, then B, acting on its stale observation,
       // unconditionally removes A's *fresh* lock and creates its own.
       // Both would report success, and the task would run twice.
       const seed = new ScheduleLock(dir);

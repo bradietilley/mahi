@@ -12,7 +12,7 @@ const cache = app.make<CacheManager>(CACHE_TOKEN);
 ```
 
 `Application` extends `Container`, so every method on this page is
-available on the app instance you already have — in a provider
+available on the app instance you already have, in a provider
 (`this.app`), a command (`this.app`), or inside a factory (its argument).
 
 ## Binding
@@ -51,7 +51,7 @@ export class CacheServiceProvider extends ServiceProvider {
 That is how `@mahiframework/cache` registers itself, and it shows two
 things: a factory resolves its own
 dependencies by calling `app.make()`, and re-binding a token drops any
-cached instance — `bind()` and `singleton()` both call
+cached instance, `bind()` and `singleton()` both call
 `instances.delete(token)` before storing the new binding.
 
 `instance()` is what the base app's bootstrap uses for the validated
@@ -64,8 +64,8 @@ app.instance("env", env);
 
 `scoped()` registers a factory resolved once **per scope** and cached only
 for that scope. A scope is opened with `runScoped()` (an `AsyncLocalStorage`
-region, the same primitive request-scoped state — auth identity, log
-context, the active transaction — already uses):
+region, the same primitive request-scoped state, auth identity, log
+context, the active transaction, already uses):
 
 ```ts
 app.scoped(REQUEST_ID_TOKEN, () => crypto.randomUUID());
@@ -112,7 +112,7 @@ has(token: string): boolean
 6. Return it.
 
 Step 1 coming before step 4 is the reason `extend()` has to handle
-already-resolved singletons specially — see [`extend()`](#extend) below.
+already-resolved singletons specially. See [`extend()`](#extend) below.
 
 `BindingNotFoundError` carries the token:
 
@@ -126,7 +126,7 @@ export class BindingNotFoundError extends Error {
 ```
 
 `has()` returns true if either a binding *or* an instance is registered.
-Packages use it to make dependencies soft — `@mahiframework/notifications` only
+Packages use it to make dependencies soft, `@mahiframework/notifications` only
 wires its `mail` channel when `MAIL_TOKEN` is actually bound:
 
 ```ts
@@ -191,7 +191,7 @@ app.make("m");            // 20 — the cached instance was rewritten
 extender list; it never looks up the binding. Extending an unbound token
 is silent, and the extender will fire if and when something binds and
 resolves that token later. That is convenient for optional integrations
-and a trap if you typo the token — nothing will tell you.
+and a trap if you typo the token. Nothing will tell you.
 
 For a transient (`bind()`) token, extenders run on every single `make()`.
 For a shared token they run once, and the extended value is what gets
@@ -243,7 +243,7 @@ Package-private tokens stay in their own package:
 | `REDIS_TOKEN` | `"redis"` | `RedisManager` | `@mahiframework/redis` |
 | `SNOWFLAKE_TOKEN` | `"snowflake"` | `SnowflakeGenerator` | `@mahiframework/snowflake` |
 
-The base app also binds `"env"` — the validated environment object, via
+The base app also binds `"env"`, the validated environment object, via
 `app.instance("env", env)` in `bin/bootstrap.ts`. That is an application
 convention, not a framework token, but framework code that needs
 `APP_KEY` (`EncryptionServiceProvider`) resolves it by that name.
@@ -257,7 +257,7 @@ parameter inspection, and no contextual binding
 A container that auto-wires has to answer "what does this constructor
 parameter mean?" from type metadata. In TypeScript that means
 `emitDecoratorMetadata`, which means the decorator transform, which means
-your build tool has to emit metadata — and esbuild, swc, and tsup all
+your build tool has to emit metadata, and esbuild, swc, and tsup all
 have different levels of support and different gaps. The framework would
 be betting its core resolution mechanism on a compiler feature that
 doesn't survive most bundlers.
@@ -285,7 +285,7 @@ considerably more obvious.
 
 ## The Manager pattern
 
-Most framework services aren't one object — they're "one of several named
+Most framework services aren't one object, they're "one of several named
 drivers, chosen by config". `Manager<TDriver>` is the shared base for
 that: `DatabaseManager`, `CacheManager`, `QueueManager`, `LogManager`,
 `StorageManager`, `MailManager`, `BroadcastManager`, `AuthManager`,
@@ -313,7 +313,7 @@ export abstract class Manager<TDriver = unknown> {
 `DriverFactory<TDriver>` is `(app: Application) => TDriver`.
 
 There is a *default* driver, not an *only* driver. Several drivers can be
-resolved and live side by side — the default SQLite connection plus a
+resolved and live side by side, the default SQLite connection plus a
 named analytics connection, the `array` cache plus an explicitly named
 `redis` store. Each is cached independently under its own name.
 
@@ -384,7 +384,7 @@ resolution step first.
 It works because constructing a driver *handle* is cheap. `new
 Kysely({ dialect })` doesn't touch the disk. `new Redis(config)` returns
 immediately and connects in the background. The actual I/O happens
-per-call, lazily, and is awaited there — which you were going to await
+per-call, lazily, and is awaited there, which you were going to await
 anyway.
 
 Drivers that genuinely need async warm-up implement `Connectable`:
@@ -397,7 +397,7 @@ export interface Connectable {
 ```
 
 The manager never calls these. The driver's **owning provider** does, from
-its own `boot()` — which is already async:
+its own `boot()`. Which is already async:
 
 ```ts
 async boot(): Promise<void> {
@@ -431,12 +431,12 @@ const cache = app().make<CacheManager>(CACHE_TOKEN);
 
 `app()` returns the current `Application`. `Application.bootstrap()` calls
 `setCurrentApp(this)` as its final step, so the global is populated the
-moment bootstrap resolves — and not before. Calling `app()` earlier throws
+moment bootstrap resolves, and not before. Calling `app()` earlier throws
 with a message telling you so.
 
 Prefer injection. Providers, commands, seeders, and models already receive
 `app`; use it. `app()` exists for the cases where threading it through is
-genuinely impractical — an ad-hoc script, a deeply nested pure helper.
+genuinely impractical, an ad-hoc script, a deeply nested pure helper.
 
 **The test caveat.** Only one `Application` can be "current" at a time,
 and it's whichever one bootstrapped last. A test suite that constructs an
@@ -504,8 +504,8 @@ a normal `TypeError` rather than silently returning `undefined`.
 
 > **A swap is not a container rebinding, and that is the point.** The
 > double lives on the facade class, so `app().make(TOKEN)` still returns
-> the real service. Code that resolves the dependency directly —
-> constructor injection, a provider, another service — is unaffected.
+> the real service. Code that resolves the dependency directly,
+> constructor injection, a provider, another service, is unaffected.
 > Rebinding the token instead would mean a swap intended to intercept
 > `Cache.get()` silently changed unrelated call paths.
 >
@@ -513,7 +513,7 @@ a normal `TypeError` rather than silently returning `undefined`.
 > than through the facade, `swap()` will not intercept it. Bind a fake on
 > the test's own `Application` for that.
 
-`restore()` in an `afterEach` — the double is static, so it outlives the
+`restore()` in an `afterEach`. The double is static, so it outlives the
 test that set it otherwise. Facades built from the same `Facade()` base
 stay isolated from one another, since the assignment creates an own
 property on each subclass.
@@ -530,7 +530,7 @@ abstract class Facade<T> {
 
 TypeScript rejects this: **"Static members cannot reference class type
 parameters."** A generic class's static side has no access to that class's
-own type parameters — there is one static side shared by every
+own type parameters. There is one static side shared by every
 instantiation, so `T` is meaningless there. The rule also holds for a base
 class's statics as seen through a subclass, so `class Events extends
 Facade<EventDispatcher>` can't inherit a working generic
@@ -540,7 +540,7 @@ Calling `Facade<T>(...)` as a *function* sidesteps it entirely. The
 returned class is ordinary and non-generic, with `T` already substituted
 into `instance()`'s return type at the call site. The cost is that the
 token must be passed as an argument to `Facade<T>(...)` rather than
-overridden as a static method on the subclass — which the same TS rule
+overridden as a static method on the subclass, which the same TS rule
 would also have disallowed.
 
 ### Why this is not a dynamic proxy
@@ -567,7 +567,7 @@ reversal of it:
 
 `Log` is hand-written directly against `app()` rather than built on
 `Facade<T>`, because `@mahiframework/facades` depends on `@mahiframework/core` and
-`LOG_TOKEN`/`LogManager` live in core — importing `Facade` there would
+`LOG_TOKEN`/`LogManager` live in core, importing `Facade` there would
 close a package cycle. Its `instance()` is otherwise identical to what
 `Facade<LogManager>(() => LOG_TOKEN)` would produce.
 
@@ -577,7 +577,7 @@ close a package cycle. Its `instance()` is otherwise identical to what
 both `delete` any cached instance for the token. Overriding a framework
 binding after bootstrap works, but anything already holding a reference to
 the old value keeps it. `app.instance(TOKEN, replacement)` is the usual
-way to swap a singleton in tests — that's what
+way to swap a singleton in tests. That's what
 `createTestApplication({ fakeEvents: true })` does for `EVENTS_TOKEN`.
 
 **`extend()` on an unbound token is silent.** No error, ever. A typo'd
@@ -599,7 +599,7 @@ into `resolved`) and is documented as test-only.
 
 ## Related
 
-- [Service providers](../providers/) — where bindings are registered
-- [Application lifecycle](../lifecycle/) — when `register()` and `boot()` run
-- [Configuration](../configuration/) — what factories read to build drivers
-- [Testing](../testing/) — swapping bindings in a test application
+- [Service providers](../providers/): where bindings are registered
+- [Application lifecycle](../lifecycle/): when `register()` and `boot()` run
+- [Configuration](../configuration/): what factories read to build drivers
+- [Testing](../testing/): swapping bindings in a test application

@@ -6,7 +6,7 @@ import { timingSafeEqual } from "node:crypto";
  *
  * A plain `===` short-circuits on the first differing byte, so the time it
  * takes to reject a wrong secret depends on how many leading bytes were
- * right — enough for an attacker to recover the secret one byte at a time.
+ * right, enough for an attacker to recover the secret one byte at a time.
  * Every place that gates access on a shared secret (maintenance bypass,
  * health-check message redaction) must go through this instead.
  *

@@ -1,6 +1,6 @@
 # @mahiframework/authorization
 
-Authorization — gates, policies, and ability checks for Mahi.
+Authorization, gates, policies, and ability checks for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

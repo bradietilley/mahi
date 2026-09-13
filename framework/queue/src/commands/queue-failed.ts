@@ -5,7 +5,7 @@ import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsFailedJobs } from "../failed-job-repository.js";
 
 /**
- * `queue:failed` — list the rows in `failed_jobs` as a table, newest
+ * `queue:failed`, list the rows in `failed_jobs` as a table, newest
  * first. Mirrors Laravel's `queue:failed`. Only the `database` connection
  * has durable failed-job storage; other drivers report so and exit.
  */

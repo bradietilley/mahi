@@ -7,11 +7,11 @@ import { MailException } from "./mail-exception.js";
 import { assertNoCrlf, assertAddressClean, assertAddressesClean } from "./sanitize.js";
 
 /**
- * Fluent builder for a single message — the mail analogue of a queue
+ * Fluent builder for a single message, the mail analogue of a queue
  * `Job`. There are two interchangeable ways to describe a message, mirror-
  * ing Laravel's modern `Mailable`:
  *
- *   1. Declarative overrides — override `envelope()` / `content()` /
+ *   1. Declarative overrides, override `envelope()` / `content()` /
  *      `attachments()` to return the objects directly. This is the usual
  *      style:
  *
@@ -21,7 +21,7 @@ import { assertNoCrlf, assertAddressClean, assertAddressesClean } from "./saniti
  *          content()  { return new Content({ html: () => renderWelcome(this.user) }); }
  *        }
  *
- *   2. Fluent build — override `build()` and chain the protected
+ *   2. Fluent build, override `build()` and chain the protected
  *      `to()/subject()/view()/attach()/...` setters. Handy for
  *      one-off/ad-hoc messages assembled imperatively.
  *
@@ -31,14 +31,14 @@ import { assertNoCrlf, assertAddressClean, assertAddressesClean } from "./saniti
  *
  * This is Laravel's `Illuminate\Mail\Mailable` reduced to its essential
  * shape, minus the two things that don't port cleanly:
- *   - No Blade `view(name, data)` template system — bodies are thunks that
+ *   - No Blade `view(name, data)` template system. Bodies are thunks that
  *     produce the final string via whatever the app chooses.
- *   - None of the ~30 `assertXxx()` PHPUnit helpers — tests assert against
+ *   - None of the ~30 `assertXxx()` PHPUnit helpers, tests assert against
  *     an `ArrayTransport`'s captured messages with Vitest matchers instead.
  *
  * There is deliberately no `queue()` method ON THE MAILABLE. Deferring a
  * send is `MailManager.queue()`, which renders here and enqueues the
- * resulting plain-JSON `RenderedMail` — so there is no second
+ * resulting plain-JSON `RenderedMail`, so there is no second
  * serialization mechanism and a `Mailable` never needs registering. A
  * mailable carrying a credential (a reset link, a one-time code) must not
  * be queued at all; see `MailManager.queue()`.
@@ -70,7 +70,7 @@ export abstract class Mailable {
 
   /**
    * Optional imperative build step. Override this *or* the declarative
-   * `envelope()/content()/attachments()` methods — the fluent setters
+   * `envelope()/content()/attachments()` methods, the fluent setters
    * called here mutate `_envelope`/`_content`, which the default
    * `envelope()/content()` return. Runs once, before `render()` reads the
    * envelope/content. No-op by default.
@@ -79,7 +79,7 @@ export abstract class Mailable {
 
   /**
    * Whether this message should be sent only after the enclosing
-   * `DB.transaction()` commits — Laravel's `Mailable::afterCommit()`.
+   * `DB.transaction()` commits, Laravel's `Mailable::afterCommit()`.
    * Return `true` on a mailable that reads rows written by the transaction
    * it is sent from, so the send is held until the data is durable and
    * dropped if the transaction rolls back. Outside a transaction it sends
@@ -211,8 +211,8 @@ export abstract class Mailable {
    *
    * Header values are a classic injection sink, so these go through the
    * same CRLF guard as every other header field. Reaching
-   * `RenderedMail.headers` any other way — building a `RenderedMail` by
-   * hand and passing it to `Mail.mailer(name).send()` — bypasses
+   * `RenderedMail.headers` any other way, building a `RenderedMail` by
+   * hand and passing it to `Mail.mailer(name).send()`, bypasses
    * `validate()` entirely.
    *
    * Only the `smtp` transport forwards these. `log` and `array` ignore
@@ -267,11 +267,11 @@ export abstract class Mailable {
   /**
    * Validate a rendered message before it reaches a transport. Two jobs:
    *
-   *   1. Completeness — a message with no recipient, no subject, or no body
+   *   1. Completeness, a message with no recipient, no subject, or no body
    *      is almost always a bug; surfacing it here as a `MailException`
    *      beats a cryptic transport error (or, with `log`/`array`, a silent
    *      send of nothing).
-   *   2. Header-injection safety — reject CR/LF in every field that maps to
+   *   2. Header-injection safety, reject CR/LF in every field that maps to
    *      a header (addresses, display names, subject, tags, metadata keys
    *      and values, and explicit `header()` names/values), at the
    *      framework level so `log`/`array`/future transports are as

@@ -3,7 +3,7 @@ import { dataGet } from "./data.js";
 /**
  * Dot-notation configuration store, e.g. `config.get("database.default")`.
  * Providers contribute default config via `merge(namespace, defaults)`,
- * typically inside their own `register()` — later merges win on conflicting
+ * typically inside their own `register()`, later merges win on conflicting
  * leaf keys but the merge is deep, so namespaces contributed by different
  * providers don't clobber each other.
  */
@@ -136,7 +136,7 @@ export class ConfigRepository {
   }
 
   /**
-   * As `get()`, but throws when the key is missing — for a service
+   * As `get()`, but throws when the key is missing, for a service
    * provider whose subsystem cannot run without its config block, so a
    * forgotten `config/mail.ts` fails at boot with a clear message rather
    * than as `undefined` deep inside a manager.
@@ -175,7 +175,7 @@ export class ConfigRepository {
     this.set(key, array);
   }
 
-  /** A deep clone of the entire config tree — mutating it never mutates the repository. */
+  /** A deep clone of the entire config tree, mutating it never mutates the repository. */
   all(): PlainObject {
     return cloneValue(this.items) as PlainObject;
   }

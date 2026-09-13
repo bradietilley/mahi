@@ -7,7 +7,7 @@ export interface ProcessOptions {
   cwd?: string;
   /** Kills the process (`SIGTERM`) if it hasn't exited after this many milliseconds. */
   timeoutMs?: number;
-  /** Merged on top of the current `process.env` (not a full replacement) — matches Node's own `spawn({ env })` semantics. */
+  /** Merged on top of the current `process.env` (not a full replacement), matches Node's own `spawn({ env })` semantics. */
   env?: Record<string, string>;
   /** Written to the child's stdin, which is then closed. */
   input?: string;
@@ -18,15 +18,15 @@ export type FakeProcessHandler =
   ProcessResult | ((command: string) => ProcessResult | Promise<ProcessResult>);
 
 /**
- * `@mahiframework/process` — a reusable process-execution wrapper, port
+ * `@mahiframework/process`, a reusable process-execution wrapper, port
  * of Laravel's `Illuminate\Process\Factory`/`PendingProcess`
  * (`Process::run()`/`Process::fake()`/`Process::assertRan()`). Thin
- * wrapper over Node's built-in `node:child_process` — no `execa`
+ * wrapper over Node's built-in `node:child_process`, no `execa`
  * dependency, matching the framework's established "minimal
  * dependencies" pattern.
  *
  * Static facade over module-level state (fake handlers, call history),
- * mirroring `@mahiframework/tui`'s `Tui` class — no dependency on
+ * mirroring `@mahiframework/tui`'s `Tui` class, no dependency on
  * `@mahiframework/core`/the container, since there's nothing here that
  * needs DI (this is a pure utility, like `Tui`, not an app service).
  *
@@ -50,11 +50,11 @@ export class Process {
 
   /**
    * Runs `command` (an argv array, spawned directly with no shell
-   * involved — the safer default; or a single string, run through the
+   * involved, the safer default; or a single string, run through the
    * platform shell so pipes/redirects/globs work) and resolves with a
    * `ProcessResult` once it exits. Never rejects: a failed spawn (e.g.
    * command not found) resolves with `exitCode: 1` and the spawn
-   * error's message in `stderr`, just like a non-zero exit — inspect
+   * error's message in `stderr`, just like a non-zero exit, inspect
    * `result.successful()`/`.failed()`, or call `result.throw()` to opt
    * into throwing a `ProcessFailedError`.
    */
@@ -65,7 +65,7 @@ export class Process {
     const commandString = commandToString(command);
 
     if (Process.fakeHandlers) {
-      // Only record history while faking — otherwise a long-lived server
+      // Only record history while faking, otherwise a long-lived server
       // or worker accumulates every real command it ever ran for the
       // lifetime of the process. `ran()`/`assertRan()` are test affordances.
       Process.history.push(commandString);
@@ -82,12 +82,12 @@ export class Process {
     );
 
     if (!match) {
-      // No matching handler registered — default to a generic
+      // No matching handler registered, default to a generic
       // successful, empty-output result, matching Laravel's
       // `Process::fake()` default-unmatched behavior.
       //
       // NOTE: `@mahiframework/http-client`'s `Http.fake()` deliberately does the
-      // opposite — an unmatched request raises `StrayRequestError` rather
+      // opposite, an unmatched request raises `StrayRequestError` rather
       // than being quietly satisfied, because a typo'd pattern otherwise
       // looks like a passing test. The two packages having opposite
       // defaults is worse than either default; this should adopt the
@@ -128,7 +128,7 @@ export class Process {
         // A child that exits before draining stdin (`grep -q`, `head`, a
         // script that `process.exit()`s early) makes the write fail with
         // `EPIPE`. Without this listener that surfaces as an uncaught
-        // exception and takes down the host process — swallow it here,
+        // exception and takes down the host process, swallow it here,
         // since `run()` is documented to never reject.
         child.stdin.on("error", (error: NodeJS.ErrnoException) => {
           if (error.code !== "EPIPE") {
@@ -143,7 +143,7 @@ export class Process {
         child.stdin.end();
       }
 
-      // Spawn-time failure (e.g. ENOENT) — resolve, don't reject, so
+      // Spawn-time failure (e.g. ENOENT), resolve, don't reject, so
       // callers only ever need to check `result.failed()`.
       child.on("error", (error) => {
         resolve(makeProcessResult(commandString, 1, stdout, stderr || error.message));
@@ -152,12 +152,12 @@ export class Process {
       // Resolve on `close`, not `exit`: `exit` fires as soon as the child
       // ends, but its stdio streams may still be flushing, so reading exit
       // there can truncate `stdout`/`stderr`. `close` fires once all stdio
-      // is drained. (`error`/`close` still resolve exactly once — extra
+      // is drained. (`error`/`close` still resolve exactly once, extra
       // `resolve` calls after the first are no-ops.)
       child.on("close", (code) => {
         // Node reports both "killed by signal" (including our own
-        // `timeoutMs` kill) and "never started" as a `null` exit code —
-        // there's no more specific POSIX convention worth inventing, so
+        // `timeoutMs` kill) and "never started" as a `null` exit code.
+        // There's no more specific POSIX convention worth inventing, so
         // both collapse to exit code 1.
         resolve(makeProcessResult(commandString, code ?? 1, stdout, stderr));
       });
@@ -166,7 +166,7 @@ export class Process {
 
   /**
    * Swaps `run()` to resolve from `handlers` instead of actually
-   * spawning anything — port of `Process::fake([...])`. Keys are
+   * spawning anything, port of `Process::fake([...])`. Keys are
    * `*`-wildcard command patterns matched against the joined command
    * string (e.g. `"git *"`, `"npm run *"`); the first matching handler
    * wins. Call with no arguments to fake every command with the
@@ -193,7 +193,7 @@ export class Process {
   /**
    * Asserts at least one recorded `run()` call matched `matcher` (a
    * `*`-wildcard command pattern, or a predicate over the raw command
-   * string) — port of `Process::assertRan(...)`. Throws a plain `Error`
+   * string), port of `Process::assertRan(...)`. Throws a plain `Error`
    * (picked up by any test runner's assertion-failure handling) if not.
    */
   static assertRan(matcher: string | ((command: string) => boolean)): void {
@@ -207,7 +207,7 @@ export class Process {
     }
   }
 
-  /** Asserts no recorded `run()` call matched `matcher` — port of `Process::assertNotRan(...)`. */
+  /** Asserts no recorded `run()` call matched `matcher`, port of `Process::assertNotRan(...)`. */
   static assertNotRan(matcher: string | ((command: string) => boolean)): void {
     const matches =
       typeof matcher === "function" ? matcher : (cmd: string) => wildcardMatch(matcher, cmd);

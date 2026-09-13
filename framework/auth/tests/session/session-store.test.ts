@@ -49,7 +49,7 @@ describe.each([
   ["ArraySessionStore", async () => new ArraySessionStore()],
   ["CacheSessionStore", async () => new CacheSessionStore(new FakeCache())],
 ])("%s", (name, make) => {
-  // Both implementations are held to the same contract — a behavioural
+  // Both implementations are held to the same contract, a behavioural
   // divergence between them is a bug, since config swaps them freely.
   let database: TestDatabase;
   let store: SessionStore;
@@ -75,7 +75,7 @@ describe.each([
   });
 
   it("returns null for an expired session", async () => {
-    // Expiry is enforced on read, not left to gc()/TTL — a cleanup job
+    // Expiry is enforced on read, not left to gc()/TTL, a cleanup job
     // lagging must never mean a stale session is honoured.
     await store.write("stale", "alice", inMinutes(-1));
     await expect(store.read("stale")).resolves.toBeNull();

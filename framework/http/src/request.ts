@@ -29,8 +29,8 @@ export interface RequestCreateExtras {
   files?: Record<string, File | File[]>;
   params?: Record<string, string>;
   /**
-   * Simulated socket peer address. Named for what it is — the TCP peer,
-   * not "the client IP" — because that distinction is the whole subject
+   * Simulated socket peer address. Named for what it is, the TCP peer,
+   * not "the client IP", because that distinction is the whole subject
    * of `ip()` below. Tests that want to exercise proxy handling set this
    * *and* an `x-forwarded-for` header, then run `trustProxies()`.
    */
@@ -44,7 +44,7 @@ type RulesOf<T> = T extends { rules: () => infer R } ? R : Record<string, never>
  * parse in `from()`, then exposes a Laravel-shaped, fully synchronous
  * accessor surface. Subclass and implement `rules()` to validate.
  *
- * App code never takes Hono `Context` — the kernel constructs one
+ * App code never takes Hono `Context`, the kernel constructs one
  * `Request` per call and threads it through pipes and the controller.
  * `raw()` is the escape hatch back to Hono.
  */
@@ -63,7 +63,7 @@ export class Request {
   protected headerBag: Record<string, string> = {};
   /**
    * The socket peer address, captured at parse time. NOT the client IP
-   * when a proxy is in front — see `ip()`.
+   * when a proxy is in front. See `ip()`.
    */
   protected peerIp: string | undefined;
   protected resolvedIp: string | undefined;
@@ -96,7 +96,7 @@ export class Request {
 
   /**
    * Parse the Hono context once. After this, every accessor is sync.
-   * Invalid/empty JSON becomes `{}` — validation decides whether that's an error.
+   * Invalid/empty JSON becomes `{}`, validation decides whether that's an error.
    */
   static async from<R extends Request>(
     this: (new (...args: any[]) => R) & { fromExisting(source: Request): R },
@@ -235,8 +235,8 @@ export class Request {
 
   /**
    * Global `use("*")` pipes construct Request before Hono has matched a
-   * route, so `c.req.param()` is empty. Re-read params — and the matched
-   * route pattern — once the route handler (or route-level pipe) runs.
+   * route, so `c.req.param()` is empty. Re-read params, and the matched
+   * route pattern, once the route handler (or route-level pipe) runs.
    */
   syncRouteParams(c: Context): void {
     this.paramBag = { ...c.req.param() };
@@ -249,7 +249,7 @@ export class Request {
    * normalised to `/posts/{post}`).
    *
    * Guarded because `routePath` throws on a context that never went
-   * through the router — `Request.create()` in a unit test, or a global
+   * through the router, `Request.create()` in a unit test, or a global
    * pipe running before any match.
    */
   protected captureRoutePattern(c: Context): void {
@@ -262,13 +262,13 @@ export class Request {
         this.matchedRoutePattern = honoPathToBraces(pattern);
       }
     } catch {
-      // No match result on this context — leave it unset.
+      // No match result on this context, leave it unset.
     }
   }
 
   /**
-   * The route PATTERN this request matched — `/posts/{post}`, not
-   * `/posts/42` — or `undefined` before the router has matched.
+   * The route PATTERN this request matched, `/posts/{post}`, not
+   * `/posts/42`, or `undefined` before the router has matched.
    *
    * The distinction matters wherever a path is used as an identity: a
    * rate-limit bucket keyed on the concrete path gives an attacker a
@@ -334,7 +334,7 @@ export class Request {
       method: c.req.method,
       path: c.req.path,
       // `c.req.query()` keeps only the first value of a repeated key and
-      // never expands brackets — see `parseNestedQuery`. Parse the raw
+      // never expands brackets. See `parseNestedQuery`. Parse the raw
       // search string instead so `?ids[]=1&ids[]=2` is an actual array.
       query: parseNestedQuery(url?.search ?? ""),
       params: c.req.param(),
@@ -400,7 +400,7 @@ export class Request {
     try {
       app().context.add(REQUEST_ROOT_CONTEXT_KEY, this.root());
     } catch {
-      // No container / no scope (unit-constructed request) — the URL
+      // No container / no scope (unit-constructed request). The URL
       // generator will fall back to the http.url config.
     }
   }
@@ -425,12 +425,12 @@ export class Request {
    * Called by `trustProxies()` after it has confirmed the peer is a
    * trusted proxy, to apply `X-Forwarded-Proto`/`-Host`/`-Port`. It is
    * the only supported way to change these, and deliberately not
-   * something a route handler should reach for: the forwarding headers
+   * something a route handler should use: the forwarding headers
    * are client-controlled until a trust boundary says otherwise, and
    * that boundary lives in exactly one place.
    *
    * Without this, an app behind a TLS terminator sees every request as
-   * plain `http` — so `secure()` is useless for cookie decisions and
+   * plain `http`, so `secure()` is useless for cookie decisions and
    * every generated link (password reset, email verification, signed
    * URLs) goes out as `http://`, which is both a downgrade and, for
    * links a browser refuses to follow, simply broken.
@@ -491,8 +491,8 @@ export class Request {
    * `X-Forwarded-For` is never consulted here. That is the entire point.
    * It is a header, so any client can set it to anything; when `ip()`
    * read it by default, the framework's own rate limiter could be
-   * defeated by rotating a fake value — an attacker got an unlimited
-   * number of login attempts by incrementing a string — and, worse,
+   * defeated by rotating a fake value, an attacker got an unlimited
+   * number of login attempts by incrementing a string, and, worse,
    * every client that sent no header at all shared one bucket, so a
    * `throttle()` on `/login` was a global lockout switch anyone could
    * flip. Both were reproduced against a scaffolded app.
@@ -508,7 +508,7 @@ export class Request {
 
   /**
    * The immediate TCP peer, ignoring any proxy resolution. This is the
-   * address of whatever opened the socket — the proxy itself, when there
+   * address of whatever opened the socket, the proxy itself, when there
    * is one. Mostly useful for logging and for asserting a proxy is where
    * you think it is.
    */
@@ -518,7 +518,7 @@ export class Request {
 
   /**
    * Set the authoritative client IP for this request. Called by
-   * `trustProxies()` once it has decided whether — and how far —
+   * `trustProxies()` once it has decided whether, and how far,
    * `x-forwarded-for` may be trusted. Passing `undefined` clears the
    * override, falling back to the socket peer.
    */
@@ -532,7 +532,7 @@ export class Request {
    * The full client-address chain, closest hop last: every
    * `X-Forwarded-For` entry followed by the socket peer.
    *
-   * **Unvalidated by design** — the leading entries are client-supplied
+   * **Unvalidated by design**. The leading entries are client-supplied
    * and only the last one is proven. Use it for diagnostics; use `ip()`
    * for decisions.
    */
@@ -590,7 +590,7 @@ export class Request {
    * Deliberately NOT Hono's `setCookie()`: Hono only merges
    * context-queued headers into a response it built itself
    * (`c.json()`/`c.newResponse()`), and Mahi handlers return platform
-   * `Response` objects — so a cookie set through Hono is silently
+   * `Response` objects, so a cookie set through Hono is silently
    * dropped. The queue is drained at the HTTP boundary instead, where the
    * framework owns the final headers. See `cookies.ts`.
    *
@@ -622,7 +622,7 @@ export class Request {
    *
    * `path`/`domain` must match those the cookie was written with, or the
    * browser treats it as a different cookie and silently keeps the
-   * original — the classic "logout didn't log out" bug.
+   * original, the classic "logout didn't log out" bug.
    */
   queueCookieForget(name: string, options: CookieOptions = {}): this {
     return this.queueCookie(name, "", { ...options, maxAge: 0, expires: new Date(0) });
@@ -667,7 +667,7 @@ export class Request {
     return headers;
   }
 
-  /** The queued cookies, unserialized — for tests and for `Response` merging. */
+  /** The queued cookies, unserialized, for tests and for `Response` merging. */
   queuedCookieList(): readonly QueuedCookie[] {
     return this.queuedCookies;
   }
@@ -713,7 +713,7 @@ export class Request {
    * The single-key overload returns a **string or undefined**, so the
    * common `request.query("page")` stays simple and typed. A key holding
    * an array or object is treated as "no usable string here" and yields
-   * `defaultValue` (or `undefined`), the same as a missing key — reach for
+   * `defaultValue` (or `undefined`), the same as a missing key, use
    * the no-arg form (or `input()`) to read a structured value.
    */
   query(): Record<string, unknown>;
@@ -729,7 +729,7 @@ export class Request {
   }
 
   /**
-   * The raw query string, without a leading `?` — exactly as it arrived,
+   * The raw query string, without a leading `?`, exactly as it arrived,
    * unexpanded.
    *
    * Signature verification needs this: an HMAC covers literal bytes, so
@@ -889,7 +889,7 @@ export class Request {
     return this.paramBag[param];
   }
 
-  /** Throwing variant of `route(param)` — the param is required by the route pattern. */
+  /** Throwing variant of `route(param)`. The param is required by the route pattern. */
   parameter(name: string): string {
     const value = this.paramBag[name];
 
@@ -969,7 +969,7 @@ export class Request {
    * double-fetch.
    *
    * Structural (not `typeof Model`) so concrete models with a typed `Row`
-   * remain assignable — `Collection` variance otherwise rejects them.
+   * remain assignable, `Collection` variance otherwise rejects them.
    */
   async model<TInstance>(
     ModelClass: {
@@ -1047,7 +1047,7 @@ export class Request {
    *
    * The controller pipeline calls this before `authorize()` (Laravel's
    * order), and `validate()` calls it too for the standalone
-   * `request.validate()` path — so it has to be idempotent, or a request
+   * `request.validate()` path, so it has to be idempotent, or a request
    * that merges a counter or generates a value would do it twice.
    */
   async prepareInput(): Promise<void> {
@@ -1105,7 +1105,7 @@ export class Request {
   }
 
   /**
-   * The validated payload — only the keys that had rules.
+   * The validated payload, only the keys that had rules.
    *
    * A Request with NO rules returns `{}` rather than throwing. It used
    * to throw, which made the base `Request` unusable in a controller
@@ -1115,7 +1115,7 @@ export class Request {
    * rules means nothing was validated, and `{}` says exactly that.
    *
    * Still throws when rules DO exist and validation has not run (or did
-   * not pass) — reading a payload that was never checked is the bug this
+   * not pass), reading a payload that was never checked is the bug this
    * guard is for.
    */
   validated(): InferRules<RulesOf<this>> {
@@ -1155,8 +1155,8 @@ function prefixedCookieName(name: string, prefix?: CookieOptions["prefix"]): str
 /**
  * What makes two queued cookies "the same cookie" for de-duplication.
  *
- * Browsers key a cookie on name + domain + path, so those three — and not
- * the name alone — decide whether a second `queueCookie()` replaces the
+ * Browsers key a cookie on name + domain + path, so those three, and not
+ * the name alone, decide whether a second `queueCookie()` replaces the
  * first or sits alongside it. An app legitimately sets `session` on two
  * paths; it never wants two `Set-Cookie`s for the same path.
  */
@@ -1199,7 +1199,7 @@ function queryFromPath(path: string): Record<string, unknown> {
 
 /**
  * Flatten a (possibly nested) query bag back into `[key, value]` pairs in
- * bracket notation — the inverse of `parseNestedQuery`. Used to rebuild
+ * bracket notation, the inverse of `parseNestedQuery`. Used to rebuild
  * `fullUrl()` so that what goes out matches what came in.
  */
 function flattenToPairs(bag: Record<string, unknown>, prefix = ""): Array<[string, string]> {

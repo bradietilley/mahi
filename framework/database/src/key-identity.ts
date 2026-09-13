@@ -10,7 +10,7 @@
  *
  * Policy: a key is a `number` when that is lossless (within
  * `Number.MAX_SAFE_INTEGER`) and a decimal `string` otherwise, and two
- * keys are the same row when their string spellings match — which is what
+ * keys are the same row when their string spellings match. Which is what
  * the database itself does for these columns.
  */
 
@@ -21,8 +21,8 @@ const MAX_SAFE = BigInt(Number.MAX_SAFE_INTEGER);
  * decimal string. Accepts the `bigint` MySQL yields for `insertId`, the
  * text Postgres yields for `int8`, or a number already in range.
  *
- * `9007199254740993` cannot survive `Number()` — it becomes
- * `9007199254740992` — which would hand back an id that silently
+ * `9007199254740993` cannot survive `Number()`, it becomes
+ * `9007199254740992`, which would hand back an id that silently
  * addresses a different row; that is the case the string branch exists
  * for.
  */

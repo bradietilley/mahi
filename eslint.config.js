@@ -29,7 +29,7 @@ export default [
     // Model files. `interface Post extends PostTable {}` alongside
     // `class Post extends Model` is THE documented way to type a model's
     // instance attributes (docs/models/README.md, "The two type
-    // declarations") — and `make:model` generates exactly this, so every
+    // declarations"), and `make:model` generates exactly this, so every
     // app hits it too.
     //
     // Both rules fire on it, and neither is right here:
@@ -38,14 +38,14 @@ export default [
     //   whole job is the declaration merge; members would defeat it.
     // - no-unsafe-declaration-merging: the rule guards against a class
     //   and interface disagreeing about a member's type. These can't
-    //   disagree — the interface only re-exports the row type the class
+    //   disagree, the interface only re-exports the row type the class
     //   already declares via `Row`.
     //
     // Not deletable, either: without the merge, `session.expires_at`
     // stops type-checking (`framework/auth/src/session/database-session-store.ts`)
     // and the build fails.
     // Test files declare models inline for the same reason, so they are
-    // covered too — a test model that couldn't use the real idiom
+    // covered too, a test model that couldn't use the real idiom
     // wouldn't be testing what real models do.
     files: ["**/models/**/*.ts", "**/*.model.ts", "**/tests/**/*.ts"],
     rules: {
@@ -80,7 +80,7 @@ export default [
   {
     // House style. Deliberately AFTER `prettierConfig`, which turns `curly`
     // off (it lists it as a rule Prettier "can" own). Prettier only reprints
-    // the braces you already wrote — it will never add them — so leaving that
+    // the braces you already wrote and will never add them, so leaving that
     // off would silently drop half of this section. Order matters here.
     //
     // These rules and Prettier split the work: ESLint decides WHERE the
@@ -104,7 +104,7 @@ export default [
         // should see where the straight-line code stops.
         { blankLine: "always", prev: "*", next: ["if", "while", "for", "return"] },
         // ...and after a branch or loop closes, before the next statement.
-        // `return` is absent by design — it ends the block, so "after" is
+        // `return` is absent by design. It ends the block, so "after" is
         // either nothing or a sibling that gets padded by the rule above.
         { blankLine: "always", prev: ["if", "while", "for"], next: "*" },
         // The "unless it's the first/last line of the parent body" carve-outs

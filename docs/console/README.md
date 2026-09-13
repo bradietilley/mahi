@@ -1,7 +1,7 @@
 # Console
 
-`./artisan` is the CLI entrypoint. It boots the full application — every
-provider registered and booted, the container populated — then hands
+`./artisan` is the CLI entrypoint. It boots the full application, every
+provider registered and booted, the container populated, then hands
 `process.argv` to a Commander program assembled from every registered
 command class.
 
@@ -48,8 +48,8 @@ download its own copy into `~/.npm/_npx`, whose module resolver does not
 see this project's `node_modules/@mahiframework/*`. The `../node_modules`
 fallback covers monorepos that hoist dependencies to the workspace root.
 
-**It `cd`s to its own directory first.** Every path helper —
-`base_path()`, `storage_path()`, `database_path()` — resolves against
+**It `cd`s to its own directory first.** Every path helper,
+`base_path()`, `storage_path()`, `database_path()`, resolves against
 `process.cwd()`, so `./artisan` from a subdirectory has to normalise cwd
 or every path would be wrong. This is also why `./artisan test` picks up
 the app's own `vitest.config.ts`.
@@ -67,7 +67,7 @@ kernel.collectFromProviders();
 await kernel.run();
 ```
 
-`bootstrap()` is shared with `bin/server.ts` — the same config, the same
+`bootstrap()` is shared with `bin/server.ts`, the same config, the same
 providers, the same `await app.bootstrap()`. **A command runs against a
 fully booted application**, so `this.app.make(...)` works for anything a
 request handler could reach.
@@ -114,7 +114,7 @@ private build(): void {
 ```
 
 Note that **every** command class is instantiated on every CLI
-invocation, not just the one you're running — Commander needs each
+invocation, not just the one you're running. Commander needs each
 `signature` and `description` to build its help output and match argv. So
 a `Command` constructor must be cheap. Do your work in `handle()`, and
 resolve container services there too.
@@ -136,7 +136,7 @@ export class ConsoleServiceProvider extends ServiceProvider {
 }
 ```
 
-The built-ins in that list are the ones `@mahiframework/cli` owns — migrations,
+The built-ins in that list are the ones `@mahiframework/cli` owns, migrations,
 `db:*`, `make:*`, `test`. Everything else (`serve`, `queue:work`,
 `route:list`, `key:generate`) comes from its own package's provider via
 the `commands()` hook.
@@ -159,7 +159,7 @@ type CommandClass = new (app: Application) => Command;
 
 Four members. `signature` and `description` are **fields**, not methods.
 
-### `signature` — the name and its positional arguments
+### `signature`: the name and its positional arguments
 
 The signature string is passed straight to Commander's `.command()`, so
 it uses Commander's syntax, not Laravel's:
@@ -169,10 +169,10 @@ it uses Commander's syntax, not Laravel's:
 | `"migrate"` | No arguments. |
 | `"db:table <table>"` | One **required** positional argument. |
 | `"queue:retry [ids...]"` | An **optional variadic** positional argument. |
-| `"test [args...]"` | Same — everything after the name, as an array. |
+| `"test [args...]"` | Same: everything after the name, as an array. |
 
 `<angle>` is required, `[square]` is optional, a trailing `...` makes it
-variadic (an array). **Options and flags are not declared here** — that's
+variadic (an array). **Options and flags are not declared here**, that's
 `configure()`'s job.
 
 Signatures must be unique across every registered command. Registering
@@ -180,11 +180,11 @@ the same one twice makes Commander throw at startup, which is why a
 provider must not re-export a command another provider already
 contributes.
 
-### `description` — the one-line help text
+### `description`: the one-line help text
 
 Shown in `./artisan --help`, and in `./artisan <name> --help`.
 
-### `configure()` — flags and options
+### `configure()`: flags and options
 
 ```ts
 configure(program: CommanderCommand): void {
@@ -203,7 +203,7 @@ defaultValue?)` is the workhorse:
 | `"--seed"` | boolean; `true` when present |
 | `"--seed", "...", false` | boolean with an explicit default |
 | `"--port <port>"` | **string**, required value |
-| `"--hours <n>"` | still a string — `Number(options.hours)` yourself |
+| `"--hours <n>"` | still a string, `Number(options.hours)` yourself |
 | `"--except <path...>"` | variadic; an array of strings |
 | `"--no-reload"` | negated boolean; sets `reload: false` |
 | `"-d, --dir <dir>"` | short and long alias for the same option |
@@ -216,10 +216,10 @@ const sleepMs = Number(options.sleep) * 1000;
 if (options.retry !== undefined) data.retryAfter = Number(options.retry);
 ```
 
-`program.allowUnknownOption()` disables Commander's unknown-flag error —
+`program.allowUnknownOption()` disables Commander's unknown-flag error.
 `test` uses it so every argument passes through to vitest unparsed.
 
-### `handle()` — the work
+### `handle()`: the work
 
 Commander calls `.action((...args) => instance.handle(...args))`, so the
 arguments arrive in Commander's own order: **positional arguments first,
@@ -240,7 +240,7 @@ async handle(ids: string[] = [], options: { connection?: string; all?: boolean }
 ```
 
 There is no type-level link between `signature`/`configure()` and
-`handle()`'s parameters — you write the parameter types to match what you
+`handle()`'s parameters. You write the parameter types to match what you
 declared. Getting them wrong is a runtime surprise, not a compile error.
 Default the variadic parameter (`ids: string[] = []`) so calling
 `handle()` directly from another command works.
@@ -250,7 +250,7 @@ Default the variadic parameter (`ids: string[] = []`) so calling
 ### Calling one command from another
 
 **There is no `this.call()` / `callSilently()`.** `Command` instances are
-cheap, explicit-DI objects — not container-resolved singletons — so the
+cheap, explicit-DI objects, not container-resolved singletons, so the
 idiom is to construct and run the other command directly:
 
 ```ts
@@ -270,8 +270,8 @@ async handle(options: { seed: boolean }): Promise<void> {
 That's `migrate:fresh` calling `db:seed`, verbatim. A formal `call()`
 wrapper would be sugar over `new X(this.app).handle(...)` and was
 deliberately not built. The catch: you're calling `handle()` directly, so
-you supply its arguments yourself and Commander's defaults don't apply —
-which is why defaulting them in the signature matters.
+you supply its arguments yourself and Commander's defaults don't apply.
+Which is why defaulting them in the signature matters.
 
 ## The `commands()` provider hook
 
@@ -337,14 +337,14 @@ Every command below, with its real signature and flags.
 
 | Command | Signature | Flags |
 |---|---|---|
-| `MigrateCommand` | `migrate` | — |
-| `MigrateRollbackCommand` | `migrate:rollback` | — |
-| `MigrateStatusCommand` | `migrate:status` | — |
+| `MigrateCommand` | `migrate` |: |
+| `MigrateRollbackCommand` | `migrate:rollback` |: |
+| `MigrateStatusCommand` | `migrate:status` |: |
 | `MigrateFreshCommand` | `migrate:fresh` | `--seed` (default `false`) |
 | `MigrateRefreshCommand` | `migrate:refresh` | `--seed` (default `false`) |
 
 All five resolve every migration directory in play via
-`collectMigrationDirectories(app)` — the app's own
+`collectMigrationDirectories(app)`. The app's own
 (`database.migrationsPath`, defaulting to `database/migrations`) plus
 every provider's `migrations()` hook. That's how the `notifications`
 table and the auth tables get migrated without appearing in your app's
@@ -358,7 +358,7 @@ nothing pending; `migrate:fresh`/`migrate:refresh` print it as a
 surprising.
 
 `migrate:refresh` loops `rollback()` until it returns an empty batch,
-then runs `up()` — so it walks back through *every* batch, not just the
+then runs `up()`, so it walks back through *every* batch, not just the
 last one.
 
 ### Database
@@ -408,8 +408,8 @@ Every `make:*` command takes `-d, --dir <dir>` with a sensible default.
 | `-m, --migration` | Also runs `make:migration create_{table}_table` |
 | `-f, --factory` | Also runs `make:factory {name}` into `database/factories` |
 
-It does this by constructing the other command directly —
-`new MakeMigrationCommand(this.app).handle(...)` — the same
+It does this by constructing the other command directly,
+`new MakeMigrationCommand(this.app).handle(...)`, the same
 call-a-command-from-a-command idiom described above.
 
 `make:migration` derives a table name from a `create_{x}_table` name and
@@ -421,7 +421,7 @@ Class names go through `toClassName(name, suffix?)`, which is
 (case-insensitively). `make:job send-email` and `make:job SendEmailJob`
 both produce `SendEmailJob`.
 
-Templates are inline template-literal functions in each command — there
+Templates are inline template-literal functions in each command. There
 are no `.stub` files to publish or customise. If you want different
 scaffolding, write your own `make:*` command; the `scaffold()` helper is
 exported for exactly that:
@@ -458,11 +458,11 @@ overwrite an existing file without asking.
 Generates `base64:` + 32 random bytes and writes `APP_KEY=`.
 
 **It refuses to overwrite an existing key without `--force`**, printing
-`APP_KEY is already set in .env — leaving it unchanged. Pass --force to
+`APP_KEY is already set in .env, leaving it unchanged. Pass --force to
 rotate it.` Overwriting silently would make everything already encrypted
 or hashed with the old key permanently unrecoverable.
 
-`--force` only ever touches `APP_KEY` — it never writes
+`--force` only ever touches `APP_KEY`. It never writes
 `APP_PREVIOUS_KEYS`. If old ciphertext must stay readable, copy the
 outgoing key into `APP_PREVIOUS_KEYS` **before** rotating; the command has
 no way to recover it afterwards. See
@@ -488,7 +488,7 @@ no way to recover it afterwards. See
 
 `queue:work` loops until interrupted, sleeping `--sleep` seconds when the
 queue is empty. `--once` processes a single job (or waits once) and
-exits — mainly for tests and scripts.
+exits, mainly for tests and scripts.
 
 The four failed-job commands only work on a connection that tracks failed
 jobs. Others report `The selected queue connection does not track failed
@@ -506,13 +506,13 @@ jobs.` and exit cleanly. See [Queues](../queues/) and
 
 | Command | Signature | Flags |
 |---|---|---|
-| `ScheduleRunCommand` | `schedule:run` | — |
-| `ScheduleListCommand` | `schedule:list` | — |
-| `ScheduleTestCommand` | `schedule:test` | — |
+| `ScheduleRunCommand` | `schedule:run` |: |
+| `ScheduleListCommand` | `schedule:list` |: |
+| `ScheduleTestCommand` | `schedule:test` |: |
 | `ScheduleWorkCommand` | `schedule:work` | `--once` |
 
 `schedule:run` is what a real crontab invokes every minute.
-`schedule:work` is a **dev convenience** — a foreground loop polling once
+`schedule:work` is a **dev convenience**, a foreground loop polling once
 a second and firing at most once per wall-clock minute. Unlike Laravel's
 `schedule:work` there's no per-tick child process; tasks run in-process
 through the same `runDueTasks()` path `schedule:run` uses.
@@ -548,7 +548,7 @@ prints one row per check:
 
 Sets `process.exitCode = 1` if any check failed, so it works as a
 deployment gate (`./artisan health || exit 1`). `--json` emits exactly
-what the HTTP endpoint serializes — same object, same bytes — with no
+what the HTTP endpoint serializes, same object, same bytes, with no
 ANSI codes, so it pipes into `jq` cleanly. Unlike the endpoint, the CLI
 never redacts failure messages: it runs inside the trust boundary.
 
@@ -566,9 +566,9 @@ See [Health checks](../health/).
 | Command | Signature | Flags |
 |---|---|---|
 | `ServeCommand` | `serve` | `--host`, `--port`, `--tries` (default `"10"`), `--no-reload` |
-| `RouteListCommand` | `route:list` | — |
+| `RouteListCommand` | `route:list` |: |
 | `DownCommand` | `maintenance:down` | `--retry`, `--secret`, `--message`, `--status`, `--except <path...>` |
-| `UpCommand` | `maintenance:up` | — |
+| `UpCommand` | `maintenance:up` |: |
 
 `serve` is the development server. Without `--no-reload` it forks a
 **supervisor**: the parent watches `.env` (polling `mtime` every 500ms)
@@ -577,13 +577,13 @@ and respawns a worker child of the same command when it changes, printing
 server directly in this process.
 
 Port selection walks `--tries` alternate ports on `EADDRINUSE`, **unless**
-the port came from `--port` or `SERVER_PORT` — an explicitly chosen port
+the port came from `--port` or `SERVER_PORT`, an explicitly chosen port
 is never silently changed. The resolution order is `--port` → a port
 embedded in `--host` (`localhost:8080`, `[::1]:8080`) → `SERVER_PORT` →
 `PORT` → `8000`.
 
 The supervisor spawns the worker with `process.execPath` and
-`tsx/dist/cli.mjs` — the real Node entry, not `node_modules/.bin/tsx`:
+`tsx/dist/cli.mjs`, the real Node entry, not `node_modules/.bin/tsx`:
 
 ```ts
 export function resolveTsxCli(cwd = process.cwd()): string | undefined {
@@ -601,7 +601,7 @@ doesn't rewrite `.js` imports to `.ts` and fails with `Cannot find module
 '.../bootstrap.js'`. Same monorepo-hoisting fallback as `./artisan`
 itself.
 
-`serve` is not for production — see [Deployment](../deployment/).
+`serve` is not for production. See [Deployment](../deployment/).
 
 `route:list` prints a table of every registered route with the HTTP
 method colour-coded (GET blue, POST/PUT/PATCH yellow, DELETE/ANY red,
@@ -628,7 +628,7 @@ breaking the CLI.
 
 Deletes expired sessions and expired password-reset tokens, logging both
 counts through `this.app.logger`. Both stores enforce expiry on read, so
-a stale row is never *honoured* — but nothing deletes them either, and
+a stale row is never *honoured*, but nothing deletes them either, and
 both tables grow without bound. It's a cleanup job, not a correctness
 guarantee; schedule it.
 
@@ -643,13 +643,13 @@ guarantee; schedule it.
 
 `signature = "test [args...]"` with `allowUnknownOption()`, so every
 argument after `test` passes through **unparsed** to `npx vitest run
-...`. It's a passthrough, not a reimplementation — it resolves whichever
+...`. It's a passthrough, not a reimplementation. It resolves whichever
 vitest is in the invoking app's `node_modules` and uses that app's
 `vitest.config.ts`. A non-zero exit sets `process.exitCode`.
 
 ## Output
 
-Commands print through `@mahiframework/tui` — a from-scratch port of
+Commands print through `@mahiframework/tui`, a from-scratch port of
 `laravel/prompts` with no dependency on `@mahiframework/core` or the
 container, so it's usable standalone and talks directly to
 `process.stdin`/`process.stdout`.
@@ -662,7 +662,7 @@ whichever reads better.
 |---|---|---|
 | `this.line(msg)` | `Tui.note` | `$this->line()` |
 | `this.info(msg)` | `Tui.info` | `$this->info()` |
-| `this.success(msg)` | `Tui.success` | — |
+| `this.success(msg)` | `Tui.success` |: |
 | `this.warn(msg)` | `Tui.warning` | `$this->warn()` |
 | `this.error(msg)` | `Tui.error` | `$this->error()` |
 | `this.table(headers, rows)` | `Tui.table` | `$this->table()` |
@@ -671,9 +671,8 @@ whichever reads better.
 | `this.confirm(label, opts?)` | `Tui.confirm` | `$this->confirm()` |
 | `this.choice(label, opts)` | `Tui.select` | `$this->choice()` |
 
-`Tui` has more than `Command` wraps — `task`, `taskLine`, `spinner`,
-`progress`, `intro`, `outro` — so reach for it directly when you need
-those.
+`Tui` has more than `Command` wraps, `task`, `taskLine`, `spinner`,
+`progress`, `intro`, `outro`, so use it directly when you need those.
 
 ### Tables
 
@@ -752,7 +751,7 @@ flight, then overwrites that line in place with the settled result:
 `DONE` is green, `FAIL` red, `SKIPPED` yellow. The callback's return value
 is passed through; a throwing callback prints `FAIL` and **rethrows**.
 Under a non-interactive output (a CI log, a pipe) there's no `RUNNING`
-flicker — just the settled line.
+flicker, just the settled line.
 
 Every migration command uses it as the runner's progress callback:
 
@@ -767,7 +766,7 @@ await Tui.task(`Seeding: ${SeederClass.name}`, () => seeder.run());
 ```
 
 `taskLine()` prints a single already-settled line with no `RUNNING`
-state — for reporting an outcome you already know:
+state, for reporting an outcome you already know:
 
 ```ts
 Tui.taskLine("Skipping: already imported", "skipped");
@@ -815,7 +814,7 @@ const task = tasks[Number(selected)]!;
 ```
 
 Prompts need a TTY. A command that prompts unconditionally will hang or
-misbehave in CI — guard with a `--force`/`--no-interaction` flag, the way
+misbehave in CI, guard with a `--force`/`--no-interaction` flag, the way
 `key:generate` guards its overwrite.
 
 ### Spinners and progress bars
@@ -872,7 +871,7 @@ try {
 ```
 
 That's `queue:work` and `schedule:work` verbatim. **Always `untrap()` in a
-`finally`** — otherwise the listeners leak, and a long-lived process that
+`finally`**, otherwise the listeners leak, and a long-lived process that
 traps repeatedly will trip Node's max-listeners warning.
 
 **Trap `SIGTERM`, not just `SIGINT`.** `SIGTERM` is what Docker and
@@ -880,7 +879,7 @@ Kubernetes send for graceful shutdown; trapping only `SIGINT` (Ctrl+C)
 leaves a worker unable to finish an in-flight job before being
 force-killed.
 
-The pattern is always "flip a flag, let the loop notice" — not "exit
+The pattern is always "flip a flag, let the loop notice", not "exit
 now". That's what makes shutdown graceful: the current job finishes, the
 loop condition fails, `finally` runs.
 
@@ -983,7 +982,7 @@ The pieces, in the order they matter:
 
 1. **`signature` declares positionals; `configure()` declares options.**
    `<file>` is required, `--dry-run`/`--chunk` are flags.
-2. **`handle(file, options)`** — positionals first, options object last.
+2. **`handle(file, options)`**: positionals first, options object last.
 3. **Coerce option values yourself.** They're strings.
 4. **Resolve services in `handle()`, not the constructor.** Every command
    class is constructed on every CLI invocation.
@@ -1027,7 +1026,7 @@ The first two argv entries are ignored by Commander (it expects
 `[execPath, scriptPath, ...]`), so any two placeholders work.
 
 For output, `Tui.fake(keys)` swaps in a buffered output and a fake
-terminal that yields keystrokes instead of reading stdin — public API,
+terminal that yields keystrokes instead of reading stdin, public API,
 mirroring `Prompt::fake([...])` in `laravel/prompts`:
 
 ```ts
@@ -1043,7 +1042,7 @@ try {
 ```
 
 `strippedOutput()` removes ANSI codes so assertions don't depend on
-colour. `restore()` puts the real output and terminal back — always in a
+colour. `restore()` puts the real output and terminal back, always in a
 `finally`.
 
 For a command's logic in isolation, skip the kernel and call `handle()`
@@ -1053,7 +1052,7 @@ directly:
 await new ImportUsersCommand(app).handle("users.ndjson", { chunk: "100", dryRun: true });
 ```
 
-Remember Commander's option defaults don't apply on that path — supply
+Remember Commander's option defaults don't apply on that path, supply
 them yourself.
 
 ## Gotchas
@@ -1099,12 +1098,12 @@ cost even for `./artisan --help`.
 
 ## Related
 
-- [Migrations](../migrations/) — `migrate:*`, `db:seed`, the `migrations()`/`seeders()` hooks
-- [Queues](../queues/) — `queue:work` and the failed-job commands
-- [Scheduling](../scheduling/) — `schedule:run` from a real crontab
-- [Providers](../providers/) — the `commands()` hook, registration order
-- [Routing](../routing/) — what `route:list` prints
-- [Encryption](../encryption/) — `key:generate`, `APP_PREVIOUS_KEYS`
-- [Deployment](../deployment/) — `serve` is not a production server
-- [Testing](../testing/) — `./artisan test`, and `Tui.fake()`
-- [Installation](../installation/) — the generated `bin/` layout
+- [Migrations](../migrations/): `migrate:*`, `db:seed`, the `migrations()`/`seeders()` hooks
+- [Queues](../queues/): `queue:work` and the failed-job commands
+- [Scheduling](../scheduling/): `schedule:run` from a real crontab
+- [Providers](../providers/): the `commands()` hook, registration order
+- [Routing](../routing/): what `route:list` prints
+- [Encryption](../encryption/): `key:generate`, `APP_PREVIOUS_KEYS`
+- [Deployment](../deployment/): `serve` is not a production server
+- [Testing](../testing/): `./artisan test`, and `Tui.fake()`
+- [Installation](../installation/): the generated `bin/` layout

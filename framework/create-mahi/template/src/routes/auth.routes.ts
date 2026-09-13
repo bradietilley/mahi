@@ -27,7 +27,7 @@ export function registerAuthRoutes(router: Router): void {
     auth.post("/logout", LogoutController).middleware(authenticate()).name("auth.logout");
     auth.get("/me", MeController).middleware(authenticate()).name("auth.me");
 
-    // Password reset. Both are unauthenticated by necessity — the user
+    // Password reset. Both are unauthenticated by necessity. The user
     // cannot log in, which is the whole problem. `throttle("passwords")`
     // limits per-IP; the broker's own `throttleSeconds` limits per-mailbox,
     // which is what stops an attacker rotating IPs to flood one inbox.

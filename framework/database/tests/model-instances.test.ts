@@ -179,7 +179,7 @@ describe("Model instances", () => {
     // `ownKeys` lists the model's real columns (`toObject()`), so an
     // appended value is reachable directly and through `toJSON()` but is
     // NOT enumerable. Pinned because the docs described this section
-    // wrongly for a while — claiming spread yielded *raw* values, when
+    // wrongly for a while, claiming spread yielded *raw* values, when
     // in fact `getOwnPropertyDescriptor` casts and the real gap is
     // relations/appends.
     const post = Post.hydrate({ id: "1", body: "hi", published: 1, meta: null, created_at: null });

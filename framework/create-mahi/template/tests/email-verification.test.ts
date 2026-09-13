@@ -9,7 +9,7 @@ import { registerUser, resetRateLimits } from "./helpers/auth.js";
  * Email verification, end to end.
  *
  * The verification link is a signed URL carrying `id` and `hash`, so these
- * tests read it out of the recorded mailable and GET it — exercising
+ * tests read it out of the recorded mailable and GET it, exercising
  * `validateSignature()` middleware and the broker's own hash check
  * together, which is the only way to prove the two compose correctly.
  */
@@ -74,7 +74,7 @@ describe("Email verification API", () => {
       expect((await User.find(user.id))?.email_verified_at).not.toBeNull();
     });
 
-    it("needs no authentication — the signature is the credential", async () => {
+    it("needs no authentication. The signature is the credential", async () => {
       // Clicking from a mail client that isn't logged in must work.
       await registerUser(testApp);
       const url = sentVerificationUrl();
@@ -126,8 +126,8 @@ describe("Email verification API", () => {
     });
 
     it("rejects a link whose address changed after it was issued", async () => {
-      // The hole the email hash closes. The signature is still valid — the
-      // URL was legitimately signed — so only the hash catches this.
+      // The hole the email hash closes. The signature is still valid, the
+      // URL was legitimately signed, so only the hash catches this.
       const user = await registerUser(testApp);
       const url = sentVerificationUrl();
 
@@ -179,7 +179,7 @@ describe("Email verification API", () => {
       testApp.mail!.assertNotSent(VerifyEmailMail);
     });
 
-    it("keeps earlier links working — resending does not invalidate them", async () => {
+    it("keeps earlier links working. Resending does not invalidate them", async () => {
       // Documented consequence of storing no token: verification links
       // cannot be revoked before they expire.
       const user = await registerUser(testApp);

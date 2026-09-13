@@ -28,7 +28,7 @@ class SecondProvider extends ServiceProvider {
   }
 }
 
-/** No gates() hook at all — must not break collection. */
+/** No gates() hook at all, must not break collection. */
 class SilentProvider extends ServiceProvider {}
 
 describe("AuthorizationServiceProvider", () => {

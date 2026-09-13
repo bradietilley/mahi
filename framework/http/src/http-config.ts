@@ -1,7 +1,7 @@
 /**
  * Optional `"http"` config namespace, read by HttpKernel at construction
  * time via `app.config.get<HttpConfig>("http")`. Nothing is applied if the
- * app never sets this namespace — CORS is opt-in, matching the framework's
+ * app never sets this namespace. CORS is opt-in, matching the framework's
  * explicit-registration philosophy (no magic defaults for cross-origin
  * access).
  */
@@ -18,12 +18,12 @@ export interface HttpCorsConfig {
 /**
  * Opt-in **liveness** endpoint (Laravel's `/up`). Present-but-empty (`{}`)
  * enables it at the default `/up` path; nothing is registered unless this
- * key is set — matching the framework's no-implicit-defaults stance. The
+ * key is set, matching the framework's no-implicit-defaults stance. The
  * route responds `200 {"status":"ok"}`, does **no I/O**, and is exempt
  * from maintenance mode (orchestrators must still reach it while the app
  * is down).
  *
- * Answers "is the process alive?" — a Kubernetes `livenessProbe`, whose
+ * Answers "is the process alive?", a Kubernetes `livenessProbe`, whose
  * failure means *restart the pod*. For "should this instance receive
  * traffic?" see `HttpHealthCheckConfig` below.
  */
@@ -38,11 +38,11 @@ export interface HttpLivenessConfig {
  * Present-but-empty (`{}`) enables it at the default `/health` path.
  *
  * Runs every registered health check and responds with the terse result
- * object — `200` if all passed, `failureStatus` (503) if any failed:
+ * object, `200` if all passed, `failureStatus` (503) if any failed:
  *
  *     {"core":{"cache":true,"database":true},"app":{"stripe":"Failed to connect"}}
  *
- * Answers "should this instance receive traffic?" — a Kubernetes
+ * Answers "should this instance receive traffic?", a Kubernetes
  * `readinessProbe`, whose failure means *drain it, leave it running*.
  *
  * Unlike `/up`, this route is **not** maintenance-exempt: a readiness
@@ -60,7 +60,7 @@ export interface HttpHealthCheckConfig {
   failureStatus?: number;
   /**
    * Shared secret that un-redacts failure messages in production, sent as
-   * the `X-Health-Secret` header — mirroring `X-Maintenance-Secret`, so an
+   * the `X-Health-Secret` header, mirroring `X-Maintenance-Secret`, so an
    * operator who has configured one already knows this.
    *
    * Deliberately header-only. The maintenance middleware also accepts its
@@ -76,7 +76,7 @@ export interface HttpHealthCheckConfig {
  *
  * Unlike CORS and the probe routes, this has **defaults and is on**. The
  * framework parses the body of every request eagerly, in a global pipe,
- * before any route or handler decision — so with no limit a single
+ * before any route or handler decision, so with no limit a single
  * unauthenticated `POST` of an arbitrarily large JSON document is a
  * memory-exhaustion DoS against any app, including on paths that do not
  * exist. "Opt in to not being trivially killable" is not a defensible
@@ -85,7 +85,7 @@ export interface HttpHealthCheckConfig {
 export interface HttpBodyLimitConfig {
   /**
    * Maximum size in bytes for a non-multipart body (JSON, urlencoded,
-   * text). Defaults to 1 MiB — comfortably above any realistic API
+   * text). Defaults to 1 MiB, comfortably above any realistic API
    * payload, far below anything that threatens a process.
    */
   maxBytes?: number;
@@ -136,7 +136,7 @@ export interface HttpConfig {
   /**
    * Request body size limits. Defaults apply when omitted; set
    * `{ maxBytes: 0 }` to disable the non-multipart limit entirely (not
-   * recommended — see `HttpBodyLimitConfig`).
+   * recommended. See `HttpBodyLimitConfig`).
    */
   bodyLimit?: HttpBodyLimitConfig;
   /**
@@ -150,7 +150,7 @@ export interface HttpConfig {
   liveness?: HttpLivenessConfig;
   /**
    * If set, a readiness route (default `GET /health`) running every
-   * registered health check is mounted — requires `@mahiframework/health`.
+   * registered health check is mounted, requires `@mahiframework/health`.
    */
   healthCheck?: HttpHealthCheckConfig;
   /**

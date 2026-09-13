@@ -4,7 +4,7 @@ import type { Job, JobClass } from "./job.js";
 import { encodeModels, decodeModels } from "./model-serialization.js";
 
 /**
- * A job's persisted state — a plain bag of the job instance's OWN
+ * A job's persisted state, a plain bag of the job instance's OWN
  * enumerable fields, with any `Model` field encoded to a `{ __model, __id }`
  * reference (see `model-serialization.ts`). This is what a durable driver
  * writes to `payload_json`; the job's class name is persisted separately
@@ -17,7 +17,7 @@ export type JobState = Record<string, unknown>;
  * encoding any live `Model` (including inside arrays/objects/`Collection`s)
  * to a compact `{ __model, __id }` reference. `maxAttempts` and methods
  * (which live on the prototype, not as own fields) are intentionally not
- * captured — they're restored from the class on rebuild.
+ * captured. They're restored from the class on rebuild.
  *
  * A no-op passthrough of the raw field bag when the database package's
  * `ModelRegistry` isn't bound (a queue-only app/test with no models),
@@ -41,7 +41,7 @@ export function encodeJob(app: Application, job: Job): JobState {
  * with the class's methods and prototype chain, then the decoded fields
  * (with `{ __model, __id }` references rehydrated back into live model
  * instances) are assigned onto it. Matches Laravel's queued-object
- * unserialization — the constructor ran once at dispatch, and its side
+ * unserialization, the constructor ran once at dispatch, and its side
  * effects must not run again on the worker.
  *
  * `maxAttempts` is not part of the persisted state; the prototype's value

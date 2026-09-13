@@ -3,7 +3,7 @@
  *
  * ## Half-open by default, and why that matters
  *
- * An `Interval` is `[start, end)` — the start is included, the end is not.
+ * An `Interval` is `[start, end)`. The start is included, the end is not.
  * This is not an arbitrary preference:
  *
  * - Adjacent intervals tile without overlapping. `[09:00, 10:00)` and
@@ -18,7 +18,7 @@
  * millisecond somewhere, and that subtraction is eventually forgotten.
  * `contains` therefore excludes the end; `Interval.closed()` exists for the
  * cases where an inclusive end genuinely is what's meant, and it works by
- * extending the end by one millisecond — the same fudge, but done once, here,
+ * extending the end by one millisecond, the same fudge, but done once, here,
  * where it is documented.
  *
  * ## Zones

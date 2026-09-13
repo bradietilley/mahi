@@ -7,7 +7,7 @@ import * as dimensions from "./terminal/dimensions.js";
  * Module-level indirection point every feature (`note`, `table`,
  * `ask`, `select`, `progress`, `spinner`) resolves `output`/the key
  * source/terminal dimensions/interactivity through, instead of
- * constructing `NodeOutput`/`RawTerminal` directly inline — mirrors
+ * constructing `NodeOutput`/`RawTerminal` directly inline, mirrors
  * PHP's `static Prompt::$output`/`$terminal`. `Tui.fake()` swaps these
  * out; without this indirection `fake()` would have nothing to
  * intercept.
@@ -51,7 +51,7 @@ export function isInteractive(): boolean {
 
 /**
  * Invoked when Ctrl+C cancels an interactive prompt. Defaults to
- * `process.exit(130)` (matching PHP's `Terminal::exit()`) — `Tui.fake()` swaps this to
+ * `process.exit(130)` (matching PHP's `Terminal::exit()`), `Tui.fake()` swaps this to
  * a no-op so simulated Ctrl+C presses don't kill the test process,
  * matching PHP's `FakesInputOutput` mocking `Terminal::exit()`.
  */

@@ -6,7 +6,7 @@ import { Command } from "../command.js";
 import { FileExistsError } from "./make/scaffold.js";
 
 /**
- * The primary-key column a scaffolded `create` migration should emit — kept
+ * The primary-key column a scaffolded `create` migration should emit, kept
  * in lockstep with the model/factory `make:model` writes, so a
  * `make:model -m` never produces a `bigint` auto-increment column against a
  * client-generated string key (or vice versa). See `make-model.ts`.
@@ -47,8 +47,8 @@ interface Plan {
  * - anything else             → an empty stub (both `up`/`down` commented)
  *
  * Explicit `--create=<table>` / `--table=<table>` override the name entirely.
- * The previous behaviour — always `Schema.create` with a literal `"..."`
- * table when the name did not match `create_*_table` — produced
+ * The previous behaviour, always `Schema.create` with a literal `"..."`
+ * table when the name did not match `create_*_table`, produced
  * `create table ""."" (…)`, which Kysely parses as a schema-qualified name
  * and the database rejects, aborting the whole `migrate` run.
  */

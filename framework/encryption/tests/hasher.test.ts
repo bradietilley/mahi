@@ -79,8 +79,8 @@ describe("Hasher", () => {
 
   it("needsRehash() flags a hash made with a different argon2 variant", async () => {
     // The library's own needsRehash() compares only version/memory/time,
-    // so an argon2i hash — the GPU-weak variant `make()` pins argon2id
-    // specifically to avoid — reports "fine" and check() keeps accepting
+    // so an argon2i hash, the GPU-weak variant `make()` pins argon2id
+    // specifically to avoid, reports "fine" and check() keeps accepting
     // it forever. A silent downgrade that survives every login.
     const argon2i = await argon2.hash("password", { type: argon2.argon2i });
 

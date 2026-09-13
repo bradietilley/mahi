@@ -11,21 +11,21 @@ import type { Blueprint } from "../../src/schema/blueprint.js";
  * The builder used to pass values straight through to `QueryBuilder`, so a
  * `boolean`-cast column bound `true` rather than `1` and a JSON column
  * bound a live JS object. `EloquentBuilder.castBinding()` now closes that,
- * and this file is the multi-engine proof — the SQLite-only suites cannot
+ * and this file is the multi-engine proof. The SQLite-only suites cannot
  * see this bug class, because SQLite coerces at the driver boundary and
  * finds the row whether or not the cast ran.
  *
  * The shape of most tests is the same on purpose: write a row through the
  * model (so the write path casts), then find it through a *binding* (so the
  * read path must cast identically). A mismatch means zero rows, which is
- * the production symptom — a silently empty result, not an error.
+ * the production symptom, a silently empty result, not an error.
  *
  * **There are two layers here, and the tests distinguish them.** Deleting
  * `castBinding()`'s body fails 14 of these, but the boolean and `DateTime`
  * `where()` cases keep passing, because `QueryBuilder.normalize()` →
  * `normalizeBinding()` independently converts `DateTime`/`Date`/`bigint`
  * and models-with-keys per dialect. So temporal bindings have a second,
- * dialect-aware safety net and JSON/array/decimal/enum do not — those are
+ * dialect-aware safety net and JSON/array/decimal/enum do not. Those are
  * carried by the cast layer alone, which is why they are the ones that
  * break. Worth knowing before "simplifying" either layer: neither is
  * redundant, and their coverage only partly overlaps.
@@ -213,7 +213,7 @@ for (const engine of ENGINES) {
       it("serialises an object and an array into the binding", async () => {
         // The cast's whole job: the value must reach the driver as text,
         // not as a JS object. Asserted on the compiled SQL because whether
-        // the query then MATCHES is an engine-specific question — see the
+        // the query then MATCHES is an engine-specific question. See the
         // next test.
         expect(Widget.query().where("meta", "=", { colour: "red" }).getBindings()).toEqual([
           '{"colour":"red"}',

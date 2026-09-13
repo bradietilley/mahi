@@ -1,7 +1,7 @@
 import type { Readable, Writable } from "node:stream";
 
 /**
- * Any byte source `putStream()` can drain onto the disk — a Node
+ * Any byte source `putStream()` can drain onto the disk, a Node
  * `Readable`, a web `ReadableStream` (e.g. `new Response("x").body` or a
  * `fetch` body), or any async iterable of chunks.
  */
@@ -25,18 +25,18 @@ export interface StorageDriver {
   /**
    * A client-facing URL for this file. A local disk with a configured
    * `url` prefix (the Laravel "public" disk) returns that prefix plus
-   * the relative path; a private disk (no `url` configured) **throws** —
+   * the relative path; a private disk (no `url` configured) **throws**,
    * matching Laravel, whose `Storage::url()` raises
    * `"This driver does not support retrieving URLs"` for such a disk.
-   * Reach for `path()` when you
+   * Use `path()` when you
    * actually want the on-disk location. `servePublicDisk()` is the
-   * matching HTTP handler for the prefix case — Node can serve the
+   * matching HTTP handler for the prefix case. Node can serve the
    * storage root directly, so there is no `storage:link` symlink step.
    */
   url(path: string): string;
   /**
    * The absolute on-disk location of `path`, for server-side use
-   * (passing to another process, streaming, etc.) — Laravel's
+   * (passing to another process, streaming, etc.), Laravel's
    * `Storage::path()`. Only meaningful for filesystem-backed disks; a
    * future remote driver (S3, etc.) would throw here.
    */
@@ -76,7 +76,7 @@ export interface StorageDriver {
   writeStream(path: string, options?: { flags?: "w" | "a" }): Promise<Writable>;
   /**
    * Drain any `Readable` / web `ReadableStream` / async iterable onto the
-   * disk — Laravel's `put($path, $resource)`. Atomic like `writeStream`.
+   * disk, Laravel's `put($path, $resource)`. Atomic like `writeStream`.
    */
   putStream(path: string, source: StreamSource): Promise<void>;
 

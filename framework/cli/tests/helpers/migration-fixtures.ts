@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
  * The migration files these tests write out `import { Schema } from
  * "@mahiframework/database"`, and `MigrationRunner.discover()` loads them
  * with a bare dynamic `import()`. That's resolved by **Node**, against
- * the importing file's own location — so a migration sitting in
+ * the importing file's own location, so a migration sitting in
  * `/var/folders/.../T/` has no `node_modules` anywhere up its parent
  * chain and the bare specifier fails with `Cannot find package
  * '@mahiframework/database'`.

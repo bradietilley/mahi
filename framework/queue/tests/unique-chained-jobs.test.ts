@@ -13,7 +13,7 @@ import type { PushOptions, QueueDriver, QueuedJob } from "../src/queue-driver.js
 
 /**
  * Uniqueness applies to each link of a chain independently, but only the
- * *head* of a chain goes through `QueueManager.dispatch()` — every tail
+ * *head* of a chain goes through `QueueManager.dispatch()`. Every tail
  * link is pushed by whoever advances the chain. Those paths used to skip
  * `acquireUniqueLock()` entirely, so a `ShouldBeUnique` job enqueued as a
  * tail link could duplicate one already queued.
@@ -67,7 +67,7 @@ async function holdLockFor(store: CacheStore, registryName: string, job: Job): P
   await lock.acquire();
 }
 
-/** Plays back pre-seeded jobs and records pushes — the chain-advance probe. */
+/** Plays back pre-seeded jobs and records pushes, the chain-advance probe. */
 class RecordingDriver implements QueueDriver {
   pushed: Array<{ jobClass: string; state: JobState; options?: PushOptions }> = [];
   deleted: QueuedJob[] = [];
@@ -94,7 +94,7 @@ beforeEach(() => {
   runs.length = 0;
 });
 
-describe("chained unique jobs — durable worker advance", () => {
+describe("chained unique jobs: durable worker advance", () => {
   function workerFor(
     store: CacheStore,
     chain: QueuedJob["chain"],
@@ -191,7 +191,7 @@ describe("chained unique jobs — durable worker advance", () => {
   });
 });
 
-describe("chained unique jobs — sync driver advance", () => {
+describe("chained unique jobs: sync driver advance", () => {
   it("drops a chained link whose unique lock is already held", async () => {
     const store = new ArrayCacheStore({ sweepIntervalSeconds: 0 });
     await holdLockFor(store, "unique-step", new UniqueStepJob("b"));
@@ -210,7 +210,7 @@ describe("chained unique jobs — sync driver advance", () => {
       },
     );
 
-    // "b" was dropped, and "c" rode behind it — the same all-or-nothing
+    // "b" was dropped, and "c" rode behind it, the same all-or-nothing
     // the durable worker has, since the remainder travels on that push.
     expect(runs).toEqual(["plain:a"]);
   });

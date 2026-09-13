@@ -28,7 +28,7 @@ function appWith(registry: JobRegistry): Application {
   return app;
 }
 
-describe("job chaining — sync driver", () => {
+describe("job chaining: sync driver", () => {
   it("runs every link inline, in order", async () => {
     order.length = 0;
     const registry = new JobRegistry();
@@ -51,7 +51,7 @@ describe("job chaining — sync driver", () => {
   });
 });
 
-describe("job chaining — fake driver", () => {
+describe("job chaining: fake driver", () => {
   it("records the chain attached to the pushed job", async () => {
     const driver = new FakeQueueDriver();
     await driver.push(
@@ -121,7 +121,7 @@ class RecordingDriver implements QueueDriver {
   async fail(): Promise<void> {}
 }
 
-describe("job chaining — worker advances the chain on success", () => {
+describe("job chaining: worker advances the chain on success", () => {
   it("dispatches the next link (carrying the remainder) after a job succeeds", async () => {
     order.length = 0;
     const registry = new JobRegistry();

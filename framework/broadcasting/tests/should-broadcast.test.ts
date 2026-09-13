@@ -181,7 +181,7 @@ describe("BroadcastServiceProvider wiring", () => {
 
     await app.make<EventDispatcher>(EVENTS_TOKEN).dispatch(new DeferredBroadcastEvent());
 
-    // Not broadcast yet — held for the commit.
+    // Not broadcast yet, held for the commit.
     await new Promise((r) => setTimeout(r, 10));
     expect(driver.messages).toEqual([]);
 
@@ -225,7 +225,7 @@ describe("BroadcastServiceProvider wiring", () => {
     });
   });
 
-  it("does not broadcast — and does not throw — for an event without the marker interface", async () => {
+  it("does not broadcast (and does not throw) for an event without the marker interface", async () => {
     const driver = new RecordingDriver();
     const app = await bootApp(driver);
 

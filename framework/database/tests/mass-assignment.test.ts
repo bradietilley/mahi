@@ -13,7 +13,7 @@ interface WidgetAttributes {
 
 type WidgetTable = WidgetAttributes;
 
-/** Default posture: no `fillable`/`guarded` — everything is mass-assignable. */
+/** Default posture: no `fillable`/`guarded`. Everything is mass-assignable. */
 class OpenWidget extends Model<WidgetAttributes>()({
   table: "widgets",
   primaryKey: "id",
@@ -74,7 +74,7 @@ describe("Mass-assignment protection", () => {
 
   it("a non-empty fillable allow-list drops keys not on it", async () => {
     await FillableWidget.create({ id: "1", name: "Sprocket", role: "admin" });
-    // role wasn't fillable, so it was never inserted — the DB default wins.
+    // role wasn't fillable, so it was never inserted, the DB default wins.
     const stored = await FillableWidget.find("1");
     expect(stored!.name).toBe("Sprocket");
     expect(stored!.role).toBe("user");

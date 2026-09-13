@@ -4,18 +4,18 @@
  * ## Why three buckets and not one number
  *
  * "One month" is not a number of milliseconds. Neither, strictly, is "one
- * day" — across a daylight-saving transition a day is 23 or 25 hours. A
+ * day", across a daylight-saving transition a day is 23 or 25 hours. A
  * `Duration` therefore keeps three independent buckets and never silently
  * collapses them:
  *
- * - `months` — calendar-relative. One month means "the same day-of-month next
+ * - `months`, calendar-relative. One month means "the same day-of-month next
  *   month", clamped at short months. Its length in milliseconds is unknowable
  *   without a starting date.
- * - `days` — calendar-relative *when applied to a zoned `DateTime`* (the wall
+ * - `days`, calendar-relative *when applied to a zoned `DateTime`* (the wall
  *   clock is preserved across DST), but treated as exactly 24 hours by the
  *   `total*` accessors, since that is what "how many hours is 2 days" means
  *   to everybody asking the question.
- * - `milliseconds` — exact. Never depends on a calendar or a zone.
+ * - `milliseconds`, exact. Never depends on a calendar or a zone.
  *
  * Years and quarters are stored as months (×12 and ×3); weeks are stored as
  * days (×7). Those conversions are exact by definition, unlike months→days.
@@ -25,7 +25,7 @@
  * `Duration.months(1).totalDays` throws, because there is no honest answer.
  * `Duration.days(2).totalHours` is `48`. `DateTime.add(Duration.days(1))`
  * across a spring-forward advances the wall clock by a day and the instant by
- * 23 hours — those are both correct, and they are different questions.
+ * 23 hours. Those are both correct, and they are different questions.
  */
 
 import { InvalidDurationError } from "./errors.js";
@@ -205,7 +205,7 @@ export class Duration {
    *
    * Note this negates each bucket independently, so a mixed-sign duration
    * such as "+1 month, −3 days" becomes "+1 month, +3 days" rather than
-   * being normalised — normalising would require a reference date.
+   * being normalised. Normalising would require a reference date.
    */
   absolute(): Duration {
     return new Duration(Math.abs(this.months), Math.abs(this.days), Math.abs(this.milliseconds));

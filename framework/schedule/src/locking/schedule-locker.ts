@@ -1,6 +1,6 @@
 /**
  * What `withoutOverlapping()` needs from a lock: take it if free, release
- * it afterwards. Deliberately narrower than a general mutex — there is no
+ * it afterwards. Deliberately narrower than a general mutex. There is no
  * "wait until available", because a scheduled task that is already running
  * should be *skipped* this tick, not queued up behind itself.
  *
@@ -19,7 +19,7 @@ export interface ScheduleLocker {
    * `false` when it is already held by a live holder.
    *
    * `expiresAfterMs` bounds how long the lock survives if it is never
-   * released — a crashed process must not block its task forever. Every
+   * released. A crashed process must not block its task forever. Every
    * implementation must make this atomic with respect to other processes
    * sharing the same backing store; a check-then-set does not qualify.
    */

@@ -8,8 +8,8 @@
  * which live in core's `well-known-tokens.ts` precisely so a package can
  * resolve a service across a boundary without a compile-time edge to it.
  * Importing the real manager types here would reinstate exactly the edge
- * the tokens exist to avoid, and would make `@mahiframework/health` — and
- * therefore `./artisan health` — unusable in an app that hasn't installed
+ * the tokens exist to avoid, and would make `@mahiframework/health`, and
+ * therefore `./artisan health`, unusable in an app that hasn't installed
  * all three.
  *
  * These describe only the handful of members the checks call. They are
@@ -35,7 +35,7 @@ export interface CacheManagerLike {
  * The slice of Kysely `databaseCheck` uses.
  *
  * `selectNoFrom` rather than the `sql` tagged template so this package
- * needs no `kysely` import at all — the compiled statement is the same
+ * needs no `kysely` import at all. The compiled statement is the same
  * trivial `select 1`.
  */
 export interface KyselyLike {

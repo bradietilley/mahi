@@ -27,7 +27,7 @@ export class Application extends Container {
 ```
 
 Those three are plain `readonly` fields, initialized when the object is
-constructed. They are **available before any provider runs** — before
+constructed. They are **available before any provider runs**, before
 `bootstrap()`, before `register()`, before anything is bound. That's
 deliberate: config has to be writable before providers read it, and
 logging has to work during boot, including when boot is what failed.
@@ -41,7 +41,7 @@ logging has to work during boot, including when boot is what failed.
 `app.logger` is the zero-config fallback and is not the same thing as the
 configurable `LogManager` bound at `LOG_TOKEN` by
 `LoggingServiceProvider`. Wiring `app.logger` through the container would
-create a bootstrap-ordering hazard — logging that happens before the
+create a bootstrap-ordering hazard, logging that happens before the
 logging provider registers would have nothing to write to. Instead there
 are two: an always-available `ConsoleLogger` on the field, and an opt-in
 multi-channel `LogManager` in the container. See [Logging](../logging/).
@@ -60,7 +60,7 @@ fallback logger renders full lines:
 The whole sequence, in order:
 
 1. **Guard.** If already booted, return immediately. If a bootstrap is
-   already *in flight*, return that same promise — see below.
+   already *in flight*, return that same promise. See below.
 2. **Set the global.** `setCurrentApp(this)` populates the `app()` helper
    and therefore every facade, **before** any provider runs.
 3. **Instantiate.** Every queued provider class is constructed with the
@@ -79,8 +79,8 @@ onto the kernel that `HttpServiceProvider.boot()` built, and
 `AuthServiceProvider` needs the database connection that
 `DatabaseServiceProvider.boot()` opened.
 
-**Step 2 comes first**, which is what makes `app()` — and every facade
-built on it (`Log`, `Events`, `Context`) — usable inside `register()` and
+**Step 2 comes first**, which is what makes `app()`, and every facade
+built on it (`Log`, `Events`, `Context`), usable inside `register()` and
 `boot()`. Laravel binds its container globally ahead of provider
 registration for the same reason. Constructor injection is still the
 better choice inside a provider (you already have `this.app`), but a
@@ -88,19 +88,19 @@ helper called from a provider no longer has to thread the app through.
 
 | Method | Returns |
 |---|---|
-| `register(providerClass)` | `void` — queues a class for instantiation |
-| `bootstrap()` | `Promise<void>` — runs the full lifecycle once |
+| `register(providerClass)` | `void`: queues a class for instantiation |
+| `bootstrap()` | `Promise<void>`: runs the full lifecycle once |
 | `isBooted()` | `boolean` |
-| `getProviders()` | `readonly ServiceProvider[]` — empty before bootstrap |
-| `terminating(cb)` | `this` — queue a shutdown callback |
-| `terminate()` | `Promise<void>` — run the shutdown sequence once |
+| `getProviders()` | `readonly ServiceProvider[]`: empty before bootstrap |
+| `terminating(cb)` | `this`: queue a shutdown callback |
+| `terminate()` | `Promise<void>`: run the shutdown sequence once |
 | `isTerminated()` | `boolean` |
 
 ### Concurrent and failed bootstraps
 
 `booted` only becomes true once the *last* provider has booted, so two
 callers racing into `bootstrap()` would both clear a naive
-`if (this.booted) return` guard and boot every provider twice —
+`if (this.booted) return` guard and boot every provider twice,
 double-binding singletons, mounting routes twice, opening two pools.
 Concurrent calls share the same in-flight run instead:
 
@@ -135,7 +135,7 @@ register(providerClass: ServiceProviderClass): void {
 }
 ```
 
-It takes a **class**, not an instance — construction happens inside
+It takes a **class**, not an instance. Construction happens inside
 `bootstrap()`. `ServiceProviderClass` is `new (app: Application) => ServiceProvider`.
 
 The base app registers from an exported array:
@@ -154,7 +154,7 @@ was registered before bootstrap.
 
 **`getProviders()` is empty before `bootstrap()`.** `providers` is only
 populated at step 2. This is why every hook collector in the framework
-runs from a `boot()` hook or later — `HttpKernel.collectFromProviders()`
+runs from a `boot()` hook or later. `HttpKernel.collectFromProviders()`
 is called from `HttpServiceProvider.boot()`, and
 `ConsoleKernel.collectFromProviders()` is called from `bin/console.ts`
 after `bootstrap()` resolves.
@@ -167,8 +167,8 @@ private environmentName: string = process.env.NODE_ENV ?? "production";
 
 **The default is `"production"`, not `"development"`.** This is a
 fail-safe. An unknown environment is treated as production, so anything
-gated on `isProduction()` — safety checks, confirmation prompts, stricter
-cookie flags — defaults to *on* rather than off. Getting production
+gated on `isProduction()`, safety checks, confirmation prompts, stricter
+cookie flags, defaults to *on* rather than off. Getting production
 behaviour in development is an annoyance; getting development behaviour in
 production is an incident. Laravel makes the same choice with `APP_ENV`.
 
@@ -192,7 +192,7 @@ app.environment("staging", "testing");   // false
 ### Pin it from your validated schema
 
 The constructor reads `process.env.NODE_ENV` raw. If your app validates
-its environment through a schema — and the base app does — call
+its environment through a schema, and the base app does, call
 `useEnvironment()` with the validated value right after construction:
 
 ```ts
@@ -203,8 +203,8 @@ app.useEnvironment(env.NODE_ENV);
 ```
 
 Now `environment()`, `isLocal()`, and `isProduction()` reflect the same
-value everything else in the app validated against — including any
-`.default()` the schema applied — rather than an unvalidated
+value everything else in the app validated against, including any
+`.default()` the schema applied, rather than an unvalidated
 `process.env` read. The base app's schema declares
 `NODE_ENV: z.enum(["development", "test", "production"]).default("development")`,
 so a missing `NODE_ENV` yields `"development"` there while the
@@ -213,7 +213,7 @@ so a missing `NODE_ENV` yields `"development"` there while the
 [Configuration](../configuration/#the-environment-schema).
 
 Note that `isLocal()` checks for exactly `"local"`, and the base app's
-schema doesn't include that value — it uses `"development"`. If you want
+schema doesn't include that value. It uses `"development"`. If you want
 `isLocal()` to mean anything, add `"local"` to your schema.
 `environment("development")` works regardless.
 
@@ -290,7 +290,7 @@ to `"test"` before calling it, then runs every migration.
 ### Why one bootstrap function matters
 
 The entrypoint-specific part of each file above is two or three lines. The
-wiring — environment validation, config, provider list, boot — is shared
+wiring, environment validation, config, provider list, boot, is shared
 verbatim.
 
 This is what makes `./artisan route:list` show the routes your server will
@@ -334,7 +334,7 @@ await app.bootstrap();
 await listenHttpServer(app, { port: 8000 });
 ```
 
-Config must be set before `bootstrap()` — providers read it in
+Config must be set before `bootstrap()`. Providers read it in
 `register()` and in factories resolved during `boot()`.
 
 ## Termination
@@ -344,7 +344,7 @@ boot, and it exists because of one fact about Node:
 
 **An open connection keeps the event loop alive.** A process holding a
 MySQL pool, a Postgres pool, or an ioredis socket does not exit when its
-work is done — it sits there until something kills it. `mahi migrate`
+work is done. It sits there until something kills it. `mahi migrate`
 against MySQL never exited at all. A `schedule:run` cron entry with
 `CACHE_STORE=redis` left a zombie process behind every minute.
 
@@ -366,7 +366,7 @@ and a failure is logged rather than thrown. The process is going down
 regardless, and one broken teardown must not strand a database pool that
 the next hook would have closed. `terminate()` therefore never rejects.
 
-It is also **idempotent** — a second call does nothing — so a signal
+It is also **idempotent**, a second call does nothing, so a signal
 handler and an entrypoint's own `finally` can both call it. There is no
 un-terminate: an application that has been terminated should be
 discarded, not reused.
@@ -381,8 +381,8 @@ app.terminating(async () => {
 });
 ```
 
-LIFO ordering means a callback registered later — and therefore
-potentially depending on what an earlier one set up — unwinds first.
+LIFO ordering means a callback registered later, and therefore
+potentially depending on what an earlier one set up, unwinds first.
 Returns `this` for chaining.
 
 ### The shutdown() provider hook
@@ -415,11 +415,11 @@ The framework's own providers implement it:
 
 | Provider | `shutdown()` does |
 |---|---|
-| `DatabaseServiceProvider` | `disconnect()` every **resolved** connection — closes MySQL/Postgres pools and the sqlite handle |
+| `DatabaseServiceProvider` | `disconnect()` every **resolved** connection, closes MySQL/Postgres pools and the sqlite handle |
 | `RedisServiceProvider` | Stop the broadcast subscriber, then `quit()` every resolved connection |
 
 "Resolved" matters here. Shutdown walks the drivers a manager actually
-built, never the *configured* list — resolving a connection in order to
+built, never the *configured* list, resolving a connection in order to
 close it would construct a pool during shutdown, opening connections in
 order to close them.
 
@@ -429,7 +429,7 @@ You mostly don't have to; every entrypoint the framework ships does it:
 
 | Entrypoint | Where |
 |---|---|
-| `ConsoleKernel.run()` | A `finally`, so every command — including one that threw — terminates. Opt out with `new ConsoleKernel(app, { terminate: false })`. |
+| `ConsoleKernel.run()` | A `finally`, so every command, including one that threw, terminates. Opt out with `new ConsoleKernel(app, { terminate: false })`. |
 | `artisan serve` | After the listener closes. |
 | `bin/server.ts` (scaffolded) | A `SIGINT`/`SIGTERM` handler: `listening.close()` then `app.terminate()`. |
 | `createTestApplication().cleanup()` | Before deleting the temp database directory. |
@@ -450,14 +450,14 @@ idle keep-alive sockets are dropped, in-flight requests get
 `drainTimeoutMs` to finish, and anything still open is destroyed.
 
 The websocket step is not an optimization. `server.close()` waits for
-open connections to end, and an upgraded websocket never ends on its own
-— so a server with one connected client hangs forever. That is the
+open connections to end, and an upgraded websocket never ends on its own,
+so a server with one connected client hangs forever. That is the
 "SIGTERM and the process appears to shut down, then sits until it is
 SIGKILLed" symptom.
 
 Cutting a request off at the end of the drain window is deliberate. The
 alternative is not "the request completes", it is "the orchestrator
-SIGKILLs the process" — which cuts it off anyway *and* skips every
+SIGKILLs the process", which cuts it off anyway *and* skips every
 remaining shutdown hook.
 
 `close()` is idempotent and concurrent calls share one close, so a signal
@@ -480,7 +480,7 @@ looks like nothing at all.
 the throw persist on the container, and the global *is* set (it is set
 first, so that `app()` works during boot). A retry resumes rather than
 restarting, but recovering a half-booted application is still rarely the
-right call — usually you want to crash.
+right call, usually you want to crash.
 
 **`terminate()` never throws.** A failing `shutdown()` is logged, not
 raised. If you need to know whether teardown succeeded, check for
@@ -502,8 +502,8 @@ provider's registration. Put I/O in `boot()`.
 
 ## Related
 
-- [Service providers](../providers/) — what runs during register and boot
-- [Service container](../container/) — what `bootstrap()` populates
-- [Configuration](../configuration/) — `loadEnv`, config namespaces
-- [Testing](../testing/) — `createTestApplication(bootstrap)`
-- [Deployment](../deployment/) — running `bin/server.ts` in production
+- [Service providers](../providers/): what runs during register and boot
+- [Service container](../container/): what `bootstrap()` populates
+- [Configuration](../configuration/): `loadEnv`, config namespaces
+- [Testing](../testing/): `createTestApplication(bootstrap)`
+- [Deployment](../deployment/): running `bin/server.ts` in production

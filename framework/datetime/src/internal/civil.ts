@@ -1,7 +1,7 @@
 /**
  * "Civil time" is a wall-clock reading with no zone attached. Internally we
  * encode one as a number of milliseconds, using the UTC timeline purely as a
- * convenient integer encoding of `(year, month, day, hour, ...)` — a civil
+ * convenient integer encoding of `(year, month, day, hour, ...)`, a civil
  * millisecond value is **not** an instant and must never be handed to
  * anything that expects one.
  *

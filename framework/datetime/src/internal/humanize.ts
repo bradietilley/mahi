@@ -15,7 +15,7 @@
  *
  * The cost is that `Intl` only exposes the *now*-relative frames ("3 days
  * ago", "in 3 days") and not Carbon's two-date frames ("3 days before").
- * That deviation is documented rather than papered over — see
+ * That deviation is documented rather than papered over. See
  * `HumanizeOptions.syntax`.
  *
  * ## Composition for multi-unit output
@@ -167,7 +167,7 @@ function framedSingle(
   return relativeFormatter(locale, style, "always").format(signedValue, unit);
 }
 
-/** The locale's word for "no meaningful time has passed" — `"now"`, `"ahora"`. */
+/** The locale's word for "no meaningful time has passed": `"now"`, `"ahora"`. */
 function nowPhrase(locale: LocaleIdentifier, style: Style, unit: HumanUnit): string {
   // `numeric: "auto"` is what turns `0 second` into the idiomatic phrase
   // rather than a literal "in 0 seconds".
@@ -216,7 +216,7 @@ function deriveFrame(
  *
  * This is not fussiness. `Intl.NumberFormat` separates a French quantity from
  * its unit with U+00A0, while `Intl.RelativeTimeFormat` uses an ordinary
- * space in the same position — so a plain `indexOf` reports "no match" for
+ * space in the same position, so a plain `indexOf` reports "no match" for
  * `"2 jours"` inside `"il y a 2 jours"` and every non-English locale silently
  * loses multi-part output.
  */

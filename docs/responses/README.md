@@ -12,7 +12,7 @@ return HttpResponse.json({ ok: true });        // framework builder
 return Response.json({ ok: true });            // platform Response
 ```
 
-`toWebResponse(value)` normalizes at the Hono boundary — framework
+`toWebResponse(value)` normalizes at the Hono boundary, framework
 responses go through `toWeb()`, anything else passes through untouched.
 
 ## Why `HttpResponse` is not a `Response`
@@ -20,11 +20,11 @@ responses go through `toWeb()`, anything else passes through untouched.
 The platform `Response` has an **immutable body**: once constructed you
 cannot change it. Middleware that wants to rewrite a payload on the way out,
 or a handler that builds a response incrementally, can't. So `HttpResponse`
-is a *builder* — mutable content, fluent status and headers, converted to a
+is a *builder*, mutable content, fluent status and headers, converted to a
 real `Response` exactly once at the edge.
 
 `headers` is a real `Headers` instance and stays mutable throughout, so
-egress middleware can keep doing `response.headers.set(…)` — which is what
+egress middleware can keep doing `response.headers.set(…)`. Which is what
 `throttle()` does to attach its rate-limit headers after the handler runs.
 
 Laravel makes the same split with `Illuminate\Http\Response`.
@@ -92,7 +92,7 @@ new JsonResponse(data: unknown, status = 200, headers = {})
 ```
 
 Holds the payload **un-serialized**, Laravel's `JsonResponse::getData()`.
-So `getJson()` returns the object, not a string — which is what makes
+So `getJson()` returns the object, not a string. Which is what makes
 response assertions in tests readable.
 
 | Method | Effect |
@@ -101,7 +101,7 @@ response assertions in tests readable.
 | `getJson<T>()` | Read the payload |
 
 `toWeb()` serializes via `Response.json()`, then merges any custom or
-middleware-set headers **over** the JSON defaults — so setting
+middleware-set headers **over** the JSON defaults, so setting
 `Content-Type` explicitly wins.
 
 ```ts
@@ -135,7 +135,7 @@ return HttpResponse.redirect(URL.route("posts.show", { post: post.id }), 303);
 new FileResponse(source: FileSource, status = 200, headers = {})
 ```
 
-`FileSource` is `string | File | Blob | Uint8Array` — a filesystem path, a
+`FileSource` is `string | File | Blob | Uint8Array`, a filesystem path, a
 Web `File`/`Blob` (what `Request` parses inbound), or a raw byte buffer.
 
 > **`FileResponse` is buffered, not streaming.** `toWeb()` reads the entire
@@ -193,7 +193,7 @@ Anything else is `application/octet-stream`.
 ### `download()` default filename
 
 With no argument: `basename(path)` for a path source, `file.name` for a
-`File`, and for a `Blob`/`Uint8Array` there's nothing to derive — the header
+`File`, and for a `Blob`/`Uint8Array` there's nothing to derive. The header
 becomes a bare `attachment`.
 
 ### `download()` filename encoding
@@ -218,7 +218,7 @@ HttpResponse.file(f).download('evil".pdf');
 
 The unlink fires **immediately after the bytes are read into memory**, not
 after they're flushed to the client. Since the read is a full buffer, the
-data is safe — but the file is gone before the response is written, so
+data is safe, but the file is gone before the response is written, so
 don't rely on it existing for anything else. It's a no-op for `Blob` and
 `Uint8Array` sources (nothing on disk to remove), errors are swallowed
 (the file may already be gone), and it is fire-and-forget.
@@ -255,7 +255,7 @@ if (existing) throw HttpError.badRequest("You already liked this post.");
 **401 vs 403.** `unauthorized()` means "we don't know who you are";
 authenticating differently could fix it. `forbidden()` means "we know who
 you are and you may not do this"; no credential change will help. Use the
-right one — clients branch on it.
+right one, clients branch on it.
 
 ## Error handling
 
@@ -278,7 +278,7 @@ The predicate should be a type guard so the renderer receives the error
 already typed. The renderer also gets the Hono `Context`, for the rare case
 that needs request data.
 
-This is the extension point for errors whose throw site you don't control —
+This is the extension point for errors whose throw site you don't control,
 a third-party library's constraint violation that would otherwise fall
 through to a generic 500. Registration is explicit and app-driven; there is
 no auto-discovery. Typically done in a provider's `boot()`:
@@ -299,12 +299,12 @@ export class AppServiceProvider extends ServiceProvider {
 ```
 
 Status is `err.status`. `details` is whatever was passed to the
-constructor — `undefined` when omitted, which `JSON.stringify` drops, so
+constructor, `undefined` when omitted, which `JSON.stringify` drops, so
 the wire body is just `{"message":"Post not found."}`.
 
 An `HttpError` may also carry response **headers**, which the handler
 merges onto the response. Several statuses are defined by a header rather
-than merely allowed one — a 401 without `WWW-Authenticate`, a 405 without
+than merely allowed one, a 401 without `WWW-Authenticate`, a 405 without
 `Allow`, a 429 without `Retry-After` are all incomplete per RFC 9110:
 
 ```ts
@@ -329,12 +329,12 @@ Status `422`:
 }
 ```
 
-`errors` is always `Record<string, string[]>`. Nested fields use dotted keys
-— see [validation](../validation/#nested-rules).
+`errors` is always `Record<string, string[]>`. Nested fields use dotted keys.
+See [validation](../validation/#nested-rules).
 
 ### 4. Hono's `HTTPException`
 
-Raised by Hono's own built-in middleware — most often the request
+Raised by Hono's own built-in middleware, most often the request
 body limit, which raises a `413`. Rendered into the same envelope with
 its own status, rather than being swallowed into a generic 500 that
 blames the server for the client's oversize upload.
@@ -356,7 +356,7 @@ value. The full error and stack are always in the log either way.
 
 `staging` and `test` get the production body. `development` is included
 alongside `local` because nothing in this framework's tooling produces
-`"local"` — `Application` seeds its environment from `NODE_ENV`, and the
+`"local"`, `Application` seeds its environment from `NODE_ENV`, and the
 scaffolded `config/env.ts` constrains that to
 `development | test | production`, so a strict `isLocal()` check meant
 the developer-facing branch was unreachable in every generated app.
@@ -378,7 +378,7 @@ never has to handle two different error shapes. See
 
 A `Resource` wraps one model row and declares the API-facing shape
 explicitly, decoupled from the database row shape. Laravel's
-`JsonResource` — but a plain class, not a decorator or a magic
+`JsonResource`, but a plain class, not a decorator or a magic
 serialization layer. Every subclass writes its own `toJson()`.
 
 ```ts
@@ -402,7 +402,7 @@ return HttpResponse.json(await UserResource.collection(rows));
 Generate one with `./artisan make:resource`.
 
 `Resource<TModel, TShape>` takes the input model type and the output shape.
-`this.model` is `protected`. `toJson()` may be sync or async — a resource
+`this.model` is `protected`. `toJson()` may be sync or async. A resource
 that needs to `await` something (a per-row gate check, say) declares
 `async toJson()`, and callers `await` it.
 
@@ -428,14 +428,14 @@ static collection<TModel, TShape>(models: TModel[]): Promise<TShape[]>
 ```
 
 Maps an array through the resource, resolving in parallel via
-`Promise.all`. Always returns a promise, even for a sync `toJson()` — so
+`Promise.all`. Always returns a promise, even for a sync `toJson()`, so
 always `await` it.
 
 ### Conditional fields
 
 All four helpers rely on one trick: **a field whose value is `undefined`
 disappears from the JSON entirely**, because `JSON.stringify` omits
-`undefined`-valued keys — while it happily serializes `null`.
+`undefined`-valued keys, while it happily serializes `null`.
 
 ```ts
 JSON.stringify({ a: undefined, b: null });   // '{"b":null}'
@@ -447,7 +447,7 @@ when the relation wasn't loaded, rather than appearing as `"author": null`.
 That distinction matters: `null` says "this post has no author", while
 absence says "we didn't fetch it".
 
-The shape type reflects this — the fields are declared optional:
+The shape type reflects this. The fields are declared optional:
 
 ```ts
 export interface PostJson {
@@ -464,7 +464,7 @@ export interface PostJson {
 | `whenLoaded(relation)` / `whenLoaded(relation, map)` | The relation key is not `undefined` on the model |
 | `whenAppended(name)` / `whenAppended(name, map)` | `model.hasAppended(name)` is `true` |
 | `whenNotNull(value)` | `value` is neither `null` nor `undefined` |
-| `mergeWhen(condition, values)` | `condition` is truthy — spread the result |
+| `mergeWhen(condition, values)` | `condition` is truthy, spread the result |
 
 ```ts
 avatarUrl: this.when(this.model.avatar_path !== null, () => this.buildAvatarUrl()),
@@ -476,7 +476,7 @@ bio: this.whenNotNull(this.model.bio),
 `whenLoaded` distinguishes "not loaded" (`undefined` → omitted) from
 "loaded but empty" (an empty `hasMany` is `[]` → kept). `whenAppended`
 distinguishes "never appended" (omitted) from "appended as `null`" (kept),
-by asking the model's `hasAppended()` rather than checking the value — so a
+by asking the model's `hasAppended()` rather than checking the value, so a
 deliberately-`null` appended value still reaches the wire.
 
 `mergeWhen` returns `{}` when the condition is false, which spreads to
@@ -496,11 +496,11 @@ author: this.whenLoaded("author"),   // emits UserResource's shape, not a raw mo
 
 | Encountered | Becomes |
 |---|---|
-| A **model instance** (has `toJsonResource()` and `toJSON()`) | `model.toJsonResource()?.toJson()` — itself normalized — falling back to `model.toJSON()` when the model declares no default resource |
+| A **model instance** (has `toJsonResource()` and `toJSON()`) | `model.toJsonResource()?.toJson()`, itself normalized, falling back to `model.toJSON()` when the model declares no default resource |
 | A **`Collection`** (anything with `toArray()`) | Its items, each normalized |
 | An **array** | Each element, normalized |
 | A **plain object** | Each own enumerable value, normalized. Keys with `undefined` values are **preserved**, so `JSON.stringify` still drops them and the omission trick keeps working. |
-| Anything else — primitives, `Date`, class instances | Unchanged |
+| Anything else: primitives, `Date`, class instances | Unchanged |
 
 Models and collections are detected **structurally** (duck-typed), not with
 `instanceof`, so `@mahiframework/http` needs no runtime import of `@mahiframework/database`
@@ -510,7 +510,7 @@ Two properties worth knowing:
 
 - **Sync-ness is preserved.** The walk only returns a `Promise` when
   something it reached was actually async. A resource whose shape and every
-  nested resource are synchronous stays synchronous — so existing sync call
+  nested resource are synchronous stays synchronous, so existing sync call
   sites (spreads, un-awaited `.map`) keep working.
 - **It's idempotent.** A nested resource's `toJson()` is itself wrapped, so
   its output is already normalized and the outer walk is a cheap no-op over
@@ -533,7 +533,7 @@ row through a resource.
 Takes a `LengthAwarePaginationResult<TModel>` from `paginate()` /
 `Model.paginate()`.
 
-Default envelope — metadata **spread at the top level**:
+Default envelope, metadata **spread at the top level**:
 
 ```json
 {
@@ -546,7 +546,7 @@ Default envelope — metadata **spread at the top level**:
 }
 ```
 
-With `{ nestMeta: true }` — Laravel's `AnonymousResourceCollection` shape:
+With `{ nestMeta: true }`, Laravel's `AnonymousResourceCollection` shape:
 
 ```json
 {
@@ -557,7 +557,7 @@ With `{ nestMeta: true }` — Laravel's `AnonymousResourceCollection` shape:
 
 | Option | Effect |
 |---|---|
-| `additional` | `Record<string, unknown>` merged in at the top level — Laravel's `->additional([…])` |
+| `additional` | `Record<string, unknown>` merged in at the top level, Laravel's `->additional([…])` |
 | `nestMeta` | Nest the five metadata fields under `meta` |
 
 ```ts
@@ -579,7 +579,7 @@ Takes a `CursorPaginationResult<TModel>`:
 }
 ```
 
-`additional` works the same way. There is no `nestMeta` — cursor pagination
+`additional` works the same way. There is no `nestMeta`, cursor pagination
 has only two metadata fields.
 
 > **There is no `links` key.** Laravel's paginator emits
@@ -593,7 +593,7 @@ has only two metadata fields.
 
 Both helpers `await` every row's `toJson()` in parallel.
 
-Nothing forces you to use them — hand-rolling the envelope is fine when the
+Nothing forces you to use them, hand-rolling the envelope is fine when the
 shape is bespoke:
 
 ```ts
@@ -606,10 +606,10 @@ return HttpResponse.json({
 
 ## Related
 
-- [Requests](../requests/) — reading input
-- [Controllers](../controllers/) — what returns these
-- [Validation](../validation/) — the source of `ValidationException`
-- [Models](../models/) — `hidden`, `toJSON()`, `toJsonResource()`, appended attributes
-- [Pagination](../pagination/) — the paginators these envelopes wrap
-- [Storage](../storage/) — `servePublicDisk()` for streaming static files
-- [Logging](../logging/) — where unhandled errors go
+- [Requests](../requests/): reading input
+- [Controllers](../controllers/): what returns these
+- [Validation](../validation/): the source of `ValidationException`
+- [Models](../models/): `hidden`, `toJSON()`, `toJsonResource()`, appended attributes
+- [Pagination](../pagination/): the paginators these envelopes wrap
+- [Storage](../storage/): `servePublicDisk()` for streaming static files
+- [Logging](../logging/): where unhandled errors go

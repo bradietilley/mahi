@@ -5,12 +5,12 @@ import type { ResponseSequence } from "./response-sequence.js";
  * A stubbed response, in any of the shapes `Http.fake()` accepts. Same
  * coercions as Laravel's `stubUrl`:
  *
- * - `number` — a status code (100-599), empty body
- * - `string` — a raw body, 200
- * - `Uint8Array` — raw bytes, 200
- * - `object` — a JSON body with `Content-Type: application/json`, 200
- * - `{ body?, status?, headers? }` — spelled out
- * - `Response` — used verbatim
+ * - `number`, a status code (100-599), empty body
+ * - `string`, a raw body, 200
+ * - `Uint8Array`, raw bytes, 200
+ * - `object`, a JSON body with `Content-Type: application/json`, 200
+ * - `{ body?, status?, headers? }`, spelled out
+ * - `Response`, used verbatim
  */
 export type StubResponse =
   string | number | Uint8Array | Response | StubResponseSpec | Record<string, unknown> | unknown[];
@@ -23,7 +23,7 @@ export interface StubResponseSpec {
 }
 
 /**
- * A stub computed from the request. Returning `undefined` **declines** —
+ * A stub computed from the request. Returning `undefined` **declines**,
  * matching falls through to the next registered stub, which is how a
  * handler can stub one shape of request and leave the rest alone.
  */
@@ -50,7 +50,7 @@ export const STRAY_STATUS = 555;
  * The response returned when nothing matched, rather than an immediate
  * throw.
  *
- * Throwing at the miss site would unwind through user middleware — a
+ * Throwing at the miss site would unwind through user middleware, a
  * `try`/`catch` in someone's logging or auth pipe could swallow it and
  * turn a loud test failure into a silent one. A response value flows back
  * out normally, gets recorded (so `assertSent()` still works on the
@@ -135,7 +135,7 @@ function buildResponse(body: unknown, status: number, headers: Record<string, st
  * rather than a JSON payload that happens to be an object.
  *
  * The discriminator is "has at least one of the three keys, *only* those
- * keys, and any `status` present is a number" — so `{ status: 201 }` is a
+ * keys, and any `status` present is a number", so `{ status: 201 }` is a
  * spec, while a JSON body of `{ status: "active" }` is not, because a
  * string `status` is a payload field, not an HTTP status code. That extra
  * type check is what stops a domain object whose keys happen to be a subset

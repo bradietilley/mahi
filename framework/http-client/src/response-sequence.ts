@@ -6,7 +6,7 @@ type SequenceEntry =
   { kind: "response"; stub: StubResponse } | { kind: "connection-failure"; message: string };
 
 /**
- * A FIFO queue of stubbed responses for one pattern — port of Laravel's
+ * A FIFO queue of stubbed responses for one pattern, port of Laravel's
  * `Illuminate\Http\Client\ResponseSequence`. Each matching request drains
  * the next entry, which is how you stub "fails twice, then succeeds" for a
  * retry test.
@@ -27,7 +27,7 @@ export class ResponseSequence {
   private emptyResponse?: StubResponse;
   private failWhenEmpty = true;
 
-  /** Queue a response — same coercions as `Http.response()`. */
+  /** Queue a response, same coercions as `Http.response()`. */
   push(body?: unknown, status = 200, headers: Record<string, string> = {}): this {
     this.entries.push({ kind: "response", stub: { body, status, headers } });
 

@@ -1,7 +1,7 @@
 import { encodeNested } from "./query-encoder.js";
 
 /**
- * Expands `{placeholder}` segments in a URL from `withUrlParameters()` —
+ * Expands `{placeholder}` segments in a URL from `withUrlParameters()`,
  * Laravel's `PendingRequest::withUrlParameters()`, which uses a
  * `UriTemplate` for the same job.
  *
@@ -10,7 +10,7 @@ import { encodeNested } from "./query-encoder.js";
  *
  * Values are percent-encoded, so a parameter can't inject path segments or
  * a query string. Placeholders with no matching parameter are left as-is
- * rather than blanked — a literal `{` in a URL is legal, and silently
+ * rather than blanked, a literal `{` in a URL is legal, and silently
  * deleting part of the path is worse than leaving it visible.
  */
 export function expandUrlTemplate(url: string, params: Record<string, string | number>): string {
@@ -32,7 +32,7 @@ export function expandUrlTemplate(url: string, params: Record<string, string | n
  */
 export function resolveUrl(baseUrl: string | undefined, url: string): string {
   // Absolute means "has a scheme" (`ws://`, `data:`, …) or is
-  // protocol-relative (`//host/path`), not just `http(s)://` — any of
+  // protocol-relative (`//host/path`), not just `http(s)://`, any of
   // those prefixed with a base URL would be nonsense.
   if (!baseUrl || /^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith("//")) {
     return url;

@@ -46,12 +46,12 @@ export interface LocalBroadcastDriverOptions {
   /**
    * The auth seam for `private-`/`presence-` channels. When omitted, the
    * driver serves public channels only and rejects every protected channel
-   * (fail closed) — the pre-authorization behaviour, made explicit.
+   * (fail closed), the pre-authorization behaviour, made explicit.
    */
   authorizer?: BroadcastAuthorizer;
   /**
    * Allowed `Origin` header values for the upgrade (cross-site websocket
-   * hijacking guard). `undefined` disables the check — appropriate for
+   * hijacking guard). `undefined` disables the check, appropriate for
    * non-browser clients, which don't send `Origin`. When set, a browser
    * whose `Origin` isn't listed is refused the upgrade; a request with no
    * `Origin` (server-to-server) is still allowed.
@@ -84,7 +84,7 @@ function nextSocketId(): string {
  * channels, and pushes messages to the matching ones.
  *
  * Channel authorization: `private-`/`presence-` channels are gated by the
- * `BroadcastAuthorizer` supplied in the options — the connecting user is
+ * `BroadcastAuthorizer` supplied in the options. The connecting user is
  * resolved once at upgrade time, and each `subscribe` to a protected
  * channel is checked against the app's `Broadcast.channel(...)` callbacks
  * (or a signed grant from `POST /broadcasting/auth`). Public channels are
@@ -96,9 +96,9 @@ function nextSocketId(): string {
  * ---------------------------------------------------------------------
  * Subscriptions live in a `Map` in this process's memory. A broadcast
  * therefore only ever reaches clients whose websocket is connected to
- * *this* process. The moment an app runs two or more server processes —
+ * *this* process. The moment an app runs two or more server processes,
  * two instances behind a load balancer, a `cluster`/PM2 fork setup, a
- * rolling deploy where old and new processes briefly overlap — a
+ * rolling deploy where old and new processes briefly overlap, a
  * broadcast from process A silently never reaches a client connected to
  * process B. Nothing errors; the message simply doesn't arrive, which is
  * the worst possible failure mode to discover in production.
@@ -158,12 +158,12 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    * `@hono/node-ws`'s `createNodeWebSocket()` must be handed the *same*
    * Hono instance the upgrade route is registered on, which is why this
    * takes the kernel's raw Hono rather than the framework's `Router`
-   * facade — this is genuinely the "advanced use" escape hatch
+   * facade. This is genuinely the "advanced use" escape hatch
    * `Router.raw()` exists for.
    *
    * **Pass `support` whenever there is a kernel to get it from.** An app
-   * with a websocket route of its own — a PTY bridge, a collaborative
-   * document, anything — must share ONE `createNodeWebSocket()` helper
+   * with a websocket route of its own, a PTY bridge, a collaborative
+   * document, anything, must share ONE `createNodeWebSocket()` helper
    * with this driver, because two of them attached to one Node server
    * crash the process on the first connection rather than conflicting
    * politely. `HttpKernel.websocketSupport()` is that shared helper and
@@ -178,7 +178,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    *
    * Registering the route is only half of it: Node's HTTP server has to
    * be told to handle upgrade requests, which can only happen once
-   * `serve()` has returned a server — see `injectWebSocket()`.
+   * `serve()` has returned a server. See `injectWebSocket()`.
    *
    * The `Origin` allow-list is enforced as a pre-handler that runs during
    * the upgrade's `fetch` pass: returning a 403 there means the node-ws
@@ -246,7 +246,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
   }
 
   /**
-   * Attach the websocket upgrade handler to a running Node server —
+   * Attach the websocket upgrade handler to a running Node server,
    * called from the app's entrypoint with `@hono/node-server`'s
    * `serve()` return value:
    *
@@ -255,10 +255,10 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    *
    * Without this the upgrade route is mounted but no connection ever
    * completes the handshake, so clients fail to connect while plain HTTP
-   * keeps working — the exact symptom to look for if websockets appear
+   * keeps working, the exact symptom to look for if websockets appear
    * dead in an app that forgot this line.
    *
-   * Safe to call even when something else has already injected — a
+   * Safe to call even when something else has already injected, a
    * shared helper from `HttpKernel.websocketSupport()` ignores every call
    * after the first, precisely so that this line can stay in an app's
    * entrypoint without anyone having to know who else calls it.
@@ -284,16 +284,16 @@ export class LocalBroadcastDriver implements BroadcastDriver {
   }
 
   /**
-   * The single seam every outbound frame — data broadcasts AND presence
-   * control frames alike — passes through, and the ONE thing a
+   * The single seam every outbound frame, data broadcasts AND presence
+   * control frames alike, passes through, and the ONE thing a
    * multi-process driver overrides. In the local driver it delivers the
    * pre-encoded `frame` to this process's own subscribers; in
    * `RedisBroadcastDriver` it publishes to Redis pub/sub so every process
    * runs its own `deliverLocalFrame()`. Presence works across processes
-   * for free because its frames ride this same path.
+   * because its frames ride this same path.
    *
    * `excludeSocketId` skips the socket that originated the frame (a
-   * presence `joining`/`leaving` isn't echoed to the actor) — matched by
+   * presence `joining`/`leaving` isn't echoed to the actor), matched by
    * the stable per-connection id, so exclusion survives the trip through
    * another process.
    */
@@ -354,7 +354,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    * slow consumers. A socket can close between the last `onClose` and this
    * send; a dead socket must never break delivery to the live ones. And a
    * client that stops reading must not turn one broadcast into unbounded
-   * server memory — past `maxBufferedBytes` of unflushed output the socket
+   * server memory, past `maxBufferedBytes` of unflushed output the socket
    * is closed and forgotten.
    */
   private deliver(ws: WSContext, frame: string): void {
@@ -382,7 +382,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
     // and here. This runs synchronously inside the Redis subscriber's
     // message pump for `RedisBroadcastDriver`, so an escaping throw would
     // become an uncaught exception and, on Node's defaults, take the
-    // process down — one bad socket must never do that. Log and drop it.
+    // process down, one bad socket must never do that. Log and drop it.
     try {
       ws.send(frame);
     } catch (error) {
@@ -558,7 +558,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
    * Run a socket-driven task without awaiting it, but never let its
    * rejection escape. These fire from `onMessage`/`onClose` handlers with no
    * caller to await them, and a presence roster or fanout backed by a
-   * remote store (Redis) can fail — most commonly during shutdown, when
+   * remote store (Redis) can fail, most commonly during shutdown, when
    * sockets close after the store has already disconnected. An unhandled
    * rejection there would crash the process on Node's defaults.
    */
@@ -603,7 +603,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
 
     // Snapshot the roster BEFORE adding this socket, so `here` lists the
     // existing members plus this one exactly once. Drop this socket's own
-    // prior entry from the snapshot: a re-subscribe (allowed — see the
+    // prior entry from the snapshot: a re-subscribe (allowed. See the
     // subscription-limit check) overwrites the roster slot, and without
     // this the old entry AND the appended `member` both appeared.
     const existing = (await this.presenceMembers(channel)).filter((m) => m.socketId !== socketId);
@@ -693,7 +693,7 @@ export class LocalBroadcastDriver implements BroadcastDriver {
 
   /**
    * Drop a socket from every channel it subscribed to. Without this the
-   * `subscriptions` map would grow forever as clients come and go —
+   * `subscriptions` map would grow forever as clients come and go,
    * a slow memory leak that only shows up under real traffic. Presence
    * channels additionally publish a `leaving` frame to the survivors.
    */

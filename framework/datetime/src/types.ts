@@ -75,21 +75,21 @@ export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
  * never happens in `America/New_York`. A fall-back creates an **overlap**:
  * 01:30 happens twice, once at UTC-4 and once at UTC-5.
  *
- * - `"compatible"` — the default, and what Carbon/`Temporal` do. For a gap,
+ * - `"compatible"`, the default, and what Carbon/`Temporal` do. For a gap,
  *   shift forward by the size of the gap (02:30 becomes 03:30). For an
  *   overlap, take the first (earlier) of the two instants.
- * - `"earlier"` — always prefer the earlier instant. For a gap this shifts
+ * - `"earlier"`, always prefer the earlier instant. For a gap this shifts
  *   *backwards* by the gap size (02:30 becomes 01:30).
- * - `"later"` — always prefer the later instant. Identical to `"compatible"`
+ * - `"later"`, always prefer the later instant. Identical to `"compatible"`
  *   for gaps; takes the second occurrence for overlaps.
- * - `"reject"` — throw `AmbiguousTimeError` rather than guess. Correct for
+ * - `"reject"`, throw `AmbiguousTimeError` rather than guess. Correct for
  *   things like billing or scheduling where a silent one-hour slip is worse
  *   than a loud failure.
  */
 export type Disambiguation = "compatible" | "earlier" | "later" | "reject";
 
 /**
- * A wall-clock reading with no timezone attached — "the 20th of August 2026
+ * A wall-clock reading with no timezone attached, "the 20th of August 2026
  * at half past two", which is a different kind of thing from an instant.
  *
  * `month` is 1-based. Unlike `Date`, nothing here is zero-indexed; the
@@ -122,7 +122,7 @@ export interface WeekOptions {
    * Which day the week starts on.
    *
    * Defaults to the package default (Monday, matching ISO 8601 and Carbon's
-   * common configuration), not to the host locale — locale-derived week
+   * common configuration), not to the host locale, locale-derived week
    * starts make the same code behave differently on different machines.
    */
   weekStartsOn?: Weekday;
@@ -166,7 +166,7 @@ export interface HumanizeOptions {
    * @default "relative"
    */
   syntax?: "relative" | "plain";
-  /** Use the locale's abbreviated forms — `"3d ago"`. @default false */
+  /** Use the locale's abbreviated forms, `"3d ago"`. @default false */
   short?: boolean;
   /** Locale tag. Defaults to the configured locale. */
   locale?: LocaleIdentifier;
@@ -196,8 +196,8 @@ export interface HumanizeOptions {
  * Which weekdays are *not* business days, plus optional named holidays.
  *
  * Holidays are supplied as a predicate rather than a list so that a caller
- * can back them with anything — a static set, a database, a public-holiday
- * API — without this package taking a position on whose calendar is right.
+ * can back them with anything, a static set, a database, a public-holiday
+ * API, without this package taking a position on whose calendar is right.
  */
 export interface BusinessDayOptions {
   /** @default [0, 6] (Sunday and Saturday) */

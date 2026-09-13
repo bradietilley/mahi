@@ -16,13 +16,13 @@ export interface ThrottleOptions {
   /** Window length in seconds. */
   windowSeconds: number;
   /**
-   * How to key the limiter — defaults to the client IP (`request.ip()`,
+   * How to key the limiter, defaults to the client IP (`request.ip()`,
    * i.e. the socket peer unless `trustProxies()` says otherwise).
    *
    * Note the default cannot distinguish clients that share an address
    * (NAT, a corporate egress), and reports `unknown` when there is no
    * peer to name. For anything protecting a specific account, key on the
-   * identity too — see `AppServiceProvider`'s `login` limiter, which
+   * identity too. See `AppServiceProvider`'s `login` limiter, which
    * combines email + IP.
    */
   key?: (request: Request) => string;
@@ -34,11 +34,11 @@ const defaultKey = (request: Request): string => request.ip() ?? "unknown";
  * Rate-limiting pipe, backed by `@mahiframework/cache`'s `RateLimiter`.
  * Two forms:
  *
- * 1. **Inline** — a plain `{ max, windowSeconds }` object:
+ * 1. **Inline**, a plain `{ max, windowSeconds }` object:
  *
  *      router.post("/todos", createTodo).middleware(throttle({ max: 20, windowSeconds: 60 }))
  *
- * 2. **Named** — a string referencing a limiter registered via
+ * 2. **Named**, a string referencing a limiter registered via
  *    `RateLimiter.for(name, callback)`:
  *
  *      limiter.for("uploads", (request) => Limit.perMinute(5).by(request.user()?.id ?? request.ip() ?? "unknown"));
@@ -58,8 +58,8 @@ export function throttle(nameOrOptions: string | ThrottleOptions): HttpPipeFn {
       // A limit that only counts *after* the response (a conditional
       // `afterCallback`) can't be incremented up front, so it still reads
       // the current count and hits later. A normal limit increments
-      // atomically HERE and decides on the returned count — see
-      // `RateLimiter.hitAndCheck()` — so concurrent requests can't all slip
+      // atomically HERE and decides on the returned count, see
+      // `RateLimiter.hitAndCheck()`, so concurrent requests can't all slip
       // under the limit in the read-then-write gap.
       const exceeded = limit.afterCallback
         ? await limiter.tooManyAttempts(limit.key, limit.maxAttempts)
@@ -107,8 +107,8 @@ async function resolveLimits(
     const keyFn = nameOrOptions.key ?? defaultKey;
     // Keyed on the route PATTERN (`/posts/{post}`), not the concrete
     // path. Using the concrete path gives every id its own bucket, so an
-    // attacker multiplies their quota simply by walking ids —
-    // `/posts/1`, `/posts/2`, … — and a limit of 5/min on `/posts/{post}`
+    // attacker multiplies their quota simply by walking ids,
+    // `/posts/1`, `/posts/2`, …, and a limit of 5/min on `/posts/{post}`
     // becomes 5/min *per post*, which for an enumerable id is no limit.
     // Falls back to the concrete path only before the router has
     // matched, where there is no pattern to use.

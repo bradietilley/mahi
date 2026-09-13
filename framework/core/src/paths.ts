@@ -2,11 +2,11 @@ import { join } from "node:path";
 
 /**
  * Path helpers mirroring Laravel's `base_path()`/`storage_path()`/etc.
- * Every helper resolves relative to the application's root — by default
+ * Every helper resolves relative to the application's root, by default
  * the directory the bootstrap process is run from (`process.cwd()`), not
  * this framework package's own location. That is wherever the consuming
  * app's `bin/console.ts` (or its artisan-equivalent entrypoint) is
- * invoked from — the skeleton app that loads the framework, analogous to
+ * invoked from, the skeleton app that loads the framework, analogous to
  * a plain `laravel/laravel` install. See `framework/create-mahi/template/`
  * for the shape of that app.
  *
@@ -14,7 +14,7 @@ import { join } from "node:path";
  * `Application` instance's state: config files (e.g.
  * the app's `config/storage.ts`) call these helpers while building the config
  * that's handed to `new Application()`/`app.config.set(...)`, before
- * `app.bootstrap()` has run — well before the `app()` global singleton
+ * `app.bootstrap()` has run, well before the `app()` global singleton
  * (`./global-app.ts`) is populated. Tying these to cwd (or to a
  * module-level override) instead keeps them usable at any point in the
  * boot sequence, with no ordering trap.
@@ -30,7 +30,7 @@ function joinPath(root: string, segments: PathSegment[]): string {
 
 /**
  * Overrides `process.cwd()` as the root, when set. Deliberately a plain
- * module-level variable and not `Application` state — see this file's
+ * module-level variable and not `Application` state. See this file's
  * header: config functions run before an `Application` exists, so there
  * is nothing to hang it off yet.
  */
@@ -41,13 +41,13 @@ let appRoot: string | undefined;
  * `process.cwd()`.
  *
  * This exists for apps that are *installed and run from anywhere* rather
- * than run from a project directory — a compiled CLI binary being the
+ * than run from a project directory, a compiled CLI binary being the
  * motivating case. Run such a binary from `~/Downloads` and the cwd
  * default silently resolves `database_path()` to `~/Downloads/database`,
  * where a relative sqlite `filename` then creates a **fresh empty
  * database** rather than failing. (The same failure is described in
  * `docs/deployment/README.md`.) An app in that position calls this with
- * its own data root — e.g. `~/.config/<name>` — as the very first
+ * its own data root, e.g. `~/.config/<name>`, as the very first
  * statement of `bootstrap()`, before `loadEnv()` and before any
  * `config/*.ts` function runs, since those call `storage_path()` etc.
  * while building the config object.
@@ -62,7 +62,7 @@ export function setBasePath(root: string): void {
 }
 
 /**
- * The root `base_path()` currently resolves against — the value passed to
+ * The root `base_path()` currently resolves against, the value passed to
  * `setBasePath()`, or `process.cwd()` when it was never called. Mostly
  * useful for diagnostics ("which root did we actually pick?") and tests.
  */
@@ -72,7 +72,7 @@ export function resolvedBasePath(): string {
 
 /**
  * Clears any root set by `setBasePath()`, restoring the `process.cwd()`
- * default. For tests — a module-level root would otherwise leak between
+ * default. For tests. A module-level root would otherwise leak between
  * test files sharing a module registry.
  */
 export function clearBasePath(): void {

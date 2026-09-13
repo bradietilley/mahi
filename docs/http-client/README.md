@@ -1,6 +1,6 @@
 # HTTP client
 
-`@mahiframework/http-client` makes outbound HTTP requests — the port of Laravel's
+`@mahiframework/http-client` makes outbound HTTP requests, the port of Laravel's
 `Illuminate\Http\Client` (`Http::withToken()->post()`, `Http::fake()`,
 `Http::assertSent()`).
 
@@ -59,7 +59,7 @@ response.successful();  // false
 response.notFound();    // true
 ```
 
-Only a *transport* failure — DNS, connection refused, TLS, timeout —
+Only a *transport* failure, DNS, connection refused, TLS, timeout,
 rejects, as a `ConnectionError`. If a send rejects, the request never got
 an answer. Raising on a failed status is opt-in via
 [`throw()`](#error-handling).
@@ -75,7 +75,7 @@ doesn't wrap is reachable through
 
 ## Building requests
 
-The builder is **immutable** — every method returns a new
+The builder is **immutable**. Every method returns a new
 `PendingRequest`, so a configured client is safe to hold, reuse, and use
 concurrently:
 
@@ -124,7 +124,7 @@ Http.withBasicAuth("ada", "s3cret");      // Authorization: Basic <base64>
 ```
 
 `withHeaders()` **replaces** on collision. Laravel's accumulates into an
-array — see [Differences](#differences-from-laravel).
+array. See [Differences](#differences-from-laravel).
 
 ### URLs
 
@@ -147,7 +147,7 @@ objects expand to bracket notation (`{ filter: { status: "x" } }` →
 ### Escape hatches
 
 `withFetchOptions()` merges raw `RequestInit` over everything the builder
-produced — the analogue of dropping Guzzle options straight in. Proxies
+produced, the analogue of dropping Guzzle options straight in. Proxies
 and TLS settings live here, via undici's non-standard `dispatcher`:
 
 ```ts
@@ -156,7 +156,7 @@ import { ProxyAgent } from "undici";   // the *app's* dependency, not this packa
 await Http.withFetchOptions({ dispatcher: new ProxyAgent(proxyUrl) }).get(url);
 ```
 
-`withTransport()` swaps the transport function outright — the seam fakes,
+`withTransport()` swaps the transport function outright, the seam fakes,
 mocks, and record/replay hook into:
 
 ```ts
@@ -165,7 +165,7 @@ await Http.withTransport(async (request, init) => new Response("stubbed")).get(u
 
 `timeout()` and a caller-supplied `signal` compose rather than override.
 When you pass your own `AbortSignal` via `withFetchOptions({ signal })`, a
-`timeout()` still applies — the request aborts as soon as *either* fires
+`timeout()` still applies, the request aborts as soon as *either* fires
 (`AbortSignal.any`), so a cancellation signal never silently disables the
 timeout:
 
@@ -178,7 +178,7 @@ await Http.timeout(5_000)
 ## Responses
 
 The body is buffered once and memoised, so accessors are **synchronous and
-repeatable** — a platform `Response` body is single-use, and making every
+repeatable**, a platform `Response` body is single-use, and making every
 accessor async would poison every call site:
 
 ```ts
@@ -209,7 +209,7 @@ Status predicates: `successful()`, `ok()`, `created()`, `noContent()`,
 ## Error handling
 
 `throw()` raises `RequestFailedError` on a failed response, is a no-op on
-success, and returns the response either way — so it chains:
+success, and returns the response either way, so it chains:
 
 ```ts
 const user = (await Http.get(url)).throw().json<User>();
@@ -237,11 +237,11 @@ Errors:
 
 | Error | When |
 |---|---|
-| `ConnectionError` | The transport failed — no response was received. |
+| `ConnectionError` | The transport failed. No response was received. |
 | `RequestFailedError` | A failed status, and you opted into throwing. |
 | `StrayRequestError` | A request matched no stub while faking. Never thrown in production. |
 
-`StrayRequestError` extends `Error` directly, not a shared base — so
+`StrayRequestError` extends `Error` directly, not a shared base, so
 `catch (e) { if (e instanceof ConnectionError) ... }` in application code
 cannot swallow a test-harness failure.
 
@@ -254,7 +254,7 @@ await Http.retry(4, [100, 500, 2000]).get(url);
 await Http.retry(3, (attempt) => attempt * 100).get(url);
 ```
 
-**Everything that failed is retryable by default** — any 4xx or 5xx,
+**Everything that failed is retryable by default**, any 4xx or 5xx,
 including 401 and 422, plus `ConnectionError`. That is Laravel's behaviour.
 
 Retrying a 422 that will never succeed is wasteful, but a status allow-list
@@ -279,7 +279,7 @@ an HTTP-date), overriding the configured backoff, capped at 60s. Laravel
 ignores the header, which is the single most common reason a retrying
 client gets rate-limit-banned.
 
-On exhaustion the final failed response is **returned**, not thrown —
+On exhaustion the final failed response is **returned**, not thrown,
 `throw()` still governs raising:
 
 ```ts
@@ -291,17 +291,17 @@ Retry wraps the whole pipeline, so middleware re-runs and `RequestSending`
 fires once per attempt.
 
 **Bodies must be replayable.** Each attempt re-sends the request body, so a
-one-shot `ReadableStream` body can't be retried — it is consumed by the
+one-shot `ReadableStream` body can't be retried. It is consumed by the
 first attempt and there is nothing left to send. Rather than let the second
 attempt fail with an opaque "body is disturbed or locked" error (which would
 be mislabelled as a `ConnectionError` and retried again), `retry()` refuses
 such a request up front with a clear message. Use a `string` or `Uint8Array`
-body — or buffer the stream yourself — when the request needs retries.
+body, or buffer the stream yourself, when the request needs retries.
 String, `Uint8Array`, `FormData`, and JSON bodies are all replayable.
 
 ## Middleware
 
-Middleware is `@mahiframework/pipeline`'s `PipeFn` — one mechanism covering
+Middleware is `@mahiframework/pipeline`'s `PipeFn`, one mechanism covering
 Laravel's `withMiddleware` + `beforeSending` + `afterResponse`. A pipe sees
 the request on the way down and the response on the way back:
 
@@ -321,7 +321,7 @@ Http.withRequestMiddleware((request) => request.withHeader("X-Signed", sign(requ
 Http.withResponseMiddleware((response) => log(response) ?? response);
 ```
 
-A pipe that returns without calling `next()` short-circuits — the
+A pipe that returns without calling `next()` short-circuits. The
 transport never runs, which is how you'd build a cache layer.
 
 Ordering is global middleware outermost, per-request inside it, transport
@@ -348,7 +348,7 @@ by the time you hold one, so an array of them can't be concurrency-limited.
 That is why this needs none of Laravel's `LazyPromise` machinery.
 
 `Http.pool()` is a thin wrapper over `@mahiframework/core`'s
-[`pooled()`](../helpers/), which is general — pooling has nothing to do
+[`pooled()`](../helpers/), which is general. Pooling has nothing to do
 with HTTP.
 
 ## Streaming and downloads
@@ -372,7 +372,7 @@ for await (const chunk of response.stream()) {
 }
 ```
 
-Streaming *request* bodies work too — `duplex: "half"` is set for you
+Streaming *request* bodies work too. `duplex: "half"` is set for you
 whenever the body is a `ReadableStream`, which is exactly the detail that
 otherwise fails at runtime.
 
@@ -403,14 +403,14 @@ network. `Http.allowStrayRequests()` opts out.
 Like Laravel's client, this package does **not** apply an allow/deny list
 to request hosts: a URL built from user input can reach internal addresses
 (`169.254.169.254`, `localhost`, RFC 1918 ranges). If any part of a request
-URL is attacker-influenced, validate the host before sending — reject
+URL is attacker-influenced, validate the host before sending, reject
 non-public addresses, or restrict to an explicit allow-list of hosts. The
 transport seam (`withTransport()`) or a request middleware is the natural
 place to enforce this centrally.
 
 ## Configuration
 
-Optional — the package works standalone with no container. Register
+Optional. The package works standalone with no container. Register
 `HttpClientServiceProvider` to configure defaults and named clients:
 
 ```ts
@@ -439,7 +439,7 @@ dispatcher, events are silently skipped.
 
 **An unmatched fake raises instead of hitting the network.** Laravel's
 `Http::fake()` falls through to the real handler for an unmatched request,
-so a typo'd pattern silently makes a live call from your test suite —
+so a typo'd pattern silently makes a live call from your test suite.
 `preventStrayRequests()` is opt-in there. Here the safe behaviour is the
 default and `allowStrayRequests()` opts out.
 
@@ -448,7 +448,7 @@ your backoff (capped at 60s). Laravel ignores the header.
 
 **`withHeaders()` replaces rather than accumulates.** Laravel uses
 `array_merge_recursive`, so `withHeaders({X:'1'}).withHeaders({X:'2'})`
-yields `X: ['1','2']` — the reason its `replaceHeaders()` exists at all.
+yields `X: ['1','2']`, the reason its `replaceHeaders()` exists at all.
 Ours replaces; `appendHeader()` covers the genuine multi-value case.
 `replaceHeaders()` is not ported, having no reason to exist.
 
@@ -457,8 +457,8 @@ Ours replaces; `appendHeader()` covers the genuine multi-value case.
 concurrency onto a synchronous default. Starting async means `pool()` is
 `pooled()` over thunks and there is exactly one retry implementation.
 
-**`PendingRequest` is immutable.** Laravel's `send()` mutates the instance
-— nulling `pendingBody`, assigning `request`/`cookies`/`transferStats` —
+**`PendingRequest` is immutable.** Laravel's `send()` mutates the instance,
+nulling `pendingBody`, assigning `request`/`cookies`/`transferStats`,
 which makes a configured client unsafe to hold or use concurrently.
 Copy-on-write fixes that, and holding a `baseUrl()`-configured client is
 the entire point.
@@ -484,6 +484,6 @@ list).
 
 ## Related
 
-- [Testing](../testing/#faking-http-requests) — `Http.fake()` and the assertions
-- [Helpers](../helpers/) — `pooled()` and `retry()`
-- [Routing](../routing/) and [Requests](../requests/) — the *inbound* side
+- [Testing](../testing/#faking-http-requests): `Http.fake()` and the assertions
+- [Helpers](../helpers/): `pooled()` and `retry()`
+- [Routing](../routing/) and [Requests](../requests/): the *inbound* side

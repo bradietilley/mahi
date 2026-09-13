@@ -1,6 +1,6 @@
 /**
  * Shared `when`/`unless` implementation for `QueryBuilder` and
- * `EloquentBuilder` — Laravel's `Conditionable`, minus the
+ * `EloquentBuilder`, Laravel's `Conditionable`, minus the
  * `HigherOrderWhenProxy` magic form.
  *
  * A function `value` is invoked with the builder to produce the

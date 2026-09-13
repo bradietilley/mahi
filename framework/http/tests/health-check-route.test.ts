@@ -7,8 +7,8 @@ import { MaintenanceMode, MAINTENANCE_MODE_TOKEN } from "../src/maintenance/main
 
 /**
  * A stand-in for `@mahiframework/health`'s `HealthRegistry`, bound at the same
- * token. `@mahiframework/http` deliberately has no dependency on that package —
- * it resolves the registry by string and serializes whatever it returns —
+ * token. `@mahiframework/http` deliberately has no dependency on that package,
+ * it resolves the registry by string and serializes whatever it returns,
  * so these tests describe exactly the contract the route relies on.
  */
 type Outcome = true | string | null;
@@ -78,7 +78,7 @@ describe("readiness route registration", () => {
 
   it("leaves the liveness route unnamed, so an app may use that name", async () => {
     // `/up` has always been unnamed, and `RouteRegistry` throws on a
-    // duplicate name — claiming one here would stop an app that already
+    // duplicate name, claiming one here would stop an app that already
     // names a route "liveness" from booting at all.
     class AppProvider {
       routes(router: any) {
@@ -311,7 +311,7 @@ describe("maintenance mode", () => {
     return app;
   }
 
-  it("returns 503 from /health while down — it is NOT exempt", async () => {
+  it("returns 503 from /health while down. It is NOT exempt", async () => {
     const app = downApp({ liveness: {}, healthCheck: {} });
     const kernel = kernelFor(app);
     await app.make<MaintenanceMode>(MAINTENANCE_MODE_TOKEN).activate({});
@@ -323,7 +323,7 @@ describe("maintenance mode", () => {
     expect(await res.json()).toEqual({ message: "Service Unavailable" });
   });
 
-  it("still returns 200 from /up in the same state — it IS exempt", async () => {
+  it("still returns 200 from /up in the same state. It IS exempt", async () => {
     const app = downApp({ liveness: {}, healthCheck: {} });
     const kernel = kernelFor(app);
     await app.make<MaintenanceMode>(MAINTENANCE_MODE_TOKEN).activate({});

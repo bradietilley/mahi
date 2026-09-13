@@ -6,12 +6,12 @@
  * `AuthManager.attempt()` open-codes (hashing a throwaway value so a
  * missing user costs the same as a wrong password). Flows like password
  * reset need the same property but don't have a natural "hash something"
- * step to lean on — a "no such account" path can otherwise return
+ * step to lean on, a "no such account" path can otherwise return
  * noticeably faster than the "account exists, send mail" path, leaking
  * account existence via timing.
  *
  * If `fn` itself already takes longer than `minMs`, no extra delay is
- * added. `fn`'s result (or thrown error) is preserved — the floor applies
+ * added. `fn`'s result (or thrown error) is preserved. The floor applies
  * to failures too, so an error path can't be distinguished by timing
  * either.
  */

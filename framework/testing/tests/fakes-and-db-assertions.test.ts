@@ -70,7 +70,7 @@ class WidgetMade extends AbstractEvent {
   }
 }
 
-/** Fixture app wiring database + queue + events (no HTTP — avoids the cache dep). */
+/** Fixture app wiring database + queue + events (no HTTP, avoids the cache dep). */
 class WidgetsProvider extends ServiceProvider {
   migrations(): string {
     return FIXTURE_MIGRATIONS_DIR;
@@ -166,7 +166,7 @@ describe("resetDatabase()", () => {
       await testApp.resetDatabase();
 
       await assertDatabaseCount(testApp.app, "widgets", 0);
-      // schema still present — inserting again works
+      // schema still present, inserting again works
       await makeWidget(testApp.app, "Two");
       await assertDatabaseCount(testApp.app, "widgets", 1);
     } finally {
@@ -281,7 +281,7 @@ describe("assertSoftDeleted / assertNotSoftDeleted", () => {
 
   it("distinguishes a soft delete from a hard one, which assertDatabaseMissing cannot", async () => {
     // The whole point of the assertion. assertDatabaseMissing() passes for
-    // a hard delete, a soft delete, and a row that was never written — so
+    // a hard delete, a soft delete, and a row that was never written, so
     // it cannot tell a working soft delete from a destructive bug.
     const testApp = await createTestApplication(bootstrapFixtureApp);
     try {

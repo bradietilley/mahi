@@ -3,7 +3,7 @@ import type { IdentifierResolver } from "./identifier-resolver.js";
 
 /**
  * Packs `[ timestamp | cluster | worker | sequence ]` into a 63-bit
- * integer. The `$group` argument is ignored — grouping is a testing
+ * integer. The `$group` argument is ignored. Grouping is a testing
  * concern handled by `SequentialIdentifierResolver`.
  */
 export class SnowflakeIdentifierResolver implements IdentifierResolver {

@@ -15,7 +15,7 @@ export type ErrorPredicate<E extends Error = Error> = (err: Error) => err is E;
 
 /**
  * Maps a matched error into a `Response`. Receives the Hono `Context` too,
- * for the rare renderer that needs request data — most only need the
+ * for the rare renderer that needs request data. Most only need the
  * error. Return a `Response` (e.g. via `c.json(...)`).
  */
 export type ErrorRenderer<E extends Error = Error> = (
@@ -32,7 +32,7 @@ interface RegisteredRenderer {
  * A registry of app-supplied `(predicate, renderer)` pairs, consulted by
  * the central error handler before its built-in `HttpError`/
  * `ValidationException` mapping. This is the extension point for shaping
- * responses from errors an app doesn't control the throw site of — e.g. a
+ * responses from errors an app doesn't control the throw site of, e.g. a
  * third-party library's constraint-violation error that would otherwise
  * fall through to the generic 500. Renderers are tried in registration
  * order; the first whose predicate matches wins.
@@ -65,7 +65,7 @@ export class ErrorRendererRegistry {
  * tooling ever produces `"local"`: `Application` seeds its environment
  * from `NODE_ENV`, and the scaffolded `config/env.ts` constrains that to
  * `development | test | production`. So the local-DX branch below was
- * unreachable in every app the framework itself generates — a developer
+ * unreachable in every app the framework itself generates, a developer
  * staring at "Internal Server Error" with the actual cause visible only
  * in the log.
  *
@@ -83,7 +83,7 @@ function showsDebugMessages(app: Application): boolean {
  * responses; anything else becomes a 500 with a generic message (the real
  * error is still logged via `app.logger`). In a local/development
  * environment the generic 500 body carries the real error message too,
- * purely for DX — never in `production`.
+ * purely for DX, never in `production`.
  *
  * The envelope mirrors Laravel: every error body carries a top-level
  * `message`; a `ValidationException` additionally carries a per-field
@@ -110,7 +110,7 @@ export function createErrorHandler(
     }
 
     // `findOrFail()`/`firstOrFail()` in a controller means "this row is
-    // required and isn't there" — a 404, exactly as Laravel's handler
+    // required and isn't there", a 404, exactly as Laravel's handler
     // maps `ModelNotFoundException`. Without this it fell through to the
     // generic 500, so the single most common "not found" spelling in a
     // controller reported a server fault. `request.model()` already
@@ -124,7 +124,7 @@ export function createErrorHandler(
       return c.json({ message: "Not Found" }, 404);
     }
 
-    // Hono's own error type, thrown by its built-in middleware — most
+    // Hono's own error type, thrown by its built-in middleware, most
     // often `bodyLimit()`, which raises a 413. Without this branch
     // an oversize body is reported to the client as a 500 "Internal
     // Server Error", i.e. as our bug rather than their request, and is

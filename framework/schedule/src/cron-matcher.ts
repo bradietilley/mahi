@@ -2,7 +2,7 @@
  * Parser and matcher for the classic 5-field cron expression
  * (`minute hour day-of-month month day-of-week`).
  *
- * An expression is **parsed once, eagerly** — `parseCronExpression()`
+ * An expression is **parsed once, eagerly**, `parseCronExpression()`
  * turns it into a `CompiledCron` (a `Set` of matching values per field)
  * and throws `InvalidCronExpressionError` on anything it can't make sense
  * of. That timing is the whole point: `ScheduledTask.cron()` compiles at
@@ -17,7 +17,7 @@
  * | Form | Example | Meaning |
  * |---|---|---|
  * | `*` | `*` | Any value. |
- * | `?` | `?` | Any value (day fields only — Quartz spelling of `*`). |
+ * | `?` | `?` | Any value (day fields only, Quartz spelling of `*`). |
  * | `* + /n` | every 5th minute | Every nth from the field's minimum. |
  * | `a-b` | `9-17` | Inclusive range. |
  * | `a-b/n` | `0-30/10` | Every nth within the range. |
@@ -34,18 +34,18 @@
  * - **Day-of-week `7` is Sunday**, the same as `0`, matching Vixie cron.
  * - **Day-of-month and day-of-week OR when both are restricted.** `0 0 1 * 1`
  *   is "the 1st of the month *or* any Monday", not "the 1st, if it's a
- *   Monday" — again matching Vixie cron (and therefore Laravel, and
+ *   Monday", again matching Vixie cron (and therefore Laravel, and
  *   therefore what a `crontab` line with the same text would do). When
  *   only one of the two is restricted, it simply applies.
  *
  * Evaluation is against local server time by default; pass a `timeZone`
  * (an IANA name like `"America/New_York"`) to evaluate the wall-clock
- * fields in that zone instead — see `ScheduledTask.timezone()`.
+ * fields in that zone instead. See `ScheduledTask.timezone()`.
  */
 
 /**
- * Thrown by `parseCronExpression()`/`validateCronExpression()` — and so by
- * `ScheduledTask.cron()` — for an expression that can't be parsed.
+ * Thrown by `parseCronExpression()`/`validateCronExpression()`, and so by
+ * `ScheduledTask.cron()`, for an expression that can't be parsed.
  */
 export class InvalidCronExpressionError extends Error {
   constructor(
@@ -121,7 +121,7 @@ const ALIASES: Record<string, string> = {
 /** A field expanded to the exact set of values it matches. */
 interface CompiledField {
   values: ReadonlySet<number>;
-  /** False when the field was `*` (or `?`) — i.e. it constrains nothing. */
+  /** False when the field was `*` (or `?`), i.e. it constrains nothing. */
   restricted: boolean;
 }
 
@@ -136,7 +136,7 @@ export interface CompiledCron {
   /**
    * The expression this was parsed from, normalised: `@shorthand`s
    * expanded, surrounding and repeated whitespace collapsed to single
-   * spaces. This — not the caller's original text — is what
+   * spaces. This, not the caller's original text, is what
    * `ScheduledTask.getCronExpression()` reports.
    */
   readonly expression: string;
@@ -202,7 +202,7 @@ function formatterFor(timeZone: string): Intl.DateTimeFormat {
 }
 
 /**
- * Extracts the wall-clock components of `date` — either in local server
+ * Extracts the wall-clock components of `date`, either in local server
  * time (default) or in the given IANA `timeZone`. Timezone extraction uses
  * `Intl.DateTimeFormat`, which every supported Node runtime ships with full
  * ICU data for.
@@ -303,7 +303,7 @@ function expandComponent(
     step = Number(stepText);
   }
 
-  // `*` and `?` (both "any value") — with an optional step, they cover the
+  // `*` and `?` (both "any value"), with an optional step, they cover the
   // field's whole range.
   if (body === "*" || (body === "?" && spec.allowsAny)) {
     for (let value = spec.min; value <= spec.max; value += step) {
@@ -390,7 +390,7 @@ function compileField(field: string, spec: FieldSpec, expression: string): Compi
   return { values, restricted: !isUnrestricted(field, spec) };
 }
 
-/** Whether a raw field constrains nothing — `*`, `?`, or a step-less wildcard list of those. */
+/** Whether a raw field constrains nothing: `*`, `?`, or a step-less wildcard list of those. */
 function isUnrestricted(field: string, spec: FieldSpec): boolean {
   return field === "*" || (spec.allowsAny === true && field === "?");
 }
@@ -431,8 +431,8 @@ const COMPILE_CACHE_LIMIT = 500;
 
 /**
  * Parses and validates a cron expression, returning its compiled form.
- * Throws `InvalidCronExpressionError` — with the field and the offending
- * text — for anything malformed, out of range, or unsupported.
+ * Throws `InvalidCronExpressionError`, with the field and the offending
+ * text, for anything malformed, out of range, or unsupported.
  */
 export function parseCronExpression(expression: string): CompiledCron {
   const cached = compiled.get(expression);
@@ -517,7 +517,7 @@ export function validateCronExpression(expression: string): void {
 
 /**
  * Whether a compiled expression is due at the given date (minute
- * resolution — seconds are ignored, matching standard cron). Evaluated
+ * resolution. Seconds are ignored, matching standard cron). Evaluated
  * against local server time unless `timeZone` (an IANA name) is given, in
  * which case the wall-clock fields are read in that zone.
  */
@@ -537,7 +537,7 @@ export function isCompiledCronDue(cron: CompiledCron, date: Date, timeZone?: str
 
 /**
  * Whether the given cron expression is due at the given date. Compiles
- * (memoised) and matches — see `isCompiledCronDue()`.
+ * (memoised) and matches. See `isCompiledCronDue()`.
  */
 export function isCronDue(expression: string, date: Date, timeZone?: string): boolean {
   return isCompiledCronDue(parseCronExpression(expression), date, timeZone);
@@ -547,7 +547,7 @@ const MINUTE_MS = 60_000;
 
 /**
  * The first instant strictly after `from` at which `cron` is due, or
- * `undefined` if there is none within `withinDays` (default ~1 year — the
+ * `undefined` if there is none within `withinDays` (default ~1 year, the
  * only expressions with a longer gap are impossible ones like Feb 30).
  *
  * Scans forward in real time (`+60_000ms` per step) rather than by
@@ -609,7 +609,7 @@ export function nextCronRun(
  * Vixie cron: when BOTH day fields are restricted they are OR-ed, so
  * `0 0 1 * 1` fires on the 1st AND on every Monday. When only one is
  * restricted the other matches everything, and OR would then make the
- * expression match every day — hence the explicit branch rather than a
+ * expression match every day, hence the explicit branch rather than a
  * uniform `||`.
  */
 function dayMatches(cron: CompiledCron, parts: DateParts): boolean {

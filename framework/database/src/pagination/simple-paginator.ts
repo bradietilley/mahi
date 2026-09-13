@@ -11,7 +11,7 @@ export interface SimplePaginationResult<T> {
 }
 
 /**
- * Offset-based pagination that skips the `COUNT(*)` query entirely —
+ * Offset-based pagination that skips the `COUNT(*)` query entirely,
  * Laravel's `Paginator` (`Model::simplePaginate()`), the cheaper sibling
  * of `paginate()`/`LengthAwarePaginator`. It fetches `perPage + 1` rows
  * (the "overfetch" trick `cursorPaginate()` already uses internally) and
@@ -19,7 +19,7 @@ export interface SimplePaginationResult<T> {
  * then trims it off the returned `data`.
  *
  * Use when you only need next/prev navigation, not a total count or page
- * numbers — it saves the extra count query, which matters once a table is
+ * numbers. It saves the extra count query, which matters once a table is
  * large enough that `COUNT(*)` over the filtered set is a real cost.
  * When you DO need the total (page-number UIs), use `paginate()`.
  */

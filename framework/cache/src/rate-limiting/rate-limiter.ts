@@ -2,32 +2,32 @@ import type { CacheStore } from "../cache-store.js";
 import { Limit } from "./limit.js";
 
 /**
- * `args` is untyped (`any[]`, not `unknown[]`) — this package has zero
+ * `args` is untyped (`any[]`, not `unknown[]`). This package has zero
  * knowledge of what a consumer will pass at `limiter(name)`'s call site
  * (`@mahiframework/http`'s `throttle()` passes a Hono `Context`; a queue
  * consumer might pass a job payload). `unknown[]` would make a concretely
  * typed callback like `(c: Context) => Limit` fail TypeScript's
- * contravariant parameter-type check against this type — `any[]` is the
+ * contravariant parameter-type check against this type. `any[]` is the
  * correct escape hatch here, matching `ResponseCallback`'s same rationale
  * in `limit.ts`.
  */
 export type LimiterCallback = (...args: any[]) => Limit | Limit[] | Promise<Limit | Limit[]>;
 
 /**
- * Cache-backed rate limiter — Laravel's `Illuminate\Cache\RateLimiter`
+ * Cache-backed rate limiter, Laravel's `Illuminate\Cache\RateLimiter`
  * equivalent. Takes a `CacheStore` (from `CacheManager`) rather than
  * inventing a parallel counter-store abstraction: rate limiting **is**
- * cache — counters with TTLs — so it belongs on top of the same
+ * cache, counters with TTLs, so it belongs on top of the same
  * `CacheStore` interface every other cached value uses, matching
  * Laravel's own architecture (`RateLimiter` takes a `Cache\Repository`).
  *
  * Two ways to use it:
  *
  * 1. **Manual**, for rate limiting outside HTTP entirely (a queued job, a
- *    login-attempt guard, ...) — `hit()`/`tooManyAttempts()`/`attempts()`/
+ *    login-attempt guard, ...), `hit()`/`tooManyAttempts()`/`attempts()`/
  *    `remaining()`/`clear()`/`availableIn()`/`attempt()`, operating
  *    directly on a plain string key.
- * 2. **Named limiters** — `for(name, callback)` registers a reusable
+ * 2. **Named limiters**, `for(name, callback)` registers a reusable
  *    limiter configuration (a callback returning one or several `Limit`s,
  *    given whatever arguments the caller passes to `limiter(name)`'s
  *    resolved closure), referenced by name from multiple call sites
@@ -49,7 +49,7 @@ export class RateLimiter {
   /**
    * Resolve a named limiter into a callback that, when invoked with
    * whatever arguments the caller has available (e.g. an HTTP `Context`),
-   * returns the `Limit`(s) that callback produced — with duplicate `.key`s
+   * returns the `Limit`(s) that callback produced, with duplicate `.key`s
    * across multiple `Limit`s from the same call resolved to each limit's
    * `fallbackKey()`, so two `Limit.perMinute()` calls with no explicit
    * `.by()` don't collide on the same counter. `undefined` if no limiter
@@ -94,7 +94,7 @@ export class RateLimiter {
    * Attempts to execute `callback` if `key` isn't currently rate-limited;
    * records a hit only if it runs. Returns `false` if rate-limited;
    * otherwise `callback`'s return value, or `true` if it returned
-   * `undefined`/`null` (matches Laravel's `attempt()` — lets a
+   * `undefined`/`null` (matches Laravel's `attempt()`, lets a
    * void-returning callback still signal "it ran" via a truthy result).
    */
   async attempt<T>(
@@ -133,11 +133,11 @@ export class RateLimiter {
 
   /**
    * Atomically record a hit and report whether `key` is now over its
-   * limit — the race-free primitive a throttle should gate on.
+   * limit, the race-free primitive a throttle should gate on.
    *
    * Reading `tooManyAttempts()` and then calling `hit()` as two steps lets
    * N concurrent requests all observe "under the limit" before any of them
-   * increments, so the effective limit is exceeded under load — a real
+   * increments, so the effective limit is exceeded under load, a real
    * TOCTOU on the framework's own abuse control. Because the underlying
    * store's `increment()` is atomic (a synchronous `Map` write, a locked
    * file RMW, or Redis `INCRBY`), incrementing FIRST and deciding on the
@@ -160,7 +160,7 @@ export class RateLimiter {
 
   /** Increment the counter for `key` for a given decay window by `amount`. */
   async increment(key: string, decaySeconds = 60, amount = 1): Promise<number> {
-    // Seed the "when does this window reset" timer exactly once — the
+    // Seed the "when does this window reset" timer exactly once, the
     // first hit in a fresh window wins, subsequent hits within the same
     // window leave it untouched (`add()` is a no-op if already set).
     await this.cache.add(`${key}:timer`, this.availableAt(decaySeconds), decaySeconds);
@@ -170,13 +170,13 @@ export class RateLimiter {
 
     // Pin the window TTL whenever this call created the counter at its
     // floor (`hits === amount`). `increment()` preserves whatever expiry
-    // the entry already had — correct for its own contract, but if the
+    // the entry already had, correct for its own contract, but if the
     // counter had expired between the `add()` above and here (or the
     // `add()` seeded it and it then expired), `increment()` recreates it
     // with NO expiry on the array/file stores, and the counter would live
-    // forever and lock the key out permanently. Re-asserting the TTL here
-    // — unconditionally, not only when `add()` reported the key already
-    // present — closes that window.
+    // forever and lock the key out permanently. Re-asserting the TTL here,
+    // unconditionally, not only when `add()` reported the key already
+    // present, closes that window.
     if (hits === amount) {
       await this.cache.put(key, hits, decaySeconds);
     }
@@ -194,7 +194,7 @@ export class RateLimiter {
     return (await this.cache.get<number>(key)) ?? 0;
   }
 
-  /** Clears the hit counter for `key` (but not its reset timer — see `clear()`). */
+  /** Clears the hit counter for `key` (but not its reset timer. See `clear()`). */
   async resetAttempts(key: string): Promise<void> {
     await this.cache.forget(key);
   }

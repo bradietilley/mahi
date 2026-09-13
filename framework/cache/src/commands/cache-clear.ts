@@ -4,13 +4,13 @@ import { CACHE_TOKEN } from "@mahiframework/core";
 import type { CacheManager } from "../cache-manager.js";
 
 /**
- * `./artisan cache:clear` — empty a cache store.
+ * `./artisan cache:clear`, empty a cache store.
  *
  * Operates on the **default** store unless `--store` names another, which
  * is the one thing to be deliberate about: `cache.default` is usually
  * `array`, and clearing an `array` store from the CLI clears that CLI
  * process's own empty `Map` and exits. It reports success and does
- * nothing, because there is nothing shared to clear — the running
+ * nothing, because there is nothing shared to clear, the running
  * server's cache is in a different process's heap. Pass
  * `--store=file`/`--store=redis`, or point `cache.default` at a shared
  * store, if you meant the server's.

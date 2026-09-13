@@ -1,11 +1,11 @@
 /**
- * Raw ANSI SGR (Select Graphic Rendition) wrappers — direct port of
+ * Raw ANSI SGR (Select Graphic Rendition) wrappers, direct port of
  * `laravel/prompts`' `Concerns/Colors.php`. No external color library
  * (no `chalk`/`picocolors`); the rest of the monorepo doesn't depend on
  * one either, and these wrappers are simple enough not to warrant one.
  *
  * Every wrapper is a no-op (returns the text unchanged) when colour is
- * disabled — piped output, `NO_COLOR`, a non-TTY (see `colorsEnabled()`) —
+ * disabled, piped output, `NO_COLOR`, a non-TTY (see `colorsEnabled()`),
  * so redirecting the CLI to a file or a CI log does not produce `^[[90m`
  * escape garbage.
  */
@@ -116,7 +116,7 @@ export type ColorFn = (text: string) => string;
 
 /**
  * Named lookup for renderers that need to pick a color by state (e.g.
- * "gray" for idle, "yellow" for error) — replaces PHP's dynamic
+ * "gray" for idle, "yellow" for error), replaces PHP's dynamic
  * `$this->{$colorName}(...)` method-name dispatch, which has no clean
  * TypeScript equivalent.
  */

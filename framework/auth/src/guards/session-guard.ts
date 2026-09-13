@@ -23,7 +23,7 @@ export interface SessionGuardConfig {
   rememberMinutes?: number;
   /**
    * `"lax"` is right for same-origin deployments. A cross-origin SPA
-   * needs `"none"`, which browsers only honour alongside `secure: true` —
+   * needs `"none"`, which browsers only honour alongside `secure: true`,
    * meaning cookie sessions do NOT work over plain HTTP across origins in
    * local development. That's a browser rule, not a framework
    * limitation; use the token guard for cross-origin clients.
@@ -36,7 +36,7 @@ export interface SessionGuardConfig {
   /**
    * Cookie name prefix the browser itself enforces. `"host"` yields
    * `__Host-<cookie>`, which cannot be set or overwritten by a sibling
-   * subdomain — the strongest available defense against session fixation
+   * subdomain, the strongest available defense against session fixation
    * from a compromised `other.example.com`. It requires `secure: true`,
    * `path: "/"`, and no `domain`, so it is opt-in rather than the
    * default: those constraints break plain-HTTP local development.
@@ -55,7 +55,7 @@ export interface SessionGuardConfig {
    *
    * Without this the server-side expiry slides forward on every request
    * but the browser still deletes its cookie `lifetimeMinutes` after
-   * LOGIN — so an actively-used session dies mid-use, which is exactly
+   * LOGIN, so an actively-used session dies mid-use, which is exactly
    * what sliding expiry exists to prevent. Set `false` for an absolute
    * session lifetime that no amount of activity extends.
    */
@@ -70,7 +70,7 @@ export interface SessionGuardConfig {
  * forged or edited cookie is rejected before it ever reaches the store,
  * so an attacker can't enumerate session ids by tampering. And because
  * only the id travels, deleting the stored row revokes the session
- * immediately — the property that rules out JWT for this framework.
+ * immediately, the property that rules out JWT for this framework.
  *
  * The injected `Signer` is narrowed to the `"session"` purpose in the
  * constructor, giving cookies their own derived key. A signature minted
@@ -86,13 +86,13 @@ export interface SessionGuardConfig {
  * COOKIES ARE QUEUED ON THE REQUEST (`request.queueCookie()`), not set
  * through Hono. Hono only merges its context-queued headers into a
  * response it built itself, and Mahi handlers return platform `Response`
- * objects — so a cookie set via `hono/cookie` here was silently dropped
+ * objects, so a cookie set via `hono/cookie` here was silently dropped
  * and login never reached the browser at all. See `@mahiframework/http`'s
  * `cookies.ts`.
  */
 
 /**
- * Thrown by `login()` when the given user id resolves to no user — a
+ * Thrown by `login()` when the given user id resolves to no user, a
  * deleted account, or an id the caller made up. Minting a session for a
  * nonexistent user would leave a live cookie whose every subsequent
  * request resolves to `null`, so this fails loudly instead.
@@ -143,7 +143,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
 
     // Sliding expiry: an active session keeps renewing, an abandoned one
     // lapses. Renew to the LATER of the normal sliding window and the
-    // session's own current expiry — so a "remember me" session (whose
+    // session's own current expiry, so a "remember me" session (whose
     // expiry is already far in the future) is never shrunk back to the
     // short lifetime, while an ordinary session still slides forward.
     const slid = this.expiresAt(this.lifetimeMinutes);
@@ -153,7 +153,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
 
     // Re-issue the cookie alongside the renewal, or the browser would
     // still drop it `lifetimeMinutes` after LOGIN while the server
-    // happily kept sliding the row forward — an active session that dies
+    // happily kept sliding the row forward, an active session that dies
     // mid-use, which is the opposite of what sliding expiry is for. Only
     // when the slide actually moved the expiry: a remembered session's
     // far-future cookie needs no refresh, and re-sending it on every
@@ -169,7 +169,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
    * Establish a session and set the cookie.
    *
    * ALWAYS mints a fresh session id, and destroys any pre-existing
-   * session first. That is the defense against session fixation — an
+   * session first. That is the defense against session fixation, an
    * attacker who plants a known session id in a victim's browser before
    * login must not still know it afterwards. It's the one session-
    * specific attack a naive implementation reliably gets wrong, so this
@@ -179,13 +179,13 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
    * REMEMBER ME (`{ remember: true }`) is deliberately NOT Laravel's
    * recaller-cookie mechanism. Laravel keeps a *second*, long-lived
    * credential (an `id|token|hmac` cookie + a `remember_token` column)
-   * specifically to AVOID holding a session row alive for months — a
+   * specifically to AVOID holding a session row alive for months. A
    * concern that doesn't apply here, because these sessions are already
    * fully server-side and revocable by deleting the row (the very
    * property that rules out a parallel, harder-to-revoke recaller
    * cookie). So "remember me" here simply means one long-lived session:
    * `expiresAt`/cookie `maxAge` use `rememberMinutes` instead of
-   * `lifetimeMinutes`. One optional param, one branch — no separate
+   * `lifetimeMinutes`. One optional param, one branch, no separate
    * cookie, table, or password-HMAC binding.
    */
   async login(
@@ -219,7 +219,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
     //
     // Best-effort: outside a request scope (a CLI command seeding a
     // session, a test) there is nothing to publish into, and that is not
-    // an error — the session row and cookie are still written.
+    // an error, the session row and cookie are still written.
     const state = currentAuthState();
 
     if (state !== undefined) {
@@ -240,7 +240,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
 
     // `path`/`domain`/`prefix` must match what `writeCookie()` wrote, or
     // the browser treats this as a different cookie and leaves the
-    // original in place — a logout that visibly succeeds and doesn't.
+    // original in place, a logout that visibly succeeds and doesn't.
     request.queueCookieForget(this.cookieName, this.cookieOptions());
 
     // Clear the ambient scope too: code running later in this same
@@ -259,7 +259,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
   }
 
   /**
-   * "Sign out everywhere else" — revoke every OTHER session for the
+   * "Sign out everywhere else", revoke every OTHER session for the
    * current user while keeping this one alive. Distinct from
    * `logoutEverywhere()`, which also kills the current session.
    *
@@ -299,7 +299,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
     return true;
   }
 
-  /** Delete expired sessions — driven by the `auth:gc` command. */
+  /** Delete expired sessions, driven by the `auth:gc` command. */
   async gc(): Promise<number> {
     return this.sessions.gc();
   }
@@ -311,7 +311,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
       return null;
     }
 
-    // null when the signature doesn't verify — tampered or signed with a
+    // null when the signature doesn't verify, tampered or signed with a
     // key no longer trusted.
     return this.signer.verify(raw);
   }
@@ -330,7 +330,7 @@ export class SessionGuard<TUser = unknown> implements StatefulGuard<TUser> {
    */
   private cookieOptions(): CookieOptions {
     return {
-      httpOnly: true, // not readable from JS — limits XSS session theft
+      httpOnly: true, // not readable from JS: limits XSS session theft
       secure: this.config.secure ?? true,
       sameSite: this.config.sameSite ?? "Lax",
       path: this.config.path ?? "/",

@@ -15,7 +15,7 @@ import { LocalStorageDriver } from "./local-storage-driver.js";
 export class FakeStorageDriver extends LocalStorageDriver {
   /**
    * @param root       the temp directory this fake disk is rooted at (used
-   *                   only for error messages here — the parent resolves
+   *                   only for error messages here, the parent resolves
    *                   against it).
    * @param urlPrefix  optional public URL prefix, mirroring a "public" disk.
    */

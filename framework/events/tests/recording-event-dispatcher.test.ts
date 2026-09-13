@@ -116,7 +116,7 @@ describe("RecordingEventDispatcher", () => {
     });
   });
 
-  it("respects Event.suppress() — a suppressed event is neither recorded nor run", async () => {
+  it("respects Event.suppress(). A suppressed event is neither recorded nor run", async () => {
     const dispatcher = new RecordingEventDispatcher(new Application());
 
     await Event.suppress(async () => {

@@ -255,7 +255,7 @@ describe("LocalStorageDriver", () => {
     });
 
     it("readStream() streams a large file without buffering it whole", async () => {
-      // 8 MiB — bigger than a single fs chunk, proving it arrives in pieces.
+      // 8 MiB, bigger than a single fs chunk, proving it arrives in pieces.
       const big = Buffer.alloc(8 * 1024 * 1024, 7);
       await driver.put("big.bin", big);
       const stream = await driver.readStream("big.bin");

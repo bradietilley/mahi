@@ -8,7 +8,7 @@ import type { EloquentBuilder } from "./eloquent-builder.js";
  *
  * That import would be a cycle: `soft-deletes.ts` needs `Model` (it
  * defines statics whose `this` is the model class), while `model.ts` and
- * `eloquent-builder.ts` need to *ask* whether soft deletes are in play —
+ * `eloquent-builder.ts` need to *ask* whether soft deletes are in play.
  * `EloquentBuilder.delete()` has to know whether to emit `DELETE` or
  * `UPDATE ... SET deleted_at`, and the instance-side `trashed()`/
  * `restore()`/`forceDelete()` need the column name. Declaring the
@@ -26,7 +26,7 @@ export interface SoftDeleteScopeLike extends GlobalScope {
  *
  * Structural, not an `instanceof` check, so an application that writes
  * its own soft-delete scope (a different column, an extra condition)
- * gets the same builder behaviour by declaring `deletedAtColumn` on it —
+ * gets the same builder behaviour by declaring `deletedAtColumn` on it,
  * and so this module stays free of the import it exists to avoid.
  */
 export function findSoftDeleteScope(
@@ -40,7 +40,7 @@ export function findSoftDeleteScope(
 
 /**
  * The `deleted_at IS NULL` global scope installed by `softDeletes: true`
- * (or `{ column }`) config. Lives here — the import-free support module —
+ * (or `{ column }`) config. Lives here, the import-free support module,
  * so the model factory can install it without importing `soft-deletes.ts`
  * (which imports `Model`, a cycle). The column is qualified with the
  * model's table so it survives joins against another soft-deletable table

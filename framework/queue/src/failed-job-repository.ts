@@ -1,20 +1,20 @@
 import type { ChainedJob } from "./queue-driver.js";
 
 /**
- * A single row in `failed_jobs` — a job that exhausted `maxAttempts` (or
+ * A single row in `failed_jobs`, a job that exhausted `maxAttempts` (or
  * whose class couldn't be resolved). `error` holds the full stack trace
  * when one was available at failure time.
  */
 export interface FailedJobRecord {
   id: string;
   jobClass: string;
-  /** The serialized job-instance fields, as stored — parsed lazily by callers. */
+  /** The serialized job-instance fields, as stored, parsed lazily by callers. */
   payloadJson: string;
   error: string;
   failedAt: string;
   /** The connection the job was running on, when the store recorded one. */
   connection?: string;
-  /** The named queue the job failed on — where `retry()` puts it back. */
+  /** The named queue the job failed on, where `retry()` puts it back. */
   queue?: string;
   /**
    * The chain the job was carrying when it failed, restored by `retry()`.
@@ -33,7 +33,7 @@ export interface FailedJobRecord {
  *
  * `retry()` pushes the stored payload back onto the queue it failed on,
  * with `attempts` reset to 0 and its chain restored, then removes the
- * failed-jobs record — matching Laravel's `queue:retry`.
+ * failed-jobs record, matching Laravel's `queue:retry`.
  */
 export interface FailedJobRepository {
   listFailed(): Promise<FailedJobRecord[]>;
@@ -44,7 +44,7 @@ export interface FailedJobRepository {
   flush(olderThanHours?: number): Promise<number>;
 }
 
-/** Narrowing guard — whether a resolved driver exposes failed-job tooling. */
+/** Narrowing guard, whether a resolved driver exposes failed-job tooling. */
 export function supportsFailedJobs(driver: unknown): driver is FailedJobRepository {
   return (
     typeof driver === "object" &&

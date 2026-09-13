@@ -35,7 +35,7 @@ class FailingJob extends Job {
   }
 }
 
-/** A queue of pre-seeded jobs, then `undefined` forever — no real timers/IO. */
+/** A queue of pre-seeded jobs, then `undefined` forever, no real timers/IO. */
 class FakeDriver implements QueueDriver {
   popped: QueuedJob[] = [];
   deleted: QueuedJob[] = [];
@@ -92,7 +92,7 @@ class FakeDriver implements QueueDriver {
 }
 
 /**
- * A `ModelRegistry` whose models resolve but whose rows are all gone —
+ * A `ModelRegistry` whose models resolve but whose rows are all gone.
  * `findMany()` returns nothing, so `decodeModels()` raises
  * `ModelNotFoundError` (the default `deleteWhenMissingModels: false`
  * path). Exactly what a job holding a since-deleted model looks like.
@@ -175,7 +175,7 @@ describe("QueueWorkCommand", () => {
     registry.register("failing", FailingJob);
 
     // FailingJob customizes maxAttempts = 1 (an own field), so its
-    // serialized state carries it — mirror what encodeJob would produce.
+    // serialized state carries it, mirror what encodeJob would produce.
     const job: QueuedJob = { id: "3", jobClass: "failing", state: { maxAttempts: 1 }, attempts: 0 };
     const driver = new FakeDriver([job]);
     const app = buildApp(driver, registry);
@@ -227,7 +227,7 @@ describe("QueueWorkCommand", () => {
     const app = buildApp(driver, registry);
     const command = new QueueWorkCommand(app);
 
-    // Not --once — the loop would otherwise keep polling forever;
+    // Not --once. The loop would otherwise keep polling forever;
     // SIGTERM (emitted by the first job itself, above) is expected to
     // stop it before the second job is popped.
     await command.handle({ connection: "fake", sleep: "0" });
@@ -454,7 +454,7 @@ describe("QueueWorkCommand", () => {
   describe("the worker survives everything it can", () => {
     it("fails (does not crash on) a job whose payload references a deleted model", async () => {
       // What `decodeJob` throws when a referenced row is gone and the
-      // model's `deleteWhenMissingModels` is false — the DEFAULT. It must
+      // model's `deleteWhenMissingModels` is false, the DEFAULT. It must
       // not escape processJob(): that would unwind handle() and kill the
       // process, stranding the job reserved forever.
       class MissingModelJob extends Job {
@@ -564,7 +564,7 @@ describe("QueueWorkCommand", () => {
         new QueueWorkCommand(app).handle({ connection: "fake", sleep: "0", once: true }),
       ).resolves.toBeUndefined();
 
-      // The failure was still recorded — the broken hook only cost a log line.
+      // The failure was still recorded, the broken hook only cost a log line.
       expect(driver.failed).toEqual([job]);
       expect(driver.failErrors[0]?.message).toBe("kaboom");
     });
@@ -583,7 +583,7 @@ describe("QueueWorkCommand", () => {
       const registry = new JobRegistry();
       registry.register("never", NeverFinishesJob);
 
-      // Reclaimed three times after killing its workers — it never threw,
+      // Reclaimed three times after killing its workers. It never threw,
       // so nothing ever routed it to failed_jobs. Without a pre-run check
       // it cycles reserve → reclaim forever.
       const job: QueuedJob = { id: "1", jobClass: "never", state: { maxAttempts: 3 }, attempts: 3 };
@@ -866,7 +866,7 @@ describe("QueueWorkCommand", () => {
       ]);
 
       // No --once, and a sleep that would hang forever if the loop kept
-      // polling — reaching the assertion at all is the assertion.
+      // polling, reaching the assertion at all is the assertion.
       await new QueueWorkCommand(buildApp(driver, registry)).handle({
         connection: "fake",
         sleep: "0",

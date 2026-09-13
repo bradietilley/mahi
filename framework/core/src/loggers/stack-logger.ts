@@ -2,7 +2,7 @@ import type { Logger, LogLevel } from "../logger.js";
 import { AbstractLogger } from "../logger.js";
 
 /**
- * A `Logger` that fans out every call to a list of other `Logger`s —
+ * A `Logger` that fans out every call to a list of other `Logger`s,
  * matches Laravel's `stack` driver concept: log to console AND file (or
  * any other combination of channels) simultaneously by resolving a
  * `"stack"` channel whose config lists the constituent channel names (see

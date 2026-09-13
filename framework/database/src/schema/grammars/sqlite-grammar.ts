@@ -248,7 +248,7 @@ async function compileAlter(db: Kysely<any>, blueprint: Blueprint): Promise<void
     await db.schema.alterTable(table).renameColumn(from, to).execute();
   }
 
-  // Indexes come off BEFORE the columns they cover — see the same
+  // Indexes come off BEFORE the columns they cover. See the same
   // ordering in native-alter-grammar. SQLite is the strict one here: it
   // validates surviving indexes when rebuilding the table for a
   // DROP COLUMN, and refuses outright with "error in index ... after drop

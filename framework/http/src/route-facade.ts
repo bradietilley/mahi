@@ -7,7 +7,7 @@ import type { HttpPipe } from "./middleware/pipeline-middleware.js";
 export const ROOT_ROUTER_TOKEN = "http.router";
 
 /**
- * Static registration entrypoint — Laravel's `Route` facade. Forwards to
+ * Static registration entrypoint, Laravel's `Route` facade. Forwards to
  * the kernel's root `Router`, so routes can be registered outside a
  * provider's `routes(router)` hook (the hook still works and is still the
  * recommended home for a package's routes):
@@ -16,7 +16,7 @@ export const ROOT_ROUTER_TOKEN = "http.router";
  *   Route.get("/posts/{post}", ShowPostController);   // class controller
  *   Route.group("/admin", (admin) => admin.get("/", dashboard));
  *
- * Handlers are typed `RouteTarget` — a plain function OR a class-based
+ * Handlers are typed `RouteTarget`, a plain function OR a class-based
  * `Controller`, matching `Router` exactly.
  */
 export class Route extends Facade<Router>(() => ROOT_ROUTER_TOKEN) {

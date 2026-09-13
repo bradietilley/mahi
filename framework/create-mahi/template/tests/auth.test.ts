@@ -6,13 +6,13 @@ import { clientFor, registerUser, resetRateLimits } from "./helpers/auth.js";
 
 /**
  * `createTestApplication(bootstrap)` boots the real application against a
- * throwaway SQLite file and runs every migration — the framework's and
+ * throwaway SQLite file and runs every migration, the framework's and
  * yours. `testApp.request()` dispatches straight into the app's own Hono
  * instance, so there's no server to start and no port to bind.
  *
  * Note there is no per-test "fake client IP" helper. Sending a unique
  * `x-forwarded-for` per request would only work if `request.ip()` trusted
- * that header — which is exactly the hole that lets an attacker rotate
+ * that header. Which is exactly the hole that lets an attacker rotate
  * the header to bypass the login limiter. The limiter is keyed on the
  * socket peer, which in-process tests share, so tests clear the limiter
  * state instead of pretending to be different clients. See

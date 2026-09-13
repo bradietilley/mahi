@@ -1,6 +1,6 @@
 /**
  * Optional `"health"` config namespace, read by `HealthServiceProvider`
- * with `?? {}` — an app that never sets it gets the defaults below.
+ * with `?? {}`, an app that never sets it gets the defaults below.
  */
 export interface HealthConfig {
   /**
@@ -9,11 +9,11 @@ export interface HealthConfig {
    */
   timeoutSeconds?: number;
   /**
-   * How many checks run at once. Defaults to `1` — strictly sequential.
+   * How many checks run at once. Defaults to `1`, strictly sequential.
    *
    * Parallel is the tempting default and it is wrong for a probe. Every
    * check is I/O against a dependency that is *already suspected of being
-   * unwell* — that is why it is being probed. Firing all of them at once,
+   * unwell*. That is why it is being probed. Firing all of them at once,
    * once per probe interval, from every instance, is a synchronised burst
    * of connection attempts at exactly the moment the dependency can least
    * absorb it. A health check that amplifies the outage it was installed

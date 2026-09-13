@@ -2,7 +2,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 /**
  * A key/value store for cross-cutting "context" that should ride along
- * with everything the application does during its lifetime — most
+ * with everything the application does during its lifetime, most
  * visibly, every log line (see `formatLogLine()` in `logger.ts`, which
  * appends `all()` as a trailing JSON object to each formatted line).
  * Mirrors the pragmatic subset of Laravel's
@@ -10,29 +10,29 @@ import { AsyncLocalStorage } from "node:async_hooks";
  * add/get/forget/only/except plus the `push` stack helper, `remember`,
  * and `scope`.
  *
- * PER-REQUEST ISOLATION. Laravel gets per-request isolation for free from
+ * PER-REQUEST ISOLATION. Laravel gets per-request isolation from
  * PHP's process-per-request model; a Node process serving concurrent
  * requests would otherwise share one repository across all of them, so
  * request-scoped data (request id, correlation id…) written by one request
  * would bleed into another's log lines. To avoid that, this repository has
  * TWO layers, resolved automatically per call:
  *
- *   - a **process-global** store — data added at boot (app version, deploy
+ *   - a **process-global** store, data added at boot (app version, deploy
  *     id, worker name…), visible to every request; and
- *   - a **per-request overlay** — an `AsyncLocalStorage`-scoped store
+ *   - a **per-request overlay**, an `AsyncLocalStorage`-scoped store
  *     opened by `runScoped()` for the duration of each request (the HTTP
  *     kernel wraps request handling in it, the same mechanism
  *     `@mahiframework/auth`'s `auth-context.ts` and `@mahiframework/database`'s
  *     `transaction-context.ts` use). It starts as a shallow copy of the
  *     global store, so a request sees all global context immediately, and
  *     every subsequent read/write/forget inside the request targets the
- *     overlay only — so nothing a request adds (or forgets) leaks into the
+ *     overlay only, so nothing a request adds (or forgets) leaks into the
  *     global store or into any other concurrent request, and the overlay
  *     is discarded when the request ends.
  *
  * Outside any `runScoped()` scope (boot, a queue job, a CLI command, a
  * test) every operation falls back to the process-global store, so the API
- * is identical whether or not a request scope is active — you never have
+ * is identical whether or not a request scope is active. You never have
  * to check.
  *
  * Omitted from Laravel's API: hidden data (`addHidden()` et al.),
@@ -59,7 +59,7 @@ export class ContextRepository {
    * read/write inside `fn` (across `await` boundaries) targets that
    * overlay, isolated from other concurrent scopes; the overlay is
    * discarded when `fn` settles. The HTTP kernel opens exactly one of
-   * these per request — see the class docstring.
+   * these per request. See the class docstring.
    */
   runScoped<T>(fn: () => T): T {
     return this.requestScope.run({ ...this.globalData }, fn);
@@ -71,8 +71,8 @@ export class ContextRepository {
   }
 
   /**
-   * Add one key/value pair — or, given a record, merge every entry of it
-   * in — overwriting any existing values. Laravel's `Context::add()`.
+   * Add one key/value pair, or, given a record, merge every entry of it
+   * in, overwriting any existing values. Laravel's `Context::add()`.
    */
   add(key: string, value: unknown): this;
   add(values: Record<string, unknown>): this;
@@ -121,7 +121,7 @@ export class ContextRepository {
   }
 
   /**
-   * All current context data, as a shallow copy — mutating the returned
+   * All current context data, as a shallow copy, mutating the returned
    * object never mutates the repository. Inside a request scope this is
    * the overlay (global data plus anything the request added); outside
    * one it's the process-global store.
@@ -168,7 +168,7 @@ export class ContextRepository {
 
   /**
    * Append value(s) to the array stored at `key`, creating the array if
-   * the key is new. Throws if the key already holds a non-array — same
+   * the key is new. Throws if the key already holds a non-array, same
    * guard as Laravel's `push()`.
    */
   push(key: string, ...values: unknown[]): this {
@@ -200,7 +200,7 @@ export class ContextRepository {
 
   /**
    * Run `callback` with `data` temporarily merged into the active store,
-   * restoring the previous context afterwards — even when the callback
+   * restoring the previous context afterwards, even when the callback
    * throws, and (for async callbacks) only after the returned promise
    * settles. Changes the callback itself makes to the context are
    * discarded along with `data`, matching Laravel's `scope()` snapshot
@@ -208,7 +208,7 @@ export class ContextRepository {
    *
    * Inside a request scope this snapshots/restores the per-request overlay
    * (so concurrent requests don't interfere); outside one it operates on
-   * the process-global store — in which case, as before, an async
+   * the process-global store, in which case, as before, an async
    * `scope()` is not isolated from other concurrent async work sharing the
    * global store.
    */
@@ -237,7 +237,7 @@ export class ContextRepository {
   }
 
   /**
-   * Replace every key of `target` in place with those of `source` — used
+   * Replace every key of `target` in place with those of `source`, used
    * by `scope()` to restore a snapshot without reassigning the store
    * reference (which, for an `AsyncLocalStorage` overlay, is owned by the
    * scope and can't be swapped out).

@@ -158,7 +158,7 @@ describe("ScheduledTask", () => {
     expect(() => new ScheduledTask(() => {}).name("   ")).toThrow();
   });
 
-  it("getName() is undefined when no name was set — no cron fallback", () => {
+  it("getName() is undefined when no name was set, no cron fallback", () => {
     expect(new ScheduledTask(() => {}).hourly().getName()).toBeUndefined();
   });
 
@@ -337,7 +337,7 @@ describe("ScheduledTask", () => {
 
   describe("webhook pings", () => {
     // Pings go through @mahiframework/http-client, so these assert with Http.fake()
-    // rather than monkey-patching globalThis.fetch — which is exactly what
+    // rather than monkey-patching globalThis.fetch. Which is exactly what
     // that package exists for.
     afterEach(() => {
       Http.restore();
@@ -432,7 +432,7 @@ describe("ScheduledTask", () => {
     });
 
     it("a hanging ping endpoint does not block the task indefinitely", async () => {
-      // A REAL server that accepts the connection and then never answers —
+      // A REAL server that accepts the connection and then never answers,
       // the failure mode a monitoring endpoint actually has, and one a
       // stubbed transport can't reproduce, because `Http.fake()` resolves
       // the stub without ever consulting the abort signal. Only a genuine
@@ -444,7 +444,7 @@ describe("ScheduledTask", () => {
       const { port } = hanging.address() as AddressInfo;
 
       const app = new Application();
-      // 300ms rather than the 5s default, to keep the test quick — the
+      // 300ms rather than the 5s default, to keep the test quick. The
       // point is that SOME bound applies, not its exact value.
       app.config.set("schedule", { pingTimeoutMs: 300 });
       const warning = vi.spyOn(app.logger, "warning").mockImplementation(() => {});

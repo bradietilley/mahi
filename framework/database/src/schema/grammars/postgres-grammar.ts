@@ -10,7 +10,7 @@ const { compileCreate, compileAlter } = makeNativeAlterGrammar({
 
   autoIncrement(col) {
     // Postgres uses serial/bigserial pseudo-types (resolved by
-    // compileColumnType) — no separate modifier. The column is still the
+    // compileColumnType), no separate modifier. The column is still the
     // primary key, which the caller applies via primaryKey().
     return col;
   },
@@ -69,7 +69,7 @@ const { compileCreate, compileAlter } = makeNativeAlterGrammar({
  * The `search_path` filter is required: Kysely's
  * `introspection.getTables()` returns every non-system table in the
  * database, across all schemas. Dropping that list unqualified would
- * reach into schemas the connection was never pointed at — so a
+ * reach into schemas the connection was never pointed at, so a
  * `migrate:fresh` against an app's own schema could destroy a
  * neighbouring one sharing the database. Restricting to
  * `current_schema()` (which `PostgresDriver` sets from `searchPath`)

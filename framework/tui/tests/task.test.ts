@@ -69,7 +69,7 @@ describe("task Tui.task()", () => {
     const output = fake.output();
     // BufferedOutput just appends (it doesn't emulate real terminal
     // erasure), so both the initial RUNNING write and the erase-and-
-    // rewrite sequence show up in the raw buffer — assert the erase
+    // rewrite sequence show up in the raw buffer, assert the erase
     // escape code (\r + erase-line) appears between them, which is
     // what makes a real terminal show only the final DONE line.
     expect(output).toContain("RUNNING");

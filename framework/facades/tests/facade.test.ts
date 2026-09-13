@@ -77,7 +77,7 @@ describe("Facade.swap()", () => {
     Greeting.swap({ greet: () => "hello, fake" });
 
     expect(Greeting.greet()).toBe("hello, fake");
-    // The container still holds the real one — a swap changes what THIS
+    // The container still holds the real one, a swap changes what THIS
     // facade returns, not what everything resolving the token gets.
     expect(application.make<Greeter>("greeter").greet()).toBe("hello, world");
   });
@@ -132,7 +132,7 @@ describe("Facade.swap()", () => {
 
   it("keeps each facade's swap to itself", async () => {
     // Each `Facade<T>()` call produces its own class, so two facades must
-    // not share swap state — otherwise faking Cache would silently fake
+    // not share swap state, otherwise faking Cache would silently fake
     // Queue too.
     class Other extends Facade<Greeter>(() => "greeter") {
       static greet(): string {

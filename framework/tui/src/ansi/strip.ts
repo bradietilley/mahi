@@ -1,5 +1,5 @@
 /**
- * Strips ANSI escape sequences from a string — used for display-width
+ * Strips ANSI escape sequences from a string, used for display-width
  * measurement (colored text must not count its escape codes as visible
  * characters) and for normalizing captured output in tests.
  */

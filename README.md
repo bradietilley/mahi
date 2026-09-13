@@ -1,7 +1,7 @@
 # Mahi
 
 A TypeScript application framework for building APIs and services on
-Node.js — service providers with a two-stage `register()`/`boot()`
+Node.js, service providers with a two-stage `register()`/`boot()`
 lifecycle, a service container, Manager-based driver resolution, an
 expressive ORM, an HTTP kernel (Hono), a CLI kernel (Commander), queues,
 scheduling, and an event system. All plugin-extensible.
@@ -112,7 +112,7 @@ git push origin main v0.2.0
 ```
 
 The `Release` workflow builds, lints, typechecks, tests, verifies the tag
-matches the lockstep version, and runs `pnpm -r publish` — which only
+matches the lockstep version, and runs `pnpm -r publish`, which only
 publishes packages whose version is not already on npm, so re-running a
 release is safe. It needs an `NPM_TOKEN` repository secret with publish
 rights to the `@mahiframework` scope.

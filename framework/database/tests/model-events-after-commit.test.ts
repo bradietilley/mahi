@@ -76,7 +76,7 @@ async function setupApp(): Promise<{ app: Application; db: SqliteDriver }> {
   return { app, db: driver };
 }
 
-describe("model events — after commit", () => {
+describe("model events: after commit", () => {
   afterEach(() => {
     clearCurrentApp();
     clearAfterCommitResolver();

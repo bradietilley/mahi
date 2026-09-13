@@ -14,7 +14,7 @@ export class MigrateCommand extends Command {
   }
 
   async handle(options: { pretend?: boolean; force?: boolean } = {}): Promise<void> {
-    // `--pretend` changes nothing, so it needs no production guard —
+    // `--pretend` changes nothing, so it needs no production guard,
     // being able to check what a deploy *would* do, on production,
     // without ceremony is the point of it.
     if (!options.pretend && !(await this.confirmToProceed(options))) {

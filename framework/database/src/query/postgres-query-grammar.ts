@@ -7,7 +7,7 @@ import type { DatePart, GrammarBinding, JsonColumn, QueryGrammar } from "./gramm
  * apply.
  *
  * Postgres has no JSONPath-string form for this the way SQLite and
- * MySQL do — the path is spelled as a chain of `->` operators, so it is
+ * MySQL do. The path is spelled as a chain of `->` operators, so it is
  * built segment by segment here. The final cast to `jsonb` is what
  * makes this work against both `json` and `jsonb` columns: `@>` and
  * `jsonb_array_length()` are `jsonb`-only, and `json` (the textual
@@ -31,12 +31,12 @@ function jsonbPath(column: JsonColumn): Expression<any> {
  * compare against Laravel's zero-padded string convention
  * (`whereMonth("09")`). `extract()` returns `numeric`, whose text form
  * is unpadded (`9`), so the numeric components are padded with
- * `lpad(..., 2, '0')` to match — except `year`, which is already four
+ * `lpad(..., 2, '0')` to match, except `year`, which is already four
  * digits.
  *
  * JSON uses the `jsonb` operator family: `@>` for containment,
  * `jsonb_path_exists()` for key presence, `jsonb_array_length()` for
- * length — see `jsonbPath()` for why everything is cast to `jsonb`
+ * length. See `jsonbPath()` for why everything is cast to `jsonb`
  * first.
  *
  * Upserts use the same `ON CONFLICT (cols) DO UPDATE SET ... =

@@ -35,7 +35,7 @@ describe("Encrypter", () => {
       const encrypter = new Encrypter(randomBytes(32));
       const raw = Buffer.from(encrypter.encrypt("sensitive value"), "base64url");
 
-      // version(1) + iv(12) + tag(16) + ct — rebuild with the tag truncated
+      // version(1) + iv(12) + tag(16) + ct, rebuild with the tag truncated
       const version = raw.subarray(0, 1);
       const iv = raw.subarray(1, 13);
       const authTag = raw.subarray(13, 29);
@@ -74,7 +74,7 @@ describe("Encrypter", () => {
       }
     });
 
-    it("accepts the minimum valid payload — an encrypted empty string", () => {
+    it("accepts the minimum valid payload, an encrypted empty string", () => {
       const encrypter = new Encrypter(randomBytes(32));
       const encrypted = encrypter.encrypt("");
       expect(Buffer.from(encrypted, "base64url")).toHaveLength(29);
@@ -109,7 +109,7 @@ describe("Encrypter", () => {
       expect(encrypter.decrypt(encrypted, "users.ssn")).toBe("secret");
     });
 
-    it("fails when decrypting under a different aad — no cross-context replay", () => {
+    it("fails when decrypting under a different aad, no cross-context replay", () => {
       const encrypter = new Encrypter(randomBytes(32));
       const encrypted = encrypter.encrypt("secret", "users.ssn");
       expect(() => encrypter.decrypt(encrypted, "users.notes")).toThrow();

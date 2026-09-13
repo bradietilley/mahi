@@ -1,15 +1,15 @@
 import { Schema, type Migration, type Blueprint } from "@mahiframework/database";
 
 /**
- * The generic, polymorphic `notifications` table backing `DatabaseChannel`
- * — a port of Laravel's `notifications` table shape.
+ * The generic, polymorphic `notifications` table backing `DatabaseChannel`,
+ * a port of Laravel's `notifications` table shape.
  *
  * `type` is the `Notification` subclass name (`"InvoicePaid"`, …); `data`
  * is that notification's JSON-encoded `toDatabase()` payload;
  * `notifiable_type`/`notifiable_id` identify the recipient. The
  * discriminant is the notifiable's `morphAlias()` (or, for a plain
  * adapter class that isn't a `Model`, its static `table`), so the pair is
- * a standard morph column pair — a read-model over this table can declare
+ * a standard morph column pair. A read-model over this table can declare
  * a `morphTo` for `notifiable` and eager-load recipients. `read_at` NULL
  * means unread. `updated_at` tracks when `read_at` last flipped (Laravel's
  * `notifications` table carries it too), so the `DatabaseNotification`

@@ -15,7 +15,7 @@ import { JOB_REGISTRY_TOKEN } from "./tokens.js";
 export interface QueueConnectionConfig {
   /**
    * Defer every dispatch on this connection until the enclosing database
-   * transaction commits — Laravel's `after_commit`. Off by default
+   * transaction commits, Laravel's `after_commit`. Off by default
    * (dispatch happens immediately), and always overridable per dispatch
    * with `{ afterCommit: false }`.
    *
@@ -27,7 +27,7 @@ export interface QueueConnectionConfig {
   /**
    * Default TTL (in **seconds**) for the uniqueness lock of a
    * `ShouldBeUnique` job dispatched on this connection, overridable
-   * per-job with `uniqueFor()`. The lock's crash safety net — a worker
+   * per-job with `uniqueFor()`. The lock's crash safety net, a worker
    * that dies mid-job holds the lock only this long. Defaults to 3600.
    */
   uniqueFor?: number;
@@ -43,7 +43,7 @@ export interface QueueConfig {
 export interface DispatchOptions {
   delaySeconds?: number;
   connection?: string;
-  /** The named queue to push onto — the connection's own default when omitted. */
+  /** The named queue to push onto. The connection's own default when omitted. */
   queue?: string;
   chain?: Job[];
   /**
@@ -81,7 +81,7 @@ export class QueueManager extends Manager<QueueDriver> {
    * registered factory (and any previously-cached instance). Defaults to
    * the *default* connection, so a `Queue::fake()`-style helper can make
    * `dispatch()` (which uses the default connection) record into a
-   * `FakeQueueDriver` with a single call — see
+   * `FakeQueueDriver` with a single call. See
    * `@mahiframework/testing`'s `createTestApplication({ fakeQueue: true })`.
    */
   swap(driver: QueueDriver, name?: string): void {
@@ -97,13 +97,13 @@ export class QueueManager extends Manager<QueueDriver> {
    * must be registered (via a provider's `jobs()` hook) so it can be
    * reconstructed by name in a worker process; its own fields are
    * serialized (with any live `Model` encoded to a `{ __model, __id }`
-   * reference — rehydrated before `handle()` runs) into the persisted
+   * reference, rehydrated before `handle()` runs) into the persisted
    * state.
    *
    * Note: for the `sync` connection this resolves only once the job has
    * *finished running* (there is no separate queue state); for `database`
    * (and any future durable driver) it resolves once the job is *enqueued*,
-   * not once it runs. This asymmetry is inherent to what "sync" means —
+   * not once it runs. This asymmetry is inherent to what "sync" means,
    * switching `QUEUE_CONNECTION` from `sync` to `database` changes what
    * `await` actually waits for.
    *
@@ -127,7 +127,7 @@ export class QueueManager extends Manager<QueueDriver> {
    * A job class marked `static unique` (see `ShouldBeUnique`) acquires a
    * cache lock at dispatch keyed by its name + `uniqueId()`. If an
    * identical job is already queued (or running, for `untilFinished`),
-   * this returns `false` **without pushing** — the duplicate is silently
+   * this returns `false` **without pushing**. The duplicate is silently
    * dropped, matching Laravel. Returns `true` for a job that was actually
    * enqueued (and for every non-unique job).
    */
@@ -138,7 +138,7 @@ export class QueueManager extends Manager<QueueDriver> {
     const name = registry.nameFor(job);
 
     // Uniqueness gate: acquire the lock before doing any work. A held lock
-    // means an identical job is already queued — drop this dispatch.
+    // means an identical job is already queued, drop this dispatch.
     const connectionName = options?.connection ?? this.getDefaultDriver();
     const uniqueForDefault = this.connectionConfig(connectionName)?.uniqueFor;
     const acquired = await acquireUniqueLock(this.app, name, job, uniqueForDefault);
@@ -193,7 +193,7 @@ export class QueueManager extends Manager<QueueDriver> {
   }
 
   /**
-   * Dispatch an ordered chain of job INSTANCES — each link runs only after
+   * Dispatch an ordered chain of job INSTANCES. Each link runs only after
    * the one before it succeeds. Sugar over `dispatch()`: the first job in
    * the list is dispatched with the rest attached as its `chain`. An empty
    * list is a no-op.

@@ -7,7 +7,7 @@ import {
 const MINUTE_MS = 60_000;
 
 /**
- * A minimal store with a genuinely atomic `add()` — synchronous
+ * A minimal store with a genuinely atomic `add()`, synchronous
  * check-then-set on a `Map`, which within one process is exactly the
  * guarantee `CacheScheduleLocker` requires (and what `ArrayCacheStore`
  * provides). TTLs are recorded rather than enforced; the tests that care
@@ -96,7 +96,7 @@ describe("CacheScheduleLocker", () => {
   describe("owner-checked release", () => {
     it("does not release a lock another locker now holds", async () => {
       // The scenario: A's task overran its expiry, the lock lapsed, B took
-      // it — and only then did A's `finally` run. A must not delete B's lock.
+      // it, and only then did A's `finally` run. A must not delete B's lock.
       const store = new FakeStore();
       const a = new CacheScheduleLocker(store);
       const b = new CacheScheduleLocker(store);

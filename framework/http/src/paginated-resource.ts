@@ -21,7 +21,7 @@ export interface NestedPaginatedResourceResult<TShape> {
 
 export interface PaginatedResourceOptions {
   /**
-   * Extra top-level fields merged into the envelope — Laravel's
+   * Extra top-level fields merged into the envelope, Laravel's
    * `->additional([...])`. Handy for a `requestId`, a computed summary,
    * etc. without hand-rolling the object literal in the controller.
    */
@@ -77,12 +77,12 @@ export interface CursorPaginatedResourceResult<TShape> {
 }
 
 export interface CursorPaginatedResourceOptions {
-  /** Extra top-level fields merged into the envelope — Laravel's `->additional([...])`. */
+  /** Extra top-level fields merged into the envelope, Laravel's `->additional([...])`. */
   additional?: Record<string, unknown>;
 }
 
 /**
- * The cursor-pagination equivalent of `paginatedResource()` — wraps a
+ * The cursor-pagination equivalent of `paginatedResource()`, wraps a
  * `CursorPaginationResult<TModel>` (from `Todo.cursorPaginate()`/
  * `cursorPaginate()`), preserving `nextCursor`/`prevCursor` unchanged.
  * Extra top-level fields can be merged via `additional`.

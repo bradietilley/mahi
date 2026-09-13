@@ -12,8 +12,8 @@ function modelName(className: string): string {
 /**
  * The factory never fills `id`, whatever the key strategy:
  *
- * - `id` (auto-increment) — the DB assigns it on insert.
- * - `uuid` / `snowflake`  — the model's `keyType` strategy fills it
+ * - `id` (auto-increment), the DB assigns it on insert.
+ * - `uuid` / `snowflake`, the model's `keyType` strategy fills it
  *   before insert, via `newUniqueId()`.
  *
  * Filling it here would make the generated factory inconsistent with an

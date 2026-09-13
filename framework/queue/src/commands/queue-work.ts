@@ -23,7 +23,7 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Default backoff: `attempts * 5` seconds, where `attempts` is the 1-based
- * number of the attempt that just failed — so the first retry waits 5s,
+ * number of the attempt that just failed, so the first retry waits 5s,
  * the second 10s, and so on. Callers must pass the post-increment count:
  * a zero here means an immediate retry that hammers whatever downstream
  * just failed.
@@ -35,7 +35,7 @@ function defaultBackoffSeconds(attempts: number): number {
 /**
  * Thrown when a job's soft `timeout()` elapses before `handle()` resolves.
  * The in-flight `handle()` promise may still be running (JS can't force an
- * abort) — see `Job.timeout`.
+ * abort). See `Job.timeout`.
  */
 export class JobTimeoutError extends Error {
   constructor(seconds: number) {
@@ -45,7 +45,7 @@ export class JobTimeoutError extends Error {
 }
 
 /**
- * Thrown when a job is popped having already used up its attempts — it
+ * Thrown when a job is popped having already used up its attempts. It
  * was reclaimed one time too many after killing (or outliving) its
  * workers, so it never reached the normal "threw an exception" path that
  * would have failed it.
@@ -117,7 +117,7 @@ interface WorkOptions {
  * ## Why the loop never throws
  *
  * A `queue:work` process is a daemon. Anything that escapes `handle()`
- * ends the process, and — worse — leaves whatever job was in flight
+ * ends the process, and, worse, leaves whatever job was in flight
  * reserved, invisible to every other worker until its `retryAfter`
  * elapses. So every failure mode has an explicit home:
  *
@@ -136,16 +136,16 @@ interface WorkOptions {
  * `SIGINT`/`SIGTERM` (the latter being what orchestrators send) stop the
  * loop after the current job. `--max-jobs`, `--max-time`, `--memory` and
  * `queue:restart` do the same, on the assumption that the process is
- * under a supervisor that will start a fresh one — which is also how a
+ * under a supervisor that will start a fresh one. Which is also how a
  * leaking job stops taking the host down with it.
  */
 export class QueueWorkCommand extends Command {
   signature = "queue:work";
   description = "Process jobs from the queue until stopped (Ctrl+C or SIGTERM).";
 
-  /** The connection this worker is draining — chained jobs stay on it. */
+  /** The connection this worker is draining, chained jobs stay on it. */
   private connection?: string;
-  /** The named queue this worker is draining — chained jobs stay on it too. */
+  /** The named queue this worker is draining, chained jobs stay on it too. */
   private queue?: string;
   /** `--tries`, overriding each job's own `maxAttempts` when given. */
   private tries?: number;
@@ -193,13 +193,13 @@ export class QueueWorkCommand extends Command {
 
     // The restart cutoff is read ONCE, at startup: a `queue:restart` that
     // lands later writes a newer timestamp, and the comparison below then
-    // says "you started before the restart was requested — stop".
+    // says "you started before the restart was requested, stop".
     const startedAt = Date.now();
     let processed = 0;
 
     let running = true;
     // SIGTERM is the standard graceful-shutdown signal sent by
-    // containerized/orchestrated deployments (Docker/Kubernetes) —
+    // containerized/orchestrated deployments (Docker/Kubernetes),
     // trapping only SIGINT would leave the worker unable to finish an
     // in-flight job cleanly before being force-killed in that setting.
     const untrap = trap(["SIGINT", "SIGTERM"], () => {
@@ -247,7 +247,7 @@ export class QueueWorkCommand extends Command {
   /**
    * `pop()`, but an infrastructure failure pauses the worker instead of
    * ending it. A database blipping out for ten seconds must not take
-   * every worker in the fleet down with it — and if the outage is
+   * every worker in the fleet down with it, and if the outage is
    * permanent, a supervisor restarting a crashed worker in a tight loop
    * is strictly worse than one that sleeps and retries.
    *
@@ -271,7 +271,7 @@ export class QueueWorkCommand extends Command {
    * signalled after this worker started.
    *
    * All three assume a supervisor (systemd, Kubernetes, PM2) restarts the
-   * process — stopping is how a worker picks up new code, and how a slow
+   * process. Stopping is how a worker picks up new code, and how a slow
    * memory leak in a job gets bounded instead of OOM-killing the host.
    */
   private async shouldStop(limits: {
@@ -316,7 +316,7 @@ export class QueueWorkCommand extends Command {
     try {
       JobClass = registry.resolve(queued.jobClass);
     } catch (error) {
-      // Unknown job class — nothing sensible to retry; move straight to failed_jobs.
+      // Unknown job class, nothing sensible to retry; move straight to failed_jobs.
       await this.failJob(driver, queued, undefined, error as Error);
 
       return;
@@ -325,7 +325,7 @@ export class QueueWorkCommand extends Command {
     // Rebuild the live job from its persisted state, rehydrating any
     // `{ __model, __id }` fields back into live model instances. A model
     // whose class opted into `deleteWhenMissingModels` and no longer exists
-    // throws `SkipJobMissingModelError` — treat that as "job completed"
+    // throws `SkipJobMissingModelError`, treat that as "job completed"
     // (remove it, don't fail/retry).
     let job: Job;
     try {
@@ -333,7 +333,7 @@ export class QueueWorkCommand extends Command {
     } catch (error) {
       if (error instanceof SkipJobMissingModelError) {
         await driver.delete(queued);
-        // The referenced model is gone — treat as completed and free the
+        // The referenced model is gone, treat as completed and free the
         // uniqueness lock so a fresh instance can be queued. Rebuild a
         // bare instance purely to read its unique markers/`uniqueId()`.
         await this.releaseUniqueForMissing(JobClass, queued);
@@ -341,9 +341,9 @@ export class QueueWorkCommand extends Command {
         return;
       }
 
-      // Any other decode failure — most commonly a referenced model that
+      // Any other decode failure, most commonly a referenced model that
       // was deleted while the job sat in the queue, with the default
-      // `deleteWhenMissingModels = false` — is a failure of THIS JOB, not
+      // `deleteWhenMissingModels = false`, is a failure of THIS JOB, not
       // of the worker. Rethrowing here would unwind the loop and kill the
       // process, stranding the job reserved: not in failed_jobs, invisible
       // to `queue:failed`, gone.
@@ -353,7 +353,7 @@ export class QueueWorkCommand extends Command {
     }
 
     // A job that has already burned its attempts never reaches the catch
-    // block below — it was reclaimed after killing or outliving its
+    // block below. It was reclaimed after killing or outliving its
     // workers, so nothing ever "threw". Laravel checks this before
     // running for the same reason; without it such a job cycles between
     // reserve and reclaim forever.
@@ -399,7 +399,7 @@ export class QueueWorkCommand extends Command {
       await this.dispatchNextInChain(queued);
     } catch (error) {
       // A middleware asking to reschedule (rate limit hit, lock held, …).
-      // Not a failure in itself — but `release()` still bumps `attempts`,
+      // Not a failure in itself, but `release()` still bumps `attempts`,
       // so a job whose lock is never free would otherwise be released
       // forever. Bounding it by the same attempt budget is what turns
       // "spins until the heat death of the universe" into "fails, loudly,
@@ -431,14 +431,14 @@ export class QueueWorkCommand extends Command {
 
   /**
    * Record a job as failed: move it to the driver's failed store, then
-   * notify (`failed()` hook, then the `JobFailed` event) — in that order,
+   * notify (`failed()` hook, then the `JobFailed` event), in that order,
    * so the hook cannot veto the record.
    *
    * Both notifications are best-effort. A `failed()` hook that throws is
    * a bug in *one job*; letting it escape here would unwind the worker
    * loop and kill the process, which is a far worse outcome than a logged
    * error. `job` is undefined when the failure happened before the
-   * instance could be built (unknown class, undecodable payload) — there
+   * instance could be built (unknown class, undecodable payload). There
    * is simply no hook to call in that case.
    */
   private async failJob(
@@ -496,8 +496,8 @@ export class QueueWorkCommand extends Command {
    * a time. Uses the same connection and queue the worker is draining.
    *
    * Pushes the next link's already-serialized `state` straight onto the
-   * driver rather than routing back through `QueueManager.dispatch()` —
-   * the state was encoded once at the original dispatch, so re-encoding a
+   * driver rather than routing back through `QueueManager.dispatch()`.
+   * The state was encoded once at the original dispatch, so re-encoding a
    * (now rehydrated) job would be wasteful and, for a link that was never
    * rebuilt here, isn't even possible.
    *
@@ -505,7 +505,7 @@ export class QueueWorkCommand extends Command {
    * (`acquireUniqueLockForState`): uniqueness applies to each link of a
    * chain independently, and a tail link that skipped the lock could
    * enqueue a duplicate of a job already queued. A held lock drops this
-   * link — and, with it, the rest of the chain behind it, since the
+   * link, and, with it, the rest of the chain behind it, since the
    * remaining links ride on this push. That is the same "a duplicate is a
    * silent no-op" contract `dispatch()` has, so it is logged rather than
    * being invisible.
@@ -573,7 +573,7 @@ export class QueueWorkCommand extends Command {
 
   /**
    * Dispatch a queue lifecycle event through `@mahiframework/events`, but
-   * only if an events provider is registered — the queue package works
+   * only if an events provider is registered. The queue package works
    * standalone (events is a soft dependency here), so this is a no-op when
    * `EVENTS_TOKEN` is unbound. Failures in a listener are swallowed and
    * logged: an observer crashing must never derail the worker or turn a

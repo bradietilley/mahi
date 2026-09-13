@@ -1,7 +1,7 @@
 import type { Output } from "./output.js";
 
 /**
- * In-memory `Output` sink — swapped in by `Tui.fake()` so interactive
+ * In-memory `Output` sink, swapped in by `Tui.fake()` so interactive
  * prompts can run against a fake terminal without touching real
  * `process.stdout`, and so tests can assert on exactly what was
  * rendered.

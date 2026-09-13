@@ -11,7 +11,7 @@ export function joinPublicUrl(prefix: string, path: string): string {
 }
 
 /**
- * The path portion of a disk `url` prefix — the thing a request path
+ * The path portion of a disk `url` prefix, the thing a request path
  * has to start with for `servePublicDisk` to treat it as a file on
  * that disk. Absolute URL prefixes contribute only their pathname, so
  * `url: "http://localhost:8000/storage"` still serves under `/storage`.

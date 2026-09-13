@@ -7,7 +7,7 @@
  * service provider is expected to call `setDefaultTimezone()` once during
  * boot from configuration; application code should not touch it afterwards.
  *
- * Nothing here affects an existing `DateTime` — instances capture their zone
+ * Nothing here affects an existing `DateTime`, instances capture their zone
  * at construction, so changing the default mid-process cannot retroactively
  * move an instant that has already been created.
  */

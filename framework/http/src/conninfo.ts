@@ -2,7 +2,7 @@ import { getConnInfo } from "@hono/node-server/conninfo";
 import type { Context } from "hono";
 
 /**
- * The immediate TCP peer address for a request — the address that
+ * The immediate TCP peer address for a request, the address that
  * actually opened the socket, which is the only part of an inbound
  * request a client cannot forge.
  *
@@ -16,7 +16,7 @@ import type { Context } from "hono";
  * present under `@hono/node-server` and absent under `hono.request()`
  * (the in-process test dispatcher), `app.fetch()`, and every non-Node
  * adapter. Callers must treat `undefined` as "unknown peer" and fail
- * **closed** — never as "no peer, so believe the headers".
+ * **closed**, never as "no peer, so believe the headers".
  */
 export function peerAddressFrom(c: Context | undefined): string | undefined {
   if (!c) {

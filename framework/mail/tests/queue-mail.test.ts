@@ -100,7 +100,7 @@ describe("MailManager.queue()", () => {
     const manager = buildManager();
     withHandler(manager);
 
-    // No subject — the same MailException send() would raise.
+    // No subject, the same MailException send() would raise.
     const broken = new Message().to("a@example.com").text("body");
 
     await expect(manager.queue(broken)).rejects.toThrow(/no subject/);
@@ -150,7 +150,7 @@ describe("MailManager.queue() attachment guard", () => {
     ]);
   });
 
-  it("still sends an in-memory attachment immediately — the guard is queue-only", async () => {
+  it("still sends an in-memory attachment immediately. The guard is queue-only", async () => {
     const manager = buildManager();
 
     const message = new Message()

@@ -8,7 +8,7 @@ import { MAIL_TOKEN } from "./tokens.js";
 /**
  * Thin facade over the `MailManager` singleton bound at `MAIL_TOKEN`, for
  * call sites that would otherwise read
- * `app().make<MailManager>(MAIL_TOKEN).send(...)` — the mail analogue of
+ * `app().make<MailManager>(MAIL_TOKEN).send(...)`, the mail analogue of
  * `Bus`.
  *
  *   await Mail.send(new WelcomeMailable(user));
@@ -18,7 +18,7 @@ import { MAIL_TOKEN } from "./tokens.js";
  * facade: recipients belong to the `Mailable` (its `envelope()`/`to()`),
  * keeping the "who receives this" decision in one place rather than split
  * between the facade call and the mailable. Prefer constructor-injecting
- * `MailManager` (via `MAIL_TOKEN`) where practical — reach for this only
+ * `MailManager` (via `MAIL_TOKEN`) where practical, use this only
  * where threading `app`/`MailManager` through is genuinely inconvenient,
  * same guidance as `app()` itself.
  */
@@ -30,7 +30,7 @@ export class Mail extends Facade<MailManager>(() => MAIL_TOKEN) {
   /**
    * Render now, deliver later through the queue.
    *
-   * The rendered body is written to the `jobs` table in plaintext — never
+   * The rendered body is written to the `jobs` table in plaintext, never
    * queue a message carrying a password-reset link, magic link or one-time
    * code. See `MailManager.queue()`.
    */

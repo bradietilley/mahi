@@ -2,7 +2,7 @@ import { type ColorFn, gray } from "../ansi/colors.js";
 import { displayWidth, longestWidth, pad, stripAnsi, truncate } from "./text-width.js";
 
 /**
- * Port of `laravel/prompts`' `DrawsBoxes::box()` — the routine every
+ * Port of `laravel/prompts`' `DrawsBoxes::box()`, the routine every
  * non-`table` renderer uses to draw the `┌─title─┐ / │ body │ /
  * └─...info─┘` box every prompt lives inside.
  */

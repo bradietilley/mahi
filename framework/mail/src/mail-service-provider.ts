@@ -11,14 +11,14 @@ export { MAIL_TOKEN };
 
 /**
  * Registers the `MailManager` singleton with the three built-in mailers
- * ("smtp", "log", "array") pre-registered via `extend()` — the same
+ * ("smtp", "log", "array") pre-registered via `extend()`, the same
  * mechanism a plugin would use to add e.g. a "ses" transport later. No
  * `boot()` needed: no built-in transport needs async warm-up (the SMTP
  * transport opens its nodemailer pool lazily on first `send()`), same as
  * `CacheServiceProvider`'s infra-free stores.
  *
- * The "log" mailer writes through `app.logger` — the always-available
- * `ConsoleLogger` fallback every `Application` carries — so this provider
+ * The "log" mailer writes through `app.logger`, the always-available
+ * `ConsoleLogger` fallback every `Application` carries, so this provider
  * has no ordering dependency on `LoggingServiceProvider` (or any other
  * provider); it can appear anywhere in `config/app.ts`'s `providers[]`.
  */
@@ -45,7 +45,7 @@ export class MailServiceProvider extends ServiceProvider {
    * Point `MailMessage` at this app's `MailManager` for theme resolution.
    *
    * In `boot()` rather than `register()` so the resolver is a closure that
-   * resolves the manager lazily on first use — binding it eagerly would
+   * resolves the manager lazily on first use, binding it eagerly would
    * construct the `MailManager` singleton at registration time, defeating
    * the lazy resolution every other provider is careful to preserve.
    */
@@ -56,7 +56,7 @@ export class MailServiceProvider extends ServiceProvider {
   /**
    * Drop the global theme resolver when the app shuts down, so a test that
    * builds a second `Application` doesn't inherit a resolver pointing at a
-   * terminated one — the same hazard `clearCurrentApp()` exists for.
+   * terminated one, the same hazard `clearCurrentApp()` exists for.
    */
   shutdown(): void {
     useThemeResolver(undefined);

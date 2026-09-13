@@ -23,10 +23,10 @@ export interface AuthConfig {
   default: string;
   guards: Record<string, unknown>;
   providers: Record<string, unknown>;
-  /** Optional password-reset settings — see `PasswordBrokerConfig`. */
+  /** Optional password-reset settings. See `PasswordBrokerConfig`. */
   passwords?: PasswordBrokerConfig & { provider?: string };
   /**
-   * Optional email-verification settings — see `EmailVerificationConfig`.
+   * Optional email-verification settings. See `EmailVerificationConfig`.
    * `model` is the app's User model, which the broker needs in order to
    * stamp the verified-at column (a `UserProvider` can read users but not
    * update arbitrary columns).
@@ -36,7 +36,7 @@ export interface AuthConfig {
    * Switches for the auth emails the scaffolded app sends.
    *
    * **The framework does not read these.** `@mahiframework/auth` sends no mail and
-   * has no `@mahiframework/mail` dependency — the mailables and the controllers
+   * has no `@mahiframework/mail` dependency, the mailables and the controllers
    * that send them are scaffolded into your app, where you can edit them
    * freely. These flags are declared here so the decision has one obvious
    * home and is typed, and the generated controllers check them:
@@ -45,8 +45,8 @@ export interface AuthConfig {
    *     await Mail.send(new ResetPasswordMail(email, url));
    *   }
    *
-   * Turn one off to take delivery over yourself — send from a listener,
-   * over SMS, through a third-party ESP's API — without deleting the
+   * Turn one off to take delivery over yourself, send from a listener,
+   * over SMS, through a third-party ESP's API, without deleting the
    * scaffolded controller. Both default to on when unset.
    */
   notifications?: {
@@ -68,8 +68,8 @@ export class UserProviderNotRegisteredError extends Error {
 
 /**
  * Extends `DriverNotRegisteredError` rather than `Error` so anything
- * already catching the base class — the framework's own tests, and any
- * app code — keeps working even though `guard()` does not go through
+ * already catching the base class, the framework's own tests, and any
+ * app code, keeps working even though `guard()` does not go through
  * `Manager.driver()`. It only adds the guard NAME to the message, which
  * the base can't know: with named guards, "driver `session` isn't
  * registered" and "guard `web` wanted driver `session`" are different
@@ -109,7 +109,7 @@ export class NotStatefulGuardError extends Error {
  * would otherwise reimplement.
  *
  * TWO DRIVER AXES: `Manager<T>` models one, and auth genuinely has two
- * orthogonal ones — guards × user providers (Laravel has the same pair).
+ * orthogonal ones, guards × user providers (Laravel has the same pair).
  * Guards go through the inherited `extend()`/`driver()`; user providers
  * get a small parallel registry below. That's deliberate: widening
  * `Manager<T>` to support two axes would complicate every other manager
@@ -117,7 +117,7 @@ export class NotStatefulGuardError extends Error {
  *
  * The `user()`/`check()`/`id()` helpers read the AsyncLocalStorage scope
  * (`auth-context.ts`) rather than asking a guard, so they're defined once
- * here instead of per-guard — and so they cost nothing after the first
+ * here instead of per-guard, and so they cost nothing after the first
  * resolution in a request.
  */
 export class AuthManager extends Manager<Guard> {
@@ -161,7 +161,7 @@ export class AuthManager extends Manager<Guard> {
    *
    *   guards: { web: { driver: "session" }, api: { driver: "token" } }
    *
-   * — two *names* over two *drivers*, and nothing stops both names using
+   * two *names* over two *drivers*, and nothing stops both names using
    * the same driver with different cookies or lifetimes. Keying the
    * resolved-guard cache by driver (as the base class does) made that
    * shape fail outright: `guard("web")` looked for a driver called
@@ -213,7 +213,7 @@ export class AuthManager extends Manager<Guard> {
   }
 
   /**
-   * Guards resolve by config name — see `guard()`. `driver()` is kept
+   * Guards resolve by config name. See `guard()`. `driver()` is kept
    * pointing at the same resolution so any caller reaching for the
    * generic `Manager` API gets the same instance rather than a second,
    * differently-configured one.
@@ -224,7 +224,7 @@ export class AuthManager extends Manager<Guard> {
 
   /**
    * A configured guard's settings block. Defaults to the guard currently
-   * being resolved (see `resolvingGuard`), then to the default guard —
+   * being resolved (see `resolvingGuard`), then to the default guard,
    * so a factory can call `guardConfig()` bare and get the right one.
    */
   guardConfig(name?: string): Record<string, unknown> {
@@ -293,7 +293,7 @@ export class AuthManager extends Manager<Guard> {
   }
 
   /**
-   * Verify credentials AND establish a session in one step — Laravel's
+   * Verify credentials AND establish a session in one step, Laravel's
    * `Auth::attempt()` semantics, as opposed to this framework's
    * `attempt()`, which deliberately only verifies.
    *
@@ -332,7 +332,7 @@ export class AuthManager extends Manager<Guard> {
 
   /**
    * Resolve a configured user provider by its config key (e.g. `"users"`),
-   * NOT by its driver name — matching how `config/auth.ts` names them.
+   * NOT by its driver name, matching how `config/auth.ts` names them.
    */
   userProvider(name?: string): UserProvider {
     const key = name ?? (this.guardConfig().provider as string | undefined) ?? "users";
@@ -365,7 +365,7 @@ export class AuthManager extends Manager<Guard> {
   /**
    * The single `PasswordBroker`, cached after first resolution.
    *
-   * One broker over one `UserProvider` — deliberately narrower than
+   * One broker over one `UserProvider`, deliberately narrower than
    * Laravel's multi-broker `PasswordBrokerManager`, since this framework
    * has no multi-user-table goal. The provider defaults to the same one
    * the default guard uses unless `auth.passwords.provider` overrides it.
@@ -384,7 +384,7 @@ export class AuthManager extends Manager<Guard> {
     // no session guard simply has no sessions to revoke.
     //
     // Without this, resetting a password left every existing session and
-    // API token alive — so account recovery did not actually recover the
+    // API token alive, so account recovery did not actually recover the
     // account from whoever was already in it.
     broker.revokesWith({
       sessions: this.credentialRevoker("logoutEverywhere", "destroyForUser"),
@@ -399,7 +399,7 @@ export class AuthManager extends Manager<Guard> {
   /**
    * The single `EmailVerificationBroker`, cached after first resolution.
    *
-   * Requires `auth.verification.model` — the app's User model. Unlike the
+   * Requires `auth.verification.model`, the app's User model. Unlike the
    * password broker, which only ever reads users and delegates the write
    * to `UserProvider.updatePassword()`, this one has to stamp an arbitrary
    * column, and `UserProvider` has no method for that. Adding one would
@@ -438,8 +438,8 @@ export class AuthManager extends Manager<Guard> {
    *
    * Discovered by CAPABILITY rather than by name: an app following
    * Laravel's convention names its guards `web`/`api`, so the old
-   * hardcoded `guard("session")` lookup found nothing and swept nothing
-   * — silently, while the tables grew.
+   * hardcoded `guard("session")` lookup found nothing and swept nothing,
+   * silently, while the tables grew.
    */
   collectableGuards(): Array<[string, { gc(): Promise<number> }]> {
     const collectable: Array<[string, { gc(): Promise<number> }]> = [];
@@ -559,7 +559,7 @@ export class AuthManager extends Manager<Guard> {
   }
 
   /**
-   * Run `fn` with an explicit user — for queue jobs, CLI commands, and
+   * Run `fn` with an explicit user, for queue jobs, CLI commands, and
    * tests, which have no HTTP request and therefore no ambient scope.
    */
   async runAs<T>(user: unknown, fn: () => T | Promise<T>): Promise<T> {
@@ -568,12 +568,12 @@ export class AuthManager extends Manager<Guard> {
 
   /**
    * Force a user to be "the authenticated user" for every subsequent
-   * request resolved through the given guard (default guard if omitted) —
+   * request resolved through the given guard (default guard if omitted),
    * Laravel's `actingAs()`.
    *
    * Unlike `runAs()` (which wraps a single synchronous scope), this swaps
    * the resolved guard so `authenticate()` → `resolve()` returns `user`
-   * for real requests driven through the HTTP kernel — the mechanism
+   * for real requests driven through the HTTP kernel, the mechanism
    * `@mahiframework/testing`'s `TestClient.actingAs()` uses. Pass `null` to clear.
    */
   actingAs(user: unknown, guardName?: string): void {
@@ -582,7 +582,7 @@ export class AuthManager extends Manager<Guard> {
 
   /**
    * Verify credentials without touching the request. Returns the user on
-   * success, null on failure — it does NOT log anyone in; the caller
+   * success, null on failure. It does NOT log anyone in; the caller
    * decides what to issue (a token, a session).
    */
   async attempt<TUser = unknown>(

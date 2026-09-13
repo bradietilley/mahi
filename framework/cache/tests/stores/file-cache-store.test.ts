@@ -13,7 +13,7 @@ const run = promisify(execFile);
  *
  * These were 0.05s / 100ms, which left only a 50ms budget for the `put()`
  * and `get()` that run *before* the sleep. Idle that is about 1ms, so it
- * looked generous — but under a loaded full-monorepo run those two file
+ * looked generous, but under a loaded full-monorepo run those two file
  * operations have taken 290ms+, expiring the value before the test could
  * read it back. The failure then pointed at the wrong assertion: the
  * *first* `expect` failed ("expected undefined to be 'value'"), which reads
@@ -116,7 +116,7 @@ describe("FileCacheStore", () => {
     await store.increment("window");
     expect(await store.get("window")).toBe(1);
 
-    // Incrementing must not have pushed the expiry out — the whole basis
+    // Incrementing must not have pushed the expiry out, the whole basis
     // of RateLimiter's fixed window.
     await sleepPastTtl();
     expect(await store.get("window")).toBeUndefined();
@@ -206,7 +206,7 @@ describe("FileCacheStore", () => {
 
       expect(await store.get(key)).toBe("safe");
       // The traversal segments in the key must not have escaped the
-      // cache directory — hashing is what guarantees that.
+      // cache directory. Hashing is what guarantees that.
       const files = (await readdir(directory, { recursive: true, withFileTypes: true })).filter(
         (e) => e.isFile(),
       );
@@ -217,7 +217,7 @@ describe("FileCacheStore", () => {
   describe("crash safety", () => {
     /**
      * The old single-file store wrote with a plain `writeFile()`, so a
-     * process killed mid-write left truncated JSON — and because that one
+     * process killed mid-write left truncated JSON, and because that one
      * file held EVERY key, the next read of any key threw. One file per
      * key plus temp-file+rename means a damaged entry is at worst one
      * cache miss.
@@ -315,7 +315,7 @@ describe("FileCacheStore", () => {
     /**
      * A process killed between `writeFile()` and `rename()` leaves a
      * `.tmp`; one killed holding an entry lock leaves a `.lock`. The
-     * `.lock` is reclaimed as stale by the next writer of *that key* —
+     * `.lock` is reclaimed as stale by the next writer of *that key*,
      * but on a key nothing writes again, never. `prune()` is where they
      * go.
      */
@@ -336,7 +336,7 @@ describe("FileCacheStore", () => {
         await utimes(`${entryFile}${suffix}`, abandoned, abandoned);
       }
 
-      // In-flight, belonging to an operation still running — possibly in
+      // In-flight, belonging to an operation still running, possibly in
       // another process. Must survive.
       await writeFile(`${entryFile}.inflight.tmp`, "");
 
@@ -381,8 +381,8 @@ describe("FileCacheStore", () => {
   });
 
   /**
-   * The claim that makes this store usable at all for its actual audience
-   * — a web server plus `queue:work` plus a `schedule:run` cron, sharing
+   * The claim that makes this store usable at all for its actual audience,
+   * a web server plus `queue:work` plus a `schedule:run` cron, sharing
    * `storage/cache`. Serializing only through an *in-process* promise
    * chain is not enough: two processes would do unsynchronised
    * read-modify-writes and simply lose each other's updates.

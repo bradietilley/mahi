@@ -9,7 +9,7 @@
  * outside that shape is a hand-written `Mailable` with its own renderer,
  * which remains fully supported and is not second-class.
  *
- * Blocks are a discriminated union of PLAIN DATA — no strings of HTML, no
+ * Blocks are a discriminated union of PLAIN DATA, no strings of HTML, no
  * functions, no class instances. That is what makes a theme swappable: a
  * theme receives a description of the message, never a half-rendered
  * fragment it would have to parse or patch. It also means a `MailMessage`
@@ -18,7 +18,7 @@
  * matching generated HTML.
  *
  * All text is UNESCAPED at this layer. Escaping is the theme's job,
- * because only the theme knows which output it is producing — the same
+ * because only the theme knows which output it is producing. The same
  * `line` needs `&amp;` in HTML and a bare `&` in text. A theme that
  * forgets to escape produces an injection bug, so `DefaultMailTheme`
  * routes every interpolation through `escapeHtml()` and any custom theme
@@ -44,7 +44,7 @@ export interface ButtonBlock {
 }
 
 /**
- * A visually set-apart block — Laravel's `MailMessage::panel()`. Typically
+ * A visually set-apart block, Laravel's `MailMessage::panel()`. Typically
  * rendered as an indented/tinted box. Useful for quoting the thing the
  * email is about (an order summary, a comment being replied to).
  */
@@ -55,8 +55,8 @@ export interface PanelBlock {
 
 /**
  * A simple data table. `header` may be empty for a headerless table.
- * Rows are rendered as-is; no alignment, spanning or per-cell formatting
- * — reach for a hand-written `Mailable` when a message needs real layout.
+ * Rows are rendered as-is; no alignment, spanning or per-cell formatting,
+ * write a hand-written `Mailable` when a message needs real layout.
  */
 export interface TableBlock {
   type: "table";
@@ -92,7 +92,7 @@ export interface MailMessageData {
   blocks: MailBlock[];
   /**
    * Trailing fine print, rendered below the salutation in a de-emphasised
-   * style — the "if you're having trouble clicking the button, paste this
+   * style, the "if you're having trouble clicking the button, paste this
    * URL" footnote, or an unsubscribe note.
    */
   footer: string[];

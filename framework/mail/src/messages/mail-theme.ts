@@ -1,7 +1,7 @@
 import type { MailMessageData } from "./blocks.js";
 
 /**
- * A rendered message body — both halves, produced together.
+ * A rendered message body, both halves, produced together.
  *
  * Both are produced in one call rather than by two separate theme methods
  * because a theme almost always derives them from the same walk over the
@@ -20,11 +20,11 @@ export interface RenderedBody {
  * A theme is an OBJECT, not a template file, and that is the deliberate
  * departure from Laravel's `mail.markdown.theme` (a CSS file applied to
  * Blade components). This package ships no template engine and does not
- * want one (see `Content`'s docblock) — so rather than inventing a
+ * want one (see `Content`'s docblock), so rather than inventing a
  * miniature one just for `MailMessage`, the extension point is an
  * interface. A theme may be:
  *
- *   - Template literals in TypeScript, with no dependencies at all — this
+ *   - Template literals in TypeScript, with no dependencies at all. This
  *     is what `DefaultMailTheme` is, and it is entirely readable.
  *   - A wrapper around whatever engine the app already uses: react-email,
  *     mjml, handlebars, a `.html` file with token replacement.

@@ -4,7 +4,7 @@
  * The property under test is not "these particular strings fail". It is the
  * package-wide contract from `errors.ts`:
  *
- * 1. A throwing entry point throws a `DateTimeError` — never a raw
+ * 1. A throwing entry point throws a `DateTimeError`, never a raw
  *    `TypeError`, `RangeError`, or a stray `date-fns` internal.
  * 2. A `*Safe` entry point never throws at all.
  * 3. Nothing ever yields a `DateTime` that is internally invalid. There is no
@@ -66,7 +66,7 @@ const NOISE = [
   "🙂",
 ];
 
-/** Truncate, splice, duplicate, or substitute — the usual suspects. */
+/** Truncate, splice, duplicate, or substitute, the usual suspects. */
 function mutate(input: string): string {
   const at = Math.floor(random() * (input.length + 1));
 

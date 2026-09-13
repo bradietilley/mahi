@@ -7,13 +7,13 @@ import { ResetPasswordRequest } from "../requests/reset-password.request.js";
  *
  * Consumes a reset token and sets the new password. A successful reset
  * also destroys every existing session and personal access token for the
- * account — password reset is the account-recovery path, so leaving an
+ * account, password reset is the account-recovery path, so leaving an
  * attacker's existing session alive would defeat the entire exercise. The
  * broker does that; nothing is needed here.
  *
  * The user is deliberately NOT logged in afterwards. Doing so would turn
  * a leaked reset link into a session in one step, and the client has the
- * new password already — it can call `/auth/login`.
+ * new password already. It can call `/auth/login`.
  */
 export class ResetPasswordController extends Controller<ResetPasswordRequest> {
   request = ResetPasswordRequest;

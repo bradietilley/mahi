@@ -75,7 +75,7 @@ class ConfirmPrompt extends InteractivePrompt<boolean> {
   }
 
   protected isInvalidWhenRequired(): boolean {
-    // A confirm prompt always has a definite true/false answer — there's
+    // A confirm prompt always has a definite true/false answer. There's
     // no "unanswered" state the way `ask`'s empty-string or `select`'s
     // `null`-highlight represent. `required` only has teeth when paired
     // with a custom `validate` (e.g. requiring `true` specifically).

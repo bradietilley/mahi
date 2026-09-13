@@ -43,7 +43,7 @@ type Registration =
 /**
  * A callback registered against an event-name wildcard pattern
  * (`"model.posts.*"`) rather than an event class. Receives the dispatched
- * `Event` instance — read `event.eventName` for the matched name.
+ * `Event` instance, read `event.eventName` for the matched name.
  */
 export type WildcardListener = (event: AbstractEvent) => void | Promise<void>;
 
@@ -64,8 +64,8 @@ interface QueuedListenerEntry {
 }
 
 /**
- * A callback run after every dispatched event, regardless of its class —
- * see `EventDispatcher.afterDispatch()`.
+ * A callback run after every dispatched event, regardless of its class.
+ * See `EventDispatcher.afterDispatch()`.
  */
 export type AfterDispatchCallback = (event: AbstractEvent) => void | Promise<void>;
 
@@ -76,7 +76,7 @@ function queuedListenerId(eventClass: EventClass, listenerClass: ListenerClass):
 /**
  * Distinguish a `ListenerClass` (a constructor whose instances expose
  * `handle()`) from a plain `ListenerFn` closure. Both are functions, so we
- * check for a `handle` method on the prototype — present on listener
+ * check for a `handle` method on the prototype, present on listener
  * classes, absent on a bare arrow/function listener.
  */
 function isListenerClass(candidate: ListenerClass | ListenerFn): candidate is ListenerClass {
@@ -95,11 +95,11 @@ export class EventDispatcher {
    * Register an inline closure listener against an event class:
    * `listen(TodoCreated, (event) => ...)`. Runs synchronously in
    * registration order like a class listener, but without the class
-   * ceremony — handy for small, one-off reactions.
+   * ceremony, handy for small, one-off reactions.
    *
    * Declared **before** the listener-class overload deliberately. Overloads
    * resolve in order, and a bare `(event) => ...` is checked against
-   * `ListenerClass` first if that comes first — a construct signature it
+   * `ListenerClass` first if that comes first, a construct signature it
    * cannot match, so inference fails and `event` silently lands as an
    * implicit `any` (or errors under `noImplicitAny`). Closure first lets
    * `E` infer from the event class, which is what makes `event.email`
@@ -121,7 +121,7 @@ export class EventDispatcher {
    * form is constructed fresh per matching dispatch exactly like the
    * event-class form, so a wildcard listener can pull its own dependencies
    * out of the container. Neither form narrows `event` beyond
-   * `AbstractEvent` — a pattern is a runtime string with no type-level
+   * `AbstractEvent`. A pattern is a runtime string with no type-level
    * link to any event class, so there is nothing to infer from. Read
    * `event.eventName` and cast if you need the payload.
    */
@@ -169,7 +169,7 @@ export class EventDispatcher {
 
   /**
    * Register a listener that is enqueued rather than run inline.
-   * Requires a handler bound via `useQueuedListenerHandler()` — typically
+   * Requires a handler bound via `useQueuedListenerHandler()`, typically
    * installed by `@mahiframework/queue`'s `QueueServiceProvider`. Explicit
    * method (not a `ShouldQueue` marker + reflection) so the queue
    * integration stays opt-in and magic-free.
@@ -236,7 +236,7 @@ export class EventDispatcher {
   }
 
   /**
-   * Register a callback run after *every* dispatched event — regardless of
+   * Register a callback run after *every* dispatched event, regardless of
    * its class, and regardless of whether it had any listeners at all.
    *
    * This is deliberately a general capability rather than a hook tailored
@@ -249,7 +249,7 @@ export class EventDispatcher {
    * any dependency on (or knowledge of) broadcasting.
    *
    * Callbacks run sequentially after all listeners, in registration order,
-   * and are awaited — so a callback that throws propagates to the
+   * and are awaited, so a callback that throws propagates to the
    * `dispatch()` caller. A callback that shouldn't be able to fail a
    * dispatch is responsible for catching its own errors (see
    * `BroadcastServiceProvider.boot()` for the canonical example).
@@ -263,7 +263,7 @@ export class EventDispatcher {
    * (and every wildcard listener whose pattern matches `event.eventName`).
    * Listeners run sequentially, in registration order, and are awaited.
    *
-   * No-ops entirely — no listeners run — when `event.eventName` matches
+   * No-ops entirely, no listeners run, when `event.eventName` matches
    * an active `Event.suppress()` pattern (default pattern `["*"]`
    *
    * matches every event). See `event.ts`'s `Event.suppress()` docstring.
@@ -274,14 +274,14 @@ export class EventDispatcher {
    *
    * An event class marked `static shouldDispatchAfterCommit = true` (see
    * `dispatchesAfterCommit()`), dispatched inside a `DB.transaction()`,
-   * has its listeners held until the transaction commits — and dropped
+   * has its listeners held until the transaction commits, and dropped
    * entirely if it rolls back. Outside a transaction, or unmarked, it
    * dispatches immediately as before. `dispatchAfterCommit()` is the
    * explicit per-call form.
    *
    * The suppression check runs at dispatch time (not deferred), so an
    * event dispatched inside `Event.suppress()` is a no-op regardless of
-   * the after-commit marker — matching the "as if never dispatched"
+   * the after-commit marker, matching the "as if never dispatched"
    * contract.
    */
   async dispatch<E extends AbstractEvent>(event: E): Promise<void> {
@@ -301,7 +301,7 @@ export class EventDispatcher {
   /**
    * Dispatch `event` after the enclosing `DB.transaction()` commits
    * (immediately when none is open), regardless of whether the event
-   * class carries the `static shouldDispatchAfterCommit` marker — the
+   * class carries the `static shouldDispatchAfterCommit` marker, the
    * explicit, per-call form of after-commit dispatch. Still a no-op when
    * the event is suppressed.
    */
@@ -315,7 +315,7 @@ export class EventDispatcher {
 
   /**
    * Run `event` through every matching listener and then every
-   * `afterDispatch()` callback — the actual delivery, split out so both
+   * `afterDispatch()` callback, the actual delivery, split out so both
    * the immediate and the after-commit-deferred paths share it. The
    * suppression gate is checked by the callers before deferring, so an
    * event whose transaction commits is delivered even if a *later*

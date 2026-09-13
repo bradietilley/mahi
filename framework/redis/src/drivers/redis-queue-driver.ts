@@ -47,7 +47,7 @@ export interface RedisQueueDriverOptions {
    * Seconds after which a reserved job is presumed abandoned and migrated
    * back onto the ready list. **The crash-recovery mechanism**: a worker
    * killed mid-job leaves its job in the reserved set, and without a
-   * visibility timeout nothing would ever put it back — the job is
+   * visibility timeout nothing would ever put it back. The job is
    * stranded, not failed, invisible to every command. Default 90, matching
    * Laravel. Must exceed the longest a job can legitimately run.
    */
@@ -58,20 +58,20 @@ export interface RedisQueueDriverOptions {
 
 /**
  * A Redis-backed `QueueDriver`. Four keys per named queue, all sharing a
- * `{queue}` hash tag so a Redis Cluster keeps them in one slot — every Lua
+ * `{queue}` hash tag so a Redis Cluster keeps them in one slot, every Lua
  * script here touches two or three of them at once, and Cluster refuses
  * multi-key commands that span slots:
  *
- *   - `queues:{name}`           — a list of ready jobs (`LPUSH` head,
+ *   - `queues:{name}`, a list of ready jobs (`LPUSH` head,
  *                                 reserved from the tail, so FIFO).
- *   - `queues:{name}:delayed`   — a sorted set of not-yet-available jobs,
+ *   - `queues:{name}:delayed`. A sorted set of not-yet-available jobs,
  *                                 scored by their availability time (ms).
- *   - `queues:{name}:reserved`  — a sorted set of in-flight jobs, scored
+ *   - `queues:{name}:reserved`. A sorted set of in-flight jobs, scored
  *                                 by **when they expire** (reserved-at +
  *                                 `retryAfterSeconds`). A zset, not a
  *                                 list, precisely so expiry is a range
  *                                 query.
- *   - `queues:{name}:failed`    — a hash of failed jobs by id, backing
+ *   - `queues:{name}:failed`, a hash of failed jobs by id, backing
  *                                 `queue:failed`/`retry`/`forget`/`flush`.
  *
  * ## Every mutation is one Lua script
@@ -80,8 +80,8 @@ export interface RedisQueueDriverOptions {
  * (incrementing their attempts), and reserves the oldest ready job.
  * `release()` moves a job from reserved back to ready/delayed. `fail()`
  * moves it from reserved into the failed hash. Each is a single
- * `EVALSHA`, because the alternative — `LREM` then `LPUSH` from the
- * client — loses the job outright if the worker dies between the two
+ * `EVALSHA`, because the alternative, `LREM` then `LPUSH` from the
+ * client, loses the job outright if the worker dies between the two
  * commands, which is exactly the failure this driver exists to survive.
  *
  * Scripts are loaded once and invoked by SHA; a `NOSCRIPT` reply (the
@@ -115,7 +115,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
    * All four keys for one queue share a `{name}` hash tag so Redis
    * Cluster hashes them to the same slot. Without it every Lua script
    * here (each of which touches two keys) is a cross-slot error on
-   * Cluster — the scripts would work in dev against a single node and
+   * Cluster. The scripts would work in dev against a single node and
    * fail on the first day in production.
    */
   private ready(queue: string): string {
@@ -138,12 +138,12 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
    * Every queue's failed hash, not just this driver's default queue.
    *
    * Failed jobs are stored under `failedKey(job.queue)`, so a job that ran
-   * on a non-default queue lands in a different hash — invisible to a
+   * on a non-default queue lands in a different hash, invisible to a
    * `queue:failed`/`queue:retry` that only looked at `this.queue`. Discover
    * all of them by scanning for the `queues:{*}:failed` pattern.
    *
    * ioredis auto-prefixes command KEYS with its `keyPrefix` but NOT a
-   * SCAN MATCH pattern, and returns matched keys WITH the prefix — so the
+   * SCAN MATCH pattern, and returns matched keys WITH the prefix, so the
    * pattern is prefixed manually here and the prefix stripped back off the
    * results before they are handed to prefix-aware commands.
    */
@@ -213,7 +213,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
 
   /**
    * Take the job out of the reserved set and re-enqueue it with one more
-   * attempt — as a single script, so a crash between the two can't lose
+   * attempt, as a single script, so a crash between the two can't lose
    * the job (the previous `LREM` + `LPUSH` pair could, and did).
    */
   async release(job: QueuedJob, delaySeconds = 0): Promise<void> {
@@ -253,7 +253,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
 
   /**
    * Move the job from reserved into the failed hash, atomically. The
-   * whole envelope is stored — payload, chain, queue — so `retry()` can
+   * whole envelope is stored, payload, chain, queue, so `retry()` can
    * put it back exactly as it was rather than as a chainless orphan.
    */
   async fail(job: QueuedJob, error: Error): Promise<void> {
@@ -266,7 +266,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
       queue: name,
       state: job.state ?? null,
       ...(job.chain && job.chain.length > 0 ? { chain: job.chain } : {}),
-      // The full stack when there is one — the same thing the database
+      // The full stack when there is one, the same thing the database
       // driver stores. A bare `error.message` throws away the only
       // information that makes a production failure diagnosable.
       error: error.stack ?? error.message,
@@ -280,7 +280,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
     );
   }
 
-  /** Number of jobs waiting in the ready list — handy for tests/monitoring. */
+  /** Number of jobs waiting in the ready list, handy for tests/monitoring. */
   async size(queue?: string): Promise<number> {
     return this.client.llen(this.ready(queue ?? this.queue));
   }
@@ -320,7 +320,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
 
   /**
    * Re-enqueue a failed job (fresh id, attempts reset, chain and queue
-   * restored) and drop the failed-hash entry — one script, so a crash
+   * restored) and drop the failed-hash entry, one script, so a crash
    * can't leave the job both queued and recorded as failed. Locates the
    * job across every queue's failed hash, not just the default one.
    */
@@ -399,7 +399,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
 
   /** The failed hash (across all queues) holding `id`, or undefined if none does. */
   private async failedKeyHolding(id: string): Promise<string | undefined> {
-    // Try the default queue first — the overwhelmingly common case — before
+    // Try the default queue first, the overwhelmingly common case, before
     // paying for a SCAN across every queue's failed hash.
     if ((await this.client.hexists(this.failedKey(this.queue), id)) === 1) {
       return this.failedKey(this.queue);
@@ -448,7 +448,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
    * Run a script by SHA, loading it on first use and reloading on
    * `NOSCRIPT`.
    *
-   * `EVAL` would ship the whole script body on every call — several
+   * `EVAL` would ship the whole script body on every call, several
    * kilobytes per poll, per worker, forever. `EVALSHA` sends 40 bytes.
    * The `NOSCRIPT` retry covers a server restart or a `SCRIPT FLUSH`
    * between load and use, which is the one thing that makes naive SHA
@@ -483,7 +483,7 @@ export class RedisQueueDriver implements QueueDriver, FailedJobRepository {
 
     if (!pending) {
       pending = this.client.script("LOAD", script) as Promise<string>;
-      // A failed load must not be cached forever — the next call should
+      // A failed load must not be cached forever. The next call should
       // be free to try again (e.g. after a reconnect).
       pending.catch(() => this.shas.delete(script));
       this.shas.set(script, pending);
@@ -517,7 +517,7 @@ return #due
  * ARGV[1] = now (ms).
  *
  * Puts every reservation that has expired back onto the ready list with
- * `attempts` incremented — the crash recovery. Incrementing here is what
+ * `attempts` incremented, the crash recovery. Incrementing here is what
  * stops a job that reliably kills its worker from being reclaimed
  * forever: each reclaim costs an attempt, so it eventually exhausts them
  * and the worker fails it (see `QueueWorkCommand`'s pre-run check).

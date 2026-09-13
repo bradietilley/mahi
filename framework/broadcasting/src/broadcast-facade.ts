@@ -3,7 +3,7 @@ import { CHANNEL_REGISTRY_TOKEN } from "./broadcast-service-provider.js";
 import type { ChannelRegistry, ChannelAuthorizationCallback } from "./channel-registry.js";
 
 /**
- * Thin facade over the `ChannelRegistry` singleton — the
+ * Thin facade over the `ChannelRegistry` singleton, the
  * `Broadcast::channel(...)` entry point for declaring who may subscribe to
  * a `private-`/`presence-` channel. Register callbacks from a provider's
  * `channels()` hook:

@@ -183,7 +183,7 @@ export const Arr = {
     return out;
   },
 
-  /** Inverse of `dot()` — expand `{ "a.b": 1 }` back into `{ a: { b: 1 } }`. */
+  /** Inverse of `dot()`, expand `{ "a.b": 1 }` back into `{ a: { b: 1 } }`. */
   undot(target: Record<string, DataValue>): DataObject | DataList {
     const out: DataObject = {};
 

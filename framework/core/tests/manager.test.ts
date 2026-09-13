@@ -35,7 +35,7 @@ describe("Manager", () => {
     expect(secondary.name).toBe("analytics");
   });
 
-  it("caches resolved drivers — the factory only runs once per name", () => {
+  it("caches resolved drivers. The factory only runs once per name", () => {
     const app = new Application();
     const manager = new FakeManager(app);
     let calls = 0;
@@ -113,7 +113,7 @@ describe("Manager.disconnectAll()", () => {
   });
 
   /**
-   * Resolving a driver in order to close it would CONSTRUCT it — for a
+   * Resolving a driver in order to close it would CONSTRUCT it, for a
    * real driver that means opening a pool during shutdown, which is the
    * opposite of the point.
    */

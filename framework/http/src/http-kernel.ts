@@ -73,10 +73,10 @@ export class HttpKernel {
 
   /**
    * The `ws` server behind `websocketSupport()`, kept only so shutdown
-   * can close the sockets it is holding open — see `closeWebSockets()`.
+   * can close the sockets it is holding open. See `closeWebSockets()`.
    * Deliberately not part of `WebSocketSupport`: that type exists to keep
    * `wss` out of consumers' reach, and nothing outside this class should
-   * be reaching into the socket server. Typed off `NodeWebSocket` rather
+   * be touching the socket server. Typed off `NodeWebSocket` rather
    * than imported from `ws` so this package keeps its single `ws` type
    * source (the one `@hono/node-ws` already pins).
    */
@@ -89,16 +89,16 @@ export class HttpKernel {
    * of an easily-missed Hono property: `use("*")` only applies
    * to routes registered AFTER it. The pipes themselves are not known until
    * `collectFromProviders()` has walked every provider, but a provider that
-   * mounts directly onto `raw()` — a websocket upgrade is the only practical
-   * way to do that — can have registered its route before then.
+   * mounts directly onto `raw()`, a websocket upgrade is the only practical
+   * way to do that, can have registered its route before then.
    *
    * Such a route would then be matched with NO global middleware on it at all:
    * no context scope, no maintenance check, and no auth. That is not a
    * degraded state, it is an unauthenticated one, and nothing about it is
    * visible from the route table.
    *
-   * So the `use("*")` slot is claimed in the constructor — which runs in
-   * `HttpServiceProvider.register()`, before any provider's `boot()` — and
+   * So the `use("*")` slot is claimed in the constructor, which runs in
+   * `HttpServiceProvider.register()`, before any provider's `boot()`, and
    * this array is filled in later. The indirection is the fix.
    */
   private pipes: HttpPipe[] = [];
@@ -148,7 +148,7 @@ export class HttpKernel {
   }
 
   /**
-   * Register a custom error renderer — an app-supplied `(predicate,
+   * Register a custom error renderer, an app-supplied `(predicate,
    * renderer)` pair consulted before the built-in `HttpError`/
    * `ValidationException` mapping. Use this to shape responses from errors
    * whose throw site the app doesn't control (e.g. a library's
@@ -168,7 +168,7 @@ export class HttpKernel {
    * Installs hono/cors globally, ahead of every provider's routes, if the
    * app has set the `"http.cors"` config namespace (e.g. so a frontend on
    * a different origin can call this API). No-op if that config key isn't
-   * set — CORS stays opt-in.
+   * set. CORS stays opt-in.
    */
   private installCors(): void {
     const config = this.app.config.get<HttpConfig["cors"]>("http.cors");
@@ -214,14 +214,14 @@ export class HttpKernel {
    *
    * Backed by a second, tiny `TrieRouter` built lazily from
    * `hono.routes`, mapping each registered PATH to the set of methods
-   * declared on it — the same technique Hono's own `methodNotAllowed`
+   * declared on it, the same technique Hono's own `methodNotAllowed`
    * middleware uses, and for the same reason: the main router is indexed
    * by (method, path) and can only answer "did this exact pair match?",
    * never "what else would have?".
    *
    * Built on first 404 rather than at registration time, because routes
    * are still being collected while the kernel is constructed. Cached
-   * afterwards — a 404 is a plausible flood target and rebuilding a trie
+   * afterwards. A 404 is a plausible flood target and rebuilding a trie
    * per request would make that flood cheaper for the attacker than for
    * us.
    */
@@ -237,7 +237,7 @@ export class HttpKernel {
       }
     }
 
-    // A GET route answers HEAD too — Hono dispatches it — so a HEAD
+    // A GET route answers HEAD too, Hono dispatches it, so a HEAD
     // request to a GET-only path must not be told the method is
     // disallowed.
     if (allowed.has("GET")) {
@@ -251,7 +251,7 @@ export class HttpKernel {
     const methodsByPath = new Map<string, Set<string>>();
 
     for (const route of this.hono.routes) {
-      // `ALL` entries are `use()` middleware, not routes — every path
+      // `ALL` entries are `use()` middleware, not routes, every path
       // "matches" them, so including them would make every 404 a 405.
       if (route.method === METHOD_NAME_ALL) {
         continue;
@@ -272,7 +272,7 @@ export class HttpKernel {
   }
 
   /**
-   * Request body size limits — see `HttpBodyLimitConfig` for why these
+   * Request body size limits. See `HttpBodyLimitConfig` for why these
    * are on by default.
    *
    * Mounted ahead of the global Mahi pipe so an oversize body is
@@ -313,7 +313,7 @@ export class HttpKernel {
   }
 
   /**
-   * Response security headers — see `HttpSecurityHeadersConfig`. On by
+   * Response security headers. See `HttpSecurityHeadersConfig`. On by
    * default; `{ enabled: false }` installs none.
    */
   private installSecurityHeaders(): void {
@@ -350,7 +350,7 @@ export class HttpKernel {
    * Register the opt-in liveness route (default `GET /up`) when
    * `http.liveness` is configured.
    *
-   * Does **no I/O** — that is the whole point. It is mounted after the
+   * Does **no I/O**. That is the whole point. It is mounted after the
    * maintenance middleware but with its path in the maintenance `except`
    * list (see `installProviderMiddleware`), so it keeps answering `200`
    * while the app is down: an orchestrator must be able to tell a
@@ -358,7 +358,7 @@ export class HttpKernel {
    *
    * If this route ever started doing real I/O, a Redis blip would fail the
    * *liveness* probe and the orchestrator would restart every pod in the
-   * deployment — turning a recoverable dependency outage into a full
+   * deployment, turning a recoverable dependency outage into a full
    * outage plus a thundering-herd reconnect. Dependency checking belongs
    * on `/health` (see `installReadinessRoute`), which is a separate route
    * for exactly this reason.
@@ -373,7 +373,7 @@ export class HttpKernel {
     // Deliberately unnamed, as it always has been. Route names must be
     // unique or `RouteRegistry.register()` throws, so claiming one here
     // would stop an app that already names a route "liveness" from
-    // booting at all — and nothing needs to reverse this path.
+    // booting at all, and nothing needs to reverse this path.
     this.router.get(path, () => Response.json({ status: "ok" }));
   }
 
@@ -383,8 +383,8 @@ export class HttpKernel {
    * registry.
    *
    * The dependency is inverted on purpose: `@mahiframework/health` depends on
-   * `@mahiframework/core` alone — so `./artisan health` works in an app with no
-   * HTTP package at all — and this package reaches it by string token,
+   * `@mahiframework/core` alone, so `./artisan health` works in an app with no
+   * HTTP package at all, and this package reaches it by string token,
    * exactly as it already does for `MAINTENANCE_MODE_TOKEN`. Both probes
    * are then configured in one namespace and mounted side by side, rather
    * than split across two packages' config.
@@ -407,7 +407,7 @@ export class HttpKernel {
         // Resolved per REQUEST, not captured here. This method runs
         // during `HttpServiceProvider.boot()`, which may be before
         // `HealthServiceProvider.boot()` has collected the app's
-        // `checks()` hooks — capturing the check list now would silently
+        // `checks()` hooks, capturing the check list now would silently
         // produce an endpoint that only ever runs the built-ins.
         const registry = this.app.make<HealthRegistryLike>(HEALTH_TOKEN);
         const report = await registry.run();
@@ -417,7 +417,7 @@ export class HttpKernel {
           : report.results;
 
         // The global `Response`, as `installLivenessRoute` above already
-        // uses — `ResponseInput` accepts either it or `HttpResponse`.
+        // uses, `ResponseInput` accepts either it or `HttpResponse`.
         return Response.json(results, {
           status: report.healthy ? 200 : (config.failureStatus ?? 503),
         });
@@ -431,8 +431,8 @@ export class HttpKernel {
   private installProviderMiddleware(): void {
     const pipes: HttpPipe[] = [];
 
-    // Open a per-request Context overlay FIRST — outermost of everything,
-    // ahead of even the maintenance check — so any context added by any
+    // Open a per-request Context overlay FIRST, outermost of everything,
+    // ahead of even the maintenance check, so any context added by any
     // downstream pipe or handler (request id, current user, …) is isolated
     // to this request and can't bleed into another concurrent one. See
     // `ContextRepository.runScoped()`. Cheap: one AsyncLocalStorage.run
@@ -440,13 +440,13 @@ export class HttpKernel {
     const context = this.app.context;
     pipes.push((request, next) => context.runScoped(() => next(request)));
 
-    // Maintenance-mode check runs next — ahead of every provider pipe —
+    // Maintenance-mode check runs next, ahead of every provider pipe,
     // so a downed app short-circuits before auth/throttle/etc. It's a
     // cheap `cache.has()` per request when the app is up.
     if (this.app.has(MAINTENANCE_MODE_TOKEN)) {
       const mode = this.app.make<MaintenanceMode>(MAINTENANCE_MODE_TOKEN);
-      // The LIVENESS route must stay reachable while the app is down —
-      // the same exemption Laravel's own `/up` route gets — so an
+      // The LIVENESS route must stay reachable while the app is down,
+      // the same exemption Laravel's own `/up` route gets, so an
       // orchestrator can tell a down-for-maintenance app from a dead one.
       //
       // The readiness route (`/health`) is deliberately NOT exempt: it
@@ -462,7 +462,7 @@ export class HttpKernel {
     }
 
     // Filling the array the constructor already registered, rather than
-    // registering a second `use("*")` here — which would sit behind any route
+    // registering a second `use("*")` here. Which would sit behind any route
     // a provider mounted onto `raw()` during its own `boot()`. See `pipes`.
     this.pipes = pipes;
   }
@@ -506,7 +506,7 @@ export class HttpKernel {
     }
   }
 
-  /** All routes registered so far — used by the `route:list` CLI command. */
+  /** All routes registered so far, used by the `route:list` CLI command. */
   listRoutes(): RegisteredRoute[] {
     return this.routes;
   }
@@ -553,9 +553,9 @@ export class HttpKernel {
 
       // Injection is wrapped to be IDEMPOTENT, and that is what makes the
       // helper safe to share. Several parties legitimately believe it is
-      // their job to inject — `listenHttpServer()`, a broadcast driver
+      // their job to inject, `listenHttpServer()`, a broadcast driver
       // whose documented entrypoint snippet does it by hand, an app with
-      // its own `serve()` — and there is no ordering rule that makes all
+      // its own `serve()`, and there is no ordering rule that makes all
       // of them right. Attaching the `upgrade` listener twice re-creates
       // the exact two-listeners-one-socket crash this type exists to
       // prevent, so rather than legislate who calls it, the second call
@@ -584,7 +584,7 @@ export class HttpKernel {
    * `serve()` returns, because the `upgrade` event does not exist before
    * then.
    *
-   * A no-op when `websocketSupport()` was never called — the difference
+   * A no-op when `websocketSupport()` was never called, the difference
    * between an app with websockets and one without is a listener that is
    * never attached, not a branch at request time.
    */
@@ -598,14 +598,14 @@ export class HttpKernel {
    *
    * Called by `listenHttpServer()`'s `close()`, and it is what makes that
    * close actually finish. `server.close()` stops accepting *new*
-   * connections and then waits for existing ones to end — and an upgraded
+   * connections and then waits for existing ones to end, and an upgraded
    * websocket never ends on its own, so a server with one connected
    * client hangs there forever. The symptom is `artisan serve` (or a
    * SIGTERM'd production server) that appears to shut down and then just
    * sits until the orchestrator SIGKILLs it.
    *
    * A no-op when no route ever asked for websockets, which is the common
-   * case — `websocketSupport()` is lazy, so `wss` is undefined and there
+   * case. `websocketSupport()` is lazy, so `wss` is undefined and there
    * is nothing to close.
    */
   closeWebSockets(): void {
@@ -615,8 +615,8 @@ export class HttpKernel {
 
     for (const client of this.wss.clients) {
       // 1001 "going away" is the code for a server shutting down, as
-      // opposed to 1000 "normal closure" for a completed conversation —
-      // it is the difference between a client that reconnects and one
+      // opposed to 1000 "normal closure" for a completed conversation.
+      // It is the difference between a client that reconnects and one
       // that concludes it was told to stop.
       client.close(1001, "Server shutting down");
     }

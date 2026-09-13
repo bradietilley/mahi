@@ -1,5 +1,5 @@
 /**
- * `@mahiframework/broadcasting` — push already-dispatched application events
+ * `@mahiframework/broadcasting`, push already-dispatched application events
  * to connected websocket clients, scoped to named channels.
  *
  * An event opts in by implementing `ShouldBroadcast`; no dispatch call
@@ -8,7 +8,7 @@
  * ⚠️ THE ONE THING TO READ BEFORE USING THIS: the shipped `"local"` driver
  * keeps its subscription table in the memory of a single Node process, so
  * broadcasts only reach clients connected to *that* process. It is correct
- * for a single-process deployment and silently lossy for any other — see
+ * for a single-process deployment and silently lossy for any other. See
  * `LocalBroadcastDriver`'s docstring for the full explanation and the
  * `BroadcastManager.extend("redis", ...)` escape hatch.
  */

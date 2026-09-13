@@ -15,7 +15,7 @@ export class LoginController extends Controller<LoginRequest> {
     const user = await Auth.attempt<User>({ email: body.email, password: body.password });
 
     if (user === null) {
-      // One message for both "no such account" and "wrong password" — the
+      // One message for both "no such account" and "wrong password", the
       // pairing to Auth.attempt()'s constant-time behaviour. Distinguishing
       // them here would leak account existence through the response body,
       // undoing the timing work entirely.

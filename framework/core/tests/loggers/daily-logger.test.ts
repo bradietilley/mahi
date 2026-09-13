@@ -34,7 +34,7 @@ describe("DailyLogger", () => {
 
   it("uses the UTC date for the filename so it agrees with the UTC line timestamps around midnight", async () => {
     vi.useFakeTimers();
-    // 23:30 UTC on the 21st — a machine in e.g. UTC+2 would compute a
+    // 23:30 UTC on the 21st, a machine in e.g. UTC+2 would compute a
     // *local* date of the 22nd, disagreeing with the UTC line timestamp.
     vi.setSystemTime(new Date("2026-08-21T23:30:00Z"));
 

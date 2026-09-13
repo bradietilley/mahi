@@ -153,7 +153,7 @@ describe("request body limit", () => {
 
   it("rejects an oversize body with a 413 in the JSON envelope", async () => {
     // The limit must apply before the body is parsed into memory, and
-    // for every request — including ones for paths that do not exist —
+    // for every request, including ones for paths that do not exist,
     // not only once validation runs.
     const res = await postJson(kernelWith({ bodyLimit: { maxBytes: 2048 } }), 8192);
 

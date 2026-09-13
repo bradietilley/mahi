@@ -15,13 +15,13 @@
  * - `inTimezone(zone)` changes how an instant is *read*. The instant is
  *   untouched, so `isEqual` still holds.
  * - `keepLocalTime(zone)` changes *which instant* is meant, preserving the
- *   wall clock. 09:00 in Perth becomes 09:00 in Sydney — a different moment.
+ *   wall clock. 09:00 in Perth becomes 09:00 in Sydney, a different moment.
  *   These two are the operations that §11 insists on distinguishing, and
  *   conflating them is the classic timezone bug.
  * - Exact arithmetic (`addHours` and below) moves the instant. Calendar
  *   arithmetic (`addDays` and above) moves the *wall clock* and then
  *   re-resolves against the zone. So across a US spring-forward,
- *   `addDays(1)` advances 23 real hours while `addHours(24)` advances 24 —
+ *   `addDays(1)` advances 23 real hours while `addHours(24)` advances 24,
  *   both correct, answering different questions.
  * - A wall clock that a zone maps to zero or two instants is resolved by an
  *   explicit `Disambiguation` policy rather than by luck.
@@ -125,7 +125,7 @@ export class DateTime {
    * Frozen clock for tests, in the spirit of Carbon's `setTestNow()`.
    * Everything that reads the current time goes through `nowInstant()`, so
    * freezing here freezes `now`, `today`, `isPast`, `diffForHumans`, and so
-   * on together — a clock that only half-freezes is worse than none.
+   * on together, a clock that only half-freezes is worse than none.
    */
   private static testNow: DateTime | null = null;
 
@@ -243,12 +243,12 @@ export class DateTime {
     return DateTime.now(zone).with({ hour, minute, second, millisecond });
   }
 
-  /** Carbon's spelling of `fromUnixTimestamp()` — seconds since the epoch. */
+  /** Carbon's spelling of `fromUnixTimestamp()`, seconds since the epoch. */
   static createFromTimestamp(seconds: number, zone?: TimezoneIdentifier): DateTime {
     return DateTime.fromUnixTimestamp(seconds, zone);
   }
 
-  /** Carbon's spelling of `fromTimestamp()` — milliseconds since the epoch. */
+  /** Carbon's spelling of `fromTimestamp()`, milliseconds since the epoch. */
   static createFromTimestampMs(milliseconds: number, zone?: TimezoneIdentifier): DateTime {
     return DateTime.fromTimestamp(milliseconds, zone);
   }
@@ -467,7 +467,7 @@ export class DateTime {
     return this.components.year;
   }
 
-  /** 1 (January) through 12 (December) — not zero-indexed. */
+  /** 1 (January) through 12 (December), not zero-indexed. */
   get month(): number {
     return this.components.month;
   }
@@ -937,7 +937,7 @@ export class DateTime {
     return this.compareTo(other) === 0;
   }
 
-  /** Same instant *and* same zone — structural identity, not just equality. */
+  /** Same instant *and* same zone, structural identity, not just equality. */
   isIdentical(other: DateTime): boolean {
     return this.isEqual(other) && this.timezone === other.timezone;
   }
@@ -1081,7 +1081,7 @@ export class DateTime {
   /**
    * The elapsed time from this instant to `other`, as an exact `Duration`.
    *
-   * Always exact milliseconds, never calendar parts — "how long between these
+   * Always exact milliseconds, never calendar parts, "how long between these
    * two moments" has one true answer, whereas "how many months" depends on
    * which calendar you ask.
    */
@@ -1095,7 +1095,7 @@ export class DateTime {
    * Hours and below measure **real elapsed time**: across a US spring-forward,
    * midnight to midnight is `diffInHours() === 23`. Days and above measure
    * **wall-clock calendar distance**, so the same pair is
-   * `diffInDays() === 1`. That is not an inconsistency — they are answers to
+   * `diffInDays() === 1`. That is not an inconsistency. They are answers to
    * different questions, and §10 requires both.
    */
   diffInMilliseconds(other: DateTimeLike, options: DiffOptions = {}): number {
@@ -1203,7 +1203,7 @@ export class DateTime {
    * Read the **same instant** in a different zone.
    *
    * `DateTime.parse("2026-08-20T09:00", "Australia/Perth").inTimezone("Australia/Sydney")`
-   * reads 11:00 — the same moment, a different clock. `isEqual` still holds.
+   * reads 11:00, the same moment, a different clock. `isEqual` still holds.
    */
   inTimezone(zone: TimezoneIdentifier): DateTime {
     return new DateTime(this.epochMilliseconds, DateTime.resolveZone(zone));
@@ -1227,7 +1227,7 @@ export class DateTime {
   /**
    * Keep the **wall clock** and change which instant is meant.
    *
-   * 09:00 in Perth becomes 09:00 in Sydney — a different moment two hours
+   * 09:00 in Perth becomes 09:00 in Sydney, a different moment two hours
    * earlier in absolute terms. This is what you want for "the meeting is at
    * 9am wherever the office is"; `inTimezone` is what you want for
    * "what time is this log line locally". Mixing them up is the timezone bug.
@@ -1358,7 +1358,7 @@ export class DateTime {
 
   /** Number of ISO weeks in this instance's ISO week-year: 52 or 53. */
   isoWeeksInYear(): number {
-    // 28 December is always in the last ISO week of its ISO year — the one
+    // 28 December is always in the last ISO week of its ISO year, the one
     // date that is guaranteed to be, whichever way the year's edges fall.
     return this.with({ month: 12, day: 28 }).isoWeek;
   }
@@ -1371,7 +1371,7 @@ export class DateTime {
   /**
    * Which seven-day block of the month this date falls in, 1–5.
    *
-   * This is Carbon's definition — `ceil(day / 7)` — and is deliberately *not*
+   * This is Carbon's definition, `ceil(day / 7)`, and is deliberately *not*
    * a week number: it ignores weekday boundaries entirely, so the 7th is
    * always week 1 and the 8th always week 2 regardless of what day they land
    * on.
@@ -1711,7 +1711,7 @@ export class DateTime {
   /**
    * Month arithmetic that lets the day-of-month spill over, PHP-style.
    *
-   * `addMonths` clamps — 31 January plus a month is 28/29 February — which is
+   * `addMonths` clamps, 31 January plus a month is 28/29 February, which is
    * this package's default because it is what people mean. PHP's `DateTime`
    * (and therefore Carbon's own `addMonths`) instead overflows to 2 or
    * 3 March. This method exists so a Carbon migration can reproduce the old
@@ -1743,7 +1743,7 @@ export class DateTime {
     return this.addYearsWithOverflow(-amount);
   }
 
-  // Singular aliases for Carbon parity — each delegates to the plural
+  // Singular aliases for Carbon parity, each delegates to the plural
   // form with a count of 1.
 
   addMillisecond(): DateTime {
@@ -1835,14 +1835,14 @@ export class DateTime {
    * Whether both render identically under `pattern`.
    *
    * Carbon's `isSameAs()`. A blunt but genuinely useful instrument: it lets a
-   * caller define "same" however they like — `isSameAs("yyyy-'W'II", other)`
+   * caller define "same" however they like, `isSameAs("yyyy-'W'II", other)`
    * asks about ISO weeks without this package needing an opinion.
    */
   isSameAs(pattern: string, other: DateTimeLike): boolean {
     return this.format(pattern) === this.coerceToThisZone(other).format(pattern);
   }
 
-  /** Same day-of-year, ignoring the year — a birthday or anniversary. */
+  /** Same day-of-year, ignoring the year, a birthday or anniversary. */
   isBirthday(other?: DateTimeLike): boolean {
     const reference =
       other === undefined ? DateTime.now(this.timezone) : this.coerceToThisZone(other);
@@ -1894,7 +1894,7 @@ export class DateTime {
     return this.isSameYear(DateTime.now(this.timezone).subYears(1));
   }
 
-  /** Exactly midnight — hour, minute, second, and millisecond all zero. */
+  /** Exactly midnight, hour, minute, second, and millisecond all zero. */
   isStartOfDay(): boolean {
     return this.isEqual(this.startOfDay());
   }
@@ -2010,7 +2010,7 @@ export class DateTime {
     return this.format(RFC2822_PATTERN);
   }
 
-  /** `yyyy-MM-dd HH:mm:ss` — the form most databases and Carbon default to. */
+  /** `yyyy-MM-dd HH:mm:ss`, the form most databases and Carbon default to. */
   toDateTimeString(): string {
     return this.format("yyyy-MM-dd HH:mm:ss");
   }
@@ -2057,17 +2057,17 @@ export class DateTime {
     return this.toLocaleString(options, locale ?? getDefaultLocale());
   }
 
-  /** This month's name in the given locale — `"August"`, `"août"`. */
+  /** This month's name in the given locale: `"August"`, `"août"`. */
   monthName(style: NameStyle = "long", locale?: LocaleIdentifier): string {
     return Locale.monthNames(style, locale ?? getDefaultLocale())[this.month - 1]!;
   }
 
-  /** This weekday's name in the given locale — `"Thursday"`, `"jeudi"`. */
+  /** This weekday's name in the given locale: `"Thursday"`, `"jeudi"`. */
   dayName(style: NameStyle = "long", locale?: LocaleIdentifier): string {
     return Locale.weekdayNames(style, locale ?? getDefaultLocale())[this.dayOfWeek]!;
   }
 
-  /** The day of the month as an ordinal — `"20th"`. */
+  /** The day of the month as an ordinal, `"20th"`. */
   ordinalDay(locale?: LocaleIdentifier): string {
     return Locale.ordinal(this.day, locale ?? getDefaultLocale());
   }
@@ -2077,7 +2077,7 @@ export class DateTime {
    *
    * Emits an offset-bearing ISO string rather than a bare `Z`, so the local
    * wall clock survives the round trip. The IANA identifier itself does not
-   * fit in ISO 8601 — if a consumer needs the zone *name* (and not merely the
+   * fit in ISO 8601, if a consumer needs the zone *name* (and not merely the
    * offset), use `toObject()`, which keeps it.
    */
   toJSON(): string {
@@ -2101,7 +2101,7 @@ export class DateTime {
     return this.unixTimestamp;
   }
 
-  /** Wall-clock components plus the zone — lossless, unlike an ISO string. */
+  /** Wall-clock components plus the zone, lossless, unlike an ISO string. */
   toObject(): DateTimeComponents & { timezone: TimezoneIdentifier; offset: number } {
     return { ...this.components, timezone: this.timezone, offset: this.offset };
   }
@@ -2154,7 +2154,7 @@ function wholeUnitsBetween(from: DateTime, to: DateTime, unit: HumanUnit): numbe
 /**
  * The first year of the decade or century containing `year`.
  *
- * Centuries are 1901–2000, 2001–2100 — the ordinal convention Carbon uses,
+ * Centuries are 1901–2000, 2001–2100, the ordinal convention Carbon uses,
  * where the first century is years 1–100. It is not the "the 2000s" reading a
  * marketing department would use, and the two disagree for exactly one year
  * in a hundred, so it is pinned by a test.

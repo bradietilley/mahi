@@ -2,7 +2,7 @@ import type { Application } from "@mahiframework/core";
 import { DATABASE_TOKEN, DatabaseManager } from "@mahiframework/database";
 
 /**
- * A set of column/value equality constraints for a database assertion —
+ * A set of column/value equality constraints for a database assertion,
  * the TS analog of Laravel's `assertDatabaseHas($table, [...])` array. Each
  * key is a column name; each value is matched with `=` (or `is null` when
  * the value is `null`).
@@ -39,7 +39,7 @@ export async function countDatabaseRows(
 
 /**
  * Assert at least one row in `table` matches every column/value pair in
- * `criteria` — the direct-DB equivalent of Laravel's `assertDatabaseHas`,
+ * `criteria`, the direct-DB equivalent of Laravel's `assertDatabaseHas`,
  * for asserting persisted state independent of what any API response body
  * claims (e.g. an internal `deleted_at`/`retry_count` column no endpoint
  * exposes). Throws a plain `Error` on failure so it stays runner-agnostic;
@@ -65,7 +65,7 @@ export async function assertDatabaseHas(
 
 /**
  * Assert **no** row in `table` matches every column/value pair in
- * `criteria` — the direct-DB equivalent of Laravel's
+ * `criteria`, the direct-DB equivalent of Laravel's
  * `assertDatabaseMissing`. Throws a plain `Error` (reporting how many rows
  * matched) on failure.
  *
@@ -87,7 +87,7 @@ export async function assertDatabaseMissing(
 }
 
 /**
- * Assert `table` holds exactly `expected` rows in total (no `criteria` —
+ * Assert `table` holds exactly `expected` rows in total (no `criteria`,
  * the whole table), the equivalent of Laravel's `assertDatabaseCount`.
  */
 export async function assertDatabaseCount(
@@ -106,7 +106,7 @@ export async function assertDatabaseCount(
 
 /**
  * The shape `assertSoftDeleted`/`assertNotSoftDeleted` accept in place of
- * a table name — satisfied by any model class, without `@mahiframework/testing`
+ * a table name, satisfied by any model class, without `@mahiframework/testing`
  * depending on the model type itself.
  */
 export interface SoftDeletableModel {
@@ -136,14 +136,14 @@ function resolveSoftDelete(target: string | SoftDeletableModel): {
 }
 
 /**
- * Assert a row exists **and** has been soft-deleted — Laravel's
+ * Assert a row exists **and** has been soft-deleted, Laravel's
  * `assertSoftDeleted`.
  *
  *   await assertSoftDeleted(app, Post, { id: post.id });
  *   await assertSoftDeleted(app, "posts", { id: post.id });
  *
  * Distinct from `assertDatabaseMissing()`, which passes whether the row
- * was soft-deleted, hard-deleted, or never written — so it cannot tell a
+ * was soft-deleted, hard-deleted, or never written, so it cannot tell a
  * working soft delete from a destructive one. This asserts both halves:
  * the row is still there, and its delete column is set.
  *
@@ -178,7 +178,7 @@ export async function assertSoftDeleted(
 }
 
 /**
- * Assert a row exists and has **not** been soft-deleted — Laravel's
+ * Assert a row exists and has **not** been soft-deleted, Laravel's
  * `assertNotSoftDeleted`.
  *
  * The counterpart to `assertSoftDeleted()`, and the one that catches an

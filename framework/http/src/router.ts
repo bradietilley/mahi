@@ -34,7 +34,7 @@ const ANY_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD",
  * Translate a framework route pattern (`/posts/{post}`, `/files/{path?}`)
  * into the Hono pattern (`/posts/:post`, `/files/:path?`). This framework
  * standardised on Laravel-style `{param}` braces, so a raw Hono `:param`
- * segment is rejected loudly rather than silently working — one syntax,
+ * segment is rejected loudly rather than silently working, one syntax,
  * no ambiguity.
  */
 export function translatePath(path: string): string {
@@ -53,7 +53,7 @@ export function translatePath(path: string): string {
 /**
  * A registered route, returned by `get`/`post`/… so `.middleware()` and
  * `.name()` can be chained. Middleware is stored on this object and run at
- * request time — Hono registration happens immediately with a wrapper that
+ * request time, Hono registration happens immediately with a wrapper that
  * reads `this.pipes`.
  */
 export class PendingRoute {
@@ -99,7 +99,7 @@ export class PendingRoute {
 
       // Cookies queued on the Request (by a guard, a pipe, the handler)
       // are written here, along with any headers Hono queued on the
-      // context — neither survives returning a bare `Response`. See
+      // context, neither survives returning a bare `Response`. See
       // `finalizeResponse`.
       return finalizeResponse(c, request, response);
     };
@@ -163,7 +163,7 @@ export class Router {
     return this.register(["HEAD"], path, handler);
   }
 
-  /** The (draft) HTTP QUERY method — a body-carrying, safe/idempotent GET. */
+  /** The (draft) HTTP QUERY method, a body-carrying, safe/idempotent GET. */
   query(path: string, handler: RouteTarget): PendingRoute {
     return this.register(["QUERY"], path, handler);
   }
@@ -200,7 +200,7 @@ export class Router {
    *
    * router.group("/admin", (admin) => {
    *   admin.get("/users", ListUsers);
-   *   admin.middleware(authenticate());   // ❌ throws — routes came first
+   *   admin.middleware(authenticate());   // ❌ throws, routes came first
    * });
    * ```
    *
@@ -213,7 +213,7 @@ export class Router {
    * you can only detect by getting breached is a bug.
    *
    * Per-route `.middleware()` on the `PendingRoute` has no such ordering
-   * constraint — it's attached to the route object itself — and
+   * constraint, it's attached to the route object itself, and
    * `use(path, ...)` is the escape hatch for deliberately mounting a
    * path-scoped pipe late.
    */
@@ -232,7 +232,7 @@ export class Router {
     return this;
   }
 
-  /** Path-scoped pipes — `use("/protected/*", authenticate())`. */
+  /** Path-scoped pipes, `use("/protected/*", authenticate())`. */
   use(path: string, ...pipes: HttpPipe[]): void {
     this.hono.use(translatePath(path), toHonoMiddleware(pipes));
   }

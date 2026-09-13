@@ -3,7 +3,7 @@ import type { ClientRequest } from "./client-request.js";
 import { RequestFailedError } from "./errors.js";
 
 /**
- * The outcome of a completed request — port of Laravel's
+ * The outcome of a completed request, port of Laravel's
  * `Illuminate\Http\Client\Response`.
  *
  * The body is buffered once at construction (unless `stream()` or `sink()`
@@ -12,7 +12,7 @@ import { RequestFailedError } from "./errors.js";
  * accessor async to preserve that would poison every call site for no gain
  * on the JSON-API case this is overwhelmingly used for.
  *
- * A non-2xx status is an ordinary return value here, never a rejection —
+ * A non-2xx status is an ordinary return value here, never a rejection.
  * `throw()` is the opt-in, mirroring `ProcessResult.throw()`.
  */
 export interface ClientResponse {
@@ -67,7 +67,7 @@ export interface ClientResponse {
   throw(callback?: (response: ClientResponse, error: RequestFailedError) => void): ClientResponse;
   throwIf(condition: boolean | ((response: ClientResponse) => boolean)): ClientResponse;
   throwUnless(condition: boolean | ((response: ClientResponse) => boolean)): ClientResponse;
-  /** Throws if the status matches — **unconditional**, even on a 2xx, per Laravel. */
+  /** Throws if the status matches, **unconditional**, even on a 2xx, per Laravel. */
   throwIfStatus(status: number | ((status: number) => boolean)): ClientResponse;
   throwUnlessStatus(status: number | ((status: number) => boolean)): ClientResponse;
   /** Runs `callback` if the response failed. Never throws. */
@@ -179,7 +179,7 @@ function buildClientResponse(
 
   const clientResponse: ClientResponse = {
     status,
-    // `response.url` is empty for a synthesised (stubbed) Response — fall
+    // `response.url` is empty for a synthesised (stubbed) Response, fall
     // back to what we asked for, which is what the caller means by "the URL".
     url: response.url || request.url,
     durationMs,
@@ -212,7 +212,7 @@ function buildClientResponse(
     successful,
     ok: () => status === 200,
     created: () => status === 201,
-    // Laravel requires both the status *and* an empty body — a 204 with a
+    // Laravel requires both the status *and* an empty body, a 204 with a
     // body is malformed, and reporting it as "no content" hides that.
     noContent: () => status === 204 && (bytes === undefined || bytes.length === 0),
     redirect: () => status >= 300 && status < 400,
@@ -279,7 +279,7 @@ function buildClientResponse(
 
 /**
  * Parses `Set-Cookie` headers into a name→value record. `getSetCookie()`
- * is the only correct way to read them — `headers.get("set-cookie")`
+ * is the only correct way to read them, `headers.get("set-cookie")`
  * comma-joins them, which is ambiguous with the commas inside an `Expires`
  * date.
  */

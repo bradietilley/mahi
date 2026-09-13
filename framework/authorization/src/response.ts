@@ -1,11 +1,11 @@
 /**
- * A rich authorization outcome — the equivalent of Laravel's
+ * A rich authorization outcome, the equivalent of Laravel's
  * `Auth\Access\Response`. A policy method can return one of these instead
  * of a bare boolean to declare its OWN denial shape: a custom message,
  * and a custom HTTP status (notably 404 instead of 403).
  *
  * Why this exists here specifically: the README's "401 vs 403, and 404"
- * section documents the exact pattern `denyAsNotFound()` solves —
+ * section documents the exact pattern `denyAsNotFound()` solves,
  * surfacing "someone else's private row" as a 404 so an endpoint can't be
  * used to probe which ids exist. Without this, that decision has to be
  * hand-rolled per-controller, OUTSIDE the gate, because a policy method
@@ -34,7 +34,7 @@ export class AuthorizationResponse {
   }
 
   /**
-   * A denial that surfaces as 404 — for "this row exists but isn't yours,
+   * A denial that surfaces as 404, for "this row exists but isn't yours,
    * and admitting it exists would leak information."
    */
   static denyAsNotFound(message = "Not Found"): AuthorizationResponse {

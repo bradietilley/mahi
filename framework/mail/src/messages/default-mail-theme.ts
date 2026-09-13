@@ -15,14 +15,14 @@ const DEFAULT_COLORS: Record<MessageLevel, string> = {
  * Written as template literals rather than as a template file on disk for
  * two reasons. It keeps the package free of any template engine or asset
  * pipeline (a `.html` file would need a loader, and a bundled app has no
- * filesystem to read it from — the same constraint that forced
+ * filesystem to read it from, the same constraint that forced
  * `QueueServiceProvider`'s migrations to be static imports). And it makes
  * the theme SUBCLASSABLE: every piece of markup is a small protected
  * method, so an app that wants a different button but the same layout
  * overrides `button()` and inherits everything else, which no template
  * file would allow without copying the whole thing.
  *
- * The markup is deliberately dated — tables, inline styles, no flexbox,
+ * The markup is deliberately dated, tables, inline styles, no flexbox,
  * no `<style>` block, no web fonts, no external images. Email clients are
  * not browsers; Outlook still renders through Word's HTML engine, and
  * Gmail strips `<style>` in some contexts. This is the subset that works.
@@ -207,7 +207,7 @@ export class DefaultMailTheme implements MailTheme {
   }
 
   /**
-   * The plain-text half. Not a stripped-tags version of the HTML — it is
+   * The plain-text half. Not a stripped-tags version of the HTML. It is
    * rendered from the same blocks independently, because the useful text
    * rendering of a button is its label AND its URL, which tag-stripping
    * would lose entirely.

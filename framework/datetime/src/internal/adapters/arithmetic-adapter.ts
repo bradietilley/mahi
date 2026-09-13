@@ -33,8 +33,8 @@ import type { Weekday } from "../../types.js";
  *
  * The clamp is the behaviour Carbon, `date-fns`, and `Temporal`'s
  * `"constrain"` mode all agree on: 31 January plus one month is 28 (or 29)
- * February, not 2 or 3 March. It is deliberately **not** reversible —
- * `addMonths(1).subMonths(1)` on 31 January returns 28 February — and the
+ * February, not 2 or 3 March. It is deliberately **not** reversible,
+ * `addMonths(1).subMonths(1)` on 31 January returns 28 February, and the
  * test suite pins that rather than pretending otherwise.
  */
 export function addCivilMonths(civilMs: number, amount: number): number {

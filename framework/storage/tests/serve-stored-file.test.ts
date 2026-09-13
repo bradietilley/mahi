@@ -201,7 +201,7 @@ describe("StorageServiceProvider + servePublicDisk", () => {
     expect(storage.disk("public")).toBeInstanceOf(LocalStorageDriver);
     expect(storage.disk("local")).toBeInstanceOf(LocalStorageDriver);
     expect(storage.url("avatars/a.png")).toBe("/storage/avatars/a.png");
-    // The private "local" disk has no url — url() throws, path() gives its location.
+    // The private "local" disk has no url, url() throws, path() gives its location.
     expect(() => storage.url("secret.txt", "local")).toThrow(/does not support retrieving URLs/);
     expect(path.isAbsolute(storage.path("secret.txt", "local"))).toBe(true);
     expect(() => storage.disk("remote")).toThrow(/not registered/);

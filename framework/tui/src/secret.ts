@@ -14,7 +14,7 @@ export interface SecretOptions {
   transform?: (value: string) => string;
 }
 
-/** Port of `laravel/prompts`' `PasswordPrompt.php` + `PasswordPromptRenderer.php` — masked (`•`) echo, otherwise identical editing behavior to `ask()`. */
+/** Port of `laravel/prompts`' `PasswordPrompt.php` + `PasswordPromptRenderer.php`, masked (`•`) echo, otherwise identical editing behavior to `ask()`. */
 class PasswordPrompt extends InteractivePrompt<string> {
   private typedValue: TypedValue;
 

@@ -3,7 +3,7 @@
  * generator rather than a property-testing dependency.
  *
  * A seeded LCG is used instead of `Math.random` so that a failure is
- * reproducible from the printed case alone — a randomly-failing date test
+ * reproducible from the printed case alone, a randomly-failing date test
  * that can't be re-run is nearly useless.
  */
 
@@ -152,7 +152,7 @@ describe("invariants", () => {
   });
 
   it("never overshoots when a month difference is added back", () => {
-    // Month differences are *not* antisymmetric — the fraction is measured
+    // Month differences are *not* antisymmetric. The fraction is measured
     // against the length of the next month from the anchor, and months have
     // different lengths in each direction. What must hold is that stepping
     // by the whole-month count always lands between the two dates.

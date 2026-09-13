@@ -3,7 +3,7 @@ import type { AnyModelClass } from "./model.js";
 /**
  * A morph-map entry: the model class a discriminant value names, behind a
  * thunk. Thunks rather than bare class references for the same reason
- * `RelationDefinition.related` is one — a provider's `register()` runs at
+ * `RelationDefinition.related` is one, a provider's `register()` runs at
  * import time, and a direct class reference in the map literal would be
  * evaluated then, hitting a TDZ `ReferenceError` whichever module the
  * bundler entered a cycle through.
@@ -15,7 +15,7 @@ export type MorphMap = Record<string, MorphMapEntry>;
 
 /**
  * Thrown when a model has no morph-map entry and `Relation.requireMorphMap()`
- * is on — the analogue of Laravel's `ClassMorphViolationException`.
+ * is on, the analogue of Laravel's `ClassMorphViolationException`.
  */
 export class ClassMorphViolationError extends Error {
   constructor(public readonly modelName: string) {
@@ -30,7 +30,7 @@ export class ClassMorphViolationError extends Error {
 // Module-level, not container-bound: a morph alias is class *metadata*,
 // not a service. Same storage decision as `bootedModels` (`model.ts`) and
 // `observerRegistry` (`model-events.ts`), and the same tradeoff Laravel
-// makes with its static `$morphMap` — two Applications in one test
+// makes with its static `$morphMap`, two Applications in one test
 // process share it. `resetMorphMap()` exists for teardown.
 const aliasToThunk = new Map<string, MorphMapEntry>();
 
@@ -69,7 +69,7 @@ function resolveEntry(alias: string): AnyModelClass | undefined {
 }
 
 /**
- * The polymorphic-relation configuration surface — Laravel's
+ * The polymorphic-relation configuration surface, Laravel's
  * `Illuminate\Database\Eloquent\Relations\Relation`, narrowed to the
  * morph map (the rest of that class is a base-class hierarchy this
  * framework deliberately doesn't have; relations here are plain data
@@ -80,7 +80,7 @@ function resolveEntry(alias: string): AnyModelClass | undefined {
  * A polymorphic column stores a short string naming the model it points
  * at. Without a map that string is derived from the model itself
  * (`morphName`, else `table`), which couples the *database's* contents to
- * the *code's* naming — rename a table and every stored discriminant is
+ * the *code's* naming, rename a table and every stored discriminant is
  * orphaned. Registering a map pins the stored values:
  *
  *   // In a provider's register():
@@ -89,7 +89,7 @@ function resolveEntry(alias: string): AnyModelClass | undefined {
  *     user: () => User,
  *   });
  *
- * Do this in `register()`, not `boot()` — the map is class metadata with
+ * Do this in `register()`, not `boot()`. The map is class metadata with
  * no container dependencies, and relations may resolve during another
  * provider's boot.
  *
@@ -103,8 +103,8 @@ function resolveEntry(alias: string): AnyModelClass | undefined {
  *
  * Laravel's fallback is `static::class`, which is always unique. There is
  * no equivalent here (a JS class name doesn't survive minification), so
- * the fallback is a chain instead. `morphName` is unique by construction
- * — `ModelRegistry` throws on collision — but is opt-in and `undefined`
+ * the fallback is a chain instead. `morphName` is unique by construction,
+ * `ModelRegistry` throws on collision, but is opt-in and `undefined`
  * by default; `table` always exists but two models *can* share one.
  *
  * `enforceMorphMap()` disables rungs 2 and 3, which makes it more
@@ -116,7 +116,7 @@ function resolveEntry(alias: string): AnyModelClass | undefined {
  * type anything: `morphMap()` accepts an arbitrary `Record<string, …>`,
  * so a `morphTo` relying on it types its value as `Model`. To get a
  * precise union (`Post | Video | undefined`), declare a local `types` map
- * on the relation. The two are complementary, not interchangeable — see
+ * on the relation. The two are complementary, not interchangeable. See
  * the relationships guide.
  */
 export class Relation {
@@ -128,7 +128,7 @@ export class Relation {
    *   Relation.morphMap({ post: () => Post });
    *   Relation.morphMap();                      // read it back
    *
-   * Registering the same alias twice is allowed (last write wins) — a
+   * Registering the same alias twice is allowed (last write wins), a
    * model listed by two providers shouldn't error. Registering two
    * aliases for the same *class* is also allowed, but only the last is
    * returned by `getMorphAlias()`, so it's a misconfiguration in
@@ -156,7 +156,7 @@ export class Relation {
   }
 
   /**
-   * `morphMap(map, merge)` plus `requireMorphMap()` — registers the map
+   * `morphMap(map, merge)` plus `requireMorphMap()`, registers the map
    * and makes it mandatory in one call, matching Laravel's
    * `enforceMorphMap()`. The recommended form for a new application:
    * every polymorphic model is named explicitly, and adding one without
@@ -177,7 +177,7 @@ export class Relation {
     morphMapRequired = require;
   }
 
-  /** Whether the morph map is currently mandatory — see `requireMorphMap()`. */
+  /** Whether the morph map is currently mandatory. See `requireMorphMap()`. */
   static requiresMorphMap(): boolean {
     return morphMapRequired;
   }
@@ -202,7 +202,7 @@ export class Relation {
    * this is the map-only rung.
    *
    * O(1) on the common path via the reverse index. On a miss it forces
-   * any not-yet-resolved thunks before concluding the class is absent —
+   * any not-yet-resolved thunks before concluding the class is absent,
    * a class registered but never resolved would otherwise read as
    * unregistered.
    */
@@ -231,7 +231,7 @@ export class Relation {
   /**
    * Clears the map and the `requireMorphMap()` flag. Exists because the
    * map is module-level and therefore shared by every `Application` in a
-   * process — call it in test teardown to keep files isolated:
+   * process, call it in test teardown to keep files isolated:
    *
    *   afterEach(() => Relation.resetMorphMap());
    */

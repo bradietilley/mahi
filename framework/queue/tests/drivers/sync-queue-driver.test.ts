@@ -44,7 +44,7 @@ describe("SyncQueueDriver", () => {
     await expect(driver.push("throwing", {})).rejects.toThrow("boom");
   });
 
-  it("pop() always returns undefined — nothing is ever queued for later", async () => {
+  it("pop() always returns undefined. Nothing is ever queued for later", async () => {
     const app = new Application();
     const registry = new JobRegistry();
     const driver = new SyncQueueDriver(app, registry);

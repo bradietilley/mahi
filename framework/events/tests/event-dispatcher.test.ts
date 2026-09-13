@@ -485,7 +485,7 @@ describe("EventDispatcher", () => {
       const trx = fakeTransaction();
       await dispatcher.dispatch(new OrderPlaced("1"));
 
-      // Nothing ran yet — the dispatch is deferred.
+      // Nothing ran yet. The dispatch is deferred.
       expect(handled).toEqual([]);
 
       await trx.drain();

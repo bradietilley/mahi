@@ -8,12 +8,12 @@ import type { Kysely } from "kysely";
  * `level` is Laravel's "transaction level": 1 for the outermost
  * `BEGIN`, 2 for the first nested call, and so on. It names the
  * savepoint a nested call issues (`mahi_sp_2`), which is why it has to
- * be tracked rather than recomputed — a nested call needs to know how
+ * be tracked rather than recomputed. A nested call needs to know how
  * deep it already is before it can pick a name that doesn't collide
  * with an enclosing one.
  */
 export interface TransactionScope {
-  /** The transactional Kysely instance — every query in this scope runs on it. */
+  /** The transactional Kysely instance, every query in this scope runs on it. */
   trx: Kysely<any>;
   /** 1 = outermost `BEGIN`; each nested `transaction()` adds one savepoint level. */
   level: number;
@@ -29,7 +29,7 @@ export interface TransactionScope {
 export type DeferredCallback = () => void | Promise<void>;
 
 interface DeferredEntry {
-  /** The transaction level the callback was registered at — what a savepoint rollback discards by. */
+  /** The transaction level the callback was registered at, what a savepoint rollback discards by. */
   level: number;
   callback: DeferredCallback;
 }
@@ -39,9 +39,9 @@ interface DeferredEntry {
  *
  * Created by the outermost `transaction()` and passed by reference into
  * every nested (savepoint) scope, which is what makes Laravel's hoisting
- * rule fall out for free: a callback registered three levels deep lands
+ * rule follow naturally: a callback registered three levels deep lands
  * in the same list as one registered at the top, so it runs when the
- * *outermost* transaction commits — not when its own savepoint is
+ * *outermost* transaction commits, not when its own savepoint is
  * released, which isn't durable on its own.
  *
  * `level` is recorded per entry so a savepoint rollback can discard
@@ -61,7 +61,7 @@ export class DeferredCallbacks {
   }
 
   /**
-   * Drop every callback registered at `level` or deeper — a savepoint
+   * Drop every callback registered at `level` or deeper, a savepoint
    * rolled back, so the work those callbacks were paired with never
    * happened.
    */
@@ -92,7 +92,7 @@ export class DeferredCallbacks {
  * AsyncLocalStorage, so static `Model` access (`Todo.find(id)`,
  * `Todo.create(...)`, etc.) automatically participates in an enclosing
  * `transaction()`/`DatabaseManager.transaction()` call with zero
- * call-site changes — no `.withConnection(trx)` ceremony needed.
+ * call-site changes, no `.withConnection(trx)` ceremony needed.
  *
  * ## Why the map is keyed by the ROOT Kysely instance
  *
@@ -106,7 +106,7 @@ export class DeferredCallbacks {
  * bug the previous "one global slot" design had:
  *
  *   await DB.transaction(async () => {
- *     await Post.create(...);        // default connection — NOT this trx
+ *     await Post.create(...);        // default connection, NOT this trx
  *   }, "analytics");
  *
  * Under a single global slot, `Post.create()` (a default-connection
@@ -127,7 +127,7 @@ export class DeferredCallbacks {
  * committed and released its connection. On MySQL/Postgres that means
  * running a query on a pooled connection that has moved on to someone
  * else's work. Always `await` (or explicitly detach from) work started
- * inside a `transaction()` callback — see `transaction()`'s docstring.
+ * inside a `transaction()` callback. See `transaction()`'s docstring.
  */
 const storage = new AsyncLocalStorage<Map<Kysely<any>, TransactionScope>>();
 
@@ -166,7 +166,7 @@ export function getActiveTransaction(connection: Kysely<any>): Kysely<any> | und
 }
 
 /**
- * Finds the scope whose `trx` **is** `db` — the "already inside this
+ * Finds the scope whose `trx` **is** `db`, the "already inside this
  * transaction" check for `transaction(trx, ...)`, where a caller passes
  * the transactional instance their callback received rather than the
  * root. Kysely's `Transaction` extends `Kysely`, so that call is
@@ -203,8 +203,8 @@ export function findScopeByTransaction(
  * producer with no connection of its own (`Bus.dispatch()`, an event, a
  * mailable) should defer against.
  *
- * Producers that DO know their connection — a model's events, the
- * database queue driver writing to its own `jobs` table — should use
+ * Producers that DO know their connection, a model's events, the
+ * database queue driver writing to its own `jobs` table, should use
  * `afterCommitOn(connection, cb)` instead, which is unambiguous.
  */
 export function getInnermostTransactionScope(): TransactionScope | undefined {
@@ -238,7 +238,7 @@ export function inTransaction(connection?: Kysely<any>): boolean {
  * Run `callback` once the enclosing transaction **commits**, or
  * immediately (awaited) when there is no transaction open.
  *
- * This is the primitive behind every "after commit" feature — deferred
+ * This is the primitive behind every "after commit" feature, deferred
  * job dispatch (`Bus.dispatch(job, { afterCommit: true })`), deferred
  * events, deferred mail. It exists because the canonical pattern
  *
@@ -250,7 +250,7 @@ export function inTransaction(connection?: Kysely<any>): boolean {
  * is a race without it: on MySQL/Postgres the job row commits on its own
  * connection immediately, a worker pops it before the outer transaction
  * commits, and `Order.find(id)` in the worker finds nothing. Deferring
- * the push until after the commit removes the race entirely — and if the
+ * the push until after the commit removes the race entirely, and if the
  * transaction rolls back, the job is never pushed at all.
  *
  * Callbacks registered inside a nested (savepoint) `transaction()` are
@@ -260,7 +260,7 @@ export function inTransaction(connection?: Kysely<any>): boolean {
  * it.
  *
  * Ordering is registration order, and a throwing callback is logged by
- * `transaction()` and does not stop the ones after it — the data is
+ * `transaction()` and does not stop the ones after it. The data is
  * already committed, so there is nothing left to abort.
  *
  * With no transaction open the callback runs immediately and this
@@ -280,7 +280,7 @@ export async function afterCommit(callback: DeferredCallback): Promise<void> {
 }
 
 /**
- * `afterCommit()` scoped to one specific connection — for producers that
+ * `afterCommit()` scoped to one specific connection, for producers that
  * know which connection their work is on (a model, the database queue
  * driver). A transaction open on some *other* connection is correctly
  * ignored: it has nothing to do with this write.
@@ -301,7 +301,7 @@ export async function afterCommitOn(
 }
 
 /**
- * Run `callback` if the enclosing transaction **rolls back** — a no-op
+ * Run `callback` if the enclosing transaction **rolls back**, a no-op
  * (never called) when there is no transaction, since nothing can roll
  * back. The mirror of `afterCommit()`: use it to undo an external side
  * effect the transaction can't take back itself.
@@ -311,7 +311,7 @@ export function afterRollback(callback: DeferredCallback): void {
   scope?.deferred?.onRollback(scope.level, callback);
 }
 
-/** `afterRollback()` scoped to one connection — see `afterCommitOn()`. */
+/** `afterRollback()` scoped to one connection. See `afterCommitOn()`. */
 export function afterRollbackOn(connection: Kysely<any>, callback: DeferredCallback): void {
   const scope = getActiveTransactionScope(connection);
   scope?.deferred?.onRollback(scope.level, callback);

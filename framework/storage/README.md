@@ -1,6 +1,6 @@
 # @mahiframework/storage
 
-Storage — a filesystem abstraction over local and cloud disks for Mahi.
+Storage, a filesystem abstraction over local and cloud disks for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

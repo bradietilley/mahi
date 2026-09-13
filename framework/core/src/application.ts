@@ -25,7 +25,7 @@ function normalizeEnvironment(name: string): string {
  * Boot sequence:
  *   1. Providers are instantiated in the order they're registered.
  *   2. `register()` is called on every provider (awaited if async).
- *      Providers should only bind their own services here — other
+ *      Providers should only bind their own services here, other
  *      providers' services are not guaranteed to exist yet.
  *   3. `boot()` is called on every provider, SEQUENTIALLY (not
  *      Promise.all), in registration order. By the time a given
@@ -44,7 +44,7 @@ export class Application extends Container {
 
   /**
    * Global log context, always available and zero-config (same design as
-   * `logger` below) — data added here is appended to every log line by
+   * `logger` below), data added here is appended to every log line by
    * `formatLogLine()`. Usually reached through the `Context` facade; see
    * `ContextRepository`'s docstring for the process-global caveat.
    */
@@ -66,14 +66,14 @@ export class Application extends Container {
   /**
    * The in-flight `bootstrap()` run, if any. Two concurrent calls share
    * one run rather than both sailing past a `booted` flag that is only
-   * set at the very end — which booted every provider twice.
+   * set at the very end, which booted every provider twice.
    */
   private bootstrapping?: Promise<void>;
 
   /** Whether every provider has been instantiated and `register()`ed. */
   private registered = false;
 
-  /** How many providers have completed `boot()` — see `runBootstrap()`. */
+  /** How many providers have completed `boot()`. See `runBootstrap()`. */
   private bootedCount = 0;
 
   private terminatingCallbacks: Array<() => void | Promise<void>> = [];
@@ -83,7 +83,7 @@ export class Application extends Container {
    * The current environment name. Seeded from `APP_ENV`, falling back to
    * `NODE_ENV`, then to `"production"` when neither is set (fail-safe: an
    * unknown environment is treated as production, so `isProduction()`-gated
-   * safety checks default to "on" rather than off — matching Laravel's
+   * safety checks default to "on" rather than off, matching Laravel's
    * `APP_ENV` default of `"production"`). `NODE_ENV`'s Node-idiomatic
    * `"development"` is normalized to Laravel's `"local"`, so `isLocal()` is
    * true under `NODE_ENV=development`. An app that validates its env through
@@ -110,7 +110,7 @@ export class Application extends Container {
    * Concurrent calls share the *same* run rather than each starting one:
    * `booted` is only true once every provider has booted, so without the
    * shared promise two callers racing here would both pass the guard and
-   * boot every provider twice — double-binding singletons, mounting routes
+   * boot every provider twice, double-binding singletons, mounting routes
    * twice, opening two pools. Whoever calls second awaits the first call's
    * promise.
    */
@@ -132,7 +132,7 @@ export class Application extends Container {
    * A provider whose `boot()` throws leaves the app un-booted, and a
    * caller may reasonably retry (fix a connection, call `bootstrap()`
    * again). Re-running `register()` on that retry would re-instantiate
-   * every provider and re-bind every singleton — an app that looked
+   * every provider and re-bind every singleton, an app that looked
    * recovered but had two of everything. `registered`/`bootedCount` make
    * the retry pick up from the provider that failed instead.
    */
@@ -170,8 +170,8 @@ export class Application extends Container {
   /**
    * Register a callback to run when the application terminates, before
    * any provider's `shutdown()`. Callbacks run in REVERSE registration
-   * order (LIFO), so a callback registered later — and therefore
-   * potentially depending on what an earlier one set up — unwinds first.
+   * order (LIFO), so a callback registered later, and therefore
+   * potentially depending on what an earlier one set up, unwinds first.
    *
    *   app.terminating(async () => { await report.flush(); });
    *
@@ -190,7 +190,7 @@ export class Application extends Container {
    * every provider's `shutdown()` hook in reverse registration order.
    *
    * This is what closes database pools, quits Redis clients, and
-   * generally releases the handles that keep Node's event loop alive — a
+   * generally releases the handles that keep Node's event loop alive, a
    * process that boots an app with a MySQL or Redis connection and never
    * terminates it does not exit, it hangs until something kills it.
    * Every entrypoint the framework ships calls this
@@ -198,7 +198,7 @@ export class Application extends Container {
    * `bin/server.ts` signal handler, `createTestApplication().cleanup()`).
    *
    * Idempotent, and never throws: each hook is awaited inside its own
-   * try/catch and failures are logged. There is no un-terminate — an
+   * try/catch and failures are logged. There is no un-terminate. An
    * application that has been terminated should be discarded.
    */
   async terminate(): Promise<void> {
@@ -255,7 +255,7 @@ export class Application extends Container {
    * `"local"`, `"production"`, `"test"`).
    *
    * With one or more arguments: returns `true` if the current environment
-   * matches any of the given names — `app.environment("local", "test")`.
+   * matches any of the given names, `app.environment("local", "test")`.
    * Matches Laravel's `Application::environment(...)` overload exactly.
    */
   environment(): string;
@@ -268,12 +268,12 @@ export class Application extends Container {
     return names.includes(this.environmentName);
   }
 
-  /** True when the environment is `"local"` — Laravel's `isLocal()`. */
+  /** True when the environment is `"local"`, Laravel's `isLocal()`. */
   isLocal(): boolean {
     return this.environmentName === "local";
   }
 
-  /** True when the environment is `"production"` — Laravel's `isProduction()`. */
+  /** True when the environment is `"production"`, Laravel's `isProduction()`. */
   isProduction(): boolean {
     return this.environmentName === "production";
   }

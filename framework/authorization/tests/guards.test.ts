@@ -48,7 +48,7 @@ describe("requireAuth", () => {
   it("stays synchronous when the callback is synchronous", () => {
     // Not incidental: the wrapper must not wrap a sync callback in a
     // promise. `GateRegistry.check()` awaits and compares `=== true`, so
-    // it's safe either way — this pins the cheaper behaviour and documents
+    // it's safe either way. This pins the cheaper behaviour and documents
     // that a policy method's sync-ness survives wrapping.
     expect(requireAuth<User, []>(() => true)(alice)).toBe(true);
     expect(requireAuth<User, []>(() => true)(null)).toBe(false);

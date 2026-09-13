@@ -34,7 +34,7 @@ class PostPolicy extends Policy<User, PostRow> {
   update = requireAuth<User, [PostRow]>((user, post) => post.user_id === user.id);
   create = requireAuth<User, []>(() => true);
 
-  /** Deliberately nullable — an ability whose subject is optional. */
+  /** Deliberately nullable, an ability whose subject is optional. */
   viewMaybe(_user: User | null, post: PostRow | null): boolean {
     return post === null;
   }
@@ -142,7 +142,7 @@ describe("can middleware", () => {
     expect(response.status).toBe(403);
   });
 
-  it("uses 403, not 401 — authorization, not authentication", async () => {
+  it("uses 403, not 401: authorization, not authentication", async () => {
     // A different token wouldn't help Bob here; the resource simply isn't
     // his. Conflating this with 401 would tell clients to re-authenticate
     // pointlessly.
@@ -178,7 +178,7 @@ describe("can middleware", () => {
     it("404s instead of 500ing", async () => {
       // `undefined` means the row doesn't exist. Passing it into the
       // policy blew up on the first property access, turning "no such
-      // post" into "the server is broken" — and leaking, via the status
+      // post" into "the server is broken", and leaking, via the status
       // code, that the id was well-formed.
       const response = await appWith(() => undefined).request("/posts/nope", { method: "PATCH" });
 
@@ -186,8 +186,8 @@ describe("can middleware", () => {
     });
 
     it("still passes an explicit null through to the policy", async () => {
-      // `null` is a deliberate "no subject", distinct from "not found" —
-      // an ability may legitimately take one, and must still be consulted
+      // `null` is a deliberate "no subject", distinct from "not found".
+      // An ability may legitimately take one, and must still be consulted
       // rather than short-circuited into a 404.
       const response = await appWith(() => null, "viewMaybe").request("/posts/p1", {
         method: "PATCH",
@@ -198,7 +198,7 @@ describe("can middleware", () => {
   });
 
   it("surfaces a missing auth scope rather than silently authorizing", async () => {
-    // If authenticate() never ran, the underlying error must propagate —
+    // If authenticate() never ran, the underlying error must propagate,
     // treating the request as a guest here would be a silent
     // authorization decision made by accident.
     authThrows = true;

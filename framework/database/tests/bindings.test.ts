@@ -9,14 +9,14 @@ import { DB } from "../src/db-facade.js";
 import { normalizeBinding } from "../src/bindings.js";
 
 /**
- * Binding normalisation — the layer that lets a caller pass a
+ * Binding normalisation. The layer that lets a caller pass a
  * `DateTime`, a `Date`, a `bigint` or a model instance straight into a
  * query, instead of serialising it by hand at the call site.
  *
  * The distinction from `builder-casts.test.ts` matters: that file covers
  * `EloquentBuilder`'s *cast* layer, which only fires for a column the
  * model **declares** a cast for. This covers normalisation, which is
- * unconditional — it applies to an undeclared column, to a model with no
+ * unconditional. It applies to an undeclared column, to a model with no
  * casts at all, and to a bare `DB.table()` query that has no model to
  * consult. That gap is the actual bug: `PersonalAccessToken` types
  * `expires_at` as a plain `string` with no cast, so nothing in the cast
@@ -26,7 +26,7 @@ import { normalizeBinding } from "../src/bindings.js";
 interface EventAttributes {
   id: number;
   name: string;
-  // Deliberately `string`, with NO cast declared — the PersonalAccessToken
+  // Deliberately `string`, with NO cast declared, the PersonalAccessToken
   // shape, and the case the cast layer cannot reach.
   occurred_at: string;
   owner_id: number | null;
@@ -63,7 +63,7 @@ describe("normalizeBinding()", () => {
     // The bug this exists for: `DateTime.toISOString()` renders in the
     // instance's own zone, so an unconverted value would serialise as
     // "2026-01-02T11:04:05.000+08:00" and be stored by SQLite/MySQL as
-    // 11:04 UTC — an 8-hour silent shift.
+    // 11:04 UTC, an 8-hour silent shift.
     expect(PERTH.toISOString()).toBe("2026-01-02T11:04:05.000+08:00");
     expect(normalizeBinding("sqlite", PERTH)).toBe(UTC_INSTANT);
   });
@@ -96,7 +96,7 @@ describe("normalizeBinding()", () => {
     expect(normalizeBinding("sqlite", null)).toBe(null);
   });
 
-  it("is idempotent — a already-normalised value is untouched", () => {
+  it("is idempotent. A already-normalised value is untouched", () => {
     const once = normalizeBinding("sqlite", PERTH);
     expect(normalizeBinding("sqlite", once)).toBe(once);
   });
@@ -140,7 +140,7 @@ describe("query builder normalises its bindings", () => {
 
   afterEach(() => clearCurrentApp());
 
-  it("binds a DateTime on an UNCAST column — the case casts cannot reach", () => {
+  it("binds a DateTime on an UNCAST column. The case casts cannot reach", () => {
     expect(
       Event.query()
         .where("occurred_at", "<=", PERTH as never)

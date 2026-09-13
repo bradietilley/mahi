@@ -47,7 +47,7 @@ describe("after-commit callbacks", () => {
       expect(order).toEqual(["callback", "after"]);
     });
 
-    it("never runs an afterRollback callback — nothing can roll back", async () => {
+    it("never runs an afterRollback callback. Nothing can roll back", async () => {
       let ran = false;
       afterRollback(() => {
         ran = true;
@@ -82,7 +82,7 @@ describe("after-commit callbacks", () => {
       await transaction(driver.kysely, async (trx) => {
         await trx.insertInto("widgets").values({ id: "1" }).execute();
         await afterCommit(async () => {
-          // The root connection, not the transaction's — this is what a
+          // The root connection, not the transaction's. This is what a
           // worker in another process would see.
           const rows = await driver.kysely.selectFrom("widgets").selectAll().execute();
           visible = rows.length;
@@ -190,7 +190,7 @@ describe("after-commit callbacks", () => {
       await transaction(driver.kysely, async () => {
         await afterCommit(() => void ran.push("outer"));
 
-        // The caller catches the inner failure — the outer transaction
+        // The caller catches the inner failure, the outer transaction
         // survives, but the inner work (and its callbacks) is gone.
         await expect(
           transaction(driver.kysely, async () => {
@@ -238,7 +238,7 @@ describe("after-commit callbacks", () => {
       const order: string[] = [];
 
       await transaction(driver.kysely, async () => {
-        // This callback belongs to `other`, which has no transaction —
+        // This callback belongs to `other`, which has no transaction,
         // so it must run immediately rather than waiting for a commit it
         // has nothing to do with.
         await afterCommitOn(other.kysely, () => void order.push("other"));

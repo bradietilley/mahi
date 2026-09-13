@@ -15,9 +15,9 @@ export type LogChannelConfig =
 /**
  * A driver creator receives the resolving channel's *own* config (the
  * `channels[name]` entry) plus the manager, and returns a `Logger`. This
- * is what lets two channels share a driver — e.g. `app: { driver: "daily",
+ * is what lets two channels share a driver, e.g. `app: { driver: "daily",
  * path: "…/app.log" }` and `audit: { driver: "daily", path: "…/audit.log" }`
- * both resolve the "daily" creator but with different config — which the
+ * both resolve the "daily" creator but with different config, which the
  * old `(app) => Logger` signature (one creator hard-coding
  * `channelConfig("daily")`) could not express.
  */
@@ -42,19 +42,19 @@ export interface LogConfig {
   channels: Record<string, LogChannelConfig>;
   /**
    * Fallback used by `channel()` when resolving the requested (or
-   * default) channel throws — an unregistered driver name, bad config, or
+   * default) channel throws, an unregistered driver name, bad config, or
    * a driver's constructor itself failing (e.g. unwritable log
    * directory). Mirrors Laravel's top-level
    * `'emergency' => ['path' => storage_path('logs/laravel.log')]` config
-   * key. Defaults to `storage_path("logs/mahi.log")` — the same physical
-   * file the "single" channel writes to by default — if omitted.
+   * key. Defaults to `storage_path("logs/mahi.log")`, the same physical
+   * file the "single" channel writes to by default, if omitted.
    */
   emergency?: { path: string };
 }
 
 /**
  * Resolves named log "channels" (`Manager<Logger>`, same pattern as
- * `DatabaseManager`/`CacheManager`) — `"console"`, `"single"`, `"daily"`,
+ * `DatabaseManager`/`CacheManager`): `"console"`, `"single"`, `"daily"`,
  * `"array"`, `"null"`, and `"stack"` (fan-out to other channels) are built
  * in via `LoggingServiceProvider`, mirroring Laravel's own driver set.
  *
@@ -74,7 +74,7 @@ export class LogManager extends Manager<Logger> {
   /**
    * Driver creators keyed by **driver name** (`"single"`, `"daily"`, …),
    * *not* channel name. `channel(name)` looks up `channels[name].driver`
-   * to pick the creator, then hands it that channel's own config — so any
+   * to pick the creator, then hands it that channel's own config, so any
    * number of distinctly-named channels can share one driver. This is a
    * separate registry from the base `Manager.creators` (which is keyed by
    * resolution name and unused here); resolved `Logger` instances are
@@ -103,7 +103,7 @@ export class LogManager extends Manager<Logger> {
   }
 
   /**
-   * Register a driver creator by **driver name** — the value channels
+   * Register a driver creator by **driver name**, the value channels
    * reference via their `driver` config key. Mirrors Laravel's
    * `LogManager::extend()`.
    */
@@ -115,14 +115,14 @@ export class LogManager extends Manager<Logger> {
 
   /**
    * Resolve (and cache, per channel name) the `Logger` for a named
-   * channel — or the default channel if no name is given.
+   * channel, or the default channel if no name is given.
    *
    * Unlike the base `Manager.driver()`, failures resolving the requested
    * channel (missing/invalid config, an unregistered *driver* the channel
-   * asked for, or the driver's own constructor throwing — e.g. an
+   * asked for, or the driver's own constructor throwing, e.g. an
    * unwritable log directory) don't propagate: this falls back to the
    * "emergency" logger (see `LogConfig.emergency`) and logs the failure
-   * through it, matching Laravel's `LogManager::get()` try/catch exactly —
+   * through it, matching Laravel's `LogManager::get()` try/catch exactly,
    * so a misconfigured/broken log channel can't itself take down the
    * request that was trying to log through it.
    */
@@ -176,8 +176,8 @@ export class LogManager extends Manager<Logger> {
   /**
    * The last-resort logger `channel()` falls back to when it can't
    * resolve the requested channel. Always a `FileLogger`, writing to
-   * `LogConfig.emergency.path` (default `storage_path("logs/mahi.log")`)
-   * — never itself resolved through `driver()`/`extend()`, so it can't
+   * `LogConfig.emergency.path` (default `storage_path("logs/mahi.log")`),
+   * never itself resolved through `driver()`/`extend()`, so it can't
    * fail for the same reason the channel it's replacing just did. Lazily
    * constructed and cached, same as any other resolved driver.
    */

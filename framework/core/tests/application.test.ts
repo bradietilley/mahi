@@ -64,7 +64,7 @@ describe("Application", () => {
     expect(events).toEqual(["Slow.boot", "Fast.boot"]);
   });
 
-  it("bootstrap() is idempotent — a second call does not re-run providers", async () => {
+  it("bootstrap() is idempotent. A second call does not re-run providers", async () => {
     let registerCalls = 0;
 
     class Once extends ServiceProvider {
@@ -94,10 +94,10 @@ describe("Application", () => {
   });
 
   /**
-   * The global must be set BEFORE providers run: otherwise `app()` — and
-   * therefore every facade built on it (Log, Events, Context) — throws
+   * The global must be set BEFORE providers run: otherwise `app()`, and
+   * therefore every facade built on it (Log, Events, Context), throws
    * "No Application instance is currently registered" inside the exact
-   * hooks where a provider is most likely to reach for one. Laravel binds
+   * hooks where a provider is most likely to need one. Laravel binds
    * the container globally before providers run.
    */
   it("app() resolves this application inside register() and boot()", async () => {
@@ -122,7 +122,7 @@ describe("Application", () => {
   /**
    * `booted` is only true once the last provider has booted, so two
    * callers racing here both cleared the `if (this.booted) return` guard
-   * and booted every provider a second time — double-binding singletons
+   * and booted every provider a second time, double-binding singletons
    * and opening two of every pool.
    */
   it("concurrent bootstrap() calls run every provider exactly once", async () => {
@@ -150,7 +150,7 @@ describe("Application", () => {
   /**
    * A provider whose boot() throws leaves the app un-booted and a caller
    * may retry. Re-running register() on that retry re-instantiated every
-   * provider and re-bound every singleton — an app that looked recovered
+   * provider and re-bound every singleton, an app that looked recovered
    * but had two of everything.
    */
   it("a retry after a failed boot() does not re-run register()", async () => {
@@ -211,7 +211,7 @@ describe("Application", () => {
     await expect(app.bootstrap()).rejects.toThrow("boom");
     await app.bootstrap();
 
-    // First booted once, not twice — its boot() is not idempotent in
+    // First booted once, not twice, its boot() is not idempotent in
     // general (it mounts routes, opens pools) and must not be repeated.
     expect(events).toEqual(["First.boot", "Second.boot", "Second.boot"]);
   });
@@ -260,7 +260,7 @@ describe("Application.terminate()", () => {
 
   /**
    * Reverse of boot order, so a provider tears down before the providers
-   * it booted on top of — the database connection an auth provider uses
+   * it booted on top of, the database connection an auth provider uses
    * must still be open while auth is shutting down.
    */
   it("runs providers' shutdown() in reverse registration order", async () => {
@@ -308,7 +308,7 @@ describe("Application.terminate()", () => {
     expect(events).toEqual(["callback", "provider"]);
   });
 
-  it("is idempotent — a second terminate() runs nothing", async () => {
+  it("is idempotent: a second terminate() runs nothing", async () => {
     let shutdowns = 0;
     let callbacks = 0;
 
@@ -441,7 +441,7 @@ describe("Application.terminate()", () => {
     await app.terminate();
 
     // The pool the first provider opened is closed even though the app
-    // never finished booting — otherwise a failed boot hangs the process.
+    // never finished booting, otherwise a failed boot hangs the process.
     expect(events).toEqual(["Opened.boot", "Opened.shutdown"]);
   });
 

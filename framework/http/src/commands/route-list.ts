@@ -3,7 +3,7 @@ import { Tui, colors } from "@mahiframework/tui";
 import { HTTP_KERNEL_TOKEN } from "../http-service-provider.js";
 import type { HttpKernel } from "../http-kernel.js";
 
-/** Matches Laravel's `RouteListCommand::$verbColors` — color-codes each HTTP method for quick scanning. */
+/** Matches Laravel's `RouteListCommand::$verbColors`, color-codes each HTTP method for quick scanning. */
 const METHOD_COLORS: Record<string, (text: string) => string> = {
   ANY: colors.red,
   GET: colors.blue,

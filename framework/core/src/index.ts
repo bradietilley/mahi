@@ -66,7 +66,7 @@ export { Arr } from "./arr.js";
 export { Collection, ItemNotFoundError, MultipleItemsFoundError } from "./collection.js";
 
 export { data_get, data_set, data_fill, data_has, data_forget } from "./data.js";
-// Deprecated camelCase aliases — prefer the snake_case names above.
+// Deprecated camelCase aliases, prefer the snake_case names above.
 export { dataGet, dataSet, dataFill, dataHas, dataForget } from "./data.js";
 export type {
   DataValue,

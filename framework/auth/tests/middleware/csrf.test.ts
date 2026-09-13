@@ -179,7 +179,7 @@ describe("csrf middleware", () => {
 
   describe("signed cookies", () => {
     // Unsigned double-submit accepts ANY value present in both the cookie
-    // and the header — so an attacker who can write a cookie (XSS on a
+    // and the header, so an attacker who can write a cookie (XSS on a
     // sibling subdomain, MITM on plain HTTP) picks both halves and
     // forges freely. Signing means only tokens this server minted count.
     let app: Application;
@@ -210,7 +210,7 @@ describe("csrf middleware", () => {
 
     it("signs the issued cookie", async () => {
       const cookie = tokenFrom(await signedApp().request("/"))!;
-      // `<token>.<hmac>` — the signature is the part a forger can't produce.
+      // `<token>.<hmac>`. The signature is the part a forger can't produce.
       expect(cookie).toMatch(/^[\w-]+\.[\w-]+$/);
     });
 
@@ -333,7 +333,7 @@ describe("csrf middleware", () => {
     expect(token).toBeTruthy();
 
     // Echo the cookie back under its real (__Host- prefixed) name and the
-    // decoded value in the header — the round trip must pass.
+    // decoded value in the header. The round trip must pass.
     const decoded = decodeURIComponent(token!);
     const ok = await app.request("/", {
       method: "POST",

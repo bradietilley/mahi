@@ -179,7 +179,7 @@ describe("LocalBroadcastDriver", () => {
    * The reason `registerRoutes()` takes a helper at all. An application
    * with a websocket route of its own has to share this driver's
    * `createNodeWebSocket()`, because two of them on one Node server crash
-   * the process on the first connection — see `WebSocketSupport` in
+   * the process on the first connection. See `WebSocketSupport` in
    * `@mahiframework/http`. These two cases are what "shared" has to mean.
    */
   describe("sharing the kernel's websocket helper", () => {
@@ -218,7 +218,7 @@ describe("LocalBroadcastDriver", () => {
       const driver = new LocalBroadcastDriver();
       driver.registerRoutes(kernel.raw(), support);
 
-      // Several parties each believe injection is their job — the kernel,
+      // Several parties each believe injection is their job, the kernel,
       // `listenHttpServer()`, and an app following the driver's own
       // documented entrypoint snippet. A second `upgrade` listener is the
       // crash this design prevents, so the extra calls must be no-ops

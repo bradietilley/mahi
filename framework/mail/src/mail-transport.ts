@@ -7,7 +7,7 @@ import type { SentMessage } from "./sent-message.js";
  * `Mailable.render()`, with every renderer thunk already awaited into a
  * concrete `html`/`text` string and every envelope field materialized.
  * This is the single value type crossing the boundary into a
- * `MailTransport` — a transport never sees a `Mailable`, only this.
+ * `MailTransport`, a transport never sees a `Mailable`, only this.
  */
 export interface RenderedMail {
   from?: Address;
@@ -26,7 +26,7 @@ export interface RenderedMail {
 }
 
 /**
- * The one interface every mail driver implements — the mail analogue of
+ * The one interface every mail driver implements, the mail analogue of
  * `CacheStore`/`QueueDriver`. Resolved by name through `MailManager`
  * (`smtp`/`log`/`array` built in, more via `MailManager.extend()`).
  *
@@ -34,7 +34,7 @@ export interface RenderedMail {
  * underlying medium, resolve with a `SentMessage` describing the outcome.
  * Any driver needing async connection warm-up (an SMTP pool, say) does its
  * I/O lazily on first `send()` rather than exposing a separate connect
- * step — see the `Manager` module doc on `Connectable` for the escape
+ * step. See the `Manager` module doc on `Connectable` for the escape
  * hatch if eager warm-up is ever genuinely needed.
  */
 export interface MailTransport {

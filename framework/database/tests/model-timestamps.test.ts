@@ -84,7 +84,7 @@ describe("Model timestamps", () => {
 
   it("timestamps defaults to true (Laravel-faithful), stamping created_at/updated_at", async () => {
     // A model that declares neither timestamps nor updatedAtColumn gets
-    // the framework default (true) — its table here has both columns.
+    // the framework default (true), its table here has both columns.
     class DefaultWidget extends Model<WidgetAttributes>()({
       table: "widgets",
       primaryKey: "id",

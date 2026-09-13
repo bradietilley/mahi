@@ -205,7 +205,7 @@ describe("Str", () => {
 
     it("uuid7() stays unique within a single millisecond", () => {
       // Ordering comes from the timestamp, uniqueness from the 74 random
-      // bits — so ids minted in the same tick are unordered but must not
+      // bits, so ids minted in the same tick are unordered but must not
       // collide.
       const ids = new Set(Array.from({ length: 10_000 }, () => Str.uuid7()));
 

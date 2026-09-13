@@ -4,14 +4,14 @@ import { CACHE_TOKEN } from "@mahiframework/core";
 import type { CacheManager } from "../cache-manager.js";
 
 /**
- * `./artisan cache:prune` — delete entries whose TTL has already elapsed,
+ * `./artisan cache:prune`, delete entries whose TTL has already elapsed,
  * without touching live ones.
  *
  * Both built-in stores expire **lazily**: an entry past its `expiresAt`
  * is only removed when something reads that key. For a key space that is
- * read back, that is free and sufficient. For one that isn't — a
+ * read back, that is free and sufficient. For one that isn't, a
  * `RateLimiter`'s per-IP counters are written once, checked during their
- * window, and then never looked at again — the dead entries stay
+ * window, and then never looked at again. The dead entries stay
  * forever. On `FileCacheStore` that is an ever-growing directory of files
  * nothing will ever open.
  *
@@ -22,8 +22,8 @@ import type { CacheManager } from "../cache-manager.js";
  * schedule.command("cache:prune").hourly();
  * ```
  *
- * A store that has no `prune()` — `RedisCacheStore`, because Redis expires
- * keys itself — reports that and exits successfully, so a scheduled task
+ * A store that has no `prune()`, `RedisCacheStore`, because Redis expires
+ * keys itself, reports that and exits successfully, so a scheduled task
  * doesn't start failing the day someone switches `cache.default`.
  */
 export class CachePruneCommand extends Command {

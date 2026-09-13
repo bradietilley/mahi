@@ -22,7 +22,7 @@ describe("Bus facade", () => {
     const app = new Application();
     app.config.set("queue", { default: "sync", connections: { sync: {} } });
     app.register(QueueServiceProvider);
-    // Mirrors how a real feature provider contributes jobs() — see
+    // Mirrors how a real feature provider contributes jobs(). See
     // TodosServiceProvider.
     class TodosLikeProvider extends ServiceProvider {
       jobs() {

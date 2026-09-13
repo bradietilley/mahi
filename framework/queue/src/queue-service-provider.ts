@@ -29,7 +29,7 @@ interface DatabaseQueueConnectionConfig {
   /** The default named queue this connection pushes to and works. Default `"default"`. */
   queue?: string;
   /**
-   * Seconds before a reserved job is presumed abandoned and reclaimed —
+   * Seconds before a reserved job is presumed abandoned and reclaimed,
    * the crash-recovery window. Must exceed the longest a job can run.
    * Default 90.
    */
@@ -45,11 +45,11 @@ interface DatabaseQueueConnectionConfig {
  * (same collection pattern `EventsServiceProvider` uses for `listeners()`).
  *
  * Contributes the `jobs`/`failed_jobs` migration (`database` connection
- * only — unused if you never resolve that connection) and the `queue:work`
+ * only, unused if you never resolve that connection) and the `queue:work`
  * CLI command.
  *
  * List this provider after `DatabaseServiceProvider` in `config/app.ts`'s
- * `providers[]` — `DatabaseQueueDriver` resolves `DatabaseManager` from the
+ * `providers[]`, `DatabaseQueueDriver` resolves `DatabaseManager` from the
  * container. If `EventsServiceProvider` is also registered, this provider
  * installs the `listenQueued()` enqueue handler on `EventDispatcher` and
  * registers the built-in `events.handle-queued-listener` job.
@@ -78,7 +78,7 @@ export class QueueServiceProvider extends ServiceProvider {
         const driver = db.driver(settings.connection);
 
         // The dialect (which selects the reservation strategy) is read
-        // from the connection itself by the driver — see `dialectOf()`.
+        // from the connection itself by the driver. See `dialectOf()`.
         return new DatabaseQueueDriver(driver.kysely, {
           queue: settings.queue ?? "default",
           retryAfterSeconds: settings.retryAfter ?? 90,
@@ -86,7 +86,7 @@ export class QueueServiceProvider extends ServiceProvider {
           connectionName: "database",
         });
       });
-      // Recording driver for tests — records pushes instead of running
+      // Recording driver for tests, records pushes instead of running
       // them (see FakeQueueDriver). Registered here (not only in
       // @mahiframework/testing) so `QUEUE_CONNECTION=fake` works out of the
       // box, mirroring how "sync"/"database" are always available.
@@ -150,7 +150,7 @@ export class QueueServiceProvider extends ServiceProvider {
    * exists if this package is on a real filesystem, so a bundled app
    * would find no `jobs` table and get "Nothing to migrate" instead of an
    * error. The names must stay byte-identical to the filenames they
-   * replace — apps migrated under the old directory form have those rows
+   * replace, apps migrated under the old directory form have those rows
    * in their `migrations` table already.
    */
   migrationSources(): RegisteredMigration[] {

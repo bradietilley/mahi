@@ -21,7 +21,7 @@ function appThatThrows(error: unknown, environment?: string): Hono {
   return hono;
 }
 
-describe("error handler — HttpError headers", () => {
+describe("error handler: HttpError headers", () => {
   it("applies an HttpError's headers to the response", async () => {
     const res = await appThatThrows(
       HttpError.unauthorized().withHeaders({ "WWW-Authenticate": 'Bearer realm="api"' }),
@@ -45,7 +45,7 @@ describe("error handler — HttpError headers", () => {
   });
 });
 
-describe("error handler — Hono HTTPException", () => {
+describe("error handler: Hono HTTPException", () => {
   it("maps it into the JSON envelope rather than a generic 500", async () => {
     // `bodyLimit()` raises this as a 413. Without the mapping, an
     // oversize request was reported to the client as our bug (500) and
@@ -64,7 +64,7 @@ describe("error handler — Hono HTTPException", () => {
   });
 });
 
-describe("error handler — debug messages by environment", () => {
+describe("error handler: debug messages by environment", () => {
   it("hides the real message in production", async () => {
     const res = await appThatThrows(new Error("kysely constraint violation"), "production").request(
       "/boom",
@@ -82,7 +82,7 @@ describe("error handler — debug messages by environment", () => {
   it("shows it in development too", async () => {
     // The scaffolded `config/env.ts` constrains NODE_ENV to
     // development|test|production and `Application` seeds the
-    // environment from it — so a strict `=== "local"` check meant the
+    // environment from it, so a strict `=== "local"` check meant the
     // local-DX branch was unreachable in every app this framework
     // generates.
     const res = await appThatThrows(new Error("boom"), "development").request("/boom");

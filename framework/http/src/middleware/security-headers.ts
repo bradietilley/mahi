@@ -17,7 +17,7 @@ const DEFAULT_HSTS = "max-age=15552000; includeSubDomains";
  *    then emit it on every response; browsers ignore it over HTTP today,
  *    but the header is a *commitment*, and emitting one the deployment
  *    cannot keep is how a staging box becomes unreachable for six
- *    months. This checks the scheme first — which, behind a TLS
+ *    months. This checks the scheme first, which, behind a TLS
  *    terminator, is only correct because `trustProxies()` applies
  *    `X-Forwarded-Proto`.
  *  - The remaining defaults there are browser-document defaults (COEP,
@@ -72,7 +72,7 @@ function setIfAbsent(headers: Headers, key: string, value: string): void {
  * Prefers the Mahi `Request`'s scheme over `c.req.url`, because that is
  * the one `trustProxies()` has already corrected from
  * `X-Forwarded-Proto`. Behind a TLS terminator the raw Hono URL is
- * always `http://` — reading it would mean HSTS is never sent by
+ * always `http://`, reading it would mean HSTS is never sent by
  * precisely the deployments that need it. Falls back to the raw URL when
  * no `Request` was constructed (a route reached before the global pipe).
  */

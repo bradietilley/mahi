@@ -33,7 +33,7 @@ import type {
 } from "./relations.js";
 
 /**
- * A hydrated row as returned by a terminal (`get()`/`first()`/...) —
+ * A hydrated row as returned by a terminal (`get()`/`first()`/...),
  * a real `Model` instance (the terminals hydrate through
  * `model.hydrate()`, so `save()`/`toObject()`/`isDirty()`/`loadMissing()`
  * are all present) carrying the declared `TRow` attributes plus the
@@ -46,7 +46,7 @@ import type {
  * string index signature that would blur `Row`).
  *
  * The `Model` half matches `WithRelations<M>`, which is what the *finder*
- * entry points (`find()`/`firstOrFail()`/...) return — both hand back the
+ * entry points (`find()`/`firstOrFail()`/...) return, both hand back the
  * same hydrated instance at runtime, so they must agree at the type level
  * too. `TCasts` is the model's `static casts` map (`CastsOf<M>`), so a
  * `BooleanCast` column types as `boolean` here while `where()` still
@@ -59,7 +59,7 @@ export type Hydrated<
   TCasts = Record<never, never>,
 > = 0 extends 1 & TRow ? any : Model & Attributes<TRow, TCasts> & RelationAccessors<TRelations>;
 
-/** The head segment of a dot path — `"author"` for `"author.team"`. */
+/** The head segment of a dot path, `"author"` for `"author.team"`. */
 type HeadSegment<P extends string> = P extends `${infer H}.${string}` ? H : P;
 
 /** The remainder of a dot path below head `H`, or `never` if `P` is just `H`. */
@@ -67,7 +67,7 @@ type RestSegments<P extends string, H extends string> = P extends `${H}.${infer 
 
 /**
  * Narrows an instance type `M` so every relation named by a requested dot
- * path `K` is non-`undefined`, at each segment — the `with(...)`
+ * path `K` is non-`undefined`, at each segment, the `with(...)`
  * return-type transform on the resolved instance side.
  *
  * Paths are grouped by head before descending, so siblings under one head
@@ -83,7 +83,7 @@ export type LoadedBy<M, K extends string> = [M] extends [never]
       };
 
 /**
- * The heads of `K` that carry further segments — the ones whose value type
+ * The heads of `K` that carry further segments, the ones whose value type
  * is *replaced* rather than merely un-optionalised.
  *
  * A head with no rest (`with("author")`) only drops `undefined`, which an
@@ -96,7 +96,7 @@ type NestedHeads<K extends string> = K extends `${infer H}.${string}` ? H : neve
 
 /**
  * Applies the remaining path segments to a loaded relation value,
- * preserving whether the relation is to-one or to-many — so
+ * preserving whether the relation is to-one or to-many, so
  * `with("comments.author")` narrows the *elements* of the `Collection`
  * rather than the `Collection` itself.
  */
@@ -107,19 +107,19 @@ type LoadNested<V, Rest extends string> = [Rest] extends [never]
     : LoadedBy<V, Rest>;
 
 /**
- * Model-aware query builder — mirrors Laravel's
+ * Model-aware query builder, mirrors Laravel's
  * `Illuminate\Database\Eloquent\Builder` wrapping
  * `Illuminate\Database\Query\Builder` via a `protected $query` property
  * (composition, not inheritance). Every chainable method here **manually
  * redefines** the matching `QueryBuilder` method, delegating to
- * `this.query.xxx()` and returning `this` — no `__call`-style forwarding
+ * `this.query.xxx()` and returning `this`, no `__call`-style forwarding
  * magic, consistent with this codebase's "no magic" stance (see
  * `container.ts`'s docstring: "no auto-wiring, no decorators, no
  * reflect-metadata").
  *
  * Holds a reference to the owning `Model` subclass (not a Kysely instance
  * directly) so it can resolve its connection lazily at execution time via
- * `model.resolveConnection()` — this is what allows a query built outside
+ * `model.resolveConnection()`. This is what allows a query built outside
  * a `transaction()` block to still be *executed* inside one, and is also
  * how `whereKey()` knows which column is the primary key.
  *
@@ -128,7 +128,7 @@ type LoadNested<V, Rest extends string> = [Rest] extends [never]
  * `where(callback)`/`orWhere(callback)` build the nested condition group
  * using a **fresh builder of this same subclass** (via `newInstance()`,
  * which reads the constructor off the instance) rather than a plain
- * `QueryBuilder` — so a nested group inside a custom `PostBuilder`
+ * `QueryBuilder`, so a nested group inside a custom `PostBuilder`
  * subclass's scope can still call that subclass's own scope methods:
  *
  *   Post.query().where("published", 1).where((q) =>
@@ -141,25 +141,25 @@ type LoadNested<V, Rest extends string> = [Rest] extends [never]
  * `resolveConnection`/table) is otherwise used.
  *
  * Subclass this to add
- * per-model query scopes — e.g. `class PostBuilder extends
+ * per-model query scopes, e.g. `class PostBuilder extends
  * EloquentBuilder<PostAttributes> { published() { return
- * this.where("published", true); } }` — and return it from the model's
+ * this.where("published", true); } }`. And return it from the model's
  * own `static query()` override (see `Model` docstring).
  *
  * ## Eager loading (`with()`)
  *
  * The second generic parameter, `TRelations`, is the model's declared
  * `static relations` shape (see `relations.ts`'s `RelationDefinition`
- * docstring) — it defaults to an empty map, and `BuilderOf<M>` threads
+ * docstring). It defaults to an empty map, and `BuilderOf<M>` threads
  * `RelationsOf<M>` (read off `typeof M.relations`) in for it, so
  * `with()`'s name-checking works with no per-model markers:
  *
- *   Post.query().with("author");   // ok — declared
+ *   Post.query().with("author");   // ok, declared
  *   Post.query().with("nope");     // compile error
  *
- * A *custom* builder subclass spelling the generics out itself —
+ * A *custom* builder subclass spelling the generics out itself,
  * `class PostBuilder extends EloquentBuilder<PostTable, typeof Post.relations>`
- * (paired with `declare static Builder: PostBuilder`) — narrows the same
+ * (paired with `declare static Builder: PostBuilder`), narrows the same
  * way; that path is what the `Builder` marker exists for.
  *
  * The value-side accessors agree: `WithRelations<M>` reads
@@ -167,7 +167,7 @@ type LoadNested<V, Rest extends string> = [Rest] extends [never]
  * whichever entry point produced them.
  *
  *   const posts = await Post.query().with("author", "images").get();
- *   posts.first()!.author  // User | undefined — typed from the declaration
+ *   posts.first()!.author  // User | undefined, typed from the declaration
  *
  * `with()` only queues the relation names; the actual batched queries
  * run once inside `get()`/`first()`, via `eager-loading.ts`'s
@@ -187,7 +187,7 @@ export class EloquentBuilder<
   }
 
   /**
-   * The `Model` subclass this builder queries — Laravel's
+   * The `Model` subclass this builder queries, Laravel's
    * `Builder::getModel()`. Exposed so a `GlobalScope` can read the
    * model's `table`/`primaryKeyColumn` when it applies itself (a scope
    * only receives the builder), which is what lets `SoftDeleteScope`
@@ -199,8 +199,8 @@ export class EloquentBuilder<
 
   // Casts
   //
-  // Every value this builder binds — a `where()` comparand, a `whereIn()`
-  // list, an `update()`/`insert()` payload — is MODEL-shape, exactly like
+  // Every value this builder binds, a `where()` comparand, a `whereIn()`
+  // list, an `update()`/`insert()` payload, is MODEL-shape, exactly like
   // the values `setAttribute()` and the static `Model.update()` take. The
   // underlying `QueryBuilder` is model-unaware and binds what it is
   // given, so without this step a cast column binds the wrong type:
@@ -223,7 +223,7 @@ export class EloquentBuilder<
    * unchanged when the column declares no cast.
    *
    * A qualified column (`posts.published`) is matched on its last
-   * segment, since that is what the model's cast map is keyed by — a
+   * segment, since that is what the model's cast map is keyed by, a
    * joined query still spells its own columns with the table prefix.
    */
   private castBinding(column: string, value: unknown): any {
@@ -238,7 +238,7 @@ export class EloquentBuilder<
     return cast ? cast.toDatabaseType(value) : value;
   }
 
-  /** `castBinding()` across a value list — the `whereIn`/`whereNotIn` path. */
+  /** `castBinding()` across a value list, the `whereIn`/`whereNotIn` path. */
   private castBindings(column: string, values: readonly unknown[]): any[] {
     return values.map((value) => this.castBinding(column, value));
   }
@@ -272,7 +272,7 @@ export class EloquentBuilder<
 
   /**
    * Queues relations to be batch-loaded when this builder's
-   * `get()`/`first()` runs — see the class docstring's "Eager loading"
+   * `get()`/`first()` runs. See the class docstring's "Eager loading"
    * section and `relations.ts`'s `RelationDefinition` docstring for how
    * to declare them on a `Model`.
    *
@@ -283,13 +283,13 @@ export class EloquentBuilder<
    *   .with({ comments: (q) => q.where("approved", 1) })   // constrained
    *
    * A dot path implies every prefix of itself, and repeated prefixes
-   * merge into one node — `.with("author.team", "author.posts")` runs ONE
+   * merge into one node. `.with("author.team", "author.posts")` runs ONE
    * `author` query with two children hanging off it, not two. The cost
    * model is one batched query per relation **node**, independent of row
    * count, so nesting never reintroduces N+1.
    *
    * In the object form the closure receives the related model's own
-   * `EloquentBuilder` before the batched `whereIn` executes — the same
+   * `EloquentBuilder` before the batched `whereIn` executes, the same
    * shape `whereHas()`'s constraint takes. A `morphTo` is the exception:
    * its callback gets a `MorphToSpec` (per-type `constrain()` and
    * `morphWith()`), since a morph union has no single builder to
@@ -298,7 +298,7 @@ export class EloquentBuilder<
    * Two documented sharp edges: a constraint that filters rows out makes
    * a to-many attach fewer and a to-one attach `undefined` (it narrows
    * the relation, it doesn't error), and `limit()` inside a constraint
-   * throws — see `applyConstraint` in `eager-loading.ts` for why.
+   * throws. See `applyConstraint` in `eager-loading.ts` for why.
    */
   with<K extends RelationPath<TRelations>>(
     ...names: K[]
@@ -310,7 +310,7 @@ export class EloquentBuilder<
   >;
   // The `& object` is required: `Partial<Record<K, …>>` collapses to
   // `{}` when `K` is `never` (a model declaring no relations), and every
-  // non-nullish value — including a string — is assignable to `{}`. That
+  // non-nullish value, including a string, is assignable to `{}`. That
   // silently re-admits `Bare.query().with("anything")` through the object
   // overload after the varargs one correctly rejected it. `object`
   // excludes primitives, so the overload only matches actual objects.
@@ -331,7 +331,7 @@ export class EloquentBuilder<
 
   /**
    * Adds a correlated `{name}_count` subquery column for each named
-   * relation — Laravel's `withCount()`. Each name is resolved through the
+   * relation, Laravel's `withCount()`. Each name is resolved through the
    * same `static relations` map `with()` uses; the added column counts
    * the related rows correlated to each parent row (respecting the
    * related model's global scopes, e.g. `SoftDeletes`). Widens the row
@@ -344,7 +344,7 @@ export class EloquentBuilder<
    * count is the full related-row count.
    *
    * Takes the same object form `with()` does, to count a *filtered*
-   * subset — the callback receives the related model's builder and
+   * subset, the callback receives the related model's builder and
    * narrows the subquery, exactly as `whereHas()`'s does:
    *
    *   Post.query().withCount({ comments: (q) => q.where("approved", 1) });
@@ -363,7 +363,7 @@ export class EloquentBuilder<
     TCasts,
     TInstance & { [P in K as `${P}_count`]: number }
   >;
-  // `& object` for the same reason as `with()`'s object overload — see
+  // `& object` for the same reason as `with()`'s object overload. See
   // the comment there.
   withCount<K extends keyof TRelations & string>(
     map: Partial<Record<K, (query: any) => void>> & object,
@@ -388,7 +388,7 @@ export class EloquentBuilder<
   }
 
   /**
-   * Filters to rows that HAVE at least one matching related row —
+   * Filters to rows that HAVE at least one matching related row,
    * Laravel's `whereHas()`. Compiles to `WHERE EXISTS (correlated
    * subquery)`. The optional `constrain` callback receives the related
    * model's own `EloquentBuilder` to narrow the subquery further.
@@ -404,7 +404,7 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** `whereHas()` joined with `OR` — Laravel's `orWhereHas()`. */
+  /** `whereHas()` joined with `OR`, Laravel's `orWhereHas()`. */
   orWhereHas<K extends keyof TRelations & string>(
     name: K,
     constrain?: (query: EloquentBuilder<RelatedRowOf<TRelations[K]>>) => void,
@@ -420,7 +420,7 @@ export class EloquentBuilder<
   }
 
   /**
-   * Filters to rows that have NO matching related row — Laravel's
+   * Filters to rows that have NO matching related row, Laravel's
    * `whereDoesntHave()`/`doesntHave()`. Compiles to `WHERE NOT EXISTS`.
    */
   whereDoesntHave<K extends keyof TRelations & string>(
@@ -432,7 +432,7 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** `whereDoesntHave()` joined with `OR` — Laravel's `orWhereDoesntHave()`. */
+  /** `whereDoesntHave()` joined with `OR`, Laravel's `orWhereDoesntHave()`. */
   orWhereDoesntHave<K extends keyof TRelations & string>(
     name: K,
     constrain?: (query: EloquentBuilder<RelatedRowOf<TRelations[K]>>) => void,
@@ -444,14 +444,14 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** Alias for `whereDoesntHave(name)` with no constraint — Laravel's `doesntHave()`. */
+  /** Alias for `whereDoesntHave(name)` with no constraint, Laravel's `doesntHave()`. */
   doesntHave<K extends keyof TRelations & string>(name: K): this {
     return this.whereDoesntHave(name);
   }
 
   /**
    * Filters to rows whose `morphTo` relation points at **this specific
-   * model instance** — Laravel's `whereMorphedTo()`.
+   * model instance**, Laravel's `whereMorphedTo()`.
    *
    *   Comment.query().whereMorphedTo("commentable", post);
    *   // where commentable_type = 'post' and commentable_id = <post.id>
@@ -469,7 +469,7 @@ export class EloquentBuilder<
    *
    *   Comment.query().whereMorphedTo("author", post);  // author is a belongsTo
    *
-   * The runtime check below still fires — for callers coming through an
+   * The runtime check below still fires, for callers coming through an
    * untyped path (a builder whose `TRelations` was never supplied, or a
    * name widened to `string`), and because a relation's *type* can only
    * be confirmed against the actual declaration.
@@ -478,7 +478,7 @@ export class EloquentBuilder<
     return this.pushMorphedTo(name, related, "and", false);
   }
 
-  /** `whereMorphedTo()` negated — rows pointing at anything BUT `related`. Laravel's `whereNotMorphedTo()`. */
+  /** `whereMorphedTo()` negated, rows pointing at anything BUT `related`. Laravel's `whereNotMorphedTo()`. */
   whereNotMorphedTo<K extends MorphToKeys<TRelations>>(name: K, related: Model): this {
     return this.pushMorphedTo(name, related, "and", true);
   }
@@ -525,7 +525,7 @@ export class EloquentBuilder<
 
   /**
    * Filters to rows whose `morphTo` relation points at an existing parent
-   * **of one of `types`** — Laravel's `whereHasMorph()`.
+   * **of one of `types`**, Laravel's `whereHasMorph()`.
    *
    *   Comment.query().whereHasMorph("commentable", [Post, Video]);
    *
@@ -545,7 +545,7 @@ export class EloquentBuilder<
    *   (q, type) => { if (type === "post") q.where("published", 1); }
    *
    * Pass `"*"` to expand to every entry in the global morph map. That
-   * throws when the map is empty — an unregistered map would silently
+   * throws when the map is empty. An unregistered map would silently
    * match nothing, which is the worse failure.
    */
   whereHasMorph<K extends MorphToKeys<TRelations>>(
@@ -565,7 +565,7 @@ export class EloquentBuilder<
     return this.pushHasMorph(name, types, constrain, "or", false);
   }
 
-  /** The complement of `whereHasMorph()` — no matching parent of any listed type. Laravel's `whereDoesntHaveMorph()`. */
+  /** The complement of `whereHasMorph()`, no matching parent of any listed type. Laravel's `whereDoesntHaveMorph()`. */
   whereDoesntHaveMorph<K extends MorphToKeys<TRelations>>(
     name: K,
     types: AnyModelClass[] | "*",
@@ -625,7 +625,7 @@ export class EloquentBuilder<
    * `morphId` column, plus any caller constraint.
    *
    * Aliased `{table}__sub` for the same reason `buildRelationSubquery()`
-   * is — the target may be the parent's own table (a comment on a
+   * is. The target may be the parent's own table (a comment on a
    * comment), and an unaliased predicate would compare the inner row to
    * itself.
    */
@@ -654,7 +654,7 @@ export class EloquentBuilder<
    * Expands a `whereHasMorph()` type argument into `[alias, class]` pairs.
    *
    * `"*"` reads the global morph map, which is the only enumerable source
-   * of "every type this could be" — a `morphTo`'s local `types` covers
+   * of "every type this could be", a `morphTo`'s local `types` covers
    * only what one declaration chose to name statically, and neither can
    * see rows storing a discriminant nobody registered. An empty map
    * throws rather than matching nothing.
@@ -701,7 +701,7 @@ export class EloquentBuilder<
    * The correlation is expressed with `whereColumn()`/`whereIn()`
    * against qualified column names rather than a hand-built
    * `whereRaw()` string, so identifier quoting is Kysely's problem and
-   * comes out right per engine — MySQL reads a `"quoted"` identifier as
+   * comes out right per engine. MySQL reads a `"quoted"` identifier as
    * a *string literal*, so the string-built form emitted predicates that
    * compared two constants there instead of two columns.
    *
@@ -729,7 +729,7 @@ export class EloquentBuilder<
   ): QueryBuilder<Record<string, any>> {
     if (definition.type === "morphTo") {
       // A morphTo's parents live in different tables, so there is no
-      // single table to correlate an EXISTS against — the subquery would
+      // single table to correlate an EXISTS against. The subquery would
       // have to be a UNION whose shape depends on data. `whereHasMorph()`
       // is the supported form: it takes the type list explicitly and
       // emits one correlated disjunct per type.
@@ -795,7 +795,7 @@ export class EloquentBuilder<
         const { pivotTable, morphType, morphId, relatedPivotKey } = definition.options;
         const localKey = definition.options.localKey ?? this.model.primaryKeyColumn;
         const relatedKey = definition.options.relatedKey ?? related.primaryKeyColumn;
-        // The discriminant names THIS model — see MorphToManyOptions.
+        // The discriminant names THIS model. See MorphToManyOptions.
         const type = definition.options.type ?? this.model.morphAlias();
         base.whereIn(`${sub}.${relatedKey}`, (q) => {
           q.table(pivotTable)
@@ -839,7 +839,7 @@ export class EloquentBuilder<
 
   /**
    * Constructs a fresh builder of the SAME (possibly custom) subclass as
-   * this one, bound to the same model — so a nested `where(callback)` group
+   * this one, bound to the same model, so a nested `where(callback)` group
    * inside a `PostBuilder` scope can call that subclass's own scope methods,
    * with `static query()` as the single builder override point (no
    * `newEloquentBuilder()` model hook needed). Reads the constructor off the
@@ -948,7 +948,7 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** `where(model.primaryKeyColumn, id)` — the primary-key equality shorthand used by `find()`. */
+  /** `where(model.primaryKeyColumn, id)`, the primary-key equality shorthand used by `find()`. */
   whereKey(id: Bindable): this {
     return this.where(
       this.model.primaryKeyColumn as keyof TRow & string,
@@ -982,7 +982,7 @@ export class EloquentBuilder<
 
   /**
    * The `whereIn`-family argument with its values cast, leaving a
-   * subquery (a callback or a builder) alone — there are no bindings to
+   * subquery (a callback or a builder) alone. There are no bindings to
    * cast in that form, and the SQL it produces is the model's business,
    * not this builder's.
    */
@@ -1387,21 +1387,21 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** Appends a raw `ORDER BY` fragment — escape hatch for expressions `orderBy()` can't express. */
+  /** Appends a raw `ORDER BY` fragment, escape hatch for expressions `orderBy()` can't express. */
   orderByRaw(sqlText: string, bindings: Bindable[] = []): this {
     this.query.orderByRaw(sqlText, bindings);
 
     return this;
   }
 
-  /** Orders by `RANDOM()` (SQLite) — matches Laravel's `inRandomOrder()`. */
+  /** Orders by `RANDOM()` (SQLite), matches Laravel's `inRandomOrder()`. */
   inRandomOrder(): this {
     this.query.inRandomOrder();
 
     return this;
   }
 
-  /** Clears every accumulated ordering, optionally replacing it with a single new `orderBy(column, direction)` — matches Laravel's `reorder()`. */
+  /** Clears every accumulated ordering, optionally replacing it with a single new `orderBy(column, direction)`, matches Laravel's `reorder()`. */
   reorder<K extends keyof TRow & string>(column?: K, direction: "asc" | "desc" = "asc"): this {
     this.query.reorder(column, direction);
 
@@ -1420,7 +1420,7 @@ export class EloquentBuilder<
     return this;
   }
 
-  /** `GROUP BY column(s)` — see `QueryBuilder.groupBy()`. */
+  /** `GROUP BY column(s)`. See `QueryBuilder.groupBy()`. */
   groupBy<K extends keyof TRow & string>(...columns: K[]): this {
     this.query.groupBy(...columns);
 
@@ -1472,13 +1472,13 @@ export class EloquentBuilder<
   /**
    * Appends a raw, aliased SQL expression to the row's column set,
    * widening this builder's row type to `TRow & TExtra` from this call
-   * onward — see `QueryBuilder.selectRaw()`'s docstring for the full
+   * onward. See `QueryBuilder.selectRaw()`'s docstring for the full
    * rationale and an example.
    *
    * `TInstance` is widened alongside `TRow`. The extra column is present
    * on the hydrated instance at runtime (`hydrate()` copies whatever the
    * row carries), so leaving the instance type alone made the selected
-   * column unreachable on the result — `rows.first()?.doubled_views`
+   * column unreachable on the result. `rows.first()?.doubled_views`
    * would not compile despite being populated.
    */
   selectRaw<TExtra extends Record<string, any>>(
@@ -1491,8 +1491,8 @@ export class EloquentBuilder<
   }
 
   /**
-   * Adds an `INNER JOIN`, widening the row type to `TRow & TJoined` —
-   * see `QueryBuilder.join()` for the full rationale and the `on`-callback
+   * Adds an `INNER JOIN`, widening the row type to `TRow & TJoined`.
+   * See `QueryBuilder.join()` for the full rationale and the `on`-callback
    * form. `TJoined` is explicit, never inferred.
    *
    *   const posts = await Post.query()
@@ -1500,7 +1500,7 @@ export class EloquentBuilder<
    *     .select("posts.*", "users.name as author_name")
    *     .get();
    *
-   * Rows are still hydrated into THIS model's instances — the joined
+   * Rows are still hydrated into THIS model's instances, the joined
    * columns land as ordinary attributes on the instance, not a nested
    * object. For a relation you want as a real instance, use `with()`.
    */
@@ -1553,7 +1553,7 @@ export class EloquentBuilder<
     >;
   }
 
-  /** Adds a `CROSS JOIN` — see `QueryBuilder.crossJoin()`. */
+  /** Adds a `CROSS JOIN`. See `QueryBuilder.crossJoin()`. */
   crossJoin<TJoined extends Record<string, any> = Record<string, any>>(
     table: string,
   ): EloquentBuilder<TRow & TJoined, TRelations, TCasts, TInstance & TJoined> {
@@ -1567,21 +1567,21 @@ export class EloquentBuilder<
     >;
   }
 
-  /** Appends another query's rows to this one's, deduplicated — see `QueryBuilder.union()`. */
+  /** Appends another query's rows to this one's, deduplicated. See `QueryBuilder.union()`. */
   union(subquery: Subquery): this {
     this.query.union(subquery);
 
     return this;
   }
 
-  /** `union()` keeping duplicates — see `QueryBuilder.unionAll()`. */
+  /** `union()` keeping duplicates. See `QueryBuilder.unionAll()`. */
   unionAll(subquery: Subquery): this {
     this.query.unionAll(subquery);
 
     return this;
   }
 
-  /** Restricts the projected column set — Laravel's `select()`. Needed on a joined query to disambiguate duplicate column names. */
+  /** Restricts the projected column set, Laravel's `select()`. Needed on a joined query to disambiguate duplicate column names. */
   select(...columns: string[]): this {
     this.query.select(...columns);
 
@@ -1610,7 +1610,7 @@ export class EloquentBuilder<
     return this.offset(n);
   }
 
-  /** See `QueryBuilder.lock()`'s docstring — a documented no-op on SQLite. */
+  /** See `QueryBuilder.lock()`'s docstring, a documented no-op on SQLite. */
   lock(value: boolean | string = true): this {
     this.query.lock(value);
 
@@ -1673,11 +1673,11 @@ export class EloquentBuilder<
   }
 
   /**
-   * Processes matching rows in offset-based pages of `size` — Laravel's
+   * Processes matching rows in offset-based pages of `size`, Laravel's
    * `chunk()`. Each page's rows are hydrated into model instances (and
    * fire `retrieved`) before `callback` sees them. Eager `with()`
    * relations are NOT loaded per page (chunking is for large batch
-   * processing, not display) — call `load()`/`with()` yourself if needed.
+   * processing, not display), call `load()`/`with()` yourself if needed.
    * Return `false` to stop early.
    */
   async chunk(
@@ -1695,7 +1695,7 @@ export class EloquentBuilder<
     });
   }
 
-  /** Calls `callback` once per matching row (hydrated), paged behind the scenes — Laravel's `each()`. Return `false` to stop early. */
+  /** Calls `callback` once per matching row (hydrated), paged behind the scenes, Laravel's `each()`. Return `false` to stop early. */
   async each(
     callback: (row: TRow, index: number) => void | boolean | Promise<void | boolean>,
     size = 1000,
@@ -1714,7 +1714,7 @@ export class EloquentBuilder<
     });
   }
 
-  /** Async generator yielding matching rows one at a time (paged), hydrated into instances — Laravel's `lazy()`. */
+  /** Async generator yielding matching rows one at a time (paged), hydrated into instances, Laravel's `lazy()`. */
   async *lazy(size = 1000): AsyncGenerator<TRow, void, unknown> {
     for await (const row of this.query.lazy(size)) {
       const instance = this.model.hydrate(row);
@@ -1723,7 +1723,7 @@ export class EloquentBuilder<
     }
   }
 
-  /** Alias for `lazy()` — Laravel's `cursor()`. See `QueryBuilder.cursor()`. */
+  /** Alias for `lazy()`, Laravel's `cursor()`. See `QueryBuilder.cursor()`. */
   cursor(size = 1000): AsyncGenerator<TRow, void, unknown> {
     return this.lazy(size);
   }
@@ -1757,7 +1757,7 @@ export class EloquentBuilder<
     return this.query.avg(column);
   }
 
-  /** `GROUP BY column` + `COUNT(*)` over this builder's `where()` conditions — see `QueryBuilder.countBy()`. */
+  /** `GROUP BY column` + `COUNT(*)` over this builder's `where()` conditions. See `QueryBuilder.countBy()`. */
   countBy<K extends keyof TRow & string>(column: K): Promise<Map<TRow[K], number>> {
     return this.query.countBy(column);
   }
@@ -1768,7 +1768,7 @@ export class EloquentBuilder<
 
   /**
    * Updates every matching row, stamping `updatedAtColumn` unless the
-   * caller supplied it — Laravel's `Builder::update()`, which does the
+   * caller supplied it, Laravel's `Builder::update()`, which does the
    * same. A model with `timestamps = true` that could be updated
    * *without* touching `updated_at` just by going through the builder
    * would make the column silently unreliable, which is worse than not
@@ -1797,14 +1797,14 @@ export class EloquentBuilder<
   }
 
   /**
-   * Deletes every matching row — **soft-deleting** when the model
+   * Deletes every matching row, **soft-deleting** when the model
    * declares soft deletes, exactly as the static `Model.delete()` does.
    *
    * This is Laravel's `SoftDeletingScope::extend()` behaviour: a builder
    * delete on a soft-deleting model compiles to `UPDATE ... SET
    * deleted_at = now()`, not `DELETE FROM`. Without it,
    * `Post.query().where(...).delete()` hard-deletes rows the model's
-   * whole contract says are recoverable — silent, unrecoverable data
+   * whole contract says are recoverable, silent, unrecoverable data
    * loss, and the failure mode is invisible until someone tries to
    * restore.
    *
@@ -1823,7 +1823,7 @@ export class EloquentBuilder<
   }
 
   /**
-   * A real `DELETE FROM`, even on a soft-deleting model — Laravel's
+   * A real `DELETE FROM`, even on a soft-deleting model, Laravel's
    * `forceDelete()`. Identical to `delete()` for a model without soft
    * deletes, so it is also the honest spelling for framework-internal
    * paths that mean "remove the row" regardless of the model's policy.
@@ -1833,7 +1833,7 @@ export class EloquentBuilder<
   }
 
   /**
-   * Clears `deleted_at` on every matching row — Laravel's `restore()`.
+   * Clears `deleted_at` on every matching row, Laravel's `restore()`.
    * Pair with `onlyTrashed()`/`withTrashed()`, since the default scope
    * hides exactly the rows this is meant to act on:
    *
@@ -1896,17 +1896,17 @@ export class EloquentBuilder<
     return this.query.decrementEach(columns, this.castWrite(extra));
   }
 
-  /** Escape hatch — the underlying `QueryBuilder`, for anything this class doesn't cover. */
+  /** Escape hatch, the underlying `QueryBuilder`, for anything this class doesn't cover. */
   toBase(): QueryBuilder<TRow> {
     return this.query;
   }
 
-  /** The compiled SELECT SQL for this builder's current state — see `QueryBuilder.toSql()`. */
+  /** The compiled SELECT SQL for this builder's current state. See `QueryBuilder.toSql()`. */
   toSql(): string {
     return this.query.toSql();
   }
 
-  /** The compiled SELECT SQL with bound values inlined — for debugging only. See `QueryBuilder.toRawSql()`. */
+  /** The compiled SELECT SQL with bound values inlined, for debugging only. See `QueryBuilder.toRawSql()`. */
   toRawSql(): string {
     return this.query.toRawSql();
   }
@@ -1918,7 +1918,7 @@ export class EloquentBuilder<
 
   /**
    * Returns a new `EloquentBuilder` with the same accumulated `where`/
-   * `order`/`limit`/`offset`/`distinct`/`lock`/eager-load state — see
+   * `order`/`limit`/`offset`/`distinct`/`lock`/eager-load state. See
    * `QueryBuilder.clone()`'s docstring for the "why".
    */
   clone(): EloquentBuilder<TRow, TRelations, TCasts, TInstance> {
@@ -1935,12 +1935,12 @@ export class EloquentBuilder<
   }
 
   /**
-   * Conditionally apply a callback — Laravel's `Conditionable::when()`.
+   * Conditionally apply a callback, Laravel's `Conditionable::when()`.
    * Receives `this` (the Eloquent builder) so the callback can call
    * model-aware methods (`with()`, scopes, ...), not just query-builder
    * ones. See `QueryBuilder.when()` for the full contract.
    */
-  // Closure-condition overload first — see the note on `QueryBuilder.when()`.
+  // Closure-condition overload first. See the note on `QueryBuilder.when()`.
   when<TValue, TReturn = this>(
     value: (builder: this) => TValue,
     callback: (builder: this, value: TValue) => TReturn | void,
@@ -1959,7 +1959,7 @@ export class EloquentBuilder<
     return applyWhen(this, value, callback, defaultCb, false);
   }
 
-  // Closure-condition overload first — see the note on `QueryBuilder.when()`.
+  // Closure-condition overload first. See the note on `QueryBuilder.when()`.
   unless<TValue, TReturn = this>(
     value: (builder: this) => TValue,
     callback: (builder: this, value: TValue) => TReturn | void,

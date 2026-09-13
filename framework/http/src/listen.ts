@@ -72,7 +72,7 @@ function isAddrInUse(error: unknown): boolean {
 /**
  * `closeAllConnections`/`closeIdleConnections` exist on `http.Server`
  * (Node >= 18.2) but not on `Http2Server`, and `ServerType` is the union
- * of the three — so they are reached through a capability check rather
+ * of the three, so they are reached through a capability check rather
  * than a cast.
  */
 interface ConnectionClosable {
@@ -87,7 +87,7 @@ interface ConnectionClosable {
  * new connections and resolves once the open ones end. The missing third
  * is that HTTP keep-alive connections and upgraded websockets do NOT end
  * on their own, so a server with a single idle browser tab attached never
- * finishes closing — which is exactly the "SIGTERM and the process hangs
+ * finishes closing. Which is exactly the "SIGTERM and the process hangs
  * until it is SIGKILLed" symptom.
  *
  * So, in order:
@@ -97,7 +97,7 @@ interface ConnectionClosable {
  *   3. in-flight requests get `drainTimeoutMs` to finish;
  *   4. anything still open is destroyed with `closeAllConnections()`.
  *
- * A request that outlives the drain window is cut off — deliberately.
+ * A request that outlives the drain window is cut off, deliberately.
  * The alternative is not "the request completes", it is "the orchestrator
  * SIGKILLs the process", which cuts it off anyway and skips every
  * remaining shutdown hook.
@@ -120,7 +120,7 @@ function closeServer(
         clearTimeout(timer);
       }
 
-      // "Server is not running" — something already closed it. Shutdown
+      // "Server is not running", something already closed it. Shutdown
       // is idempotent by contract, so that is a success, not an error.
       if (error && (error as NodeJS.ErrnoException).code !== "ERR_SERVER_NOT_RUNNING") {
         reject(error);
@@ -140,7 +140,7 @@ function closeServer(
     timer = setTimeout(() => {
       closable.closeAllConnections?.();
     }, drainTimeoutMs);
-    // The drain timer must not itself keep the process alive — it exists
+    // The drain timer must not itself keep the process alive. It exists
     // to shorten shutdown, not extend it.
     timer.unref?.();
   });
@@ -151,7 +151,7 @@ function closeServer(
  * when a broadcast manager is registered, hand it the Node server so
  * websocket drivers can attach to the `upgrade` event.
  *
- * The upgrade handler only exists once `serve()` has returned — inject
+ * The upgrade handler only exists once `serve()` has returned, inject
  * immediately, before the listen callback. A no-op for drivers that
  * don't run their own socket server.
  */
@@ -208,7 +208,7 @@ export function listenHttpServer(
     // no route ever asked for a socket.
     kernel.injectWebSocket(server);
 
-    // Then any driver that runs a socket server of its OWN — which is not
+    // Then any driver that runs a socket server of its OWN. Which is not
     // the shipped local driver any more, but remains the contract for a
     // third-party one.
     if (app.has(BROADCAST_TOKEN)) {

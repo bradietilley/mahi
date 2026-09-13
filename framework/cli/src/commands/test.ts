@@ -5,18 +5,18 @@ import { base_path } from "@mahiframework/core";
 import { Command } from "../command.js";
 
 /**
- * `./artisan test` — a thin passthrough to `vitest run`, shelled out via
+ * `./artisan test`, a thin passthrough to `vitest run`, shelled out via
  * `npx` (same approach the `artisan` script itself uses for `tsx`) so it resolves
  * whichever `vitest` is installed in the invoking app's own
  * `node_modules`, using that app's own `vitest.config.ts`. Not a
- * reimplementation of vitest's CLI — every argument after `test` is
+ * reimplementation of vitest's CLI, every argument after `test` is
  * passed straight through unparsed (`allowUnknownOption()` below), so
  * `./artisan test --watch`, `./artisan test tests/todos.test.ts`, and
  * `./artisan test -t "creates a todo"` all behave exactly as the
  * equivalent `vitest run ...` invocation would.
  *
  * Resolves the app's OWN `node_modules/.bin/vitest` directly rather than
- * shelling to `npx vitest` — `npx` may (silently, over the network) fetch
+ * shelling to `npx vitest`. `npx` may (silently, over the network) fetch
  * and run a foreign copy of vitest if the local one is missing or on a
  * different major, which is exactly the trap the top of the `artisan`
  * script warns about. Falls back to `npx` only if the local binary is not
@@ -24,7 +24,7 @@ import { Command } from "../command.js";
  *
  * Runs in the current working directory (the app's own directory when
  * invoked via `./artisan`, which `cd`s there first) so it picks up that
- * app's `vitest.config.ts` — this command intentionally has no opinion
+ * app's `vitest.config.ts`. This command intentionally has no opinion
  * about *which* app's tests it runs; it is not itself a test runner.
  */
 export class TestCommand extends Command {

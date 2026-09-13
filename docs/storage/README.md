@@ -1,7 +1,7 @@
 # Storage
 
 `@mahiframework/storage` is a named-disk abstraction over file storage. One
-interface — a core of six methods plus listing, streaming and metadata —
+interface, a core of six methods plus listing, streaming and metadata,
 resolved by name through a `Manager`, the same pattern as
 `DatabaseManager` and `CacheManager`.
 
@@ -14,7 +14,7 @@ const url = Storage.url("avatars/427185966743560456.png");   // "/storage/avatar
 ```
 
 One driver ships: `local`, backed by the filesystem. A "public" disk is
-not a special driver — it's a local disk that happens to have a `url`
+not a special driver. It's a local disk that happens to have a `url`
 prefix configured.
 
 ## The `StorageDriver` contract
@@ -53,7 +53,7 @@ interface StorageDriver {
 ```
 
 The **core** six (two of them synchronous string computations) cover the
-motivating use case — "write a file, read it back, hand a client a URL
+motivating use case, "write a file, read it back, hand a client a URL
 for it". The rest add directory listing, streaming and file metadata,
 grouped so a driver author can see exactly what a new backend has to
 implement.
@@ -69,7 +69,7 @@ don't exist for a local disk / a remote disk respectively. The interface
 is the same; the correctness bar per backend is not.
 
 If you're on the `local` disk and want something the interface doesn't
-expose, you still have the concrete driver as an escape hatch —
+expose, you still have the concrete driver as an escape hatch.
 `Storage.disk("local")` returns a `LocalStorageDriver`, and `path()`
 gives you a filesystem path you can hand to `node:fs` directly:
 
@@ -118,13 +118,13 @@ type DiskConfig = LocalDiskConfig | { driver: string; [key: string]: unknown };
 
 | Key | Meaning |
 |---|---|
-| `driver` | Optional for local disks — `"local"` is the default when omitted. |
+| `driver` | Optional for local disks. `"local"` is the default when omitted. |
 | `root` | The directory every path on this disk resolves inside. Required. |
 | `url` | The public HTTP prefix. Its presence is what makes a disk **public**. |
 
 `url` may be a path (`"/storage"`) or a full origin
 (`"https://cdn.example.com/media"`). Omit it entirely for a **private**
-disk — one whose files are never addressable by a client directly.
+disk, one whose files are never addressable by a client directly.
 
 `isLocalDiskConfig(value)` is the exported type guard the provider (and
 `servePublicDisk`) uses to decide whether a config entry describes a
@@ -137,8 +137,8 @@ function isLocalDiskConfig(value: unknown): value is LocalDiskConfig
 It returns `true` when `value` is an object with a string `root` and a
 `driver` that is either absent or exactly `"local"`. That check is why
 `StorageServiceProvider` can register `LocalStorageDriver` factories for
-every local disk while leaving disks belonging to a plugin driver alone —
-the plugin's own `extend("s3", ...)` owns those.
+every local disk while leaving disks belonging to a plugin driver alone.
+The plugin's own `extend("s3", ...)` owns those.
 
 ## `LocalStorageDriver`
 
@@ -159,7 +159,7 @@ private resolve(path: string): string {
 }
 ```
 
-This is the path-traversal guard, and it is applied by **every** method —
+This is the path-traversal guard, and it is applied by **every** method:
 `put`, `get`, `exists`, `delete`, `path`, **and `url()`**. `url()`
 calling `resolve()` looks pointless (it throws away the result and builds
 a URL from the prefix instead), but it isn't: a `url()` that skipped the
@@ -177,7 +177,7 @@ root itself; the `startsWith(rootResolved + sep)` clause is what stops
 
 `put()` creates intermediate directories (`mkdir` with `recursive: true`)
 before writing. `delete()` uses `force: true`, so deleting a file that
-isn't there is a no-op rather than an error — the contract has no
+isn't there is a no-op rather than an error. The contract has no
 `missing()` and no "did it exist" return value, and it doesn't need one.
 
 ### `url()` throws on a private disk
@@ -199,7 +199,7 @@ Calling `url()` on a disk with no `url` configured is an error, not a
 fallback. This matches Laravel, whose `Storage::url()` raises *"This
 driver does not support retrieving URLs"* for the same situation.
 
-The alternative — returning the filesystem path — was tried and removed.
+The alternative, returning the filesystem path, was tried and removed.
 It is a Laravel-muscle-memory footgun of the worst kind: it doesn't
 throw, it doesn't warn, and the failure mode is that
 `/Users/deploy/app/storage/app/private/invoices/2026-01.pdf` gets
@@ -215,14 +215,14 @@ Storage.url("invoices/2026-01.pdf", "local");    // throws
 ```
 
 If you want a client to be able to fetch a private file, put a route in
-front of it that does its own authorization and returns the bytes — see
+front of it that does its own authorization and returns the bytes. See
 [`serveStoredFile`](#servestoredfile) below.
 
 ## Listing files
 
 Five methods list a disk. Every returned path is **disk-relative,
 POSIX-separated (`/`) and sorted**, so a test can assert on them
-deterministically. A directory argument is optional — omit it to list
+deterministically. A directory argument is optional, omit it to list
 from the disk root.
 
 ```ts
@@ -240,21 +240,21 @@ const { files, directories } = await Storage.list("uploads");
 // directories: ["uploads/thumbs"]
 ```
 
-**A directory that doesn't exist lists as empty** — `files("nope")`
+**A directory that doesn't exist lists as empty**. `files("nope")`
 returns `[]`, not an error, matching Laravel. A path-traversal argument
 (`files("../..")`) still throws, like every other method.
 
 ## Streaming
 
 Buffering a large file through `get()`/`put()` costs its whole size in
-heap. The stream methods never do — a multi-gigabyte upload or download
+heap. The stream methods never do, a multi-gigabyte upload or download
 flows through in chunks.
 
 ### `readStream(path, { start?, end? })`
 
 A Node `Readable` over the file's bytes. Existence is checked up front, so
 a missing file rejects with a typed `FileNotFoundException` **before** any
-chunk — you never have to attach an error handler just to learn the file
+chunk. You never have to attach an error handler just to learn the file
 wasn't there. `start`/`end` are inclusive byte offsets (as
 `fs.createReadStream`), for serving a byte range.
 
@@ -285,7 +285,7 @@ await new Promise((res, rej) => out.on("finish", res).on("error", rej));
 ### `putStream(path, source)`
 
 Drain any `Readable`, web `ReadableStream`, or `AsyncIterable<Uint8Array>`
-onto the disk — Laravel's `put($path, $resource)`. Atomic, like
+onto the disk, Laravel's `put($path, $resource)`. Atomic, like
 `writeStream`.
 
 ```ts
@@ -309,7 +309,7 @@ await Storage.deleteDirectory("thumbs");   // recursive; no error if absent
 
 `size()`/`lastModified()`/`copy()`/`move()` throw `FileNotFoundException`
 when the (source) file is missing. `mimeType()` is a best-effort guess
-from the extension — the disk has no real content-type concept — and
+from the extension, the disk has no real content-type concept, and
 returns `undefined` for an unknown extension.
 
 ## `StorageManager`
@@ -331,7 +331,7 @@ class StorageManager extends Manager<StorageDriver>
 the first argument always matches the driver method it forwards to.
 
 Resolution is synchronous and cached per name, like every other
-`Manager`. Constructing a `LocalStorageDriver` does no I/O at all — the
+`Manager`. Constructing a `LocalStorageDriver` does no I/O at all, the
 `mkdir`/`writeFile` happen lazily inside `put()`. `StorageServiceProvider`
 therefore has no `boot()`.
 
@@ -355,7 +355,7 @@ export class StorageServiceProvider extends ServiceProvider {
 
 Note what this does: it registers **one factory per configured local
 disk**, keyed by the disk's own name. Disk names *are* driver names in
-this manager — there is no `createLocalDriver()` indirection layer
+this manager. There is no `createLocalDriver()` indirection layer
 mapping a `driver` string onto a method. That's the same choice every
 `Manager` in the framework makes.
 
@@ -391,7 +391,7 @@ through `Storage.disk(name)`, which hands back a plain `StorageDriver`
 with the identical methods.
 
 Prefer injecting `StorageManager` via `STORAGE_TOKEN` where you already
-have `app` — inside a `ServiceProvider`, a `Command`, a controller that
+have `app`, inside a `ServiceProvider`, a `Command`, a controller that
 received it. The facade is for call sites where threading it through is
 genuinely inconvenient. Same guidance as `app()` itself, and the same
 test caveat: the facade resolves off the *current global* app, so a test
@@ -420,7 +420,7 @@ with one `/`. This is what `LocalStorageDriver.url()` calls.
 
 ### `publicUrlPathname(prefix)`
 
-The **path portion** of a prefix — what an incoming request path has to
+The **path portion** of a prefix, what an incoming request path has to
 start with for that prefix to match.
 
 ```ts
@@ -451,7 +451,7 @@ pathFromPublicUrl("/storage/a%20b.png", "/storage")       // "a b.png"
 
 It `decodeURIComponent`s the result and returns `null` if that throws (a
 malformed percent-escape) or yields an empty string. A `null` return is
-the caller's cue to 404 — which is exactly what `servePublicDisk` does
+the caller's cue to 404. Which is exactly what `servePublicDisk` does
 with it.
 
 ## Serving files
@@ -472,7 +472,7 @@ serveStoredFile(
 
 Streams `path` off `driver` and returns a web-standard `Response`. It
 takes a `StorageDriver`, not a disk name, so it works with any disk you've
-already resolved — including a private one behind your own authorization
+already resolved, including a private one behind your own authorization
 check. The body is a streamed `Readable`, so a large file is never
 buffered into memory.
 
@@ -531,18 +531,18 @@ That symmetry is the security property. If traversal produced a 400 with
 `"Path [...] escapes the storage root."` and a missing file produced a
 404, an attacker would have a working oracle: probe a path, read the
 status, and learn whether their traversal reached a real directory. Same
-status, same body, no leak. The error is still thrown by the driver — it
+status, same body, no leak. The error is still thrown by the driver. It
 just never becomes a response.
 
 `Content-Type` comes from `options.contentType` when given, otherwise
 from a small extension→MIME table covering `jpg`/`jpeg`/`png`/`gif`/
 `webp`/`svg`/`json`/`txt`/`pdf`. Anything else is
-`application/octet-stream`. The disk itself has no content-type concept —
-`get()` returns a bare `Buffer` — so this map is a property of the
+`application/octet-stream`. The disk itself has no content-type concept,
+`get()` returns a bare `Buffer`, so this map is a property of the
 *serving* helper, not of storage. `Content-Length` is set from the file's
 size; `Cache-Control` is set only when you pass `cacheControl`.
 
-The body is streamed, not buffered — a large download costs no heap. For
+The body is streamed, not buffered, a large download costs no heap. For
 gigabytes of media in production you may still want a CDN in front of the
 prefix (see below), but the process no longer OOMs on a big file.
 
@@ -583,19 +583,19 @@ export class MediaServiceProvider extends ServiceProvider {
 
 The `/storage/*` wildcard must line up with the disk's `url: "/storage"`.
 The handler resolves the disk's config at request time, derives the
-prefix pathname, and strips it — so if you change `url` you change the
+prefix pathname, and strips it, so if you change `url` you change the
 route pattern to match, and nothing else.
 
 Two failure modes, deliberately different:
 
-- **The disk has no `url` configured** — `servePublicDisk` *throws*:
+- **The disk has no `url` configured**, `servePublicDisk` *throws*:
   `Disk [name] has no url configured — cannot serve it publicly.` This is
   a wiring bug in your app, not a client error, and surfacing it as a 500
   in development is the point.
-- **The request path isn't under the prefix, or names no file** —
+- **The request path isn't under the prefix, or names no file**.
   `pathFromPublicUrl` returns `null` and the handler 404s.
 
-The handler's parameter type is structural — `{ path(): string }`, not
+The handler's parameter type is structural, `{ path(): string }`, not
 `@mahiframework/http`'s `Request`. That's what keeps `@mahiframework/storage` free of a
 dependency on the HTTP package while still being usable directly as a
 route handler.
@@ -604,7 +604,7 @@ route handler.
 
 Laravel ships `php artisan storage:link` because PHP web servers serve
 files out of a fixed document root, and `storage/app/public` is not in
-it — the symlink exists purely to drag those files into a directory the
+it. The symlink exists purely to drag those files into a directory the
 web server will look at.
 
 Node has no document root. Your application process *is* the server, and
@@ -615,7 +615,7 @@ that route. There is no symlink, no artisan command, and no
 The trade-off is that every public file is served by your Node process,
 which is fine for avatars and post images and wrong for gigabytes of
 video. When it stops being fine, point the disk's `url` at a CDN origin
-that reads from the same bucket — `url()` starts emitting CDN URLs, the
+that reads from the same bucket, `url()` starts emitting CDN URLs, the
 catch-all route stops being hit, and no application code changes.
 
 ## Writing a custom driver
@@ -667,7 +667,7 @@ export class S3ServiceProvider extends ServiceProvider {
 Three things to get right:
 
 **Register in `boot()`, not `register()`**, if you're extending a manager
-another provider owns — `STORAGE_TOKEN` has to be bound first. (Or
+another provider owns. `STORAGE_TOKEN` has to be bound first. (Or
 register in your own `register()` and accept the ordering constraint in
 `config/app.ts`; `RedisServiceProvider` does exactly that for cache,
 queue and broadcasting.)
@@ -684,7 +684,7 @@ plausible-looking-but-fake path is worse than one that refuses.
 If your driver needs async warm-up, implement `Connectable`
 (`connect()`/`disconnect()`) and call `connect()` from your provider's
 `boot()`. `Manager.driver()` is always synchronous and will never await
-for you — see [Providers](../providers/).
+for you. See [Providers](../providers/).
 
 ## Testing
 
@@ -719,7 +719,7 @@ filesystem path. Use `path()` for that, or serve the file through a route.
 
 **Path traversal throws, it doesn't return `false`.** `exists("../x")`
 raises rather than reporting "no". Anything calling `exists()` on
-untrusted input needs a `try`/`catch` — `serveStoredFile` has one.
+untrusted input needs a `try`/`catch`. `serveStoredFile` has one.
 
 **`delete()` is silent on a missing file.** `force: true`. There is no
 return value telling you whether anything was removed.
@@ -735,12 +735,12 @@ returns `null` for a path that isn't under `/files`.
 
 **`serveStoredFile` needs `options.request` for ranges and conditional
 GETs.** It always streams and sets `ETag`/`Last-Modified`, but without the
-request's headers it can't honour `Range` or `If-None-Match` — pass
+request's headers it can't honour `Range` or `If-None-Match`, pass
 `{ request: { headers, signal } }` to get 206/304 and client-abort
 handling.
 
 **A non-existent directory lists as `[]`.** `files("nope")` returns an
-empty array, not an error — but a *traversal* argument (`files("../..")`)
+empty array, not an error, but a *traversal* argument (`files("../..")`)
 still throws, like every other method.
 
 **Stream/metadata methods throw `FileNotFoundException` on a missing
@@ -761,10 +761,10 @@ override instead.
 
 ## Related
 
-- [Configuration](../configuration/) — `config/storage.ts`, `storage_path()`
-- [Providers](../providers/) — registering a custom driver via `extend()`, boot ordering
-- [Routing](../routing/) — mounting the catch-all that `servePublicDisk` handles
-- [Requests](../requests/) — reading uploaded files out of a multipart body
-- [Responses](../responses/) — what else you can return from a route handler
-- [Container](../container/) — `STORAGE_TOKEN`
-- [Mail](../mail/) — attaching a stored file to a message
+- [Configuration](../configuration/): `config/storage.ts`, `storage_path()`
+- [Providers](../providers/): registering a custom driver via `extend()`, boot ordering
+- [Routing](../routing/): mounting the catch-all that `servePublicDisk` handles
+- [Requests](../requests/): reading uploaded files out of a multipart body
+- [Responses](../responses/): what else you can return from a route handler
+- [Container](../container/): `STORAGE_TOKEN`
+- [Mail](../mail/): attaching a stored file to a message

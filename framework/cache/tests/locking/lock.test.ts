@@ -157,7 +157,7 @@ describe("Lock", () => {
 
   describe("the TTL floor", () => {
     /**
-     * `Math.ceil(0)` is `0`, which every store reads as "no expiry" —
+     * `Math.ceil(0)` is `0`, which every store reads as "no expiry",
      * so a lock configured with a zero TTL was a lock with no recovery
      * path at all. A `WithoutOverlapping({ expireAfterSeconds: 0 })` job
      * would wedge its whole job class permanently, which is the opposite
@@ -190,7 +190,7 @@ describe("Lock", () => {
 
   describe("release() on a store with an atomic releaseLock()", () => {
     /**
-     * The portable release is `get()` then `forget()` — two operations
+     * The portable release is `get()` then `forget()`, two operations
      * with a window in between. On a store shared across processes, the
      * lock's TTL can expire inside that window, another holder can
      * acquire it, and the `forget()` then deletes *their* lock: two live
@@ -213,7 +213,7 @@ describe("Lock", () => {
 
     it("falls back to get()-then-forget() on a store without one", async () => {
       const store = new ArrayCacheStore();
-      // A store predating `releaseLock()` — it is optional on the
+      // A store predating `releaseLock()`. It is optional on the
       // interface, so an out-of-package implementation may not have it
       // and the fallback must still release the lock.
       const withoutRelease: CacheStore = {

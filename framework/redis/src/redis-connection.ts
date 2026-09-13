@@ -4,7 +4,7 @@ import type { Connectable } from "@mahiframework/core";
 /**
  * Per-connection configuration. Either give a `url` (`redis://[:password@]
  * host:port[/db]`, or `rediss://…` for TLS) or the discrete `host`/`port`/
- * `password`/`db` fields — `url` wins if both are present. `keyPrefix` is
+ * `password`/`db` fields, `url` wins if both are present. `keyPrefix` is
  * applied by ioredis to every key on this connection, which is the
  * cleanest way to give one shared Redis server per-app namespacing (see
  * `RedisCacheStore.flush()`'s docstring for why that matters). `options`
@@ -23,7 +23,7 @@ export interface RedisConnectionConfig {
 }
 
 /**
- * Owns one logical Redis connection — a single command client plus,
+ * Owns one logical Redis connection, a single command client plus,
  * lazily, any *dedicated* clients that a caller needs because Redis puts a
  * connection into a mode where it can't also serve normal commands:
  *
@@ -38,7 +38,7 @@ export interface RedisConnectionConfig {
  * `LPUSH`/`LREM`/…) shares the single `client()`. Implements `Connectable`
  * so its owning provider connects it explicitly in `boot()` and
  * disconnects every client it handed out on shutdown, following the
- * sync-driver-resolution + `Connectable` philosophy — this is exactly the
+ * sync-driver-resolution + `Connectable` philosophy. This is exactly the
  * driver that legitimately needs an async `connect()` step.
  */
 export class RedisConnection implements Connectable {
@@ -48,8 +48,8 @@ export class RedisConnection implements Connectable {
 
   constructor(config: RedisConnectionConfig = {}) {
     this.options = buildOptions(config);
-    // `lazyConnect` keeps `new Redis()` from opening a socket eagerly —
-    // resolution stays synchronous (a driver handle is cheap to
+    // `lazyConnect` keeps `new Redis()` from opening a socket eagerly.
+    // Resolution stays synchronous (a driver handle is cheap to
     // construct), and the actual connect happens in `connect()`, matching
     // how `SqliteDriver` defers real I/O.
     this.primary = new Redis(this.options);
@@ -66,7 +66,7 @@ export class RedisConnection implements Connectable {
    *
    * Read it from here rather than re-deriving it from config. ioredis
    * applies the prefix automatically to command *keys*, but not to a
-   * `SCAN`/`KEYS` `MATCH` pattern, and not to a pub/sub channel — so the
+   * `SCAN`/`KEYS` `MATCH` pattern, and not to a pub/sub channel, so the
    * handful of places that need to construct a fully-qualified key by
    * hand (`RedisCacheStore.flush()`, `RedisBroadcastDriver`'s channel
    * name) need the real, effective value. Taking it from `client()
@@ -83,7 +83,7 @@ export class RedisConnection implements Connectable {
   /**
    * A brand-new client with the *same* options, tracked so `disconnect()`
    * tears it down too. Callers use this for the two modes a shared client
-   * can't be in — subscriber mode and blocking reads (see class docstring).
+   * can't be in, subscriber mode and blocking reads (see class docstring).
    */
   duplicate(): Redis {
     const client = this.primary.duplicate();
@@ -95,7 +95,7 @@ export class RedisConnection implements Connectable {
   async connect(): Promise<void> {
     // With `lazyConnect`, `connect()` resolves once the socket is ready
     // (or rejects on failure). A client that's already connecting/ready
-    // throws "Redis is already connecting/connected" — treat that as a
+    // throws "Redis is already connecting/connected", treat that as a
     // no-op so a double-`connect()` (e.g. two providers sharing one
     // connection) is harmless.
     await ignoreAlreadyConnected(this.primary.connect());
@@ -199,7 +199,7 @@ async function quit(client: Redis): Promise<void> {
       client.disconnect();
     }
   } catch {
-    // A best-effort shutdown must never throw — the process is going down
+    // A best-effort shutdown must never throw. The process is going down
     // regardless, and a failed quit shouldn't mask the real exit reason.
     client.disconnect();
   }

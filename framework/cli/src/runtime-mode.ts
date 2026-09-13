@@ -3,9 +3,9 @@ import path from "node:path";
 /**
  * How the CLI is being run.
  *
- * - `dev`  — from a checkout, through `./artisan` / `tsx bin/console.ts`.
+ * - `dev`, from a checkout, through `./artisan` / `tsx bin/console.ts`.
  *   The app's source tree is present and writable, `node_modules` exists.
- * - `user` — as a packaged/compiled executable on an end user's machine.
+ * - `user`, as a packaged/compiled executable on an end user's machine.
  *   There is no source tree, no `node_modules`, and no reason to believe the
  *   current directory has anything to do with the application.
  *
@@ -22,7 +22,7 @@ export type RuntimeMode = "dev" | "user";
  *
  * Detected from `argv[1]`, which such a binary reports as a path inside its
  * virtual filesystem root (`/$bunfs/...`; `B:\~BUN\...` on Windows) rather
- * than a real file. `process.execPath` is NOT usable for this — it is the
+ * than a real file. `process.execPath` is NOT usable for this. It is the
  * executable's own path in both the compiled and the plain `bun run` case.
  */
 export function isCompiledBinary(argv: readonly string[] = process.argv): boolean {
@@ -43,7 +43,7 @@ export function isCompiledBinary(argv: readonly string[] = process.argv): boolea
  * `MAHI_MODE` overrides everything, which is what makes the mode testable and
  * lets a packaged-but-not-compiled install (a `bin` script over bundled JS)
  * declare itself. Otherwise a compiled binary is `user` and anything else is
- * `dev` — the safe default, since being wrong in that direction only shows
+ * `dev`, the safe default, since being wrong in that direction only shows
  * commands that would have worked anyway.
  */
 export function resolveRuntimeMode(
@@ -64,7 +64,7 @@ export function resolveRuntimeMode(
  *
  * Laravel has it easy here: `artisan` is always `artisan`. A Mahi app is run as
  * `./artisan` in development and as whatever the user named the binary once it
- * ships, so a hardcoded name is wrong in one of the two modes — and the name
+ * ships, so a hardcoded name is wrong in one of the two modes, and the name
  * matters. It is what appears in `Usage:` and in Commander's "unknown
  * command" output, i.e. exactly the text a confused user will retype.
  *

@@ -31,7 +31,7 @@ describe("ConfigRepository", () => {
     expect(config.has("a.c")).toBe(false);
   });
 
-  it("all() returns an immutable clone — mutating it doesn't affect the repository", () => {
+  it("all() returns an immutable clone, mutating it doesn't affect the repository", () => {
     const config = new ConfigRepository();
     config.set("app.name", "mahi");
 
@@ -41,7 +41,7 @@ describe("ConfigRepository", () => {
     expect(config.get("app.name")).toBe("mahi");
   });
 
-  it("get() returns a clone of object values — mutation doesn't leak back", () => {
+  it("get() returns a clone of object values. Mutation doesn't leak back", () => {
     const config = new ConfigRepository();
     config.set("app", { list: [1, 2] });
 

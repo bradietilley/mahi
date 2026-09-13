@@ -29,13 +29,13 @@ function parseSetCookie(line: string): { name: string; value: string } | undefin
  * Thin convenience wrapper around a raw `request()` function (as returned
  * by `createTestApplication()`) that cuts down on repeated
  * `JSON.stringify`/`headers: {"Content-Type": ...}` boilerplate per test.
- * Deliberately a plain class, not a vitest-specific base class — compose
+ * Deliberately a plain class, not a vitest-specific base class, compose
  * it from `beforeAll`/`afterAll` like any other test fixture.
  *
  * Holds a **cookie jar** and a set of **default headers** so a session
  * cookie set by one request (login) is replayed on the next (`GET /me`),
  * and an `Authorization`/`actingAs` header set once applies to every
- * request — the behaviours session/token-guard tests need through the
+ * request, the behaviours session/token-guard tests need through the
  * kernel. Both are mutable builder state; each `with*` method returns
  * `this` for chaining and mutates in place.
  */
@@ -47,7 +47,7 @@ export class TestClient {
 
   /**
    * Send an `Authorization: Bearer <token>` header on every subsequent
-   * request — for token-guard (`Bearer`) authentication. Pair with
+   * request, for token-guard (`Bearer`) authentication. Pair with
    * `TokenGuard.createToken()` to get a plaintext token.
    */
   withToken(token: string, type = "Bearer"): this {
@@ -76,7 +76,7 @@ export class TestClient {
     return this.cookies.get(name);
   }
 
-  /** Drop all default headers and cookies — reset between logical sessions. */
+  /** Drop all default headers and cookies, reset between logical sessions. */
   flush(): this {
     this.cookies.clear();
     this.defaultHeaders = new Headers();

@@ -205,7 +205,7 @@ describe("Morph-aware query methods", () => {
       ).toEqual(["cv"]);
     });
 
-    it("emits no subquery — both columns are on this table", async () => {
+    it("emits no subquery. Both columns are on this table", async () => {
       const post = await Post.findOrFail("p1");
       const sql = Comment.query().whereMorphedTo("commentable", post).toSql().toLowerCase();
 
@@ -218,7 +218,7 @@ describe("Morph-aware query methods", () => {
       Relation.morphMap({ article: () => Post });
       const post = await Post.findOrFail("p1");
 
-      // The map now says Post is "article", but the rows store "post" —
+      // The map now says Post is "article", but the rows store "post",
       // so nothing matches. Proves the alias is read, not hardcoded.
       expect((await Comment.query().whereMorphedTo("commentable", post).get()).isEmpty()).toBe(
         true,
@@ -374,7 +374,7 @@ describe("Morph-aware query methods", () => {
     });
 
     it("works when the target is the queried table itself", async () => {
-      // A comment on a comment — the self-referential case the __sub
+      // A comment on a comment, the self-referential case the __sub
       // alias exists for. Comment has no morphName, so its alias falls
       // through to the table name; store exactly that.
       await Comment.create({

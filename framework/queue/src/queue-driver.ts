@@ -1,7 +1,7 @@
 import type { JobState } from "./job-serialization.js";
 
 /**
- * One link of a job chain — a job to dispatch (by registered name) with
+ * One link of a job chain, a job to dispatch (by registered name) with
  * its persisted `state` (the serialized job-instance fields), once the job
  * it's chained behind succeeds. A chain is just an ordered array of these.
  */
@@ -13,7 +13,7 @@ export interface ChainedJob {
 export interface QueuedJob {
   id: string;
   jobClass: string;
-  /** The serialized job-instance fields — rebuilt into a live job via `decodeJob()`. */
+  /** The serialized job-instance fields, rebuilt into a live job via `decodeJob()`. */
   state: JobState;
   /**
    * How many times this job has been attempted, **including the attempt
@@ -22,7 +22,7 @@ export interface QueuedJob {
    * the job burned an attempt). See `QueueDriver.pop()`.
    */
   attempts: number;
-  /** The named queue this job was popped from — carried so a release/fail puts it back on the same one. */
+  /** The named queue this job was popped from, carried so a release/fail puts it back on the same one. */
   queue?: string;
   /**
    * Remaining jobs to dispatch, in order, once this job succeeds. The
@@ -56,8 +56,8 @@ export interface QueueDriver {
    * Reserve the next due job on `queue` (the driver's default when
    * omitted), or `undefined` when there is nothing to do.
    *
-   * Reserving is exclusive — two concurrent `pop()`s never return the
-   * same job — but **not permanent**: a durable driver reclaims a job
+   * Reserving is exclusive, two concurrent `pop()`s never return the
+   * same job, but **not permanent**: a durable driver reclaims a job
    * whose worker stopped responding after that connection's
    * `retryAfterSeconds`, returning it with `attempts` incremented. That
    * is what makes a `kill -9` recoverable, and it is also why delivery is
@@ -65,33 +65,33 @@ export interface QueueDriver {
    * twice. Write `handle()` to be idempotent.
    */
   pop(queue?: string): Promise<QueuedJob | undefined>;
-  /** Retry later — used when a job throws but hasn't exhausted maxAttempts. */
+  /** Retry later, used when a job throws but hasn't exhausted maxAttempts. */
   release(job: QueuedJob, delaySeconds?: number): Promise<void>;
-  /** Success — remove the job permanently. */
+  /** Success, remove the job permanently. */
   delete(job: QueuedJob): Promise<void>;
-  /** Exhausted maxAttempts — move to failed_jobs (or equivalent). */
+  /** Exhausted maxAttempts, move to failed_jobs (or equivalent). */
   fail(job: QueuedJob, error: Error): Promise<void>;
   /**
-   * Optional — push once the enclosing database transaction commits, or
+   * Optional, push once the enclosing database transaction commits, or
    * immediately when there is none. What `Bus.dispatch(job, { afterCommit:
    * true })` calls; drivers without a transaction to observe simply omit
    * it and the dispatch happens immediately.
    */
   pushAfterCommit?(jobClass: string, state: JobState, options?: PushOptions): Promise<void>;
-  /** Optional — how many jobs are pending on a queue. Backs monitoring and `queue:clear`'s report. */
+  /** Optional, how many jobs are pending on a queue. Backs monitoring and `queue:clear`'s report. */
   size?(queue?: string): Promise<number>;
-  /** Optional — delete every pending job on a queue without running it (`queue:clear`). Returns the count. */
+  /** Optional, delete every pending job on a queue without running it (`queue:clear`). Returns the count. */
   clear?(queue?: string): Promise<number>;
 }
 
-/** Narrowing guard — whether a resolved driver can defer a push until commit. */
+/** Narrowing guard, whether a resolved driver can defer a push until commit. */
 export function supportsAfterCommit(
   driver: QueueDriver,
 ): driver is QueueDriver & Required<Pick<QueueDriver, "pushAfterCommit">> {
   return typeof driver.pushAfterCommit === "function";
 }
 
-/** Narrowing guard — whether a resolved driver holds pending jobs that can be counted/cleared. */
+/** Narrowing guard, whether a resolved driver holds pending jobs that can be counted/cleared. */
 export function supportsClearing(
   driver: QueueDriver,
 ): driver is QueueDriver & Required<Pick<QueueDriver, "size" | "clear">> {

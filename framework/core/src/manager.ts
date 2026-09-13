@@ -3,17 +3,17 @@
  *
  * A Manager resolves named "drivers" lazily and caches each resolved driver
  * independently. There is a *default* driver (see `getDefaultDriver()`), not
- * a single *only* driver — multiple drivers can be resolved and live
+ * a single *only* driver, multiple drivers can be resolved and live
  * simultaneously (e.g. the default sqlite connection plus an explicitly
  * named analytics connection).
  *
- * Driver registration is always explicit via `extend()` — there is no
+ * Driver registration is always explicit via `extend()`. There is no
  * `create{Name}Driver` string-to-method dispatch magic. Subclasses register
  * their built-in drivers via `extend()` just like a third-party plugin
  * would register its own.
  *
  * Driver resolution is always synchronous. Constructing a driver handle is
- * assumed to be cheap (e.g. `new Kysely({ dialect })`, `new pg.Pool(cfg)`) —
+ * assumed to be cheap (e.g. `new Kysely({ dialect })`, `new pg.Pool(cfg)`),
  * actual I/O happens lazily per-call regardless of driver. Drivers that
  * genuinely need an async warm-up implement the optional `Connectable`
  * interface and are connected explicitly by their owning ServiceProvider's
@@ -39,7 +39,7 @@ export class DriverNotRegisteredError extends Error {
 /**
  * Optional contract for drivers that need an async warm-up before use
  * (e.g. a Postgres pool that pings the DB, an OAuth handshake for a model
- * provider). `Manager.driver()` itself is always synchronous — a driver's
+ * provider). `Manager.driver()` itself is always synchronous, a driver's
  * owning ServiceProvider is responsible for calling `connect()` explicitly
  * during its own (already async-capable) `boot()`.
  */
@@ -63,7 +63,7 @@ export function isConnectable(value: unknown): value is Connectable {
  * The two halves are genuinely independent: `SqliteDriver` has nothing to
  * warm up (better-sqlite3 connects synchronously in its constructor) but
  * very much has a file handle to close. Requiring a no-op `connect()`
- * from it just to be disconnectable would be ceremony — and would make
+ * from it just to be disconnectable would be ceremony. And would make
  * `DatabaseServiceProvider.boot()` "connect" it for no reason.
  */
 export function isDisconnectable(value: unknown): value is Pick<Connectable, "disconnect"> {
@@ -104,7 +104,7 @@ export abstract class Manager<TDriver = unknown> {
 
   /**
    * Resolve (and cache) a driver by name, or the default driver if no name
-   * is given. Always synchronous — see module doc above.
+   * is given. Always synchronous. See module doc above.
    */
   driver(name?: string): TDriver {
     const key = name ?? this.getDefaultDriver();
@@ -163,7 +163,7 @@ export abstract class Manager<TDriver = unknown> {
    *
    * Best-effort by design (shutdown is): every driver is attempted even
    * if an earlier one rejects, and the rejections are collected and
-   * returned rather than thrown — one unreachable Redis must not leave a
+   * returned rather than thrown, one unreachable Redis must not leave a
    * MySQL pool open and hang the process. Callers that care (a
    * provider's `shutdown()`) log what comes back.
    */

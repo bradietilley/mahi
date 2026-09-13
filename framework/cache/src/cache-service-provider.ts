@@ -37,19 +37,19 @@ interface ArrayCacheStoreConfig {
 
 /**
  * Registers the CacheManager singleton with the two built-in stores
- * ("array", "file") pre-registered via `extend()` — same mechanism a
+ * ("array", "file") pre-registered via `extend()`, same mechanism a
  * plugin would use to add e.g. a "redis" store later. No `boot()` needed:
  * neither built-in store needs an async warm-up, same as `SqliteDriver`.
  *
- * `shutdown()` is a different matter — `ArrayCacheStore` runs a periodic
+ * `shutdown()` is a different matter. `ArrayCacheStore` runs a periodic
  * sweep timer, and a resolved store must be given the chance to stop it.
  *
  * Also registers the `RateLimiter` singleton, backed by the app's default
- * cache store — matches Laravel's own `Illuminate\Cache\
+ * cache store, matches Laravel's own `Illuminate\Cache\
  * CacheServiceProvider`, which binds `RateLimiter::class` here rather
  * than in a separate provider (rate limiting is cache: counters with
  * TTLs). `@mahiframework/http`'s `throttle()` resolves this singleton via
- * `app().make(RATE_LIMITER_TOKEN)` — register `CacheServiceProvider`
+ * `app().make(RATE_LIMITER_TOKEN)`, register `CacheServiceProvider`
  * before `HttpServiceProvider` in `config/app.ts`'s `providers[]`.
  */
 export class CacheServiceProvider extends ServiceProvider {
@@ -67,7 +67,7 @@ export class CacheServiceProvider extends ServiceProvider {
       manager.extend("file", () => {
         const fileConfig = (manager.storeConfig("file") ?? {}) as FileCacheStoreConfig;
 
-        // A **directory** — `FileCacheStore` keeps one file per key. The
+        // A **directory**. `FileCacheStore` keeps one file per key. The
         // default is resolved here rather than being required in config
         // so an app that scaffolded before the layout change, or one that
         // omits the block entirely, still gets a working store.
@@ -94,7 +94,7 @@ export class CacheServiceProvider extends ServiceProvider {
    * `isResolved` rather than `has`: on a shutdown following a failed
    * boot, `make()`ing the manager would construct a store purely to close
    * it. `disconnectAll()` then skips any store without a `disconnect()`,
-   * so this is a no-op for every store but the array one — whose sweep
+   * so this is a no-op for every store but the array one, whose sweep
    * timer is `unref()`ed and therefore can't hang a process, but would
    * otherwise accumulate one live timer per `Application` built in a long
    * test run.

@@ -20,7 +20,7 @@ import { Session } from "../../src/models/session.js";
  * real tokens."
  *
  * Worth its own file because the failure mode was entirely in the
- * wiring — `PasswordBroker` simply never asked anything to revoke, and no
+ * wiring, `PasswordBroker` simply never asked anything to revoke, and no
  * unit test of the broker in isolation could have noticed.
  */
 describe("password reset revokes credentials (wired through AuthManager)", () => {

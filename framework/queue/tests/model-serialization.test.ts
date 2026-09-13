@@ -213,7 +213,7 @@ describe("end-to-end via SyncQueueDriver", () => {
 
   it("skips the job (no handle, no throw) when a deleteWhenMissingModels model is gone", async () => {
     const { manager, received } = wireQueue();
-    // A job field holding a raw reference to a Ghost that was never inserted —
+    // A job field holding a raw reference to a Ghost that was never inserted,
     // encodeModels passes the reference through untouched, decode looks it up.
     const job = new RecordJob({ ghost: { __model: "Ghost", __id: "nope" } });
 

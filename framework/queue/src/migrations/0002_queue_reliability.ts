@@ -4,15 +4,15 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
  * Brings the `jobs`/`failed_jobs` tables up to what a crash-safe,
  * multi-worker queue needs. A separate migration rather than an edit to
  * `0001_create_jobs_table` because that name is already recorded in every
- * existing app's `migrations` table — editing it would change nothing on
+ * existing app's `migrations` table, editing it would change nothing on
  * any database that has run it.
  *
- * **`jobs.queue`** — named queues. One table, many logical queues, so
+ * **`jobs.queue`**, named queues. One table, many logical queues, so
  * `queue:work --queue emails` drains only what it should instead of
  * every worker fighting over one list. Defaults to `"default"`, which is
  * exactly what pre-existing rows should be treated as.
  *
- * **`jobs (queue, available_at, id)`** — the index `pop()` lives on, and
+ * **`jobs (queue, available_at, id)`**, the index `pop()` lives on, and
  * its column order matters twice over.
  *
  * It keeps the hottest query in the system (every poll of every worker)
@@ -30,15 +30,15 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
  * can range-scan anyway, and putting it ahead of `available_at` is what
  * forced the filesort in the first place.
  *
- * **`failed_jobs.connection` / `.queue`** — where the job came from, so
+ * **`failed_jobs.connection` / `.queue`**, where the job came from, so
  * `queue:retry` puts it back there instead of onto the default queue of
  * the default connection.
  *
- * **`failed_jobs.chain_json`** — the chain the job was carrying. Without
+ * **`failed_jobs.chain_json`**, the chain the job was carrying. Without
  * it a retried job runs alone and every link queued behind it is silently
  * dropped, which is the kind of bug you find in production a week later.
  *
- * **`failed_jobs (failed_at)`** — `queue:failed` orders by it and
+ * **`failed_jobs (failed_at)`**, `queue:failed` orders by it and
  * `queue:flush --hours` prunes by it.
  */
 const migration: Migration = {

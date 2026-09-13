@@ -7,7 +7,7 @@ interface RecordedEvent {
   event: AbstractEvent;
   /**
    * Whether this dispatch would have been deferred until the enclosing
-   * transaction commits — i.e. it was marked (or explicitly dispatched)
+   * transaction commits, i.e. it was marked (or explicitly dispatched)
    * after-commit AND a transaction was actually open. A fake records at
    * the point `dispatch()` is *called* (it doesn't really defer), so this
    * captures the intent for `assertDispatchedAfterCommit()`.
@@ -19,7 +19,7 @@ interface RecordedEvent {
  * The event equivalent of Laravel's `Event::fake()`.
  *
  * A drop-in `EventDispatcher` subclass that **records** every `dispatch()`
- * call and then **suppresses** all real work — no `listen()` listeners run,
+ * call and then **suppresses** all real work, no `listen()` listeners run,
  * no `listenQueued()` jobs are enqueued, no `afterDispatch()` callbacks
  * (broadcasting, auditing, ...) fire. This is the crucial difference from
  * `Event.suppress()`, which *also* stops listeners but records nothing:
@@ -37,7 +37,7 @@ interface RecordedEvent {
  *
  * `registrations`/`afterCallbacks` are still recorded normally via the
  * inherited `listen()`/`afterDispatch()` (so provider boot wiring doesn't
- * throw) — they simply never *run*, exactly like `Event::fake()`.
+ * throw). They simply never *run*, exactly like `Event::fake()`.
  *
  * Assertions throw a plain `Error` on failure rather than using a vitest
  * matcher, keeping this package free of any test-runner dependency.
@@ -52,11 +52,11 @@ export class RecordingEventDispatcher extends EventDispatcher {
   /**
    * Record the event and return without running any listener, queued
    * listener, or afterDispatch callback. Events whose name matches an
-   * active `Event.suppress()` pattern are neither recorded nor run — this
+   * active `Event.suppress()` pattern are neither recorded nor run. This
    * keeps `suppress()` meaning "as if never dispatched" even under a fake.
    *
    * An event marked `static shouldDispatchAfterCommit` is recorded as
-   * after-commit *when a transaction is open* — matching how it would
+   * after-commit *when a transaction is open*, matching how it would
    * actually behave (deferred inside a transaction, immediate outside).
    */
   override async dispatch<E extends AbstractEvent>(event: E): Promise<void> {
@@ -68,7 +68,7 @@ export class RecordingEventDispatcher extends EventDispatcher {
   }
 
   /**
-   * Record `event` as an explicit after-commit dispatch — the fake
+   * Record `event` as an explicit after-commit dispatch, the fake
    * counterpart of `EventDispatcher.dispatchAfterCommit()`. Marked
    * after-commit only when a transaction is actually open.
    */
@@ -169,7 +169,7 @@ export class RecordingEventDispatcher extends EventDispatcher {
   }
 
   /**
-   * Assert an event of `eventClass` was dispatched **after commit** — i.e.
+   * Assert an event of `eventClass` was dispatched **after commit**, i.e.
    * marked `static shouldDispatchAfterCommit` (or dispatched via
    * `dispatchAfterCommit()`) while a transaction was open. Throws on
    * failure.
@@ -206,7 +206,7 @@ export class RecordingEventDispatcher extends EventDispatcher {
     }
   }
 
-  /** Discard all recorded events — handy from a `beforeEach()` for per-test isolation. */
+  /** Discard all recorded events, handy from a `beforeEach()` for per-test isolation. */
   reset(): void {
     this.recorded = [];
   }

@@ -106,7 +106,7 @@ function parseOffset(offset: string): number | null {
 /**
  * Format-directed parsing using `date-fns` tokens.
  *
- * `referenceCivilMs` supplies any field the pattern doesn't mention — parsing
+ * `referenceCivilMs` supplies any field the pattern doesn't mention, parsing
  * `"14:30"` with `"HH:mm"` needs a date from somewhere.
  *
  * In strict mode the parsed result is re-formatted with the same pattern and

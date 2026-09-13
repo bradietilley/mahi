@@ -124,7 +124,7 @@ describe("QueryBuilder", () => {
     expect(rows.map((r) => r.name)).toEqual(["Cog"]);
   });
 
-  it("whereIn() accepts a Subquery callback in place of a value list — same overload real Laravel uses", async () => {
+  it("whereIn() accepts a Subquery callback in place of a value list, same overload real Laravel uses", async () => {
     await kysely.schema
       .createTable("featured")
       .addColumn("widget_id", "text", (col) => col.notNull())
@@ -233,7 +233,7 @@ describe("QueryBuilder", () => {
       "widget_id",
     );
     const withFeature = await query().whereExists(hasFeatured).get();
-    expect(withFeature.length).toBe(3); // uncorrelated — matches every row since "featured" has at least one row
+    expect(withFeature.length).toBe(3); // uncorrelated, matches every row since "featured" has at least one row
   });
 
   it("whereIn()/whereExists() accept a raw Expression as the subquery value, correctly parenthesized", async () => {
@@ -246,7 +246,7 @@ describe("QueryBuilder", () => {
     const withMatch = await query()
       .whereExists(Expression.raw("select 1 from widgets where price > ?", [15]))
       .get();
-    expect(withMatch.length).toBe(3); // uncorrelated — matches every row since at least one widget has price > 15
+    expect(withMatch.length).toBe(3); // uncorrelated, matches every row since at least one widget has price > 15
   });
 
   it("whereRaw()/orWhereRaw() accept a raw SQL fragment with positional bindings", async () => {
@@ -508,7 +508,7 @@ describe("QueryBuilder", () => {
   });
 
   it("lock()/lockForUpdate()/sharedLock() track intent but are a documented no-op on SQLite", async () => {
-    // Must not throw — SQLite's dialect errors if FOR UPDATE/SHARE is
+    // Must not throw, SQLite's dialect errors if FOR UPDATE/SHARE is
     // actually compiled into the query, so these are no-ops by design.
     const rows = await query().where("active", 1).lockForUpdate().get();
     expect(rows).toHaveLength(2);
@@ -660,7 +660,7 @@ describe("QueryBuilder", () => {
 
   describe("first()", () => {
     it("compiles with limit 1 rather than fetching the whole result set", async () => {
-      // Kysely's executeTakeFirst() is `const [row] = await execute()` —
+      // Kysely's executeTakeFirst() is `const [row] = await execute()`,
       // without an explicit limit the database ships every matching row.
       const executor = (kysely as any).getExecutor();
       const original = executor.executeQuery.bind(executor);

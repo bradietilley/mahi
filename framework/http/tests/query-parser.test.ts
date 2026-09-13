@@ -13,7 +13,7 @@ describe("parseNestedQuery()", () => {
 
   it("expands [] into a real array", () => {
     // The headline case: without this, `ids` is the single string-keyed
-    // entry `{"ids[]": "1"}` — so an `array()` validation rule on a query
+    // entry `{"ids[]": "1"}`, so an `array()` validation rule on a query
     // field could never pass, and the second value was silently dropped.
     expect(parseNestedQuery("ids[]=1&ids[]=2")).toEqual({ ids: ["1", "2"] });
   });
@@ -43,7 +43,7 @@ describe("parseNestedQuery()", () => {
     expect(parseNestedQuery("a=1&a=2")).toEqual({ a: "2" });
   });
 
-  it("leaves values as strings — coercion is the validator's job", () => {
+  it("leaves values as strings. Coercion is the validator's job", () => {
     // Coercing here would turn a zip code of "01234" into 1234.
     expect(parseNestedQuery("n=007")).toEqual({ n: "007" });
   });

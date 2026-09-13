@@ -16,7 +16,7 @@ import type { Dialect } from "./schema/dialect.js";
  *
  * Since the migrations table stamps `migrated_at` the same way every
  * model stamps `created_at`, that made `migrate` unable to record a
- * single migration on MySQL — the framework could not bootstrap a
+ * single migration on MySQL. The framework could not bootstrap a
  * schema there at all.
  *
  * So MySQL gets the space-separated form it does accept
@@ -25,9 +25,9 @@ import type { Dialect } from "./schema/dialect.js";
  * given (and existing rows are already ISO), and Postgres parses the
  * `Z` correctly into both `timestamp` and `timestamptz`.
  *
- * Both forms are read back the same way — the Postgres driver
+ * Both forms are read back the same way, the Postgres driver
  * normalises its date/time text to ISO, MySQL's returns the
- * space-separated form, and `DateTime.fromISO()` accepts either — so
+ * space-separated form, and `DateTime.fromISO()` accepts either, so
  * the difference does not leak past the driver boundary.
  *
  * Sub-second precision is included because a `timestamp(3)`/
@@ -44,7 +44,7 @@ export function formatTimestamp(dialect: Dialect, now: DateTime = DateTime.now("
 }
 
 /**
- * `formatTimestamp()` for the engine behind `db` — the form every
+ * `formatTimestamp()` for the engine behind `db`, the form every
  * timestamp-stamping call site uses, since they hold a connection
  * rather than a dialect.
  */
@@ -53,7 +53,7 @@ export function currentTimestampFor(db: Kysely<any>, now?: DateTime): string {
 }
 
 /**
- * A full ISO-8601 datetime carrying a zone — `2026-09-02T07:31:37.499Z`
+ * A full ISO-8601 datetime carrying a zone, `2026-09-02T07:31:37.499Z`
  * or `...+08:00`. Deliberately strict: a bare date, a time, or anything
  * with trailing text does not match, so only values that are
  * unambiguously an instant are rewritten.
@@ -104,7 +104,7 @@ export function toDriverTimestamp(dialect: Dialect, value: unknown): unknown {
 
 /**
  * `values` with every column `modelClass` casts as a datetime rewritten
- * into `dialect`'s accepted spelling — see `toDriverTimestamp()`.
+ * into `dialect`'s accepted spelling. See `toDriverTimestamp()`.
  *
  * Returns the original object when nothing needs changing (every
  * dialect but MySQL, or a model with no datetime casts), so the common

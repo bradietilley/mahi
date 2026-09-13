@@ -24,7 +24,7 @@ import { STORAGE_TOKEN, StorageManager, FakeStorageDriver } from "@mahiframework
 
 /**
  * Snapshot the given `process.env` keys and return a function that puts
- * them back exactly as they were — including deleting a key that was
+ * them back exactly as they were, including deleting a key that was
  * previously unset, which `env[key] = undefined` does not do (it sets the
  * literal string `"undefined"`).
  */
@@ -45,7 +45,7 @@ function captureEnv(keys: string[]): () => void {
 export interface TestApplicationOptions {
   /**
    * Called with the booted Application, after `bootstrapFn()` resolves but
-   * before migrations run — for extra `app.config.set`/`merge` calls or
+   * before migrations run, for extra `app.config.set`/`merge` calls or
    * test-only overrides that don't belong in the app's own bootstrap.
    * Note `bootstrapFn` itself is responsible for calling `app.bootstrap()`
    * (see the app's `bin/bootstrap.ts`), so this hook necessarily runs after
@@ -80,8 +80,8 @@ export interface TestApplicationOptions {
    * on `cleanup()`.
    *
    * Unlike `fakeQueue`/`fakeEvents` this needs no container swap and no
-   * provider to be registered — `Http` is a static facade over
-   * module-level state — so there is no `testApp.http`: assert with the
+   * provider to be registered, `Http` is a static facade over
+   * module-level state, so there is no `testApp.http`: assert with the
    * statics (`Http.assertSent(...)`) instead.
    *
    * Note the stub map is empty, and an unmatched request raises
@@ -100,7 +100,7 @@ export interface TestApplicationOptions {
    * assert with the statics (`Process.assertRan(...)`).
    *
    * The stub map starts empty. An unmatched command returns a successful
-   * empty result rather than throwing — `Process.fake()`'s own default,
+   * empty result rather than throwing. `Process.fake()`'s own default,
    * left alone here so the behaviour does not depend on who turned it on.
    * Call `Process.fake({ "git *": ... })` in the test to stub specifics.
    *
@@ -153,45 +153,45 @@ export interface TestApplication {
   cleanup: () => Promise<void>;
   /**
    * Re-run every migration from scratch against the same temp DB
-   * (`migrate:fresh` — drops all tables, re-migrates), wiping all rows
+   * (`migrate:fresh`, drops all tables, re-migrates), wiping all rows
    * without re-creating the temp file. Call from `beforeEach()` in test
    * files that want per-`it()` isolation rather than the shared-DB-per-file
    * default. Fast (better-sqlite3 is synchronous, no network round-trip),
-   * but not free — most files are fine relying on the shared-DB default
+   * but not free. Most files are fine relying on the shared-DB default
    * and creating fresh fixtures per test.
    */
   resetDatabase: () => Promise<void>;
   /**
-   * The `FakeQueueDriver` installed when `options.fakeQueue` was set —
+   * The `FakeQueueDriver` installed when `options.fakeQueue` was set,
    * `undefined` otherwise. Assert with `testApp.queue!.assertPushed(...)`.
    */
   queue?: FakeQueueDriver;
   /**
    * The `RecordingEventDispatcher` installed when `options.fakeEvents` was
-   * set — `undefined` otherwise. Assert with
+   * set, `undefined` otherwise. Assert with
    * `testApp.events!.assertDispatched(...)`.
    */
   events?: RecordingEventDispatcher;
   /**
-   * The `RecordingMailManager` installed when `options.fakeMail` was set —
+   * The `RecordingMailManager` installed when `options.fakeMail` was set,
    * `undefined` otherwise. Assert with `testApp.mail!.assertSent(...)`.
    */
   mail?: RecordingMailManager;
   /**
    * The `RecordingChannelManager` installed when `options.fakeNotifications`
-   * was set — `undefined` otherwise. Assert with
+   * was set, `undefined` otherwise. Assert with
    * `testApp.notifications!.assertSentTo(...)`.
    */
   notifications?: RecordingChannelManager;
   /**
    * The `FakeStorageDriver`s installed when `options.fakeStorage` was set,
-   * keyed by disk name — empty otherwise. Assert with
+   * keyed by disk name, empty otherwise. Assert with
    * `testApp.storage.public!.assertExists("avatars/1.png")`.
    */
   storage: Record<string, FakeStorageDriver>;
   /**
    * Set the acting (authenticated) user for requests driven through the
-   * kernel — Laravel's `actingAs()`. Delegates to `AuthManager.actingAs()`,
+   * kernel, Laravel's `actingAs()`. Delegates to `AuthManager.actingAs()`,
    * so `authenticate()` resolves `user` for every subsequent request. Pass
    * `null` to clear. Requires `@mahiframework/auth`'s provider to be registered.
    */
@@ -201,11 +201,11 @@ export interface TestApplication {
 /**
  * Boots a real `Application` against a temp sqlite file, runs migrations,
  * and returns an in-process `request()` function backed by the app's own
- * Hono instance — the setup every app's test suite would otherwise
+ * Hono instance, the setup every app's test suite would otherwise
  * hand-roll, extracted once.
  *
  * Takes the app's own `bootstrapFn` (e.g. the app's `bin/bootstrap.ts`
- * `bootstrap`) as a parameter rather than importing it directly — this
+ * `bootstrap`) as a parameter rather than importing it directly. This
  * package can't depend on any specific app, so it stays a generic helper
  * any app supplies its own bootstrap function to.
  *
@@ -219,7 +219,7 @@ export interface TestApplication {
  *
  * Pass `{ fakeQueue: true }` / `{ fakeEvents: true }` to swap in the
  * recording queue driver / event dispatcher (the `Queue::fake()` /
- * `Event::fake()` equivalents) — the installed fake is returned as
+ * `Event::fake()` equivalents). The installed fake is returned as
  * `testApp.queue` / `testApp.events` to assert against. `{ fakeHttp: true }`
  * fakes outbound HTTP, asserted through the `Http` statics rather than a
  * property on the returned object.
@@ -234,7 +234,7 @@ export async function createTestApplication(
   // process-global and outlives the Application, so a test file that
   // points `DB_FILENAME` at its own temp database would otherwise leave
   // it pointing there for every file that runs afterwards in the same
-  // worker — at a path `cleanup()` has already deleted.
+  // worker, at a path `cleanup()` has already deleted.
   const restoreEnv = captureEnv(["DB_FILENAME", "NODE_ENV", "APP_KEY"]);
 
   process.env.DB_FILENAME = path.join(tmpDir, "test.sqlite");
@@ -254,7 +254,7 @@ export async function createTestApplication(
   if (options.fakeQueue && app.has(QUEUE_TOKEN)) {
     // Hand the driver the app's JobRegistry so tests can assert by job
     // CLASS (`assertPushed(LogPostCreatedJob)`) rather than only by the
-    // registered name string — see FakeQueueDriver's `JobIdentifier`.
+    // registered name string. See FakeQueueDriver's `JobIdentifier`.
     queue = new FakeQueueDriver(app.make<JobRegistry>(JOB_REGISTRY_TOKEN));
     app.make<QueueManager>(QUEUE_TOKEN).swap(queue);
   }
@@ -266,7 +266,7 @@ export async function createTestApplication(
     // Replace the container singleton so every fresh `make(EVENTS_TOKEN)`
     // (Model lifecycle events, the Events facade, etc.) resolves the
     // recorder. Listener wiring already ran during boot against the real
-    // dispatcher; that's fine — a fake runs no listeners anyway.
+    // dispatcher; that's fine. A fake runs no listeners anyway.
     app.instance(EVENTS_TOKEN, events);
   }
 
@@ -306,7 +306,7 @@ export async function createTestApplication(
   }
 
   if (options.fakeCache && app.has(CACHE_TOKEN)) {
-    // A fresh in-memory store with the sweep timer OFF — no interval to
+    // A fresh in-memory store with the sweep timer OFF. No interval to
     // keep the event loop alive after the test, and full per-test
     // isolation.
     app.make<CacheManager>(CACHE_TOKEN).swap(new ArrayCacheStore({ sweepIntervalSeconds: 0 }));

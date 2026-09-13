@@ -2,7 +2,7 @@ import { Command } from "@mahiframework/cli";
 import { signalRestart } from "../restart-signal.js";
 
 /**
- * `queue:restart` — tell every running worker to stop after its current
+ * `queue:restart`, tell every running worker to stop after its current
  * job, so a supervisor can start replacements running the new code.
  *
  * Workers load their job classes once at boot, so a deploy leaves them
@@ -11,7 +11,7 @@ import { signalRestart } from "../restart-signal.js";
  * interrupted and nothing is left reserved.
  *
  * Needs a cache store shared by the workers (Redis in a multi-host
- * deployment) — with the per-process array store nothing else can see the
+ * deployment), with the per-process array store nothing else can see the
  * signal, and this command says so rather than reporting a false success.
  */
 export class QueueRestartCommand extends Command {

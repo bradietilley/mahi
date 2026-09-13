@@ -46,7 +46,7 @@ describe("Request.create()", () => {
     expect(request.input("extra")).toBe(true);
   });
 
-  it("ignores x-forwarded-for — ip() is the socket peer unless trustProxies() says otherwise", () => {
+  it("ignores x-forwarded-for, ip() is the socket peer unless trustProxies() says otherwise", () => {
     const request = Request.create(
       "/posts",
       "GET",
@@ -148,7 +148,7 @@ describe("Request.from()", () => {
     expect(await res.json()).toEqual({});
   });
 
-  it("does not throw on empty/invalid JSON — validation decides", async () => {
+  it("does not throw on empty/invalid JSON, validation decides", async () => {
     const hono = new Hono();
     hono.post("/x", async (c) => {
       const request = await Request.from(c);

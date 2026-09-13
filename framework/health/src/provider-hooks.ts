@@ -4,7 +4,7 @@ declare module "@mahiframework/core" {
   interface ProviderHooks {
     /**
      * Contribute readiness checks. Collected during
-     * `HealthServiceProvider.boot()`, which walks every provider — so a
+     * `HealthServiceProvider.boot()`, which walks every provider, so a
      * provider listed *after* `HealthServiceProvider` in
      * `config/app.ts` still has its checks collected.
      *

@@ -14,27 +14,27 @@ import type { Env } from "./env.js";
  * source tree isn't shipped at all, finds zero migrations and silently
  * migrates nothing against an empty production database.
  *
- * `import.meta.dirname` is where THIS file actually is — `config/` under
- * source (tsx), `dist/config/` once compiled — so `../database/migrations`
+ * `import.meta.dirname` is where THIS file actually is, `config/` under
+ * source (tsx), `dist/config/` once compiled, so `../database/migrations`
  * lands on the matching `.ts` in development and the compiled `.js` in
  * `dist/`, with no dependence on how the process was launched.
  */
 const migrationsPath = path.join(import.meta.dirname, "..", "database", "migrations");
 
 /**
- * SQLite by default — the file lives at `database/database.sqlite`
+ * SQLite by default. The file lives at `database/database.sqlite`
  * (`DB_FILENAME`), created on first connect. Switch engines by setting
  * `DB_CONNECTION` to `mysql` or `pgsql` and filling in the `DB_*` host
  * credentials.
  *
  * Each connection names its `driver` explicitly, so a connection can be
- * called whatever you like (`mysql`, `analytics`, `reporting`, ...) — the
+ * called whatever you like (`mysql`, `analytics`, `reporting`, ...), the
  * `driver` field, not the key, decides which engine builds it.
  *
  * `migrationsPath` is where `./artisan migrate` looks for *this app's*
  * migrations; the framework's own tables (personal access tokens,
  * sessions, jobs, notifications, ...) are contributed by their packages'
- * `migrations()` provider hooks and are picked up automatically — you
+ * `migrations()` provider hooks and are picked up automatically. You
  * don't list them here.
  */
 export function databaseConfig(env: Env): DatabaseConfig & { migrationsPath: string } {

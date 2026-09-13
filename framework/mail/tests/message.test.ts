@@ -62,7 +62,7 @@ describe("Mailable.header()", () => {
     expect(rendered.headers).toEqual({ "X-Priority": "5" });
   });
 
-  it("rejects CRLF in a header value — the classic injection sink", async () => {
+  it("rejects CRLF in a header value, the classic injection sink", async () => {
     const message = new Message()
       .to("a@example.com")
       .subject("x")

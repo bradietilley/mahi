@@ -3,7 +3,7 @@
 Routes map an HTTP method and path to a handler. In Mahi a handler is
 either a plain function taking a [`Request`](../requests/) or a
 [single-action controller class](../controllers/). There is no global
-`routes/web.php` equivalent — routes are registered from a service
+`routes/web.php` equivalent. Routes are registered from a service
 provider's `routes()` hook, so a feature's routes live beside the rest of
 it.
 
@@ -23,7 +23,7 @@ export class PostsServiceProvider extends ServiceProvider {
 `HttpServiceProvider.boot()` calls `HttpKernel.collectFromProviders()`,
 which walks every registered provider in `config/app.ts` order and calls
 its optional `routes(router)` hook. By the time `bin/server.ts` or
-`artisan serve` binds a port, every route is mounted — regardless of which
+`artisan serve` binds a port, every route is mounted, regardless of which
 entrypoint booted the application. That's also why `./artisan route:list`
 works from the console without starting a server.
 
@@ -79,7 +79,7 @@ router.get("/posts/:id", handler);
 ```
 
 This is deliberate. Mahi sits on Hono, whose native syntax is `:param`, so
-both forms would otherwise silently work — and you'd end up with two
+both forms would otherwise silently work, and you'd end up with two
 syntaxes in one codebase, only one of which the URL generator can
 substitute into. `RouteRegistry` stores paths in `{param}` form because
 that's the form `URL.route()` needs. Rather than accept both and quietly
@@ -111,13 +111,13 @@ chaining.
 | `router.delete(path, handler)` | `DELETE` |
 | `router.options(path, handler)` | `OPTIONS` |
 | `router.head(path, handler)` | `HEAD` |
-| `router.query(path, handler)` | `QUERY` — the draft HTTP method: a safe, idempotent, body-carrying `GET` |
+| `router.query(path, handler)` | `QUERY`: the draft HTTP method: a safe, idempotent, body-carrying `GET` |
 | `router.any(path, handler)` | All of the above |
 | `router.match(methods, path, handler)` | The methods you list (case-insensitive; uppercased internally) |
 
 `any()` is expanded to the explicit list `GET POST PUT PATCH DELETE OPTIONS
 HEAD QUERY` rather than using a Hono "all methods" primitive, because Hono's
-`ALL` entries don't report usefully through `hono.routes` — and
+`ALL` entries don't report usefully through `hono.routes`, and
 `route:list` reads that. The cost is eight registrations instead of one;
 the benefit is that `route:list` shows what actually answers.
 
@@ -150,7 +150,7 @@ router.group("/api", (api) => {
 
 ## Middleware
 
-Mahi middleware is an `HttpPipe` — a `@mahiframework/pipeline` `Pipe<Request,
+Mahi middleware is an `HttpPipe`, a `@mahiframework/pipeline` `Pipe<Request,
 ResponseInput>`:
 
 ```ts
@@ -164,7 +164,7 @@ const requestId: HttpPipe = async (request, next) => {
 };
 ```
 
-The passable is the framework `Request`, never Hono's `Context` — app and
+The passable is the framework `Request`, never Hono's `Context`, app and
 provider code never imports Hono. A pipe that returns without calling
 `next(request)` short-circuits the rest of the stack.
 
@@ -178,7 +178,7 @@ router.post("/posts", CreatePostController)
 ```
 
 Stored on the `PendingRoute` object and run at request time inside the
-route's own pipeline — not registered as extra Hono handlers. That's why
+route's own pipeline, not registered as extra Hono handlers. That's why
 `route:list` shows a middleware-bearing route once rather than once per
 pipe.
 
@@ -218,7 +218,7 @@ Same `use("*")` mechanism, scoped to a pattern. The path goes through
 
 ### Global
 
-Contributed from a provider's `middleware()` hook — see
+Contributed from a provider's `middleware()` hook. See
 [the global pipeline](#the-global-middleware-pipeline) below.
 
 ## Named routes
@@ -241,7 +241,7 @@ route names must be unique.
 ```
 
 Silently overwriting would make `URL.route("posts.show")` return whichever
-provider happened to boot last — a bug that only shows up in a generated
+provider happened to boot last, a bug that only shows up in a generated
 link. Failing at boot is louder and cheaper.
 
 ## The `Route` facade
@@ -327,7 +327,7 @@ this order:
    `REQUEST_ROOT_CONTEXT_KEY`. The generator reads it back. Because the
    overlay is opened per-request by the kernel's outermost pipe (see
    below), concurrent requests never see each other's host.
-2. **The `http.url` config value** (`APP_URL` in the generated app) — used
+2. **The `http.url` config value** (`APP_URL` in the generated app), used
    by queue jobs, scheduled tasks, and CLI commands, which have no request.
 3. **Throws.**
 
@@ -345,8 +345,8 @@ until a user clicks it. The error names both fixes.
 A signed URL is tamper-evident but not secret: `path?params&expires&signature`,
 where the signature is an HMAC over the path plus every query param except
 `signature` itself. It uses `@mahiframework/encryption`'s `Signer` (HMAC), not the
-`Encrypter` — the payload doesn't need to stay hidden, only to be
-unforgeable, and `Signer.verify()` gives key rotation for free. This is the
+`Encrypter`. The payload doesn't need to stay hidden, only to be
+unforgeable, and `Signer.verify()` handles key rotation. This is the
 machinery behind email verification, password reset, and one-click
 unsubscribe links.
 
@@ -381,7 +381,7 @@ verifies.
 **Omitting `expiresInSeconds` produces a non-expiring signature.** No
 `expires` param is added and no expiry is checked. That's the right default
 for something like a permanent unsubscribe link, and the wrong one for a
-password reset — be deliberate.
+password reset, be deliberate.
 
 `signature` and `expires` are reserved. Passing either as a route param to
 `signedRoute()` throws:
@@ -392,7 +392,7 @@ password reset — be deliberate.
 
 `signedRoute()` always signs the **relative** path, even when returning an
 absolute URL, because `hasValidSignature()` rebuilds the payload from
-`request.path()` — which is never absolute. Signing the absolute form would
+`request.path()`. Which is never absolute. Signing the absolute form would
 make every link fail verification behind a proxy that rewrites the host.
 
 ## The global middleware pipeline
@@ -402,7 +402,7 @@ installed as a single Hono `use("*")` handler ahead of route dispatch. The
 order is fixed:
 
 1. **Context overlay.** `(request, next) => context.runScoped(() => next(request))`.
-   Outermost of everything — ahead of even the maintenance check — so
+   Outermost of everything, ahead of even the maintenance check, so
    anything a downstream pipe or handler adds to the [context](../container/)
    (request id, current user, the request root the URL generator reads) is
    isolated to this request and cannot bleed into a concurrent one. Cost is
@@ -411,7 +411,7 @@ order is fixed:
    provider pipe, so a downed app short-circuits before auth, throttling, or
    anything else runs. When the app is up this is a cached check of the
    `storage/framework/down` marker file (re-read at most once a second).
-3. **Every provider's `middleware()` hook**, in provider registration order —
+3. **Every provider's `middleware()` hook**, in provider registration order,
    a provider earlier in `config/app.ts`'s `providers[]` runs its pipes
    before a later provider's.
 
@@ -440,7 +440,7 @@ in the `http` config namespace to tune or disable it.
 ### Request body limit
 
 The framework parses every request body eagerly, in the global pipe,
-before any route decision — so an unbounded body is a memory-exhaustion
+before any route decision, so an unbounded body is a memory-exhaustion
 DoS reachable on paths that don't even exist. Bodies are capped at
 **1 MiB** (JSON/urlencoded) and **10 MiB** (`multipart/form-data`);
 exceeding either returns `413` in the normal JSON envelope.
@@ -461,7 +461,7 @@ in-flight request. Set either to `0` to disable that limit.
 Every response carries `X-Content-Type-Options: nosniff`,
 `Referrer-Policy: no-referrer` and `X-Frame-Options: DENY`.
 `Strict-Transport-Security` is added **only** when the request is already
-secure — behind a TLS terminator that means `trustProxies()` must be
+secure, behind a TLS terminator that means `trustProxies()` must be
 configured, or `request.secure()` is false and the header is never sent.
 
 ```ts
@@ -478,7 +478,7 @@ Set `{ enabled: false }` to install none.
 ### JSON 404 and 405
 
 An unmatched route returns `{"message":"Not Found"}`, not Hono's plain
-text — so a client never has to parse two different error shapes. A known
+text, so a client never has to parse two different error shapes. A known
 path requested with the wrong method returns **405** with an `Allow`
 header listing what would have worked, rather than a 404 that sends the
 caller looking for a deployment problem.
@@ -488,7 +488,7 @@ caller looking for a deployment problem.
 `throttle()` is a pipe backed by `@mahiframework/cache`'s `RateLimiter`. It has two
 forms.
 
-**Inline** — a plain options object:
+**Inline**, a plain options object:
 
 ```ts
 router.post("/todos", createTodo)
@@ -504,17 +504,17 @@ router.post("/todos", createTodo)
 
 | Option | Type | Default |
 |---|---|---|
-| `max` | `number` | — |
-| `windowSeconds` | `number` | — |
+| `max` | `number` |: |
+| `windowSeconds` | `number` |: |
 | `key` | `(request) => string` | `request.ip() ?? "unknown"` |
 
-The cache key is `throttle:<key>:<route pattern>` — the **pattern**
+The cache key is `throttle:<key>:<route pattern>`, the **pattern**
 (`/posts/{post}`), not the concrete path. Keying on the concrete path
 would give `/posts/1` and `/posts/2` separate buckets, so any enumerable
 id turns an N/minute limit into N-per-id/minute.
 
 The default key is `request.ip()`, which is the socket peer unless
-[`trustProxies()`](#trusted-proxies-and-hosts) is configured — it is
+[`trustProxies()`](#trusted-proxies-and-hosts) is configured. It is
 **not** read from `X-Forwarded-For`, which any client can forge. Note it
 also can't separate clients behind one NAT, and is `"unknown"` when there
 is no peer. For anything guarding a specific account, key on the identity
@@ -529,7 +529,7 @@ Keying on IP alone lets an attacker spread guesses for one account across
 many addresses; keying on email alone lets them lock a victim out of
 their own account. Combining them bounds both.
 
-**Named** — a string referring to a limiter registered via
+**Named**, a string referring to a limiter registered via
 `RateLimiter.for()`, usually in a provider's `boot()`:
 
 ```ts
@@ -550,7 +550,7 @@ router.post("/auth/login", LoginController).middleware(throttle("login"));
 ```
 
 Named limiter callbacks may return several `Limit`s (stacked limits: "30 a
-minute AND 1000 a day") — all of them are checked. Keys are prefixed
+minute AND 1000 a day"). All of them are checked. Keys are prefixed
 `throttle:<limiterName>:<limit.key>`. A callback returning `Limit.none()`
 (an `Unlimited`) skips limiting entirely for that request. Referencing an
 unregistered name throws:
@@ -561,7 +561,7 @@ Rate limiter "uploads" is not defined. Register it via RateLimiter.for().
 
 `Limit` offers `perSecond`, `perMinute`, `perMinutes`, `perHour`, `perDay`,
 `none`, plus `.by(key)`, `.after(callback)` (only count a hit when the
-callback says so — "count failed logins only") and `.response(callback)`
+callback says so, "count failed logins only") and `.response(callback)`
 (custom 429 body).
 
 ### Headers
@@ -570,17 +570,17 @@ Every response passing through `throttle()` gets:
 
 | Header | When |
 |---|---|
-| `X-RateLimit-Limit` | Always — the limit's `maxAttempts` |
+| `X-RateLimit-Limit` | Always: the limit's `maxAttempts` |
 | `X-RateLimit-Remaining` | Always |
-| `Retry-After` | Only when remaining is `0` — seconds until the window resets |
-| `X-RateLimit-Reset` | Only when remaining is `0` — unix seconds when the window resets |
+| `Retry-After` | Only when remaining is `0`: seconds until the window resets |
+| `X-RateLimit-Reset` | Only when remaining is `0`: unix seconds when the window resets |
 
 Exceeding the limit returns `429` with body `{"message":"Too Many Requests"}`
 and the same headers, unless the `Limit` has a `.response()` callback.
 
 ## Trusted proxies and hosts
 
-`request.ip()` is the **socket peer address** — the machine that actually
+`request.ip()` is the **socket peer address**, the machine that actually
 opened the connection. It never reads `X-Forwarded-For` on its own,
 because a header is just something the client typed: honouring it by
 default means an attacker chooses their own identity for rate limiting,
@@ -588,7 +588,7 @@ IP allow-lists and audit logs.
 
 That is safe but incomplete behind a load balancer, where the peer is the
 balancer and every client looks identical. `trustProxies()` is the trust
-boundary that fixes it — it reads the forwarding headers only when the
+boundary that fixes it. It reads the forwarding headers only when the
 peer is a proxy you have named:
 
 ```ts
@@ -613,8 +613,8 @@ matching.
 entry last; everything to its left was copied from whatever the previous
 hop received, including anything the client made up. `trustProxies()`
 starts at the peer, walks left while each hop is a configured proxy, and
-takes the first address that isn't one. Taking the *leftmost* entry — the
-common naive implementation — hands the attacker their own forgery back.
+takes the first address that isn't one. Taking the *leftmost* entry, the
+common naive implementation, hands the attacker their own forgery back.
 
 When the peer cannot be determined at all (an in-process dispatch, a
 non-Node adapter) it **fails closed**: `ip()` is `undefined` and no
@@ -644,9 +644,9 @@ trustHosts(["example.com", "*.example.com"]);
 A leading `*.` matches subdomains and the bare domain. The port is
 ignored, and IPv6 literals (`[::1]:3000`) are handled. `hostsFromUrl()`
 derives the list from a configured `APP_URL` so you don't maintain your
-hostname twice — that is what the scaffolded app does.
+hostname twice. That is what the scaffolded app does.
 
-Both are opt-in. Nothing changes unless you install them — the same
+Both are opt-in. Nothing changes unless you install them, the same
 "no magic defaults" stance as CORS.
 
 ## CORS
@@ -672,7 +672,7 @@ export function httpConfig(env: Env): HttpConfig {
 
 | Key | Type |
 |---|---|
-| `origin` | `string \| string[]` — defaults to `hono/cors`'s own default (`"*"`) if omitted |
+| `origin` | `string \| string[]`: defaults to `hono/cors`'s own default (`"*"`) if omitted |
 | `allowMethods` | `string[]` |
 | `allowHeaders` | `string[]` |
 | `exposeHeaders` | `string[]` |
@@ -696,19 +696,19 @@ export function httpConfig(): HttpConfig {
 }
 ```
 
-### `GET /up` — liveness
+### `GET /up`: liveness
 
 `http.liveness`; present-but-empty enables it at `/up`, or set
 `{ path: "/healthz" }`. Responds `200 {"status":"ok"}` and does **no I/O**.
 Its path is added to the maintenance `except` list automatically, so it
-keeps answering `200` while the app is down — an orchestrator has to be
+keeps answering `200` while the app is down. An orchestrator has to be
 able to tell a down-for-maintenance app from a dead one.
 
 > Previously `http.health`. That key still works as a fallback, so existing
-> apps keep running, but prefer `liveness` — the old name was too easy to
+> apps keep running, but prefer `liveness`. The old name was too easy to
 > confuse with `healthCheck` below.
 
-### `GET /health` — readiness
+### `GET /health`: readiness
 
 `http.healthCheck`; requires `@mahiframework/health`. Runs every registered check
 and returns `200`, or `503` if any failed. Unlike `/up` it is **not**
@@ -738,7 +738,7 @@ reasoning, the `checks()` hook, and production redaction.
 State is a **marker file** at `storage/framework/down`, holding the
 payload as JSON. `maintenance:down` runs in a different process from the
 server, so a file (rather than cache state) is what makes the running
-server actually see it — the previous cache-backed version, on the
+server actually see it, the previous cache-backed version, on the
 default `array` driver, wrote the flag into the CLI's own heap and
 exited, and the app kept serving traffic.
 
@@ -750,7 +750,7 @@ A request bypasses maintenance mode if it:
 
 - sends `X-Maintenance-Secret: <secret>`,
 - carries the bypass cookie, or
-- has `<secret>` as its first path segment (`/hunter2`) — which responds
+- has `<secret>` as its first path segment (`/hunter2`), which responds
   `302` to `/` and **sets** that cookie, so the browser works normally
   from then on and the secret stops appearing in URLs.
 
@@ -783,7 +783,7 @@ middleware appears once.
 
 By default a supervisor parent process watches `.env` (polled every 500ms)
 and respawns a worker child when it changes. `--tries` only applies when the
-port wasn't chosen explicitly — if you asked for `8080`, `bindWithRetries`
+port wasn't chosen explicitly, if you asked for `8080`, `bindWithRetries`
 makes exactly one attempt rather than quietly serving on `8081`.
 
 `serve` is the development server. For production, bind directly:
@@ -799,10 +799,10 @@ See [Deployment](../deployment/).
 
 ## Related
 
-- [Requests](../requests/) — reading input, route params, form requests
-- [Controllers](../controllers/) — single-action controllers
-- [Responses](../responses/) — what a handler returns
-- [Service providers](../providers/) — the `routes()` and `middleware()` hooks
-- [Authentication](../authentication/) — `authenticate()`, `authenticateOptional()`
-- [Cache](../cache/) — the `RateLimiter` behind `throttle()`
-- [Encryption & hashing](../encryption/) — the `Signer` behind signed URLs
+- [Requests](../requests/): reading input, route params, form requests
+- [Controllers](../controllers/): single-action controllers
+- [Responses](../responses/): what a handler returns
+- [Service providers](../providers/): the `routes()` and `middleware()` hooks
+- [Authentication](../authentication/): `authenticate()`, `authenticateOptional()`
+- [Cache](../cache/): the `RateLimiter` behind `throttle()`
+- [Encryption & hashing](../encryption/): the `Signer` behind signed URLs

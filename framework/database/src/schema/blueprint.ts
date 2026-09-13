@@ -17,7 +17,7 @@ import { asColumnList, type BlueprintMode, type IndexCommand, type IndexKind } f
  * millisecond precision. A `timestamp(0)` column on MySQL/Postgres
  * would round that away, so the same `create()` produced a value that
  * round-tripped exactly on SQLite and lost its milliseconds on the
- * other two — the kind of difference that only shows up in production.
+ * other two, the kind of difference that only shows up in production.
  *
  * 3 rather than 6 because milliseconds are what a JS `Date`/`DateTime`
  * can represent; the extra microsecond digits MySQL and Postgres can
@@ -196,7 +196,7 @@ export class Blueprint {
 
   /**
    * A timestamp column. `precision` is the number of fractional-second
-   * digits kept — see `DEFAULT_TEMPORAL_PRECISION` for why it defaults
+   * digits kept. See `DEFAULT_TEMPORAL_PRECISION` for why it defaults
    * to milliseconds rather than Laravel's whole seconds. Pass `0` for
    * second resolution.
    */

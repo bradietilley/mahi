@@ -14,11 +14,11 @@ demand for tests and seeders. All three live in `@mahiframework/database`.
 
 Two sources, both collected on every migration command:
 
-1. **The app's own migrations** — the `database/migrations` directory by
+1. **The app's own migrations**: the `database/migrations` directory by
    default, configurable via the `database.migrationsPath` config key, or
    a static list under `database.migrationSources` (see
    [Static migration sources](#static-migration-sources)).
-2. **Every registered provider's migrations** — via its
+2. **Every registered provider's migrations**: via its
    `migrationSources()` hook, or its `migrations()` hook returning an
    absolute directory path.
 
@@ -54,7 +54,7 @@ export function collectMigrationSources(app: Application): MigrationSource[] {
 
 This is how `@mahiframework/auth` ships `personal_access_tokens`, `sessions` and
 `password_reset_tokens`, `@mahiframework/queue` ships `jobs` and `failed_jobs`, and
-`@mahiframework/notifications` ships `notifications` — none of them are copied into
+`@mahiframework/notifications` ships `notifications`, none of them are copied into
 your app, and all of them run alongside your own.
 
 To contribute a directory from your own package or provider:
@@ -68,7 +68,7 @@ export class BillingServiceProvider extends ServiceProvider {
 ```
 
 Return an **absolute** path. A published package should point at its
-compiled `dist/`, not `src/` — the discovery filter handles that (it
+compiled `dist/`, not `src/`, the discovery filter handles that (it
 excludes `.d.ts` explicitly, which matters when `.js` and `.d.ts` sit side
 by side).
 
@@ -78,7 +78,7 @@ re-export can sit in the same directory without being run as a migration
 under its own filename.
 
 Migrations from **all** sources are merged and sorted by name **byte-wise**
-(not `localeCompare`, which is locale-dependent — under ICU it ignores
+(not `localeCompare`, which is locale-dependent, under ICU it ignores
 punctuation, so `2024_01_01_a` and `2024-01-01-a` collate as *equal* and
 their relative order varies by machine). A provider's migration and yours
 therefore interleave by timestamp, identically on a laptop, in CI and in
@@ -92,7 +92,7 @@ Directory discovery is `readdir` plus a dynamic `import()` of the file it
 finds. Neither survives bundling: a single-file executable has no
 `database/migrations` directory to read and no path to import. Worse, the
 runner treats an unreadable directory as *nothing to discover* rather than
-an error — so a compiled app prints **"Nothing to migrate"** and then
+an error, so a compiled app prints **"Nothing to migrate"** and then
 happily runs against an empty database.
 
 An app or package that intends to be compiled supplies its migrations
@@ -143,7 +143,7 @@ the filename-without-extension the directory form produced. Change it and
 every existing database re-runs that migration against tables that already
 exist.
 
-The two forms mix freely — an app can keep `migrationsPath` for its own
+The two forms mix freely. An app can keep `migrationsPath` for its own
 migrations while consuming providers that register statically, or pass
 both during a migration to the static form.
 
@@ -183,12 +183,12 @@ export default migration;
 ```
 
 The discovery loader accepts `mod.default ?? mod`, so a module exporting
-`up`/`down` as named exports also works — but the default export is the
+`up`/`down` as named exports also works, but the default export is the
 convention every generator and every shipped migration uses.
 
 The filename **without its extension** is the unique id and the ordering
 key. `make:migration` prefixes a `YYYYMMDDHHmmss` timestamp; the shipped
-app migrations use a `2026_01_03_000000_` style. Either sorts correctly —
+app migrations use a `2026_01_03_000000_` style. Either sorts correctly,
 just be consistent within a directory.
 
 Multiple statements in one migration are fine, and order matters for
@@ -218,7 +218,7 @@ async down(): Promise<void> {
 ## Atomicity and the migration lock
 
 **Each migration runs in its own transaction**, together with the
-`migrations` row recording it — on SQLite and Postgres, which have
+`migrations` row recording it, on SQLite and Postgres, which have
 transactional DDL. A migration that throws halfway therefore undoes its
 own tables and columns and records nothing, so the next run retries it
 cleanly rather than skipping work that never happened (or re-running DDL
@@ -227,18 +227,18 @@ against a schema that already has it).
 **MySQL is the exception.** Every `CREATE`/`ALTER TABLE` there causes an
 implicit commit, so a transaction around a migration would look atomic
 without being it. Rather than pretend, MySQL runs each migration
-unwrapped — a failed migration leaves partial DDL to clean up by hand,
+unwrapped. A failed migration leaves partial DDL to clean up by hand,
 exactly as it does in Laravel.
 
 Migrations within one run are *separately* atomic, not collectively: if
 the third of four fails, the first two stay applied and recorded. That's
-the useful granularity — re-running picks up where it stopped.
+the useful granularity, re-running picks up where it stopped.
 
 **A run holds a lock** for its duration, in a `migrations_lock` table with
 a single fixed-id row. Two `migrate` processes racing (a deploy starting
 two app instances, a CI job overlapping a manual run) would otherwise both
 read the same pending list and the same `max(batch)`, then both run
-everything — the loser's DDL failing halfway and leaving the schema in a
+everything, the loser's DDL failing halfway and leaving the schema in a
 state neither process's `migrations` rows describe.
 
 The second process gets a clear error instead:
@@ -251,7 +251,7 @@ delete from "migrations_lock".
 ```
 
 The lock is released on success *and* on failure. A hard crash (SIGKILL,
-a lost host) leaves the row behind and the next run refuses to start —
+a lost host) leaves the row behind and the next run refuses to start,
 deliberately the safer failure: a stale lock costs one manual `DELETE`,
 while a lock that vanished with a dead connection costs a corrupted
 schema.
@@ -283,7 +283,7 @@ created the same way, and is empty except while a run is in progress.
 
 **Batches** are how rollback knows what to undo. Every migration applied
 by a single `migrate` run gets the same batch number, computed as
-`max(batch) + 1`. `migrate:rollback` undoes exactly the highest batch — so
+`max(batch) + 1`. `migrate:rollback` undoes exactly the highest batch, so
 if you ran three migrations in one go, rollback undoes all three; if you
 ran them one at a time, rollback undoes only the last (pass
 `--step 3` to undo all three).
@@ -322,20 +322,20 @@ interface MigrationStatus {
 }
 ```
 
-`onEach(name, run)` wraps the execution of each individual migration — the
+`onEach(name, run)` wraps the execution of each individual migration, the
 CLI passes `Tui.task` to print a per-migration status line. It **must**
 call and await `run()` itself.
 
 `fresh()` bypasses every `down()` entirely and does a direct schema wipe,
 so it works even when a `down()` is missing or broken.
 `SchemaBuilder.dropAllTables()` suspends foreign-key enforcement, drops
-every non-view table, then restores it in a `finally` — with each engine
+every non-view table, then restores it in a `finally`, with each engine
 using its own mechanism: the `foreign_keys` pragma on SQLite,
 `FOREIGN_KEY_CHECKS` on MySQL (pinned to one pooled connection, since it
 is a session variable), and `DROP ... CASCADE` on Postgres.
 
 **On Postgres this only drops the current schema's tables**, resolved
-from `current_schema()` — a database shared with another schema is left
+from `current_schema()`, a database shared with another schema is left
 alone.
 
 ## Schema
@@ -363,12 +363,12 @@ const schema = DB.schema("analytics");
 await schema.create("events", (table) => { /* ... */ });
 ```
 
-## Blueprint — column types
+## Blueprint: column types
 
 Every method below exists. The right column shows the SQLite affinity it
 compiles to (SQLite has five storage classes, so length and precision
 arguments are recorded but ignored there). On MySQL and Postgres the
-same definitions compile to that engine's real types — `string(col, 64)`
+same definitions compile to that engine's real types. `string(col, 64)`
 is `varchar(64)`, `decimal(col, 12, 4)` is `decimal(12, 4)`, and
 `timestamp()` carries its fractional-second precision.
 
@@ -376,8 +376,8 @@ is `varchar(64)`, `decimal(col, 12, 4)` is `decimal(12, 4)`, and
 
 | Method | Affinity |
 |---|---|
-| `id(column = "id")` | `integer` — alias for `bigIncrements` |
-| `increments(column = "id")` | `integer` — alias for `integerIncrements` |
+| `id(column = "id")` | `integer`: alias for `bigIncrements` |
+| `increments(column = "id")` | `integer`: alias for `integerIncrements` |
 | `integerIncrements(column = "id")` | `integer` |
 | `tinyIncrements(column = "id")` | `integer` |
 | `smallIncrements(column = "id")` | `integer` |
@@ -411,19 +411,19 @@ All seven set `autoIncrement`, `primary` and `unsigned` on the definition.
 | `unsignedSmallInteger(column)` | `integer` (`.unsigned()`) |
 | `unsignedMediumInteger(column)` | `integer` (`.unsigned()`) |
 | `unsignedBigInteger(column)` | `integer` (`.unsigned()`) |
-| `foreignId(column)` | `integer` — alias for `unsignedBigInteger` |
+| `foreignId(column)` | `integer`: alias for `unsignedBigInteger` |
 
 ### Numbers and booleans
 
 | Method | Affinity |
 |---|---|
-| `boolean(column)` | `integer` — SQLite has no native boolean |
-| `float(column, precision?)` | `real` — precision ignored |
-| `double(column, total?, places?)` | `real` — args ignored |
+| `boolean(column)` | `integer`: SQLite has no native boolean |
+| `float(column, precision?)` | `real`: precision ignored |
+| `double(column, total?, places?)` | `real`: args ignored |
 | `decimal(column, total = 8, places = 2)` | `numeric` |
 
 Pair a `boolean` column with `Cast.boolean()`, and a `decimal` column with
-`Cast.decimal(places)` from `@mahiframework/database` — see
+`Cast.decimal(places)` from `@mahiframework/database`. See
 [Models](../models/#casts). A `boolean` attribute without a cast is a
 compile error, precisely because the column comes back as `0`/`1`.
 
@@ -448,7 +448,7 @@ temporal types, and the `Tz` variants become `timestamp with time zone`
 **`precision` defaults to 3 (milliseconds)**, not Laravel's 0. SQLite
 stores whatever text it is handed and the framework stamps timestamps
 with millisecond precision, so a `timestamp(0)` column on MySQL/Postgres
-would round that away — the same `create()` would round-trip exactly on
+would round that away, the same `create()` would round-trip exactly on
 SQLite and lose its milliseconds elsewhere. Pass `0` explicitly for
 whole-second columns.
 
@@ -461,13 +461,13 @@ whole-second columns.
 | `uuid(column)` | `text` |
 | `ulid(column)` | `text` |
 | `binary(column)` | `blob` |
-| `enum(column, allowed)` | `text` — `allowed` recorded, **not enforced** |
+| `enum(column, allowed)` | `text`: `allowed` recorded, **not enforced** |
 | `ipAddress(column)` | `text` |
 | `macAddress(column)` | `text` |
 | `rememberToken()` | `string("remember_token", 100).nullable()` |
 
 `enum()` does not generate a `CHECK` constraint. Validate in the
-application layer — see [Validation](../validation/).
+application layer. See [Validation](../validation/).
 
 ### Helper groups
 
@@ -481,7 +481,7 @@ application layer — see [Validation](../validation/).
 | `softDeletesTz(column = "deleted_at", precision?)` | Nullable `timestampTz`. |
 | `softDeletesDatetime(column = "deleted_at", precision?)` | Nullable `dateTime`. |
 
-`timestamps()` returns `void`, not a `ColumnDefinition` — you can't chain
+`timestamps()` returns `void`, not a `ColumnDefinition`. You can't chain
 modifiers onto it. Declare the columns individually if you need to (the
 shipped `posts` migration does exactly that for non-nullable timestamps).
 
@@ -496,10 +496,10 @@ shipped `posts` migration does exactly that for non-nullable timestamps).
 | `numericMorphs(name, indexName?)` | Same as `morphs` |
 
 These are the only place in the framework that *does* derive column names
-from a base name — the relation declarations themselves require explicit
+from a base name, the relation declarations themselves require explicit
 column names. See [Relationships](../relationships/).
 
-## Blueprint — column modifiers
+## Blueprint: column modifiers
 
 Every modifier returns the `ColumnDefinition` for chaining.
 
@@ -526,23 +526,23 @@ Every modifier returns the `ColumnDefinition` for chaining.
 **Columns are `NOT NULL` unless you call `nullable()`.** That's the
 opposite of raw SQL's default and matches Laravel.
 
-`constrained()` infers the table from the column name — `user_id` →
-`users` — by stripping `_id` and appending `s` unless it already ends in
+`constrained()` infers the table from the column name, `user_id` →
+`users`, by stripping `_id` and appending `s` unless it already ends in
 `s`. This is the framework's one bit of naming inference outside `morphs`,
 and it's naive: `person_id` infers `persons`, `category_id` infers
 `categorys`. Pass the table explicitly when the guess is wrong.
 
 `comment()`, `after()` and `first()` are recorded on the definition but
-never emitted — they exist for API parity, not effect.
+never emitted. They exist for API parity, not effect.
 
-## Blueprint — indexes
+## Blueprint: indexes
 
 | Method | Notes |
 |---|---|
 | `primary(columns, name?)` | Composite primary key constraint. |
 | `unique(columns, name?)` | |
 | `index(columns, name?)` | |
-| `fullText(columns, name?)` | **MySQL only** — throws on SQLite and Postgres. |
+| `fullText(columns, name?)` | **MySQL only**: throws on SQLite and Postgres. |
 | `spatialIndex(columns, name?)` | **Throws on every dialect.** |
 
 `columns` is a string or a string array.
@@ -554,7 +554,7 @@ spatialIndex is not supported on postgres.
 
 They throw at compile time, before any DDL runs.
 
-Index names default to Laravel's scheme — `{table}_{col1}_{col2}_{type}`,
+Index names default to Laravel's scheme, `{table}_{col1}_{col2}_{type}`,
 lowercased, with `-` and `.` replaced by `_`:
 
 ```
@@ -578,7 +578,7 @@ Indexes are created as separate `CREATE INDEX` statements **after** the
 table, both for `.unique()`/`.index()` column modifiers and for
 table-level `unique()`/`index()` calls.
 
-## Blueprint — foreign keys
+## Blueprint: foreign keys
 
 ```ts
 table.foreign(columns, name?): ForeignKeyDefinition
@@ -625,7 +625,7 @@ Foreign key on posts(user_id) is missing .on(table).
 Foreign keys are actually enforced because `SqliteDriver` sets
 `PRAGMA foreign_keys = ON`. Without it they'd be decorative.
 
-## Blueprint — drop and rename
+## Blueprint: drop and rename
 
 | Method | Notes |
 |---|---|
@@ -644,7 +644,7 @@ Foreign keys are actually enforced because `SqliteDriver` sets
 
 ## SQLite limitations in `Schema.table()`
 
-These restrictions are **SQLite-only** — MySQL and Postgres support all
+These restrictions are **SQLite-only**, MySQL and Postgres support all
 of them natively through real `ALTER TABLE` statements.
 
 `compileAlter()` rejects several operations up front, before touching the
@@ -665,7 +665,7 @@ rename. Write that explicitly in a migration.
 
 ### `change()` rebuilds the table
 
-`.change()` **is** supported, and it triggers a full table rebuild —
+`.change()` **is** supported, and it triggers a full table rebuild,
 introspect the current schema, create `__temp__{table}` with the modified
 columns, `INSERT ... SELECT` every row across, drop the original, rename
 the temp table, then recreate any non-constraint indexes:
@@ -719,7 +719,7 @@ async down() {
 > Until recently this ran the other way round and the above failed on
 > SQLite with `error in index ... after drop column: no such column`.
 > MySQL and Postgres drop a covering index implicitly with its column, so
-> the same migration passed there — which is why the cross-engine test for
+> the same migration passed there. Which is why the cross-engine test for
 > it matters more than the SQLite one.
 
 ## Commands
@@ -734,7 +734,7 @@ guarded when `APP_ENV=production`. So are the destructive queue commands,
 
 | Situation | Behaviour | Exit code |
 |---|---|---|
-| Not production | Runs. No prompt — a local `migrate:fresh` stays one keystroke. | 0 |
+| Not production | Runs. No prompt, a local `migrate:fresh` stays one keystroke. | 0 |
 | Production, terminal attached | Prompts `Do you really wish to run this command?`, defaulting to **no**. | 0 either way |
 | Production, no terminal (CI, deploy script) | **Refuses.** Pass `--force`. | **1** |
 | `--force` | Runs, no prompt. | 0 |
@@ -746,13 +746,13 @@ because nobody was watching the terminal. Note the app treats an
 
 The two refusals differ in exit code on purpose. No terminal exits **1**,
 because nobody was asked and a deploy that continues against an unmigrated
-schema is worse than one that stops. A human answering "no" exits 0 — that
+schema is worse than one that stops. A human answering "no" exits 0. That
 is a decision, not a failure.
 
 "Terminal attached" means stdin *and* stdout, so `./artisan migrate | tee
 deploy.log` counts as unattended.
 
-`--pretend` is exempt — it cannot change anything.
+`--pretend` is exempt. It cannot change anything.
 
 ### `migrate`
 
@@ -771,7 +771,7 @@ per-migration task line. `Nothing to migrate.` when up to date.
 
 `--pretend` lists the pending migration *names*; it does not print SQL.
 A migration here is arbitrary TypeScript rather than a declarative list
-of statements, so the only way to know its SQL would be to run it —
+of statements, so the only way to know its SQL would be to run it,
 and a migration that branches on a query result would take a different
 path under a pretend connection, or do real non-DDL work. Reporting the
 names is the part that is both useful and true.
@@ -788,7 +788,7 @@ names is the part that is both useful and true.
 | `--seed` | Run `db:seed` afterwards. |
 | `--force` | Skip the production confirmation. |
 
-Drops **every** table — bypassing `down()` entirely — then re-runs
+Drops **every** table, bypassing `down()` entirely, then re-runs
 everything from scratch. Works even if a `down()` is missing or broken.
 Destroys all data.
 
@@ -805,7 +805,7 @@ Destroys all data.
 | `--force` | Skip the production confirmation. |
 
 Rolls back **every batch**, then re-runs everything. Unlike `fresh`,
-this exercises your `down()` methods — which is the point, and also the
+this exercises your `down()` methods. Which is the point, and also the
 risk: a broken `down()` stops it partway.
 
 ### `migrate:reset`
@@ -820,7 +820,7 @@ risk: a broken `down()` stops it partway.
 | `--pretend` | List what would roll back, run nothing. |
 | `--force` | Skip the production confirmation. |
 
-Rolls back **every** migration, newest batch first, and stops there —
+Rolls back **every** migration, newest batch first, and stops there,
 `migrate:refresh` without the re-migrate. Like `refresh` and unlike
 `fresh`, it runs each migration's `down()`, so it exercises them and
 correspondingly fails partway on one that is broken.
@@ -838,7 +838,7 @@ un-run. Use `db:wipe` when you want the ledger gone too.
 |---|---|
 | `--force` | Skip the production confirmation. |
 
-Drops every table and stops — `migrate:fresh` without the re-migrate. No
+Drops every table and stops, `migrate:fresh` without the re-migrate. No
 `down()` is involved, so nothing in the migrations can object, and it
 works on a schema whose migrations no longer exist.
 
@@ -880,7 +880,7 @@ together without leaving a half-applied deploy. A `--step` larger than
 the number of batches rolls back everything rather than erroring.
 
 Within the rollback, order is newest batch first and, inside each batch,
-the reverse of the order it was applied — a `down()` can depend on
+the reverse of the order it was applied, a `down()` can depend on
 everything applied before it still existing.
 
 ### `migrate:status`
@@ -906,7 +906,7 @@ Migration                                Status
 | `--force` | Skip the production confirmation. |
 
 Runs every seeder returned by every provider's `seeders()` hook, in
-provider registration order. There is no `--class` flag — run a single
+provider registration order. There is no `--class` flag, run a single
 seeder from a custom command if you need to.
 
 `migrate:fresh --seed` and `migrate:refresh --seed` call this directly
@@ -962,7 +962,7 @@ default directories, ignoring `-d`.
 
 `make:migration` derives the table name from a `create_{table}_table`
 name; anything else gets a `"..."` placeholder. Names are normalised to
-`StudlyCase` with the expected suffix appended if absent — `make:factory
+`StudlyCase` with the expected suffix appended if absent, `make:factory
 post` and `make:factory PostFactory` both produce `PostFactory`.
 
 ## Seeders
@@ -997,7 +997,7 @@ export class AppServiceProvider extends ServiceProvider {
 
 `db:seed` instantiates each with the `Application` and awaits `run()`.
 Seeders run in provider registration order, then declaration order within
-each provider's array. There's no dependency graph — order your array so
+each provider's array. There's no dependency graph, order your array so
 parents come before children.
 
 Composing seeders is a plain instantiation:
@@ -1012,7 +1012,7 @@ export class DatabaseSeeder extends Seeder {
 ```
 
 Keep each seeder focused on one table or feature. For a large demo
-dataset, a dedicated console command is often clearer than a seeder — see
+dataset, a dedicated console command is often clearer than a seeder. See
 [Console](../console/).
 
 ## Factories
@@ -1040,7 +1040,7 @@ export class PostFactory extends Factory<typeof Post> {
 
 Two required members: `protected model` and `protected definition()`.
 
-`definition()` is **synchronous** and returns a **model-shape** row — the
+`definition()` is **synchronous** and returns a **model-shape** row, the
 same shape the instance accessors deal in, which is what its type
 (`Partial<Post>`) says. It goes through `forceFill()`, so each column's
 cast is applied on the way in: write `published: true` and
@@ -1048,7 +1048,7 @@ cast is applied on the way in: write `published: true` and
 
 (Casts are idempotent, so a DB-shape value still works if you have one
 in hand. `forceFill` rather than `fill` means `fillable`/`guarded` are
-deliberately bypassed — a factory is trusted fixture code and must be
+deliberately bypassed. A factory is trusted fixture code and must be
 able to set a guarded `id`.)
 
 Note what's omitted: `id` (filled by the model's `keyType` key strategy on
@@ -1073,7 +1073,7 @@ export class Post extends Model<PostAttributes>()({
 await Post.factory().times(10).create();
 ```
 
-The override's return type **is** the declaration — `createOne()` narrows
+The override's return type **is** the declaration, `createOne()` narrows
 to `Post`, `create()` to `Post[]`, with no companion marker to keep in
 sync.
 
@@ -1155,7 +1155,7 @@ await Post.factory()
   .createOne();
 ```
 
-`afterMaking` runs on every instance right after it's built — **including
+`afterMaking` runs on every instance right after it's built, **including
 for `make()`/`makeOne()`**, before any DB write. `afterCreating` runs
 after insert.
 
@@ -1168,21 +1168,21 @@ special case:
 
 1. Stamp timestamps (unless already supplied).
 2. Fire `saving` per row.
-3. `assignGeneratedPrimaryKey()` — run the model's key strategy if the key
+3. `assignGeneratedPrimaryKey()`: run the model's key strategy if the key
    is client-generated and still empty.
 4. Fire `creating` per row.
 5. Insert.
-6. `markPersisted()` — `exists = true`, `wasRecentlyCreated = true`, and
+6. `markPersisted()`: `exists = true`, `wasRecentlyCreated = true`, and
    the dirty snapshot synced, so a factory-made model reports itself
    exactly as a `create()`d one does.
 7. Fire `created` then `saved` per row, then run `afterCreating`.
 
 **The insert strategy depends on the model's `keyType`:**
 
-- a client-generated key — `keyType: "uuid"`, `snowflake()`, or any custom
-  `KeyStrategy` (the common factory case) — **one batch insert** for the
+- a client-generated key, `keyType: "uuid"`, `snowflake()`, or any custom
+  `KeyStrategy` (the common factory case), **one batch insert** for the
   whole set. `times(50).create()` is one round trip.
-- `keyType: "increment"` (the default, DB-generated) — **row by row.**
+- `keyType: "increment"` (the default, DB-generated): **row by row.**
   Kysely's `InsertResult.insertId` only reports the *last* row's generated
   id for a multi-row `VALUES`, so there's no way to read back every key
   from a batched insert. Correctness wins over the batching guarantee.
@@ -1199,7 +1199,7 @@ await Post.factory().times(50).createQuietly();
 Wraps in `Model.withoutEvents()`, so no observers, no `on()` listeners, no
 `dispatchesEvents`, no generic lifecycle events.
 
-Rows still get their timestamps and their generated keys — suppression
+Rows still get their timestamps and their generated keys, suppression
 covers event dispatch only. `afterMaking`/`afterCreating` still run;
 they're `Factory`'s own hooks, not model lifecycle events.
 

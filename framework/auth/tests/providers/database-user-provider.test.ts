@@ -65,7 +65,7 @@ describe("DatabaseUserProvider", () => {
   });
 
   it("retrieveByCredentials() never consults the password", async () => {
-    // Lookup and verification are deliberately separate steps — see
+    // Lookup and verification are deliberately separate steps. See
     // UserProvider's docstring. If this method started checking the
     // password, attempt()'s constant-time behaviour would break.
     await expect(

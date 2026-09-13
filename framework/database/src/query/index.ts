@@ -10,7 +10,7 @@ const GRAMMARS: Record<Dialect, QueryGrammar> = {
   postgres: postgresQueryGrammar,
 };
 
-/** Resolve the query grammar for a dialect — the query-layer twin of `grammarFor()`. */
+/** Resolve the query grammar for a dialect, the query-layer twin of `grammarFor()`. */
 export function queryGrammarFor(dialect: Dialect): QueryGrammar {
   const grammar = GRAMMARS[dialect];
 

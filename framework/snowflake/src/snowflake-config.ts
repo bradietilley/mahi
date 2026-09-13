@@ -6,7 +6,7 @@
 export interface SnowflakeConfig {
   /**
    * When true, IDs are sequential `9000000000000000001`, `…002`, … grouped
-   * by model class name — predictable in tests without giving up the
+   * by model class name, predictable in tests without giving up the
    * 19-digit JSON width of real snowflakes.
    */
   testing: boolean;
@@ -35,9 +35,9 @@ export interface SnowflakeConfig {
      * generator valid for ~35 years. Never change this after IDs exist.
      */
     epoch: string;
-    /** Cluster id — must fit the configured cluster bit width (default 0–31). */
+    /** Cluster id, must fit the configured cluster bit width (default 0–31). */
     cluster: number;
-    /** Worker id within the cluster — must fit the worker bit width (default 0–31). */
+    /** Worker id within the cluster, must fit the worker bit width (default 0–31). */
     worker: number;
   };
 }

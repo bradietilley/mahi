@@ -54,7 +54,7 @@ async function backdateReservation(db: Kysely<any>, id: string, secondsAgo: numb
  * A Kysely plugin that reports every query's AST as it is executed, and
  * can make chosen ones throw.
  *
- * The AST — not a SQL string — because that's what a plugin actually
+ * The AST, not a SQL string, because that's what a plugin actually
  * receives, and because "the select node carries a limit" is a stronger
  * assertion than "the SQL text contains the word limit" anyway. The
  * `fail` hook is how the atomicity tests simulate a mid-`fail()` crash
@@ -345,7 +345,7 @@ describe("DatabaseQueueDriver", () => {
 
       const reclaimed = await driver.pop();
       expect(reclaimed).toBeDefined();
-      // Freshly reserved again — nobody else may have it.
+      // Freshly reserved again, nobody else may have it.
       expect(await driver.pop()).toBeUndefined();
     });
 
@@ -382,7 +382,7 @@ describe("DatabaseQueueDriver", () => {
       await new DatabaseQueueDriver(observed, { popBatchSize: 5 }).pop();
 
       expect(selects).toHaveLength(1);
-      // The candidate read is capped — an unbounded select here is a full
+      // The candidate read is capped, an unbounded select here is a full
       // scan of the backlog on every poll of every worker.
       expect(selects[0].limit).toBeDefined();
       expect(selects[0].limit.limit.value).toBe(5);
@@ -399,7 +399,7 @@ describe("DatabaseQueueDriver", () => {
         .execute()) as { name: string; sql: string | null }[];
 
       // The column order matters: it has to satisfy `ORDER BY
-      // available_at, id`, or MySQL adds a filesort — and a filesorted
+      // available_at, id`, or MySQL adds a filesort, and a filesorted
       // `FOR UPDATE SKIP LOCKED` locks every row it sorts, so concurrent
       // workers skip them all and the queue looks empty.
       const covering = indexes.find((index) =>
@@ -462,7 +462,7 @@ describe("DatabaseQueueDriver", () => {
         "disk full",
       );
 
-      // Still there, still reserved — reclaimable after retryAfter, not lost.
+      // Still there, still reserved, reclaimable after retryAfter, not lost.
       expect(await db.selectFrom("jobs").selectAll().execute()).toHaveLength(1);
       expect(await driver.listFailed()).toEqual([]);
     });
@@ -585,7 +585,7 @@ describe("DatabaseQueueDriver", () => {
       let visibleDuring: unknown;
       await transaction(db, async (trx) => {
         await driver.pushAfterCommit("send-email", { n: 1 });
-        // Nothing written yet — the whole point. Read through `trx`, not
+        // Nothing written yet, the whole point. Read through `trx`, not
         // the root: SQLite's single writer is held by this transaction,
         // so a root-connection read would just block until busy_timeout.
         visibleDuring = await trx.selectFrom("jobs").selectAll().execute();

@@ -1,7 +1,7 @@
 import { Str } from "@mahiframework/core";
 
 /**
- * `*`-wildcard match — the behaviour behind Laravel's
+ * `*`-wildcard match, the behaviour behind Laravel's
  * `Http::fake(['github.com/*' => ...])`/`assertSent('github.com/*')`,
  * which delegate to `Str::is()`. Delegates to `@mahiframework/core`'s `Str.is`
  * rather than carrying its own copy, so `?` and every other regex
@@ -18,7 +18,7 @@ export function wildcardMatch(pattern: string, subject: string): boolean {
  * write the scheme and subdomain out.
  *
  * Deliberately **not** used for `allowStrayRequests()` allow-lists, which
- * match on the bare pattern — an explicit escape from the stray guard is
+ * match on the bare pattern, an explicit escape from the stray guard is
  * worth spelling out in full. Matches Laravel's `isAllowedRequestUrl`.
  */
 export function urlMatch(pattern: string, url: string): boolean {

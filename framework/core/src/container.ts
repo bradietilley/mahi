@@ -7,7 +7,7 @@
  * This keeps resolution predictable and avoids TS decorator/build-tool
  * friction (emitDecoratorMetadata, esbuild/tsup compatibility, etc).
  * Contextual binding (`when($concrete)->needs($abstract)->give($impl)`)
- * is not provided — a specific consumer that needs a different
+ * is not provided, a specific consumer that needs a different
  * implementation binds an explicit distinct token instead.
  */
 
@@ -17,7 +17,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
  * A factory receives the concrete container/application instance it was
  * registered on (via `this`-typing on Container's methods), so a factory
  * registered on an `Application` receives an `Application`, not a bare
- * `Container` — no `as any` casts needed to reach `app.config`, `app.logger`,
+ * `Container`, no `as any` casts needed to reach `app.config`, `app.logger`,
  * etc. from inside a factory.
  */
 export type Factory<T, TContainer = Container> = (container: TContainer) => T;
@@ -39,7 +39,7 @@ export class BindingNotFoundError extends Error {
 
 /**
  * Thrown when resolving a token requires resolving itself (directly or
- * transitively) — the message names the full cycle so the offending pair of
+ * transitively), the message names the full cycle so the offending pair of
  * factories is obvious (`a -> b -> a`).
  */
 export class CircularDependencyError extends Error {
@@ -55,11 +55,11 @@ export class Container {
   private bindings = new Map<string, Binding>();
   private instances = new Map<string, unknown>();
   private extenders = new Map<string, Extender[]>();
-  /** Tokens currently mid-resolution on this call stack — the cycle guard for `make()`. */
+  /** Tokens currently mid-resolution on this call stack, the cycle guard for `make()`. */
   private resolving: string[] = [];
   /**
    * Per-scope cache for `scoped()` bindings, isolated per async call stack
-   * via `AsyncLocalStorage` — the same mechanism `ContextRepository` uses
+   * via `AsyncLocalStorage`, the same mechanism `ContextRepository` uses
    * for per-request context. `undefined` outside any `runScoped()` scope.
    */
   private readonly scopeStore = new AsyncLocalStorage<Map<string, unknown>>();
@@ -82,7 +82,7 @@ export class Container {
 
   /**
    * Register a factory resolved once *per scope* (per request, per queue
-   * job — whatever `runScoped()` wraps) and cached for that scope only.
+   * job, whatever `runScoped()` wraps) and cached for that scope only.
    * Resolved outside any scope it behaves like a plain transient, so it is
    * always safe to `make()`. Same `AsyncLocalStorage` mechanism as
    * `ContextRepository`'s per-request overlay.
@@ -133,7 +133,7 @@ export class Container {
     }
 
     // Cycle guard: if `token` is already being resolved further up this
-    // call stack, its factory (transitively) depends on itself — surface a
+    // call stack, its factory (transitively) depends on itself, surface a
     // named cycle instead of Node's opaque `RangeError: Maximum call stack`.
     if (this.resolving.includes(token)) {
       throw new CircularDependencyError([...this.resolving, token]);
@@ -183,7 +183,7 @@ export class Container {
   }
 
   /**
-   * Whether this token has actually been *built* — a singleton that has
+   * Whether this token has actually been *built*. A singleton that has
    * been `make()`d at least once, or an `instance()` registered directly.
    * `has()` answers the different question of whether anything is bound.
    *
@@ -220,7 +220,7 @@ export class Container {
   /**
    * Drop the binding, any cached instance/scoped instance, and any
    * extenders for `token`. After this the container has no knowledge of the
-   * token at all (`has()` is `false`). Primarily a test affordance — swap a
+   * token at all (`has()` is `false`). Primarily a test affordance, swap a
    * binding out and re-register a fake, without leaking into the next test.
    */
   forget(token: string): void {
@@ -231,7 +231,7 @@ export class Container {
   }
 
   /**
-   * Forget only the cached instance for `token`, keeping the binding — the
+   * Forget only the cached instance for `token`, keeping the binding, the
    * next `make()` rebuilds it from the factory. Leaves scoped/transient
    * bindings (which cache nothing globally) untouched.
    */

@@ -67,7 +67,7 @@ describe("ContextRepository", () => {
   });
 
   describe("all / only / except", () => {
-    it("all() returns a copy — mutating it does not affect the repository", () => {
+    it("all() returns a copy, mutating it does not affect the repository", () => {
       const context = new ContextRepository();
       context.add("a", 1);
 
@@ -233,7 +233,7 @@ describe("ContextRepository", () => {
     });
   });
 
-  describe("runScoped — per-request isolation", () => {
+  describe("runScoped: per-request isolation", () => {
     it("seeds the overlay with the current global context", () => {
       const context = new ContextRepository();
       context.add("deploy", "abc123");

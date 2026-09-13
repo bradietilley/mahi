@@ -6,13 +6,13 @@ import type { Request } from "@mahiframework/http";
  * GET /auth/verify-email?id=&hash=&expires=&signature=
  *
  * The route carries `validateSignature()`, which rejects a tampered or
- * expired link before this runs — so by the time we get here the URL is
+ * expired link before this runs, so by the time we get here the URL is
  * known-authentic and only the two things a signature *cannot* prove are
  * left to check: that the user still exists, and that the address hasn't
  * changed since the link was issued. The broker does both.
  *
  * This endpoint is intentionally unauthenticated. The signature is the
- * credential — requiring a session too would break the common case of
+ * credential, requiring a session too would break the common case of
  * clicking the link in a mail client that isn't logged in.
  */
 export class VerifyEmailController extends Controller {
@@ -34,7 +34,7 @@ export class VerifyEmailController extends Controller {
       return HttpResponse.json({ message: "Your email address is already verified." });
     }
 
-    // A valid signature over a stale or mismatched payload — the address was
+    // A valid signature over a stale or mismatched payload. The address was
     // changed after the link was issued, or the account is gone.
     throw new HttpError(422, "This verification link is no longer valid.");
   }

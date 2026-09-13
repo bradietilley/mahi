@@ -1,5 +1,5 @@
 /**
- * A message could not be built or sent — the mail package's own error
+ * A message could not be built or sent. The mail package's own error
  * type, thrown by `Mailable.render()` when a message is malformed
  * (no recipient, no subject/body, header-injection attempt) *before* it
  * reaches a transport. Framework-level validation means the same clear

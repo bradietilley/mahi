@@ -3,14 +3,14 @@
  *
  * Auto-writes for convenience (matches Laravel's `artisan key:generate`
  * UX), but only when `.env` has no `APP_KEY` set yet (missing entirely, or
- * present with an empty value) — never overwrites an existing key, since
+ * present with an empty value), never overwrites an existing key, since
  * doing so would silently make any data already encrypted/hashed with the
  * old key permanently undecryptable/unverifiable. If a key is already
  * set, prints a message and exits without touching the file; pass
  * `--force` to override that safety check and rotate to a new key anyway.
  *
  * Rotation (`--force`) is otherwise Laravel parity: this command only
- * ever touches `APP_KEY` itself, never `APP_PREVIOUS_KEYS` — if
+ * ever touches `APP_KEY` itself, never `APP_PREVIOUS_KEYS`, if
  * already-encrypted/signed data needs to stay readable under the old key,
  * manually copy the outgoing `APP_KEY` value into `APP_PREVIOUS_KEYS`
  * (comma-separated if more than one) *before* running `--force`, since

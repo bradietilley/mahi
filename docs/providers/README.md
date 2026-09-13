@@ -1,7 +1,7 @@
 # Service providers
 
 A service provider is a class with three optional lifecycle methods and a
-set of optional hooks. It is the only extension point in Mahi — routes,
+set of optional hooks. It is the only extension point in Mahi, routes,
 commands, listeners, migrations, jobs, policies, scheduled tasks, and
 container bindings all arrive through one.
 
@@ -44,7 +44,7 @@ All three are optional and all may be async. The guarantee:
 
 Concretely, for providers A and B registered in that order, the call
 sequence is always `A.register`, `B.register`, `A.boot`, `B.boot`,
-`B.shutdown`, `A.shutdown` — and if `A.boot()` is async and takes 20ms
+`B.shutdown`, `A.shutdown`, and if `A.boot()` is async and takes 20ms
 while `B.boot()` is synchronous, `B` still runs second. This is not
 `Promise.all`; it's a deliberate ordering guarantee that providers depend
 on. The reversal at shutdown is the same guarantee read backwards: a
@@ -57,13 +57,13 @@ merge your own default config. Nothing else.
 
 You cannot assume any other provider has registered yet. `register()` runs
 in list order, so a provider listed earlier has bound its tokens by the
-time yours runs — but relying on that couples you to list position, and
+time yours runs, but relying on that couples you to list position, and
 the framework's own providers deliberately don't. The exception is
 `RedisServiceProvider`, which *does* resolve other managers in
 `register()` and documents the ordering requirement loudly for it.
 
 Because container factories are lazy, a factory body can freely resolve
-anything — it doesn't run until someone calls `make()`, long after all
+anything. It doesn't run until someone calls `make()`, long after all
 registration is done:
 
 ```ts
@@ -119,7 +119,7 @@ Because boots are sequential and awaited, every provider after
 ### What goes in shutdown()
 
 **Whatever `boot()` acquired.** `shutdown()` is the mirror of `boot()` and
-runs during `app.terminate()`, in **reverse** registration order — so a
+runs during `app.terminate()`, in **reverse** registration order, so a
 provider tears down before the providers it booted on top of.
 
 ```ts
@@ -137,7 +137,7 @@ the process just sits there instead of exiting.
 Three things to get right:
 
 - **Be best-effort.** Failures are caught and logged by `terminate()`, not
-  raised — the process is going down regardless, and one broken teardown
+  raised. The process is going down regardless, and one broken teardown
   must not strand a pool the next hook would have closed.
 - **Guard against a partial boot.** `shutdown()` can run after an *earlier*
   provider's `boot()` threw, so state your own `boot()` creates may not
@@ -171,7 +171,7 @@ by whichever package owns it, by iterating `app.getProviders()`.
 | `checks` | `() => HealthCheck[]` | `HealthRegistry` | `HealthServiceProvider.boot()` |
 
 Note the "when" column. Hooks collected during another provider's `boot()`
-are gathered from **every** provider regardless of list position — the
+are gathered from **every** provider regardless of list position, the
 collector iterates all of them, and they're all instantiated before any
 boot runs. So a hook on the last provider in the list is still picked up
 by a collector in the first. What list position affects is the *order*
@@ -208,7 +208,7 @@ See [Routing](../routing/) for the router API.
 ### middleware()
 
 Global HTTP pipes, run ahead of route dispatch for every request. Pipes
-are collected in provider registration order — an earlier provider's pipes
+are collected in provider registration order, an earlier provider's pipes
 run before a later one's.
 
 ```ts
@@ -219,7 +219,7 @@ export class AuthServiceProvider extends ServiceProvider {
 }
 ```
 
-`HttpPipe` is `Pipe<Request, ResponseInput>` from `@mahiframework/pipeline` — it
+`HttpPipe` is `Pipe<Request, ResponseInput>` from `@mahiframework/pipeline`. It
 receives the framework `Request` (not a Hono context) and a `next`
 function, and returns a response. A pipe that returns without calling
 `next(request)` short-circuits the whole request.
@@ -255,7 +255,7 @@ export class QueueServiceProvider extends ServiceProvider {
 
 Note it returns one string, not an array.
 
-Prefer `migrationSources()` below in any provider that might be bundled —
+Prefer `migrationSources()` below in any provider that might be bundled,
 a directory path resolves to nothing inside a single-file executable, and
 the runner reports that as "nothing to migrate" rather than an error.
 
@@ -276,8 +276,8 @@ export class QueueServiceProvider extends ServiceProvider {
 }
 ```
 
-This is how the framework's own tables — `personal_access_tokens`,
-`sessions`, `jobs`, `failed_jobs`, `notifications` — get created without
+This is how the framework's own tables, `personal_access_tokens`,
+`sessions`, `jobs`, `failed_jobs`, `notifications`, get created without
 you copying migration files into your app. `@mahiframework/auth`, `@mahiframework/queue`,
 and `@mahiframework/notifications` each register theirs statically, so they work in
 a compiled binary; each also keeps a `migrations()` directory for older
@@ -310,9 +310,9 @@ export class ScheduleServiceProvider extends ServiceProvider {
 }
 ```
 
-Command signatures must be unique across the whole application — the
+Command signatures must be unique across the whole application. The
 kernel throws at startup if two providers register the same signature.
-This bites when you re-list a framework command that its own provider
+This happens when you re-list a framework command that its own provider
 already contributes. See [Console](../console/).
 
 ### listeners()
@@ -351,7 +351,7 @@ jobs(): Record<string, JobClass> {
 }
 ```
 
-Names are yours to choose but must be stable — changing one orphans any
+Names are yours to choose but must be stable, changing one orphans any
 job already sitting in the queue under the old name. See [Queues](../queues/).
 
 ### gates()
@@ -366,7 +366,7 @@ gates(gate: GateRegistry): void {
 ```
 
 A single hook covers both, rather than a separate `policies()` returning
-tuples — same shape as `schedule()`: receive the registry, call methods on
+tuples, same shape as `schedule()`: receive the registry, call methods on
 it. See [Authorization](../authorization/).
 
 ### schedule()
@@ -392,7 +392,7 @@ throws a clear error if `QueueServiceProvider` isn't registered. See
 
 ### checks()
 
-Returns readiness checks — the dependencies that must be working for this
+Returns readiness checks. The dependencies that must be working for this
 instance to serve traffic. Surfaced by `GET /health` and
 `./artisan health`.
 
@@ -414,7 +414,7 @@ Throw or return a string to fail, return nothing to pass, return `null` to
 skip. Checks default to the `"app"` group; declaring `group: "core"` with a
 built-in's name replaces that built-in, since later registrations win.
 
-Checks must be cheap and constant-cost — `run()` executes on every probe
+Checks must be cheap and constant-cost, `run()` executes on every probe
 interval, on every instance. See [Health checks](../health/).
 
 ## How hook typing works
@@ -461,8 +461,8 @@ can implement any merged hook as a normal typed method override.
 The payoff is that **the set of hooks available to you is exactly the set
 of packages you installed**. An app importing `@mahiframework/http`, `@mahiframework/cli`,
 and `@mahiframework/events` sees `routes`, `middleware`, `commands`, and
-`listeners` — fully typed, with `Router` and `CommandClass` resolved to
-their real types — while `@mahiframework/core` never imports any of those packages
+`listeners`, fully typed, with `Router` and `CommandClass` resolved to
+their real types, while `@mahiframework/core` never imports any of those packages
 and has no dependency on them. Remove `@mahiframework/http` from your
 `package.json` and `routes()` stops type-checking, which is correct: there
 is nothing to collect it.
@@ -549,7 +549,7 @@ package that can't depend on yours, look at how
 [Configuration](../configuration/#merge-vs-set).
 
 **Use `Manager` for anything with named drivers**, and register your
-built-ins with `extend()` — the same call a downstream plugin would use to
+built-ins with `extend()`, the same call a downstream plugin would use to
 add one. No special-casing for built-ins.
 
 **Make optional dependencies soft.** Guard with `app.has(TOKEN)`:
@@ -561,7 +561,7 @@ if (app.has(MAIL_TOKEN)) {
 ```
 
 An app that didn't install `@mahiframework/mail` gets a package that works, minus
-the mail channel — not a `BindingNotFoundError` during boot.
+the mail channel, not a `BindingNotFoundError` during boot.
 
 **Add a `declare module "@mahiframework/core"` block** if your package introduces a
 new hook, and import it for side effect from `index.ts`.
@@ -576,7 +576,7 @@ is the whole mechanism.
 
 `boot()` runs sequentially in list order, so a provider may rely on an
 earlier one being fully booted. The base app's `config/app.ts` documents
-every constraint that actually bites:
+every constraint that applies:
 
 ```ts
 export const providers: ServiceProviderClass[] = [
@@ -608,12 +608,12 @@ The reasoning, constraint by constraint:
 its own `boot()`.** Listeners are wired in the events provider's boot; a
 provider that dispatches before that happens dispatches into the void.
 
-**`DatabaseServiceProvider` before anything that queries during boot** —
+**`DatabaseServiceProvider` before anything that queries during boot**,
 including `QueueServiceProvider`, whose `database` connection factory
 resolves `DatabaseManager`.
 
 **`ScheduleServiceProvider` after `QueueServiceProvider`**, so a task
-using `schedule.job(...)` finds a bound `QUEUE_TOKEN`. Soft dependency —
+using `schedule.job(...)` finds a bound `QUEUE_TOKEN`. Soft dependency,
 `schedule()` hooks that never call `.job()` work either way.
 
 **`CacheServiceProvider` before `HttpServiceProvider`**, since
@@ -622,7 +622,7 @@ using `schedule.job(...)` finds a bound `QUEUE_TOKEN`. Soft dependency —
 **`AuthServiceProvider` after Database** (user lookups plus its own
 `personal_access_tokens` and `sessions` tables), **after Encryption**
 (`HASHER_TOKEN` for passwords, `SIGNER_TOKEN` for signed session
-cookies), **and before Http** — so `AUTH_TOKEN` is bound, and its global
+cookies), **and before Http**, so `AUTH_TOKEN` is bound, and its global
 auth-scope pipe collected, before routes and middleware are.
 
 **`AuthorizationServiceProvider` after Auth** (its gate resolves the
@@ -635,13 +635,13 @@ websocket upgrade endpoint onto the already-constructed kernel).
 
 **`RedisServiceProvider` after Cache/Queue/Broadcast.** Its `register()`
 extends each of those managers with a `redis` driver, so their tokens must
-already be bound — this is the one provider that genuinely resolves other
+already be bound. This is the one provider that genuinely resolves other
 providers' tokens during `register()` rather than inside a lazy factory.
 It stays inert until some config points at `"redis"`, so listing it costs
 nothing without a running Redis.
 
 **`NotificationsServiceProvider` after Database** (it owns the
-`notifications` table), **Mail, and Events** — its channel factories
+`notifications` table), **Mail, and Events**, its channel factories
 resolve those tokens at `register()` time.
 
 `LoggingServiceProvider`, `EncryptionServiceProvider`, and
@@ -654,7 +654,7 @@ reverse.
 
 Note what's *not* on this list: nothing is registered implicitly. Even
 `LoggingServiceProvider`, which lives in `@mahiframework/core`, must be listed
-explicitly like everything else — consistent with there being no implicit
+explicitly like everything else, consistent with there being no implicit
 registration anywhere, and with `Application.logger` remaining the
 always-available zero-config fallback.
 
@@ -723,7 +723,7 @@ Every wire from that feature to the framework is on one screen.
 
 **Registering a provider after `bootstrap()` does nothing.** `register()`
 pushes onto a class list that `bootstrap()` reads once. Post-bootstrap
-additions are never instantiated and never run — silently. Register
+additions are never instantiated and never run, silently. Register
 everything before you bootstrap.
 
 **`getProviders()` is empty until `bootstrap()` runs.** Instances are
@@ -733,8 +733,8 @@ later for this reason.
 
 **Resolving another provider's token in your `register()` body is a
 list-order bet.** Put the `make()` inside the lazy factory instead. If
-you genuinely can't — `RedisServiceProvider` genuinely can't, since
-`extend()` mutates a live manager — document the constraint in the
+you genuinely can't, `RedisServiceProvider` genuinely can't, since
+`extend()` mutates a live manager, document the constraint in the
 provider docstring, because nothing else will catch it.
 
 **Duplicate command signatures throw at startup.** Registering a framework
@@ -748,7 +748,7 @@ registration.** It's supported, but if you're doing I/O there, ask whether
 it belongs in `boot()`.
 
 **`migrations()` returns an absolute path.** Use `path.dirname(fileURLToPath(import.meta.url))`,
-not a relative string — the CLI resolves the app's own migrations
+not a relative string, the CLI resolves the app's own migrations
 directory against `base_path()`, but a package's directory must be
 resolved against the package.
 
@@ -760,9 +760,9 @@ it means the provider's tables are silently never created. Use
 
 ## Related
 
-- [Service container](../container/) — `bind`, `singleton`, `make`, tokens
-- [Application lifecycle](../lifecycle/) — the exact bootstrap sequence
-- [Configuration](../configuration/) — `set()` vs `merge()`, config namespaces
-- [Routing](../routing/) — the `Router` passed to `routes()`
-- [Console](../console/) — writing the classes `commands()` returns
-- [Events](../events/) — the classes `listeners()` pairs up
+- [Service container](../container/): `bind`, `singleton`, `make`, tokens
+- [Application lifecycle](../lifecycle/): the exact bootstrap sequence
+- [Configuration](../configuration/): `set()` vs `merge()`, config namespaces
+- [Routing](../routing/): the `Router` passed to `routes()`
+- [Console](../console/): writing the classes `commands()` returns
+- [Events](../events/): the classes `listeners()` pairs up

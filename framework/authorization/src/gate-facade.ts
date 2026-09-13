@@ -6,8 +6,8 @@ import { GATE_TOKEN } from "./tokens.js";
 /**
  * Thin facade over the `GateRegistry` singleton bound at `GATE_TOKEN`.
  *
- * The class is `GateRegistry` and the facade is `Gate` — the name written
- * at call sites — mirroring how `Hash`/`Crypt` front `Hasher`/
+ * The class is `GateRegistry` and the facade is `Gate`, the name written
+ * at call sites, mirroring how `Hash`/`Crypt` front `Hasher`/
  * `Encrypter`.
  *
  *   await Gate.authorize("update", Todo, todo);   // throws 403 if denied

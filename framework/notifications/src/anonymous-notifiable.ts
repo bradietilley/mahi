@@ -1,7 +1,7 @@
 import type { NotificationRoutable } from "./notifiable.js";
 
 /**
- * An on-demand notifiable with no backing model — for notifying an address
+ * An on-demand notifiable with no backing model, for notifying an address
  * you hold directly rather than a persisted recipient (Laravel's
  * `Notification::route(...)->notify(...)`):
  *
@@ -12,7 +12,7 @@ import type { NotificationRoutable } from "./notifiable.js";
  *
  * The `database` channel is rejected: it needs a persisted
  * `notifiable_type`/`notifiable_id` to write, which an anonymous target by
- * definition has none of — routing it there is always a mistake, so it
+ * definition has none of, routing it there is always a mistake, so it
  * throws early rather than writing a row keyed to nothing.
  */
 export class AnonymousNotifiable implements NotificationRoutable {

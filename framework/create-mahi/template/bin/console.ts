@@ -7,7 +7,7 @@ const kernel = app.make<ConsoleKernel>(CONSOLE_KERNEL_TOKEN);
 kernel.collectFromProviders();
 
 // `run()` terminates the application in its own `finally`, which is what
-// closes database pools and Redis clients — an open pool keeps Node's
+// closes database pools and Redis clients. An open pool keeps Node's
 // event loop alive, so without it a command finishes its work and then
 // the process just sits there. The `catch` is here so a failed command
 // exits non-zero (which is what a CI step or a `&&` chain reads) instead

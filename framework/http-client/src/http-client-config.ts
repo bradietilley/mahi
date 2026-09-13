@@ -2,14 +2,14 @@
 export interface HttpClientOptions {
   /** Prefix for relative request paths. Absolute URLs ignore it. */
   baseUrl?: string;
-  /** Whole-exchange timeout in milliseconds — `fetch` has no separate connect timeout. */
+  /** Whole-exchange timeout in milliseconds. `fetch` has no separate connect timeout. */
   timeout?: number;
   /** Headers applied to every request, overridable per request. */
   headers?: Record<string, string>;
 }
 
 /**
- * The `http-client` config namespace — `app.config.get<HttpClientConfig>("http-client")`.
+ * The `http-client` config namespace, `app.config.get<HttpClientConfig>("http-client")`.
  *
  *   export default {
  *     timeout: 10_000,

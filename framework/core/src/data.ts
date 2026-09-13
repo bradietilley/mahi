@@ -1,12 +1,12 @@
 /**
- * Dot-notation get/set/fill/has/forget over nested objects and arrays —
+ * Dot-notation get/set/fill/has/forget over nested objects and arrays,
  * Laravel's `data_get`/`data_set`/`data_fill`/`data_has`/`data_forget`.
  *
  * The path argument is type-checked against `T`: invalid paths fail at
  * compile time, and `dataGet`/`dataSet` propagate the type at that path
  * (`PathValue` / `PathAssigned`). `*` is a wildcard over array/object
  * values; remaining `*` segments collapse one array level, matching
- * Laravel. Runtime walks plain objects and arrays only — no reflection.
+ * Laravel. Runtime walks plain objects and arrays only, no reflection.
  *
  *   const country = dataGet(user, "address.country"); // string
  *   dataSet(user, "address.country", "NZ");
@@ -196,7 +196,7 @@ function setImpl(
  *
  * Missing *runtime* keys return `fallback` (default `undefined`). A
  * `null`/empty key returns `target` itself. Paths that don't exist on
- * `T` are a compile-time error — use an optional property on the type
+ * `T` are a compile-time error, use an optional property on the type
  * (and a fallback) for keys that may be absent.
  *
  * @deprecated Prefer the Laravel-matching snake_case `data_get`.
@@ -231,11 +231,11 @@ export function dataGet(
 /**
  * Write `value` at a dotted path, creating missing objects/arrays along
  * the way. Mutates `target` when it is already an object/array; otherwise
- * builds a fresh structure and returns it — callers should use the return
+ * builds a fresh structure and returns it. Callers should use the return
  * value (JS has no PHP-style pass-by-reference for primitives).
  *
  * `overwrite` (default `true`) controls whether an existing leaf is
- * replaced — `dataFill` is `dataSet` with `overwrite = false`. The path
+ * replaced. `dataFill` is `dataSet` with `overwrite = false`. The path
  * must exist on `T`; the value must match `PathAssigned<T, P>`.
  *
  * @deprecated Prefer the Laravel-matching snake_case `data_set`.
@@ -332,7 +332,7 @@ export function dataFill(target: object, key: string | readonly string[], value:
 /**
  * Whether every given dotted path exists on `target` (key present,
  * even when the value is `null`/`undefined`). A string is one path;
- * an array of strings is several paths, all of which must exist —
+ * an array of strings is several paths, all of which must exist,
  * matching Laravel's `Arr::has` / `data_has`.
  *
  * @deprecated Prefer the Laravel-matching snake_case `data_has`.
@@ -420,17 +420,17 @@ function forgetPath(target: Accessible, segments: string[]): void {
 // `@deprecated` aliases so existing imports keep compiling. `as typeof`
 // preserves the full overloaded signatures without re-declaring them.
 
-/** Dot-notation getter over nested objects/arrays — Laravel's `data_get`. */
+/** Dot-notation getter over nested objects/arrays, Laravel's `data_get`. */
 export const data_get = dataGet;
 
-/** Dot-notation setter over nested objects/arrays — Laravel's `data_set`. */
+/** Dot-notation setter over nested objects/arrays, Laravel's `data_set`. */
 export const data_set = dataSet;
 
-/** `data_set` that does not overwrite an existing leaf — Laravel's `data_fill`. */
+/** `data_set` that does not overwrite an existing leaf, Laravel's `data_fill`. */
 export const data_fill = dataFill;
 
-/** Whether every given dotted path exists — Laravel's `data_has`. */
+/** Whether every given dotted path exists, Laravel's `data_has`. */
 export const data_has = dataHas;
 
-/** Remove one or more dotted paths (mutates) — Laravel's `data_forget`. */
+/** Remove one or more dotted paths (mutates), Laravel's `data_forget`. */
 export const data_forget = dataForget;

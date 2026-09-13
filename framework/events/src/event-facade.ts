@@ -13,7 +13,7 @@ import { EVENTS_TOKEN } from "./events-service-provider.js";
  *
  * Prefer constructor-injecting `EventDispatcher` (via `EVENTS_TOKEN`)
  * where that's practical (e.g. inside a `ServiceProvider`/`Command`
- * that already receives `app`) — reach for this only at call sites
+ * that already receives `app`), use this only at call sites
  * where threading `app`/`EventDispatcher` through is genuinely
  * inconvenient, same guidance as `app()` itself.
  */
@@ -24,7 +24,7 @@ export class Events extends Facade<EventDispatcher>(() => EVENTS_TOKEN) {
 
   /**
    * Dispatch `event` after the enclosing `DB.transaction()` commits (or
-   * immediately when none is open) — the explicit per-call form of
+   * immediately when none is open), the explicit per-call form of
    * after-commit dispatch, when you don't want to mark the event class
    * with `static shouldDispatchAfterCommit`. See
    * `EventDispatcher.dispatchAfterCommit()`.
@@ -34,7 +34,7 @@ export class Events extends Facade<EventDispatcher>(() => EVENTS_TOKEN) {
   }
 
   /**
-   * Register a listener — the facade form of `EventDispatcher.listen()`,
+   * Register a listener, the facade form of `EventDispatcher.listen()`,
    * for wiring done outside a provider (a bootstrap script, a test setup,
    * a route file) where there's no `app` already in hand:
    *
@@ -45,7 +45,7 @@ export class Events extends Facade<EventDispatcher>(() => EVENTS_TOKEN) {
    *
    * **Prefer a provider's `listeners()` hook** for anything permanent.
    * Registration order is dispatch order, and registrations are
-   * append-only for the life of the dispatcher — so calling this from a
+   * append-only for the life of the dispatcher, so calling this from a
    * module that can be imported more than once, or from a request path,
    * silently duplicates listeners. The hook runs exactly once, at boot,
    * which is why it stays the default.
@@ -53,7 +53,7 @@ export class Events extends Facade<EventDispatcher>(() => EVENTS_TOKEN) {
    * Note the two argument forms are **not** interchangeable. An event
    * class matches by `instanceof` and infers `E`, so the handler's `event`
    * is fully typed. A string matches `event.eventName` through the same
-   * wildcard matcher as `Event.suppress()`, and cannot narrow — there is
+   * wildcard matcher as `Event.suppress()`, and cannot narrow. There is
    * no type-level link from a runtime string to an event class. Use the
    * class form unless you genuinely need to match a family of events by
    * name.
@@ -78,7 +78,7 @@ export class Events extends Facade<EventDispatcher>(() => EVENTS_TOKEN) {
   }
 
   /**
-   * Register a listener that is enqueued rather than run inline — the
+   * Register a listener that is enqueued rather than run inline, the
    * facade form of `EventDispatcher.listenQueued()`. Requires
    * `QueueServiceProvider` (or an explicit
    * `useQueuedListenerHandler()`); throws at dispatch time otherwise. No

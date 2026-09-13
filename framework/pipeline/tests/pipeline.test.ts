@@ -133,7 +133,7 @@ describe("Pipeline", () => {
     ).rejects.toThrow("Pipeline.send() must be called before run().");
   });
 
-  it("is not a thenable — awaiting an instance never runs it", async () => {
+  it("is not a thenable, awaiting an instance never runs it", async () => {
     const ran: string[] = [];
     const pipeline = new Pipeline<number>().send(1).through([
       (n, next) => {

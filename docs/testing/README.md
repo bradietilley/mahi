@@ -1,7 +1,7 @@
 # Testing
 
 `@mahiframework/testing` boots your **real** application against a throwaway SQLite
-database and dispatches requests straight into its Hono instance — no
+database and dispatches requests straight into its Hono instance, no
 server, no port, no mocking of the framework.
 
 ```ts
@@ -38,7 +38,7 @@ npm test
 
 The package is runner-agnostic by construction. Every assertion here
 throws a plain `Error` rather than using a vitest matcher, so nothing
-stops you composing it from node:test or any other runner — vitest is
+stops you composing it from node:test or any other runner. Vitest is
 simply what the template wires up.
 
 ## `createTestApplication()`
@@ -52,7 +52,7 @@ createTestApplication(
 
 It takes **your app's own bootstrap function** rather than importing one.
 The package can't depend on any specific application, so it stays a
-generic helper that each app supplies its bootstrap to — which is also
+generic helper that each app supplies its bootstrap to. Which is also
 what makes a test run against the same wiring as production. `bin/bootstrap.ts`
 is shared by `bin/console.ts`, `bin/server.ts`, and the test suite:
 
@@ -74,7 +74,7 @@ process.env.APP_KEY ??= `base64:${randomBytes(32).toString("base64")}`;
 ```
 
 Every call gets its **own** `mkdtemp` directory, so two
-`createTestApplication()` calls — in the same file or in parallel files —
+`createTestApplication()` calls, in the same file or in parallel files,
 never share a database.
 
 **2. Sets three environment variables *before* `bootstrapFn()` runs.**
@@ -91,7 +91,7 @@ export function databaseConfig(env: Env): DatabaseConfig {
 `NODE_ENV=test` flows into `app.useEnvironment(env.NODE_ENV)`, so
 `app.environment("test")` is true and `isProduction()` is false.
 
-`APP_KEY` is set with `??=` — only when nothing has set one already. The
+`APP_KEY` is set with `??=`, only when nothing has set one already. The
 template's env schema deliberately leaves `APP_KEY` without a default so a
 missing key fails loudly in production, which would otherwise make every
 test that doesn't have a real `.env` fail `loadEnv()` validation. A fresh
@@ -141,7 +141,7 @@ interface TestApplicationOptions {
 **`configure`** runs after `bootstrapFn()` resolves but before migrations.
 Note that `bootstrapFn` is itself responsible for calling
 `app.bootstrap()`, so this hook necessarily runs **after** providers have
-already registered and booted — it is not a pre-boot hook. Use it for
+already registered and booted. It is not a pre-boot hook. Use it for
 extra `app.config.set`/`merge` calls or test-only overrides that don't
 belong in the app's own bootstrap:
 
@@ -154,17 +154,17 @@ const testApp = await createTestApplication(bootstrap, {
 ```
 
 **`fakeQueue`** swaps the queue's *default* connection for a
-`FakeQueueDriver` — the `Queue::fake()` equivalent. Dispatches are
+`FakeQueueDriver`, the `Queue::fake()` equivalent. Dispatches are
 recorded, not run.
 
 **`fakeEvents`** replaces the `EventDispatcher` singleton with a
-`RecordingEventDispatcher` — the `Event::fake()` equivalent. Events are
+`RecordingEventDispatcher`, the `Event::fake()` equivalent. Events are
 recorded; no listener, queued listener, or `afterDispatch` callback runs.
 
 **`fakeHttp`** calls `Http.fake()` so `@mahiframework/http-client` intercepts every
 outbound request, and registers `Http.restore()` on `cleanup()`. Unlike the
-other two it needs no container swap and no provider — `Http` is a static
-facade over module-level state — so there is **no `testApp.http`**; assert
+other two it needs no container swap and no provider, `Http` is a static
+facade over module-level state, so there is **no `testApp.http`**; assert
 with the statics:
 
 ```ts
@@ -195,37 +195,37 @@ await testApp.request("/deploy", { method: "POST" });
 Process.assertRan("git *");
 ```
 
-Worth turning on broadly — a test that shells out unmocked is slow,
+Worth turning on broadly, a test that shells out unmocked is slow,
 environment-dependent, and occasionally destructive.
 
 > **Note the asymmetry with `fakeHttp`.** An unmatched *command* returns a
 > successful empty result; an unmatched *request* throws
 > `StrayRequestError`. That is `Process.fake()`'s own documented default
 > (matching Laravel's), left alone here so the behaviour does not change
-> depending on who enabled it — but it does mean a typo'd pattern looks
+> depending on who enabled it, but it does mean a typo'd pattern looks
 > like a passing test. Assert with `Process.assertRan()` rather than
 > relying on the stub having matched.
 
 **`fakeMail`** replaces the `MailManager` singleton with a
-`RecordingMailManager` — the `Mail::fake()` equivalent. `Mail.send()` /
+`RecordingMailManager`, the `Mail::fake()` equivalent. `Mail.send()` /
 `MailManager.send()` records the `Mailable` instead of delivering it, and
 the recorder is returned as `testApp.mail`. See [Faking mail](#faking-mail).
 
 **`fakeNotifications`** replaces the notifications `ChannelManager` with a
-`RecordingChannelManager` — the `Notification::fake()` equivalent.
+`RecordingChannelManager`, the `Notification::fake()` equivalent.
 `Notifications.send()` records the `(notifiable, notification)` pair
 instead of fanning out to channels; returned as `testApp.notifications`.
 See [Faking notifications](#faking-notifications).
 
-**`fakeStorage`** swaps the named disks (`["public", "s3"]`) — or the
-default disk, when `true` — for `FakeStorageDriver`s rooted at fresh temp
+**`fakeStorage`** swaps the named disks (`["public", "s3"]`), or the
+default disk, when `true`, for `FakeStorageDriver`s rooted at fresh temp
 directories, the `Storage::fake($disk)` equivalent. Writes under test never
 touch the app's real disk roots; each fake is returned on `testApp.storage`
 keyed by disk name. See [Faking storage](#faking-storage).
 
 **`fakeCache`** points the cache's default store at a fresh in-memory
 `ArrayCacheStore` (with its sweep timer disabled), the `Cache::fake()`
-equivalent — per-test isolation with no interval keeping the event loop
+equivalent, per-test isolation with no interval keeping the event loop
 alive.
 
 **`fakeQueue`, `fakeEvents`, `fakeMail`, `fakeNotifications`, `fakeStorage`,
@@ -238,14 +238,14 @@ if (options.fakeMail && app.has(MAIL_TOKEN)) { /* ... */ }
 ```
 
 An app that registers only the database and HTTP layers can pass
-`{ fakeQueue: true }` without an error — `testApp.queue` is simply
+`{ fakeQueue: true }` without an error. `testApp.queue` is simply
 `undefined`. That's why `queue`/`events`/`mail`/`notifications` are all
 optional on `TestApplication` and why every example asserts through
 `testApp.queue!`.
 
 `fakeEvents` uses `app.instance(EVENTS_TOKEN, events)` rather than
-rebinding a factory, so every subsequent `make(EVENTS_TOKEN)` — model
-lifecycle events, the `Events` facade, a controller resolving it — gets
+rebinding a factory, so every subsequent `make(EVENTS_TOKEN)`, model
+lifecycle events, the `Events` facade, a controller resolving it, gets
 the recorder. Listener wiring already ran during boot against the real
 dispatcher; that's fine, because a fake runs no listeners anyway.
 
@@ -275,7 +275,7 @@ const schedule = testApp.app.make<Schedule>(SCHEDULE_TOKEN);
 
 **`request(path, init)`** dispatches into the app's own Hono instance via
 `hono.request()` and returns a standard `Response`. Nothing binds a port.
-The `init` is a plain `RequestInit` — method, headers, body.
+The `init` is a plain `RequestInit`, method, headers, body.
 
 If no HTTP kernel is bound, calling `request()` throws a clear message
 rather than failing at setup time, so a database-only test app is still
@@ -290,7 +290,7 @@ registered), so request() is unavailable.
 
 1. restores any module-level fakes (`Http.restore()` when `fakeHttp` was
    set, `Process.restore()` when `fakeProcess` was);
-2. `app.terminate()` — runs every provider's `shutdown()` hook, which
+2. `app.terminate()`: runs every provider's `shutdown()` hook, which
    closes the sqlite handle and any Redis client the app opened;
 3. restores the `process.env` keys it mutated (`DB_FILENAME`, `NODE_ENV`,
    `APP_KEY`) to exactly what they were, deleting the ones that were
@@ -304,11 +304,11 @@ holding a file descriptor for the rest of the run.
 Always call it from `afterAll`.
 
 **`resetDatabase()`** re-runs every migration from scratch against the
-same temp file (`migrate:fresh` — drop all tables, re-migrate), wiping all
+same temp file (`migrate:fresh`, drop all tables, re-migrate), wiping all
 rows without recreating the file. See [Test isolation](#test-isolation).
 
 **`actingAs(user, guard?)`** sets the authenticated user for every
-subsequent request driven through the kernel — Laravel's `actingAs()`. It
+subsequent request driven through the kernel, Laravel's `actingAs()`. It
 delegates to `AuthManager.actingAs()`, which swaps the resolved guard so
 `authenticate()` returns `user` without a real token or session cookie:
 
@@ -318,7 +318,7 @@ const me = await client.getJson("/me");   // 200, Auth.user() === user
 ```
 
 Pass `null` to clear it. It requires `@mahiframework/auth`'s `AuthServiceProvider`
-to be registered — calling it otherwise throws a clear error. For a full
+to be registered, calling it otherwise throws a clear error. For a full
 round trip through a real guard (issuing a bearer token or a session
 cookie) rather than short-circuiting resolution, use
 [`withToken()`](#actingas-tokens-and-cookies) or the cookie jar instead.
@@ -345,7 +345,7 @@ const { status, body } = await client.postJson<{ token: string }>("/auth/login",
 | `putJson<T>` | `(path, payload?, init?)` |
 | `deleteJson<T>` | `(path, init?)` |
 
-Every method returns `{ status: number; body: T }` — no `Response`, no
+Every method returns `{ status: number; body: T }`, no `Response`, no
 second `await res.json()`.
 
 **There is no bare `get()`, `post()`, or `delete()`.** Every method parses
@@ -353,7 +353,7 @@ the body as JSON, and every method's name says so. But unlike a naive
 `res.json()`, the client **reads the body defensively**: a `204 No
 Content`, an empty body, or a non-JSON `Content-Type` (a plain-text
 `404`/`500`) returns `body: undefined` rather than throwing an opaque
-`SyntaxError` — you still have `status` to assert on:
+`SyntaxError`. You still have `status` to assert on:
 
 ```ts
 const { status, body } = await client.getJson("/auth/me");
@@ -370,7 +370,7 @@ expect(response.headers.get("content-type")).toContain("application/json");
 
 Headers passed as `init.headers` are **normalised through `new
 Headers()`**, so a `Headers` instance or a `[key, value][]` tuple array is
-honoured — both used to spread to `{}` and be silently dropped:
+honoured, both used to spread to `{}` and be silently dropped:
 
 ```ts
 await client.getJson("/me", { headers: new Headers({ Authorization: "Bearer x" }) });
@@ -409,12 +409,12 @@ const dashboard = await client.getJson("/dashboard");   // sends the cookie
 
 Every `Set-Cookie` on a response is captured into the jar and replayed as a
 `Cookie` header on subsequent requests, so session-guard flows are testable
-end to end through the kernel — which is what the token/session tests need
+end to end through the kernel. Which is what the token/session tests need
 (and what `actingAs()` short-circuits when you don't care about the guard
 mechanics). Per-request `init.headers` always win over the client
 defaults.
 
-`TestClient` is a plain class, not a runner-specific base — compose it
+`TestClient` is a plain class, not a runner-specific base, compose it
 from `beforeAll`/`afterAll` like any other fixture.
 
 ## Writing tests
@@ -464,7 +464,7 @@ export function clientFor(testApp: TestApplication, token: string) {
 ```
 
 Two things this buys you. The helper **throws on an unexpected status
-with the response body in the message** — a failed registration surfaces
+with the response body in the message**, a failed registration surfaces
 as "user registration returned 422: {...}" rather than as a confusing
 `undefined` three assertions later. And it returns both a `TestClient`
 (for JSON assertions) and a raw `request` (for header and status
@@ -482,14 +482,14 @@ const raw = await author.request("/auth/logout", { method: "POST" });
 This is the detail most likely to bite you, and it's why the helper calls
 `resetRateLimits()`.
 
-The app's rate limiters key off `request.ip()` — the template registers
+The app's rate limiters key off `request.ip()`, the template registers
 `register` at 10/min and `login` at 5/min. An in-process `hono.request()`
 has **no socket peer**, so `ip()` is `undefined` and every request in the
 suite shares one limiter key. The consequences:
 
 - One test file's requests eat another's budget. A file that registers 12
   users trips the `register` limiter and the twelfth `registerUser()` call
-  fails with a 429 — in a file that has nothing to do with rate limiting.
+  fails with a 429, in a file that has nothing to do with rate limiting.
 - Failures become **order-dependent**. The suite passes when run alone and
   fails under `--shard`, or vice versa.
 - A genuine rate-limiting test can't distinguish "I tripped the limit"
@@ -509,13 +509,13 @@ beforeEach(async () => {
 ```
 
 > **Don't fake a distinct client with a per-request `x-forwarded-for`.**
-> That only works if `Request.ip()` trusts the header — which is exactly
+> That only works if `Request.ip()` trusts the header. Which is exactly
 > the hole that lets an attacker rotate it to bypass the login limiter.
 > The header is not trusted, so a test that sets it is testing nothing.
 > If a testing convenience depends on a security hole, the hole is the
 > problem.
 
-Testing the limiter itself is direct — fire until it trips:
+Testing the limiter itself is direct, fire until it trips:
 
 ```ts
 const statuses = [];
@@ -560,8 +560,8 @@ beforeAll(async () => {
 afterAll(() => testApp.cleanup());
 ```
 
-Write tests that don't collide — unique emails, unique hashtag names,
-fresh posts — and the shared database is a non-issue. The template's
+Write tests that don't collide, unique emails, unique hashtag names,
+fresh posts, and the shared database is a non-issue. The template's
 helpers already do this with `randomUUID()` suffixes.
 
 When you genuinely need per-`it()` isolation, `resetDatabase()` from a
@@ -579,7 +579,7 @@ beforeEach(async () => {
 afterAll(() => testApp.cleanup());
 ```
 
-It runs `migrate:fresh` — drops every table and re-migrates — so rows are
+It runs `migrate:fresh`, drops every table and re-migrates, so rows are
 gone but the schema is intact. It is fast (better-sqlite3 is synchronous,
 no network round-trip) but not free, and it does **not** recreate the temp
 file or re-boot the application. Any fixture created in `beforeAll` is
@@ -600,7 +600,7 @@ beforeEach(async () => {
 ```
 
 For per-`describe` isolation without the reset, nest `describe` blocks
-with their own `beforeAll`/`afterAll` — useful when each block needs
+with their own `beforeAll`/`afterAll`, useful when each block needs
 different fake options anyway.
 
 ## Database assertions
@@ -627,7 +627,7 @@ import {
 | `countDatabaseRows` | `(app, table, criteria?)` | *(not an assertion)* returns the count |
 
 `assertSoftDeleted()` exists because `assertDatabaseMissing()` cannot tell
-a working soft delete from a destructive one — it passes whether the row
+a working soft delete from a destructive one. It passes whether the row
 was soft-deleted, hard-deleted, or never written at all. This asserts both
 halves.
 
@@ -643,8 +643,8 @@ A model configured with `softDeletes: { column: "archived_at" }` would be
 mis-asserted by the string form, and a model that does not soft-delete at
 all throws rather than silently passing.
 
-All are `async` and take the `Application` as their first argument —
-they go through `app.make<DatabaseManager>(DATABASE_TOKEN).driver().kysely`
+All are `async` and take the `Application` as their first argument.
+They go through `app.make<DatabaseManager>(DATABASE_TOKEN).driver().kysely`
 directly rather than through the model layer.
 
 `DatabaseCriteria` is `Record<string, unknown>`. Each key is a **column
@@ -655,12 +655,12 @@ name** (not a model attribute), and each value is matched with `=`, except
 query = value === null ? query.where(column, "is", null) : query.where(column, "=", value);
 ```
 
-That `null` handling matters — `WHERE deleted_at = NULL` matches nothing
+That `null` handling matters. `WHERE deleted_at = NULL` matches nothing
 in SQL, and getting it wrong would make every soft-delete assertion
 silently pass.
 
 The point of these is asserting **persisted state independent of what an
-API response claims** — an internal column no endpoint exposes:
+API response claims**, an internal column no endpoint exposes:
 
 ```ts
 it("soft-deletes rather than removing the row", async () => {
@@ -685,7 +685,7 @@ has/missing isn't enough:
 expect(await countDatabaseRows(testApp.app, "posts", { user_id: author.id })).toBe(3);
 ```
 
-**`assertDatabaseCount()` takes no criteria** — it counts the whole table.
+**`assertDatabaseCount()` takes no criteria**. It counts the whole table.
 For a filtered count, use `countDatabaseRows()` with an `expect()`.
 
 Failure messages name the table and the criteria:
@@ -789,7 +789,7 @@ See [Queues](../queues/) for jobs, chains, and middleware.
 
 ### Testing that a job actually works
 
-The fake proves the *dispatch*. To prove the *job*, run it — either
+The fake proves the *dispatch*. To prove the *job*, run it, either
 construct and `handle()` it directly, or dispatch on the sync connection
 without the fake:
 
@@ -801,7 +801,7 @@ const manager = testApp.app.make<QueueManager>(QUEUE_TOKEN);
 await expect(manager.dispatch(new LogPostCreatedJob(post))).resolves.toBeUndefined();
 ```
 
-That path also exercises model serialization — a job carrying a live model
+That path also exercises model serialization, a job carrying a live model
 is encoded on dispatch and rehydrated to a **freshly loaded** instance
 before `handle()` runs:
 
@@ -820,7 +820,7 @@ const testApp = await createTestApplication(bootstrap, { fakeEvents: true });
 
 `RecordingEventDispatcher` extends `EventDispatcher` and overrides
 `dispatch()` to record and return. No listener, queued listener, or
-`afterDispatch()` callback runs — including broadcasting and auditing.
+`afterDispatch()` callback runs, including broadcasting and auditing.
 
 This is the crucial difference from `Event.suppress()`, which also stops
 listeners but **records nothing**. With a recorder, a test can prove code
@@ -838,7 +838,7 @@ happening.
 | `reset()` | Discard recorded events |
 
 The filter receives the **live event instance**, so you assert on its real
-properties — no serialization in the way:
+properties, no serialization in the way:
 
 ```ts
 await author.client.postJson<PostJson>("/posts", { body: "Faked events" });
@@ -864,7 +864,7 @@ override async dispatch<E extends AbstractEvent>(event: E): Promise<void> {
 That keeps `suppress()` meaning "as if never dispatched" rather than "runs
 no listeners but still shows up in assertions".
 
-Listener registration still works normally — `listen()` and
+Listener registration still works normally, `listen()` and
 `afterDispatch()` are inherited and record their registrations, so
 provider boot wiring doesn't throw. They simply never fire.
 
@@ -877,7 +877,7 @@ const testApp = await createTestApplication(bootstrap, { fakeMail: true });
 ```
 
 `RecordingMailManager` extends `MailManager` and overrides `send()` to
-record the `Mailable` and deliver nothing — no transport is resolved,
+record the `Mailable` and deliver nothing. No transport is resolved,
 nothing leaves the process. Because a transport only ever sees the
 flattened `RenderedMail` (the `Mailable` class is lost at that boundary),
 the fake intercepts at `send(mailable)` and keeps the actual `Mailable`
@@ -913,7 +913,7 @@ const testApp = await createTestApplication(bootstrap, { fakeNotifications: true
 
 `RecordingChannelManager` extends `ChannelManager` and overrides `send()`
 to record the `(notifiable, notification)` pair and skip the channel
-fan-out — no mail, no `notifications` table row, no broadcast. It keeps
+fan-out, no mail, no `notifications` table row, no broadcast. It keeps
 both halves so you assert the notification class **and** its target
 together:
 
@@ -946,8 +946,8 @@ const testApp = await createTestApplication(bootstrap, { fakeStorage: ["public"]
 // or fakeStorage: true for just the default disk
 ```
 
-Each named disk is swapped for a `FakeStorageDriver` — a real
-`LocalStorageDriver` rooted at a fresh temp directory — so writes under
+Each named disk is swapped for a `FakeStorageDriver`, a real
+`LocalStorageDriver` rooted at a fresh temp directory, so writes under
 test never touch the app's configured disk roots, and `cleanup()` removes
 each temp dir. The fakes are returned on `testApp.storage`, keyed by disk
 name, with `assertExists`/`assertMissing` helpers:
@@ -970,7 +970,7 @@ const testApp = await createTestApplication(bootstrap, { fakeCache: true });
 ```
 
 Points the cache's **default** store at a fresh in-memory `ArrayCacheStore`
-with its sweep timer disabled — full per-test isolation, and no interval
+with its sweep timer disabled, full per-test isolation, and no interval
 keeping the event loop alive after the run. Functionally the array store
 already works in tests; `fakeCache` is the symmetry helper that guarantees
 a clean, isolated store regardless of what `cache.default` is configured
@@ -1004,7 +1004,7 @@ of the command string. An **unmatched** command resolves with a generic
 success and empty output rather than throwing, so `Process.fake()` with no
 arguments stubs out every command.
 
-Two things to remember. `Process.ran()` records **real** runs too — the
+Two things to remember. `Process.ran()` records **real** runs too. The
 history is appended on every `run()` call whether faked or not. And it's
 module-level static state, so `Process.restore()` in an `afterEach` is not
 optional; without it, fake handlers and command history leak into the next
@@ -1039,7 +1039,7 @@ spelling out the scheme. First match wins. A value can be an object (JSON
 body), a string (raw body), a number (status code), an explicit
 `{ body, status, headers }`, a handler function, or a `Http.sequence()`.
 
-**An unmatched request raises `StrayRequestError` — it never reaches the
+**An unmatched request raises `StrayRequestError`. It never reaches the
 network.** This is the one place the client deliberately diverges from
 Laravel, which falls through to the real handler and so turns a typo'd
 pattern into a live call from your test suite. Failing loudly costs one
@@ -1048,7 +1048,7 @@ test you debug later. `Http.allowStrayRequests()` restores Laravel's
 behaviour if you want it.
 
 A handler that returns `undefined` **declines**, falling through to the
-next stub — useful for stubbing one shape of request and leaving the rest:
+next stub, useful for stubbing one shape of request and leaving the rest:
 
 ```ts
 Http.fake({
@@ -1076,7 +1076,7 @@ Assertions throw plain `Error`s, so they work in any runner:
 `assertSent`, `assertNotSent`, `assertSentInOrder`, `assertSentCount`,
 `assertNothingSent`, and `assertSequencesAreEmpty`. `Http.recorded()`
 returns the raw `[request, response]` pairs when you need something the
-assertions don't cover — including requests that matched no stub, which is
+assertions don't cover, including requests that matched no stub, which is
 what you want when debugging why a pattern missed.
 
 Like `Process`, this is module-level static state: `Http.restore()` in an
@@ -1112,7 +1112,7 @@ The returned handle:
 | Method | Returns |
 |---|---|
 | `output()` | Raw captured output, including ANSI escapes |
-| `strippedOutput()` | The same with escapes removed — assert against this |
+| `strippedOutput()` | The same with escapes removed, assert against this |
 | `restore()` | Undo the fake |
 
 **One `FakeTerminal` is shared for the whole `fake()` session**, so
@@ -1180,12 +1180,12 @@ expect(after.status).toBe(401);
 ```
 
 See [Requests](../requests/), [Responses](../responses/), and
-[Validation](../validation/) — a 422 body carries the field-keyed messages
+[Validation](../validation/), a 422 body carries the field-keyed messages
 you can assert against.
 
 ## Testing models
 
-Models work normally against the test database — they're the same classes
+Models work normally against the test database. They're the same classes
 production uses:
 
 ```ts
@@ -1215,8 +1215,8 @@ const post = await Post.create({ id: "log-post-1", user_id: alice.id, parent_id:
 const { body } = await client.getJson<PostJson>(`/posts/${post.id}`);
 ```
 
-Factories are the third option and usually the best for bulk fixtures —
-see [Migrations](../migrations/#factories).
+Factories are the third option and usually the best for bulk fixtures.
+See [Migrations](../migrations/#factories).
 
 For anything the model layer hides (a soft-delete marker, a counter
 column, an internal flag), drop to
@@ -1234,7 +1234,7 @@ it("registers posts:log-created via PostsServiceProvider's jobs() hook", () => {
 });
 ```
 
-Scheduled tasks are testable without waiting for a clock — `isDueAt()`
+Scheduled tasks are testable without waiting for a clock. `isDueAt()`
 takes a `Date`, and `run()` takes the app:
 
 ```ts
@@ -1282,7 +1282,7 @@ it("expires a token after seven days", async () => {
 
 `DateTime.setTestNow()` freezes everything that reads the current time
 through one code path, so `now`, `today`, `isPast`, and `diffForHumans`
-freeze together — and so do model timestamps, token expiries, and queue
+freeze together, and so do model timestamps, token expiries, and queue
 stamps, since they all go through `DateTime.now("UTC")`.
 
 It's process-wide static state; release it in an `afterEach`. See
@@ -1323,7 +1323,7 @@ terminated: its connections are closed and `app()` no longer resolves it.
 Create a new one rather than reviving it.
 
 **Clean up in reverse.** If a file creates two test applications, clean
-the second up before the first — `terminate()` restores the global
+the second up before the first, `terminate()` restores the global
 `app()` and env keys, and unwinding in creation order restores them out
 of sequence.
 
@@ -1339,7 +1339,7 @@ fixtures in `beforeEach` too.
 
 **`fakeQueue`/`fakeEvents` are silent no-ops when the provider isn't
 registered.** `testApp.queue` is `undefined` and `assertPushed` was never
-reachable — a test that "passes" this way asserted nothing.
+reachable, a test that "passes" this way asserted nothing.
 
 **Give every simulated client its own `x-forwarded-for`.** Otherwise every
 request in the suite shares one rate-limiter key and failures become
@@ -1349,7 +1349,7 @@ order-dependent.
 `*Json`. Use `testApp.request()` for non-JSON responses, header
 assertions, and `204`s.
 
-**`assertDatabaseCount()` ignores criteria** — it counts the whole table.
+**`assertDatabaseCount()` ignores criteria**. It counts the whole table.
 Use `countDatabaseRows()` for a filtered count.
 
 **Database assertions take column names, not model attributes**, and
@@ -1364,7 +1364,7 @@ class form at compile time and silently un-matches the string form.
 **`Process.fake()` leaks without `Process.restore()`**, and
 `Process.ran()` records real runs too.
 
-**`Tui.fake()` leaks without `restore()`** — it swaps module-level output
+**`Tui.fake()` leaks without `restore()`**. It swaps module-level output
 and stdin wiring.
 
 **`DateTime.setTestNow()` leaks without `setTestNow(null)`.**
@@ -1380,11 +1380,11 @@ but two calls in one file leave the *last* value in `process.env`.
 
 ## Related
 
-- [Installation](../installation/) — `npm test` in a generated app
-- [Console](../console/) — `./artisan test`, and testing commands
-- [Queues](../queues/) — jobs, chains, and what `fakeQueue` records
-- [Events](../events/) — dispatching, listeners, and `Event.suppress()`
-- [Migrations](../migrations/) — factories and seeders for fixtures
-- [Cache](../cache/) — the rate limiter the `x-forwarded-for` trick works around
-- [Dates & times](../datetime/) — `DateTime.setTestNow()`
-- [Helpers](../helpers/) — `Process.fake()`, `Tui.fake()`
+- [Installation](../installation/): `npm test` in a generated app
+- [Console](../console/): `./artisan test`, and testing commands
+- [Queues](../queues/): jobs, chains, and what `fakeQueue` records
+- [Events](../events/): dispatching, listeners, and `Event.suppress()`
+- [Migrations](../migrations/): factories and seeders for fixtures
+- [Cache](../cache/): the rate limiter the `x-forwarded-for` trick works around
+- [Dates & times](../datetime/): `DateTime.setTestNow()`
+- [Helpers](../helpers/): `Process.fake()`, `Tui.fake()`

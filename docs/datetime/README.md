@@ -26,8 +26,8 @@ Four things are modelled, and the package refuses to blur them:
 Plus `Timezone` and `Locale`, two function namespaces over host data.
 
 It has three runtime dependencies (`date-fns`, `date-fns-tz`,
-`@date-fns/utc`), and none of their types appear in any public signature —
-the implementation library can be swapped without a breaking change.
+`@date-fns/utc`), and none of their types appear in any public signature.
+The implementation library can be swapped without a breaking change.
 Localization and relative time delegate to the host's `Intl`, so a
 `small-icu` Node build will not have full locale coverage.
 
@@ -35,7 +35,7 @@ Localization and relative time delegate to the host's `Intl`, so a
 
 ### The model: an instant plus a display zone
 
-A `DateTime` is an absolute instant — milliseconds since the Unix epoch —
+A `DateTime` is an absolute instant, milliseconds since the Unix epoch,
 together with an IANA identifier saying which clock to read it on:
 
 ```ts
@@ -115,7 +115,7 @@ Carbon's own spellings exist for migration: `createFromTimestamp()`
 `createFromTime()`, `instance()`.
 
 **Every factory takes an optional timezone as its last positional
-argument.** Without one, the configured default is used — see
+argument.** Without one, the configured default is used. See
 [Configuration](#configuration).
 
 **Months are 1-based everywhere.** `DateTime.create(2026, 8, 20)` is
@@ -166,8 +166,8 @@ DateTime.createFromFormat("03/04/2026", "dd/MM/yyyy");   // 3 April, unambiguous
 ```
 
 The refusal to guess is deliberate. Locale-sniffing parsers are a reliable
-source of production incidents — the same string means different days on
-different machines — and `createFromFormat()` exists for when the caller
+source of production incidents, the same string means different days on
+different machines, and `createFromFormat()` exists for when the caller
 genuinely knows the layout.
 
 **Offset-bearing strings determine the instant; `zone` only decides the
@@ -214,7 +214,7 @@ perth.keepLocalTime("Australia/Sydney").isEqual(perth); // false — different i
 shorthands for `inTimezone("UTC")` and the host's zone.
 
 Timezone identifiers are validated at runtime against the host's IANA
-database. Unknown zones — including **blank** ones — throw
+database. Unknown zones, including **blank** ones, throw
 `InvalidTimezoneError` rather than falling back to the host's zone, which
 is what `Intl` would silently do.
 
@@ -254,7 +254,7 @@ one-hour slip is worse than a loud failure. `AmbiguousTimeError` carries a
 case it hit.
 
 Boundary methods pick sensibly on your behalf. `startOf()` uses
-`"compatible"` — so a day with no midnight (São Paulo used to change
+`"compatible"`, so a day with no midnight (São Paulo used to change
 clocks at midnight) starts at the first instant that *does* exist, rather
 than shifting backwards into the previous day. `endOf()` resolves
 ambiguity to `"later"`, so the end of a fall-back day really is the end of
@@ -302,7 +302,7 @@ date.setUnit("hour", 9);           // any single field by name
 ```
 
 `with()` merges over the current components, validates the result, and
-re-resolves against the zone — so replacing the hour on a transition date
+re-resolves against the zone, so replacing the hour on a transition date
 behaves like any other calendar operation. Out-of-range components throw.
 
 ### Arithmetic
@@ -333,8 +333,8 @@ questions.
 DateTime.create(2026, 1, 31).addMonths(1).toISODate();   // "2026-02-28"
 ```
 
-This is deliberately not reversible — `addMonths(1).subMonths(1)` on
-31 January returns 28 February — and deliberately different from PHP. Every
+This is deliberately not reversible, `addMonths(1).subMonths(1)` on
+31 January returns 28 February, and deliberately different from PHP. Every
 alternative is worse. `addMonthsWithOverflow()` /
 `subMonthsWithOverflow()` / `addYearsWithOverflow()` /
 `subYearsWithOverflow()` reproduce PHP's spill-over behaviour (2 or
@@ -342,7 +342,7 @@ alternative is worse. `addMonthsWithOverflow()` /
 numbers.
 
 `add(duration)` applies buckets **largest-first**: months, then days, then
-exact milliseconds. That matters at month boundaries — 31 January plus
+exact milliseconds. That matters at month boundaries, 31 January plus
 "1 month and 1 day" is 1 March (clamp to 28 Feb, then add a day), not
 3 March. The order is fixed and tested rather than incidental.
 
@@ -368,8 +368,8 @@ date.round("hour");    // nearest; exact midpoints round up
 `startOf`/`endOf` also exist for `millisecond`, `second`, `minute`, and
 `hour` as named methods (`startOfSecond()`, `endOfHour()`, …).
 
-`startOfWeek()` defaults to **Monday everywhere**, not to the host locale —
-see [`Locale`](#locale) for why.
+`startOfWeek()` defaults to **Monday everywhere**, not to the host locale.
+See [`Locale`](#locale) for why.
 
 ### Comparisons
 
@@ -398,12 +398,12 @@ a.clamp(min, max);
 
 **Calendar comparisons use the receiver's zone.** `a.isSameDay(b)` asks
 whether `b` falls on `a`'s calendar day, which makes it intentionally
-non-symmetric across zones — a calendar question needs a calendar, and a
+non-symmetric across zones. A calendar question needs a calendar, and a
 calendar needs a zone.
 
 `clamp()` accepts its bounds in either order. `closest()`/`farthest()`
-return the result **in the receiver's zone** — "which of these is nearest
-to *me*" belongs on the caller's clock — and throw if given no candidates.
+return the result **in the receiver's zone**, "which of these is nearest
+to *me*" belongs on the caller's clock, and throw if given no candidates.
 
 A large family of convenience predicates:
 
@@ -458,7 +458,7 @@ Available: `diffInMilliseconds`, `diffInSeconds`, `diffInMinutes`,
 **Hours and below measure real elapsed time. Days and above measure
 wall-clock calendar distance.** Across a spring-forward, midnight to
 midnight is `diffInHours() === 23` and `diffInDays() === 1`. That's not an
-inconsistency — they are answers to different questions.
+inconsistency. They are answers to different questions.
 
 The sign is positive when `other` is later than the receiver.
 `DiffOptions` has two flags: `absolute` (discard the sign) and `float`
@@ -466,7 +466,7 @@ The sign is positive when `other` is later than the receiver.
 
 **Month differences are not antisymmetric.**
 `a.diffInMonths(b) !== -b.diffInMonths(a)` in general, because months
-differ in length by direction. What does hold — and what is tested — is
+differ in length by direction. What does hold, and what is tested, is
 that stepping by the whole-month count never overshoots. The
 implementation counts whole units by stepping until the next step would
 pass the target, then measures the fraction into the following unit;
@@ -474,7 +474,7 @@ dividing by an "average month" would break the property that 31 Jan →
 28 Feb is exactly 1 month, matching what `addMonths` does.
 
 `diff()` is always an **exact** `Duration` of milliseconds, never calendar
-parts — "how long between these two moments" has one true answer.
+parts, "how long between these two moments" has one true answer.
 
 ### Relative time
 
@@ -535,7 +535,7 @@ much of the Middle East:
 date.isBusinessDay({ weekend: [5, 6] });
 ```
 
-Holidays are a **predicate**, not a bundled list — this package has no
+Holidays are a **predicate**, not a bundled list. This package has no
 business deciding whose public holidays apply:
 
 ```ts
@@ -558,7 +558,7 @@ date.toTimeString();     // 14:30:00.000
 
 > **Format tokens are `date-fns` Unicode tokens, not PHP's.** `yyyy-MM-dd`,
 > not `Y-m-d`. The two overlap enough to be confusable and differ enough to
-> be dangerous — `i` means minutes in PHP and nothing in Unicode — so the
+> be dangerous, `i` means minutes in PHP and nothing in Unicode, so the
 > confusable subset is rejected rather than guessed at. A bad pattern
 > throws `InvalidFormatError`.
 
@@ -580,7 +580,7 @@ date.valueOf();         // the instant — makes <, >, and +date work
 
 `toJSON()` emits an **offset-bearing** ISO string rather than a bare `Z`,
 so the local wall clock survives the round trip. The IANA identifier
-itself does not fit in ISO 8601 — if a consumer needs the zone *name*, use
+itself does not fit in ISO 8601, if a consumer needs the zone *name*, use
 `toObject()`.
 
 The framework's own storage convention is different and worth knowing:
@@ -663,7 +663,7 @@ Duration.months(1).totalDays;   // throws InvalidDurationError
 ```
 
 **`total*` throws on a duration containing months.** There is no honest
-answer — a month has no fixed number of milliseconds. The error says so
+answer. A month has no fixed number of milliseconds. The error says so
 and tells you what to do instead: apply the duration to a `DateTime` and
 take the difference.
 
@@ -672,7 +672,7 @@ like "+1 month, −3 days" becomes "+1 month, +3 days" rather than being
 normalised. Normalising would require a reference date.
 
 Serialization is ISO 8601 duration notation, with months preserved as `M`
-in the date section rather than expanded into days — so the
+in the date section rather than expanded into days, so the
 calendar-relative meaning survives a round trip:
 
 ```ts
@@ -723,7 +723,7 @@ and that subtraction is eventually forgotten.
 | `Interval.fromISOString(s, zone?)` | Parse `"<start>/<end>"`. |
 
 `Interval.closed()` exists for the cases where an inclusive end genuinely
-is what you mean. It works by extending the end by one millisecond — the
+is what you mean. It works by extending the end by one millisecond, the
 same fudge every closed-interval implementation makes, but done once,
 here, where it's documented. `endInclusive` reads it back (and throws on
 an empty interval, which has no inclusive end).
@@ -765,7 +765,7 @@ gap. Returning the enclosing span for `[09:00, 10:00)` and
 `[14:00, 15:00)` would silently claim the four hours in between; adjacent
 intervals do unite.
 
-`difference()` returns **zero, one, or two** intervals — punching a hole
+`difference()` returns **zero, one, or two** intervals, punching a hole
 in the middle of a span leaves two pieces, and pretending otherwise would
 lose one of them.
 
@@ -820,7 +820,7 @@ Period.months(start, end);        Period.quarters(start, end);
 Period.years(start, end);
 ```
 
-`Period.fromInterval()` passes `excludeEnd: true` through automatically —
+`Period.fromInterval()` passes `excludeEnd: true` through automatically,
 an `Interval` excludes its end and a `Period` includes it, and that's what
 keeps the two consistent.
 
@@ -864,7 +864,7 @@ period.excludeStart();
 period.excludeEnd();
 ```
 
-`filter()` **composes** — calling it twice requires both predicates to
+`filter()` **composes**, calling it twice requires both predicates to
 pass. The index handed to the predicate counts **candidates**, not
 survivors, so it stays stable as further filters are layered on.
 
@@ -885,7 +885,7 @@ period.timezone;
 period.recurrences;      // the element cap, or null when bounded by a date
 ```
 
-`includes()` exploits monotonicity — it stops as soon as the sequence
+`includes()` exploits monotonicity. It stops as soon as the sequence
 passes the target rather than scanning to the end.
 
 ### `maxSteps`
@@ -896,8 +896,8 @@ Period.days(start, end, { maxSteps: 500_000 });
 
 Iteration aborts with a clear `InvalidIntervalError` after `maxSteps`
 candidates (default **100,000**). It's a safety net for two situations: a
-`filter` that rejects nearly everything, and a genuinely enormous sequence
-— every millisecond of a day is 86.4 million elements. Either way a hard
+`filter` that rejects nearly everything, and a genuinely enormous sequence,
+every millisecond of a day is 86.4 million elements. Either way a hard
 stop with a message beats a hung process or an exhausted heap.
 
 Note the cap counts **candidates examined**, not elements yielded, so a
@@ -999,8 +999,8 @@ date.startOfWeek({ weekStartsOn: Locale.firstDayOfWeek(user.locale) });
 
 `firstDayOfWeek()` and `weekendDays()` read CLDR week metadata off
 `Intl.Locale`, which moved from a property to a method mid-standard. All
-three runtime shapes are handled — `getWeekInfo()`, `weekInfo`, and
-neither — falling back to Monday and `[0, 6]` rather than assuming
+three runtime shapes are handled, `getWeekInfo()`, `weekInfo`, and
+neither, falling back to Monday and `[0, 6]` rather than assuming
 whichever one your Node happens to implement.
 
 ## Configuration
@@ -1022,7 +1022,7 @@ setDefaultWeekStartsOn(0);
 setDefaultLocale("en-AU");
 ```
 
-These are process-wide mutable settings — a deliberate trade. The
+These are process-wide mutable settings, a deliberate trade. The
 alternative is threading a zone and a week-start through every call site,
 and in practice an application has exactly one answer for both. Set them
 once during boot, from configuration, in a service provider's `boot()`:
@@ -1045,7 +1045,7 @@ Three defaults, three different fallback policies, each for a reason:
 |---|---|---|
 | timezone | the host's zone, resolved **lazily on first use** | Lazy so a test setting `process.env.TZ` before touching the package still gets what it asked for. |
 | week start | **Monday** (ISO 8601), never the locale | A locale-derived default would make `startOfWeek()` differ between a laptop and a server. |
-| locale | the host's locale | A wrong locale produces text in an unexpected language — cosmetic and immediately visible. A wrong timezone silently produces the wrong instant. |
+| locale | the host's locale | A wrong locale produces text in an unexpected language, cosmetic and immediately visible. A wrong timezone silently produces the wrong instant. |
 
 Server applications should still set the locale explicitly.
 
@@ -1066,7 +1066,7 @@ family without also swallowing unrelated `TypeError`s.
 The rule: **`parse`, `create`, and `from*` throw; the `*Safe` variants
 return `null`.** The authoritative constructors throw because a caller
 handing them garbage has a bug, and silently producing an "Invalid
-Date"-style poisoned object — the native `Date` mistake — makes that bug
+Date"-style poisoned object, the native `Date` mistake, makes that bug
 surface somewhere far away. Use `parseSafe`/`createSafe` for genuinely
 untrusted input where failure is an expected branch:
 
@@ -1095,7 +1095,7 @@ date.toDate();                 // a fresh Date at the same instant
 ```
 
 `valueOf()` returns the instant, so `<`, `>`, and `+date` work as
-expected. `==` and `===` compare object identity, as always — use
+expected. `==` and `===` compare object identity, as always, use
 `isEqual()` (same instant) or `isIdentical()` (same instant *and* zone).
 
 `fromDate()` on an Invalid Date throws `InvalidDateTimeError` rather than
@@ -1226,9 +1226,9 @@ pattern throws `InvalidFormatError`.
 
 ## Related
 
-- [Models](../models/) — timestamp columns, date casts, soft deletes
-- [Queues](../queues/) — `available_at`, delays, `retryUntil()`
-- [Scheduling](../scheduling/) — cron expressions and task timezones
-- [Authentication](../authentication/) — token and session expiry
-- [Testing](../testing/) — freezing the clock in a test suite
-- [Helpers](../helpers/) — `Str`, `Arr`, `Collection`, `Number`
+- [Models](../models/): timestamp columns, date casts, soft deletes
+- [Queues](../queues/): `available_at`, delays, `retryUntil()`
+- [Scheduling](../scheduling/): cron expressions and task timezones
+- [Authentication](../authentication/): token and session expiry
+- [Testing](../testing/): freezing the clock in a test suite
+- [Helpers](../helpers/): `Str`, `Arr`, `Collection`, `Number`

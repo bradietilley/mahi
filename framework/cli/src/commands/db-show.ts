@@ -3,7 +3,7 @@ import { Tui } from "@mahiframework/tui";
 import { Command } from "../command.js";
 
 /**
- * `db:show` — a connection/table overview, mirroring Laravel's
+ * `db:show`, a connection/table overview, mirroring Laravel's
  * `ShowCommand`. Backed by Kysely's own `introspection.getTables()`
  * (already used by `MigrationRunner` internally), so this packages an
  * existing capability as a CLI command rather than building new

@@ -1,7 +1,7 @@
 import type { SessionRecord, SessionStore } from "./session-store.js";
 
 /**
- * Minimal structural view of `@mahiframework/cache`'s `CacheStore` — the
+ * Minimal structural view of `@mahiframework/cache`'s `CacheStore`, the
  * operations this store actually needs.
  *
  * Structural rather than an import so `@mahiframework/auth` doesn't take a
@@ -16,12 +16,12 @@ export interface SessionCacheStore {
 }
 
 /**
- * Sessions in the cache, getting TTL-based expiry for free.
+ * Sessions in the cache, with TTL-based expiry handled by the store.
  *
  * Faster than the database store, with two real caveats worth knowing
  * before choosing it: sessions vanish on restart with the `array` store,
  * and `destroyForUser()` is unsupported because a cache can't be queried
- * by value — "log this user out everywhere" needs the database store.
+ * by value, "log this user out everywhere" needs the database store.
  */
 export class CacheSessionStore implements SessionStore {
   constructor(
@@ -41,7 +41,7 @@ export class CacheSessionStore implements SessionStore {
     }
 
     // The cache TTL should already have evicted this, but expiry is
-    // enforced here too rather than trusted — same reasoning as the
+    // enforced here too rather than trusted, same reasoning as the
     // database store, and it keeps both stores behaviourally identical.
     if (new Date(record.expiresAt).getTime() <= Date.now()) {
       return null;

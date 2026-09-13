@@ -58,7 +58,7 @@ describe("DB.table() / DB.query()", () => {
   it("types columns and values from an explicit TRow generic", async () => {
     const rows = await DB.table<WidgetTable>("widgets").where("price", ">", 15).get();
 
-    // `rows` is WidgetTable[], not Record<string, any>[] — `name` is a string.
+    // `rows` is WidgetTable[], not Record<string, any>[]. `name` is a string.
     const names: string[] = rows.map((row) => row.name);
     expect(names.sort()).toEqual(["Cog", "Sprocket"]);
   });
@@ -89,7 +89,7 @@ describe("DB.table() / DB.query()", () => {
 
     await DB.transaction(async () => {
       await DB.table("widgets").insert({ id: "4", name: "Gear", price: 40 });
-      // Built outside the transaction, executed inside it — the connection
+      // Built outside the transaction, executed inside it. The connection
       // thunk runs at the terminal, not at construction.
       expect(await builder.count()).toBe(1);
     });
@@ -116,7 +116,7 @@ describe("DB.table() / DB.query()", () => {
     it("ignores an enclosing default-connection transaction", async () => {
       await DB.transaction(async () => {
         // The transaction context is global ("is there an active trx"), not
-        // per-connection — naming a connection means that connection, so this
+        // per-connection, naming a connection means that connection, so this
         // write lands on `secondary` outside the default's transaction.
         await DB.table("widgets", "secondary").insert({ id: "10", name: "Axle", price: 100 });
         throw new Error("boom");

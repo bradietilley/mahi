@@ -8,7 +8,7 @@ import { NOTIFICATIONS_TOKEN } from "./tokens.js";
 /**
  * Thin facade over the `ChannelManager` singleton bound at
  * `NOTIFICATIONS_TOKEN`, for call sites that would otherwise read
- * `app().make<ChannelManager>(NOTIFICATIONS_TOKEN).send(...)` — the
+ * `app().make<ChannelManager>(NOTIFICATIONS_TOKEN).send(...)`, the
  * notifications analogue of `Mail`/`Bus`/`Events`.
  *
  *   await Notifications.send(user, new InvoicePaid(invoice));
@@ -16,7 +16,7 @@ import { NOTIFICATIONS_TOKEN } from "./tokens.js";
  *   await Notifications.route("mail", "ops@example.com").send(new ServerDown());
  *
  * Named `Notifications` (plural), not `Notification`, because the package
- * already exports the `Notification` base class — same plural-facade /
+ * already exports the `Notification` base class, same plural-facade /
  * singular-base-class split as `Events`/`Event`, `Bus`/`Job`,
  * `Mail`/`Mailable`.
  *
@@ -29,7 +29,7 @@ export class Notifications extends Facade<ChannelManager>(() => NOTIFICATIONS_TO
   /**
    * Deliver `notification` to one notifiable or an array of them, over
    * each recipient's `via()` channels. Recipients are processed
-   * sequentially — pass an array rather than looping at the call site so a
+   * sequentially, pass an array rather than looping at the call site so a
    * single `await` covers the whole fan-out. Errors propagate (a caller
    * wanting best-effort delivery wraps its own dispatch or queues
    * per-recipient).
@@ -47,7 +47,7 @@ export class Notifications extends Facade<ChannelManager>(() => NOTIFICATIONS_TO
 
   /**
    * Begin an on-demand notification to a route you hold directly (an email
-   * address, a broadcast channel, …) rather than a persisted notifiable —
+   * address, a broadcast channel, …) rather than a persisted notifiable,
    * Laravel's `Notification::route(...)->notify(...)`. Returns an
    * `AnonymousNotifiable` whose own `.route()` chains further channels and
    * whose delivery is done via `Notifications.send(...)`:
@@ -58,7 +58,7 @@ export class Notifications extends Facade<ChannelManager>(() => NOTIFICATIONS_TO
    *   );
    *
    * The `database` channel is rejected here (an anonymous target has no
-   * persisted `notifiable_type`/`notifiable_id`) — see
+   * persisted `notifiable_type`/`notifiable_id`). See
    * `AnonymousNotifiable`.
    */
   static route(channel: string, target: unknown): AnonymousNotifiable {

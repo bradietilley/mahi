@@ -241,7 +241,7 @@ export class Rule<T = unknown, P extends Presence = "required"> {
   sometimes(): Rule<T, "optional"> {
     // Order-independent: a flag consulted at run time, not a presence
     // mutation. `sometimes().required()` and `required().sometimes()`
-    // therefore behave identically — a missing key is skipped, a present
+    // therefore behave identically. A missing key is skipped, a present
     // one runs every other rule.
     this.sometimesFlag = true;
     this.steps.push({ name: "sometimes" });
@@ -581,7 +581,7 @@ export class Rule<T = unknown, P extends Presence = "required"> {
   /**
    * One of a TypeScript enum's member values.
    *
-   * Strict — no coercion, so a numeric enum rejects the string `"1"`. Put a
+   * Strict, no coercion, so a numeric enum rejects the string `"1"`. Put a
    * coercing type rule first (`rule().integer().enum(Priority)`) when the
    * input arrives form-encoded.
    *
@@ -593,7 +593,7 @@ export class Rule<T = unknown, P extends Presence = "required"> {
    *   // → { Low: 0, High: 1, 0: "Low", 1: "High" }
    *   Object.values(Priority)  // ["Low", "High", 0, 1]
    *
-   * A bare `Object.values()` therefore admits `"Low"` and `"High"` — keys,
+   * A bare `Object.values()` therefore admits `"Low"` and `"High"`, keys,
    * not values, and outside the declared `E[keyof E]` return type. See
    * `enumMemberValues()`.
    */
@@ -759,7 +759,7 @@ export class Rule<T = unknown, P extends Presence = "required"> {
  * entries removed.
  *
  * TypeScript compiles `enum Priority { Low, High }` to an object carrying
- * both directions — `{ Low: 0, High: 1, 0: "Low", 1: "High" }` — so
+ * both directions, `{ Low: 0, High: 1, 0: "Low", 1: "High" }`, so
  * `Object.values()` yields `["Low", "High", 0, 1]` and a naive membership
  * check accepts the key `"High"` as though it were a value.
  *

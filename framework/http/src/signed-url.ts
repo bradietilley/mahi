@@ -5,7 +5,7 @@ import { HttpError } from "./http-error.js";
 import type { HttpPipe } from "./middleware/pipeline-middleware.js";
 
 /**
- * HTTP-layer wrapper over `@mahiframework/encryption`'s `Signer` — the
+ * HTTP-layer wrapper over `@mahiframework/encryption`'s `Signer`, the
  * equivalent of Laravel's `UrlGenerator::signedRoute()` + the
  * `ValidateSignature` middleware. This is the path-based form, where the
  * caller passes the raw path it already has; for a NAMED route, use
@@ -16,8 +16,8 @@ import type { HttpPipe } from "./middleware/pipeline-middleware.js";
  * where the HMAC covers the path plus every query param except
  * `signature` itself, in a canonical (sorted) order so build and verify
  * agree regardless of param ordering. Because the payload doesn't need to
- * stay secret — only tamper-evident — this uses `Signer` (HMAC), not
- * `Encrypter`; key rotation comes for free via `Signer.verify()`.
+ * stay secret, only tamper-evident, this uses `Signer` (HMAC), not
+ * `Encrypter`; key rotation is handled by `Signer.verify()`.
  *
  * Directly needed by email-verification / password-reset / one-click
  * unsubscribe / invite links.
@@ -38,7 +38,7 @@ export const EXPIRES_PARAM = "expires";
 /**
  * Resolves the signer and narrows it to the `"url"` purpose, so signed
  * URLs use a key derived exclusively for them. This is what stops a URL
- * signature being replayed as a session cookie (or vice versa) — the two
+ * signature being replayed as a session cookie (or vice versa), the two
  * consumers never share a key. Applied to explicitly-passed signers
  * too, so tests exercise the same derivation as production.
  */
@@ -68,7 +68,7 @@ export function canonicalPayload(path: string, params: Record<string, string>): 
 }
 
 /**
- * Compute just the HMAC signature for a canonical payload — shared by
+ * Compute just the HMAC signature for a canonical payload, shared by
  * `signedUrl()` (path-based) and the URL generator's `signedRoute()`
  * (named-route based). `Signer.sign()` returns `${payload}.${hmac}`; we
  * slice off and return only the hmac, which callers carry as a
@@ -116,7 +116,7 @@ export interface VerifySignatureOptions {
 }
 
 /**
- * Verify a request's signature (and expiry) without throwing — returns
+ * Verify a request's signature (and expiry) without throwing, returns
  * `true`/`false`. `validateSignature()` builds on this.
  */
 export function hasValidSignature(request: Request, options: VerifySignatureOptions = {}): boolean {
@@ -125,7 +125,7 @@ export function hasValidSignature(request: Request, options: VerifySignatureOpti
   // Rebuilt from the RAW query string, not `request.query()`. The parsed
   // bag expands bracket notation (`ids[]=1` becomes an array), so
   // canonicalising it would hash a different string than the one that
-  // was signed for any link carrying a bracketed param — a signature
+  // was signed for any link carrying a bracketed param, a signature
   // that verifies in a unit test and fails in production.
   const query: Record<string, string> = {};
 

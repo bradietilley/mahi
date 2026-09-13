@@ -6,7 +6,7 @@ function after<T>(ms: number, value: T): Promise<T> {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
-describe("pooled — array form", () => {
+describe("pooled: array form", () => {
   it("preserves array position", async () => {
     const results = await pooled([
       () => after(30, "a"),
@@ -39,7 +39,7 @@ describe("pooled — array form", () => {
   });
 });
 
-describe("pooled — record form", () => {
+describe("pooled: record form", () => {
   it("preserves record keys", async () => {
     const results = await pooled({
       user: () => after(20, { id: 1 }),
@@ -56,7 +56,7 @@ describe("pooled — record form", () => {
   });
 });
 
-describe("pooled — failures", () => {
+describe("pooled: failures", () => {
   it("surfaces a rejection as an Error value without rejecting the pool", async () => {
     const results = await pooled([
       () => Promise.resolve("ok"),
@@ -89,7 +89,7 @@ describe("pooled — failures", () => {
   });
 });
 
-describe("pooled — concurrency", () => {
+describe("pooled: concurrency", () => {
   it("concurrency: 1 runs strictly sequentially", async () => {
     const log: string[] = [];
     const task = (name: string) => async () => {

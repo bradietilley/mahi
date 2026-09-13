@@ -4,8 +4,8 @@ import { Command } from "../../command.js";
 import { scaffold, toClassName } from "./scaffold.js";
 
 /**
- * Middleware here is an `HttpPipe` — a `(request, next) => Response`
- * function, not a class — matching how the router and providers'
+ * Middleware here is an `HttpPipe`, a `(request, next) => Response`
+ * function, not a class, matching how the router and providers'
  * `middleware()` hooks consume them. The stub exports a named pipe the app
  * can register in a provider or on a route.
  */

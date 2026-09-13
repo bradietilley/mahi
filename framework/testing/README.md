@@ -1,6 +1,6 @@
 # @mahiframework/testing
 
-Testing — test helpers, fakes, and assertions for Mahi applications.
+Testing, test helpers, fakes, and assertions for Mahi applications.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

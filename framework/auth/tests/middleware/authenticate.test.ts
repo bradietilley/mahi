@@ -106,7 +106,7 @@ describe("authenticate middleware", () => {
     expect(response.status).toBe(401);
   });
 
-  it("uses 401, not 403 — the request may succeed with different credentials", async () => {
+  it("uses 401, not 403: the request may succeed with different credentials", async () => {
     const response = await hono.request("/private");
     expect(response.status).not.toBe(403);
   });

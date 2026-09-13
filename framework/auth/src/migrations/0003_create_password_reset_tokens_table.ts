@@ -6,7 +6,7 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
  * `email` is the primary key: a user has at most one outstanding reset,
  * so re-requesting overwrites rather than accumulating rows, and
  * verifying a reset is one indexed PK lookup. `token` stores an argon2
- * hash, never the plaintext — a leaked table dump yields no usable reset
+ * hash, never the plaintext, a leaked table dump yields no usable reset
  * links.
  *
  * No foreign key to `users`: that table is app-owned and the framework

@@ -25,7 +25,7 @@ class Widget extends Model<WidgetAttributes>()({
   // when one is missing (per-model sequence group = the class name).
   keyType: snowflake(),
   // This fixture is about the snowflake PRIMARY KEY, not timestamps, and
-  // its table below has no created_at/updated_at columns — `Model
+  // its table below has no created_at/updated_at columns, `Model
   // .timestamps` defaults to true, so opt out explicitly rather than
   // widening the fixture schema for columns nothing here asserts on.
   timestamps: false,
@@ -47,7 +47,7 @@ describe("HasSnowflake", () => {
     manager.extend("sqlite", () => new SqliteDriver({ filename: ":memory:" }));
     app.instance(DATABASE_TOKEN, manager);
     // `HasSnowflake.newUniqueId()` resolves SNOWFLAKE_TOKEN out of the
-    // container, so the generator has to actually be registered — the
+    // container, so the generator has to actually be registered. The
     // extension is not self-binding. `register()` only queues the
     // provider; `bootstrap()` is what runs its register()/boot().
     app.register(SnowflakeServiceProvider);

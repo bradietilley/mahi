@@ -1,13 +1,13 @@
 import type { SessionRecord, SessionStore } from "./session-store.js";
 
 /**
- * In-memory sessions in a plain `Map`, with zero setup — no database, no
+ * In-memory sessions in a plain `Map`, with zero setup, no database, no
  * cache, no I/O. For tests: a `SessionGuard` can be exercised end to end
  * without a DB round-trip or a cache backend.
  *
  * Not for production: everything vanishes on restart and nothing is
  * shared across processes. Unlike `CacheSessionStore`, this one CAN back
- * `destroyForUser()`/`destroyForUserExcept()` — it holds the records
+ * `destroyForUser()`/`destroyForUserExcept()`. It holds the records
  * directly, so it can scan them by value.
  *
  * Behaviourally identical to the other stores (expiry enforced on read,

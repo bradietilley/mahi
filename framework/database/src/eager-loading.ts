@@ -13,13 +13,13 @@ import type { RelationDefinition } from "./relations.js";
 
 /**
  * The batched eager-loading engine behind `EloquentBuilder.with()` and
- * the instance `load()` method — see `relations.ts`'s `RelationDefinition`
+ * the instance `load()` method. See `relations.ts`'s `RelationDefinition`
  * docstring for the declaration side. Not exported from `index.ts`;
  * called internally once one or more relation names have been queued.
  *
  * Operates on **model instances**: it reads foreign/local keys via each
  * instance's raw (DB-shape) attributes, hydrates the related rows into
- * their own model instances, and attaches them with `setRelation()` — so
+ * their own model instances, and attaches them with `setRelation()`, so
  * `post.author` (a loaded belongsTo) is a `User` instance and
  * `post.images` (a loaded hasMany) is a `PostImage[]`. Every relation
  * type batches into a small, constant number of extra queries regardless
@@ -29,7 +29,7 @@ import type { RelationDefinition } from "./relations.js";
  */
 /**
  * Batch-loads declared relations onto an array of already-fetched
- * instances — Laravel's `$collection->load(...)`. One batched query per
+ * instances, Laravel's `$collection->load(...)`. One batched query per
  * relation name across the WHOLE array (never one per instance), so it's
  * the N+1-free way to attach relations to a page of rows fetched without
  * `with()` (e.g. after `cursorPaginate()`). Infers the model class from
@@ -41,7 +41,7 @@ export async function loadMany(instances: Model[], ...relationNames: string[]): 
   }
 
   // NB: read the constructor off the prototype, not `instance.constructor`
-  // directly — a Model instance is a Proxy whose `get` trap binds every
+  // directly. A Model instance is a Proxy whose `get` trap binds every
   // function-valued property (including `constructor`) to the target, and
   // a bound function loses its static properties (`table`/`relations`).
   const model = Object.getPrototypeOf(instances[0]!).constructor as unknown as ModelClass;
@@ -54,7 +54,7 @@ export async function loadMany(instances: Model[], ...relationNames: string[]): 
  *
  * Accepts either the parsed tree or the raw `with()`-style argument
  * (names/dot paths, or a `{ path: constraint }` map), so callers that
- * never needed the tree — `Model.load()`, `loadMany()` — keep passing a
+ * never needed the tree, `Model.load()`, `loadMany()`, keep passing a
  * plain string array.
  *
  * ## The recursion, and what it costs
@@ -66,8 +66,8 @@ export async function loadMany(instances: Model[], ...relationNames: string[]): 
  * queries, and would be 2 over 500,000. That is the same "constant, never
  * N+1" promise the flat version made, expressed over a tree.
  *
- * Siblings at a level are loaded sequentially rather than in parallel —
- * a transaction-scoped connection is not safe to issue concurrent
+ * Siblings at a level are loaded sequentially rather than in parallel.
+ * A transaction-scoped connection is not safe to issue concurrent
  * statements on, and ordering keeps failure modes deterministic.
  */
 export async function loadRelations(
@@ -109,7 +109,7 @@ async function loadTree(
     }
 
     // `loadMissing()` skips the query only when EVERY instance already has
-    // the relation — a partially-loaded set still needs the batch, and
+    // the relation. A partially-loaded set still needs the batch, and
     // re-attaching an already-loaded value is harmless. The skip applies
     // per level, so `loadMissing("author.team")` can reuse an attached
     // `author` and still go fetch its missing `team`.
@@ -119,7 +119,7 @@ async function loadTree(
     // inside its constraining callback, so the callback has to be run to
     // find out what they are. Resolved HERE rather than in `loadOne`
     // because `loadMissing()` skips `loadOne` for an already-attached
-    // relation — and a morphWith under a loaded morphTo must still apply.
+    // relation, and a morphWith under a loaded morphTo must still apply.
     const morphSpec = definition.type === "morphTo" ? resolveMorphSpec(node) : undefined;
 
     if (targets.length > 0) {
@@ -170,7 +170,7 @@ function resolveMorphSpec(node: EagerLoadNode): MorphToSpec {
  * ## Why the grouping key is the raw `*_type` value
  *
  * `morphWith({ post: [...] })` is keyed by whatever the caller writes in
- * the declaration's `types` map — which is a **local** name, resolved by
+ * the declaration's `types` map. Which is a **local** name, resolved by
  * `resolveMorphType` through local `types` FIRST and only then the global
  * morph map. So a relation declaring `types: { post: () => Post }` uses
  * `"post"` even when `Post.morphAlias()` says `"posts"` (the table-name
@@ -181,7 +181,7 @@ function resolveMorphSpec(node: EagerLoadNode): MorphToSpec {
  * Grouping walks the PARENT rows rather than the loaded instances so the
  * discriminant is read from the same column the loader matched on. Two
  * discriminants pointing at one class stay separate groups, which is the
- * point — `morphWith` is per declared type, not per class.
+ * point. `morphWith` is per declared type, not per class.
  */
 async function loadMorphChildren(
   instances: Model[],
@@ -202,7 +202,7 @@ async function loadMorphChildren(
     const typeValue = String(instance.getRawAttribute(morphType));
     const bucket = byType.get(typeValue) ?? { parents: [], seen: new Set<Model>() };
 
-    // The same parent is shared by every row pointing at it — descend
+    // The same parent is shared by every row pointing at it, descend
     // once, as `collectRelated` does for the non-morph path.
     if (!bucket.seen.has(parent)) {
       bucket.seen.add(parent);
@@ -215,7 +215,7 @@ async function loadMorphChildren(
   for (const [typeValue, { parents }] of byType) {
     const parentClass = Object.getPrototypeOf(parents[0]!).constructor as unknown as ModelClass;
 
-    // A type listed in neither place loads nothing — a mixed page
+    // A type listed in neither place loads nothing, a mixed page
     // routinely holds types the caller had nothing extra to load for.
     const perType = node.morphWith?.get(typeValue);
 
@@ -233,9 +233,9 @@ async function loadMorphChildren(
  * Flattens the relation values `name` attached across `instances` into
  * the instance set the next level runs against.
  *
- * Handles all three shapes the loader can set — a `Collection` (to-many),
+ * Handles all three shapes the loader can set, a `Collection` (to-many),
  * a single instance (to-one), or `undefined` (a to-one that matched
- * nothing, or a `morphTo` whose discriminant didn't resolve) — and
+ * nothing, or a `morphTo` whose discriminant didn't resolve), and
  * de-duplicates by identity, since the same related instance is routinely
  * shared by many parents (twenty posts by one author attach the *same*
  * `Author`). Without that, `with("author.team")` would issue the `team`
@@ -284,7 +284,7 @@ async function loadOne(
   morphSpec?: MorphToSpec,
 ): Promise<void> {
   // NB: `definition.related()` is resolved per-case rather than up front,
-  // because `morphTo` has no `related` thunk — it points at several
+  // because `morphTo` has no `related` thunk. It points at several
   // models, chosen at runtime by each row's discriminant.
   switch (definition.type) {
     case "belongsTo": {
@@ -407,7 +407,7 @@ async function loadOne(
 
       // through rows: firstKey (this model) -> secondLocalKey (join key
       // to related). Goes through the through model's OWN builder so its
-      // global scopes apply — a soft-deleted through row must stop
+      // global scopes apply, a soft-deleted through row must stop
       // linking its related rows to the parent, exactly as the
       // non-batched `hasManyThrough()` helper now does.
       const throughRows = (await (
@@ -477,7 +477,7 @@ async function loadOne(
         localKey: options.localKey ?? model.primaryKeyColumn,
         relatedKey: options.relatedKey ?? related.primaryKeyColumn,
         morphType: options.morphType,
-        // Discriminates THIS model — see MorphToManyOptions.
+        // Discriminates THIS model. See MorphToManyOptions.
         morphValue: options.type ?? model.morphAlias(),
         withPivot: options.withPivot,
         withTimestamps: options.withTimestamps,
@@ -513,7 +513,7 @@ async function loadOne(
       // batches to a constant count because it targets a single table;
       // a morphTo's parents live in different tables, so the best
       // possible is one query per DISTINCT discriminant present in this
-      // page of rows — same as Laravel. Grouping first is what keeps it
+      // page of rows, same as Laravel. Grouping first is what keeps it
       // O(distinct types) rather than O(rows).
       const idsByType = new Map<string, Set<unknown>>();
 
@@ -530,7 +530,7 @@ async function loadOne(
         idsByType.set(String(typeValue), bucket);
       }
 
-      // Keyed by `{type}\u0000{id}` — a composite, because ids are only
+      // Keyed by `{type}\u0000{id}`, a composite, because ids are only
       // unique WITHIN a type. Post 1 and Video 1 are different parents,
       // and a plain id key would collide them.
       const byTypeAndId = new Map<string, Model>();
@@ -540,7 +540,7 @@ async function loadOne(
           ModelClass | undefined;
 
         // An unresolvable discriminant attaches `undefined` rather than
-        // throwing — stale `*_type` data behaves like a dangling FK,
+        // throwing, stale `*_type` data behaves like a dangling FK,
         // matching the non-batched `morphTo()` helper.
         if (!related) {
           continue;
@@ -576,7 +576,7 @@ async function loadOne(
 
 /**
  * The related model's builder with the node's constraining closure
- * applied — the `with({ comments: (q) => q.where("approved", 1) })` half.
+ * applied, the `with({ comments: (q) => q.where("approved", 1) })` half.
  *
  * ## Why `limit()` is blocked rather than honoured
  *
@@ -587,7 +587,7 @@ async function loadOne(
  * Per-parent limits need window functions
  * (`ROW_NUMBER() OVER (PARTITION BY …)`), which this loader doesn't emit,
  * so it throws. Silently returning wrong rows is the one outcome worth
- * ruling out — it looks like it worked.
+ * ruling out. It looks like it worked.
  *
  * `where()`/`orderBy()`/`whereIn()` etc. are all fine: they apply
  * row-wise, so batching doesn't change their meaning.
@@ -596,7 +596,7 @@ function applyConstraint(builder: any, node: EagerLoadNode, relation: string): a
   return applyMorphConstraint(builder, node.constrain, relation);
 }
 
-/** `applyConstraint` for a callback held somewhere other than `node.constrain` — the per-type morphTo case. */
+/** `applyConstraint` for a callback held somewhere other than `node.constrain`, the per-type morphTo case. */
 function applyMorphConstraint(
   builder: any,
   constrain: ((query: any) => void) | undefined,
@@ -622,7 +622,7 @@ function applyMorphConstraint(
   return builder;
 }
 
-/** The normalised shape of a pivot-backed relation for the batched loader — the loader-side twin of `model.ts`'s `PivotQuerySpec`. */
+/** The normalised shape of a pivot-backed relation for the batched loader, the loader-side twin of `model.ts`'s `PivotQuerySpec`. */
 interface PivotLoadSpec {
   pivotTable: string;
   thisPivotKey: string;
@@ -645,7 +645,7 @@ interface PivotLoadSpec {
  * ## Why pivot columns force per-parent instances
  *
  * Without pivot columns, one related instance can be shared by every
- * parent that links to it — they're identical. With them it cannot: the
+ * parent that links to it. They're identical. With them it cannot: the
  * *same* tag attached to two posts carries a different `weight` for each,
  * so a shared instance would show one parent the other's pivot data.
  * When pivot columns are requested, each attachment therefore gets its
@@ -719,8 +719,8 @@ async function loadPivotRelation(
         continue;
       }
 
-      // Re-hydrate per attachment so each carries its own pivot values —
-      // see this function's docstring.
+      // Re-hydrate per attachment so each carries its own pivot values.
+      // See this function's docstring.
       const pivotAttributes: Record<string, any> = {};
 
       for (const column of columns) {

@@ -18,7 +18,7 @@ export type CompiledColumnType = Expression<any>;
  *
  * Mirrors the `type*` methods on Laravel's schema grammars. Auto-increment
  * columns are handled here for MySQL/Postgres (they need a specific integer
- * type — `serial`/`bigserial` on PG, plain int on MySQL where the
+ * type, `serial`/`bigserial` on PG, plain int on MySQL where the
  * AUTO_INCREMENT modifier is applied separately); SQLite ignores width and
  * uses INTEGER PRIMARY KEY AUTOINCREMENT via the modifier layer.
  */
@@ -39,7 +39,7 @@ function resolveTypeString(def: ColumnDefinition, dialect: Dialect): string {
   }
 }
 
-// SQLite has storage classes, not real types — width/precision are ignored.
+// SQLite has storage classes, not real types, width/precision are ignored.
 // This preserves the affinities the previous `LARAVEL_TO_SQLITE` map used.
 
 const SQLITE_AFFINITY: Record<string, string> = {
@@ -111,7 +111,7 @@ function mysqlEnum(def: ColumnDefinition): string {
  * fills `precision` in for every temporal column it creates (see
  * `DEFAULT_TEMPORAL_PRECISION`); the `undefined` branch covers a
  * `ColumnDefinition` built directly, where the engine's own default
- * (0 — whole seconds) applies.
+ * (0, whole seconds) applies.
  */
 function fractionalSeconds(def: ColumnDefinition): string {
   return def.precision === undefined ? "" : `(${def.precision})`;
@@ -203,7 +203,7 @@ function postgresEnum(def: ColumnDefinition): string {
   // lifecycle (adding a value to a native enum is its own DDL
   // statement, and removing one is not supported at all). The varchar
   // keeps migrations reversible; the allowed values are enforced by a
-  // CHECK constraint the grammar adds alongside the column — see
+  // CHECK constraint the grammar adds alongside the column. See
   // `applyEnumCheck()` in `native-alter-grammar.ts`.
   const longest = (def.allowed ?? []).reduce((max, v) => Math.max(max, v.length), 255);
 

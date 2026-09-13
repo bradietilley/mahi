@@ -7,8 +7,8 @@
  * single interface (`interface PostAttributes { … }`) where plain columns
  * are plain types, relations are `BelongsTo<User>`/`HasMany<Comment>`
  * markers, and computed attributes are `Computed<string>` markers.
- * Everything else — the instance shape, the DB row shape, the builder,
- * the finder return types — is derived from it, so there is exactly one
+ * Everything else, the instance shape, the DB row shape, the builder,
+ * the finder return types, is derived from it, so there is exactly one
  * declaration to keep in sync.
  *
  * These are erased at runtime (each is a phantom brand over a `unique
@@ -27,7 +27,7 @@ declare const ATTRIBUTES_BRAND: unique symbol;
  * A phantom carrying a model instance's *unresolved* attributes map `A`.
  *
  * `ModelInstance<A>` resolves every marker to its loaded value, which
- * erases the markers — so from an instance type alone there is no way
+ * erases the markers, so from an instance type alone there is no way
  * back to `A`. Nested eager loading needs exactly that trip: to know
  * whether `"author.team"` is valid, the path walker has to get from
  * `Post`'s `author` relation to `User`'s *declared relations*, i.e. to
@@ -43,7 +43,7 @@ export interface HasAttributes<A> {
 /** Recovers the attributes map `A` from a model instance type. */
 export type AttributesOf<I> = I extends HasAttributes<infer A> ? A : never;
 
-/** The kinds of relation a marker can name — mirrors `RelationDefinition`'s discriminant. */
+/** The kinds of relation a marker can name, mirrors `RelationDefinition`'s discriminant. */
 export type RelationKind =
   | "belongsTo"
   | "hasOne"
@@ -74,7 +74,7 @@ export interface RelationMarker<K extends RelationKind, R, ToMany extends boolea
 }
 
 /**
- * The empty-pivot type — a relation with no `withPivot` attributes.
+ * The empty-pivot type, a relation with no `withPivot` attributes.
  *
  * Deliberately an empty interface rather than `Record<string, never>`:
  * `keyof Record<string, never>` is `string`, not `never`, so the
@@ -86,11 +86,11 @@ export interface RelationMarker<K extends RelationKind, R, ToMany extends boolea
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface NoPivot {}
 
-/** Many-to-one — the FK lives on this model's table. Loaded value: `R | undefined`. */
+/** Many-to-one. The FK lives on this model's table. Loaded value: `R | undefined`. */
 export type BelongsTo<R, B = unknown> = RelationMarker<"belongsTo", R, false, NoPivot, B>;
-/** One-to-one — the FK lives on the related table. Loaded value: `R | undefined`. */
+/** One-to-one. The FK lives on the related table. Loaded value: `R | undefined`. */
 export type HasOne<R, B = unknown> = RelationMarker<"hasOne", R, false, NoPivot, B>;
-/** One-to-many — the FK lives on the related table. Loaded value: `Collection<R> | undefined`. */
+/** One-to-many. The FK lives on the related table. Loaded value: `Collection<R> | undefined`. */
 export type HasMany<R, B = unknown> = RelationMarker<"hasMany", R, true, NoPivot, B>;
 /** Many-to-many through a pivot. Loaded value: `Collection<R & { pivot: Pivot }> | undefined`. */
 export type BelongsToMany<R, Pivot = NoPivot, B = unknown> = RelationMarker<
@@ -104,7 +104,7 @@ export type BelongsToMany<R, Pivot = NoPivot, B = unknown> = RelationMarker<
 export type HasOneThrough<R, B = unknown> = RelationMarker<"hasOneThrough", R, false, NoPivot, B>;
 /** Has-many-through an intermediate model. Loaded value: `Collection<R> | undefined`. */
 export type HasManyThrough<R, B = unknown> = RelationMarker<"hasManyThrough", R, true, NoPivot, B>;
-/** Polymorphic inverse — `R` is the union of the target instance types. Loaded value: `R | undefined`. */
+/** Polymorphic inverse. `R` is the union of the target instance types. Loaded value: `R | undefined`. */
 export type MorphTo<R> = RelationMarker<"morphTo", R, false, NoPivot, unknown>;
 /** Polymorphic one-to-one. Loaded value: `R | undefined`. */
 export type MorphOne<R, B = unknown> = RelationMarker<"morphOne", R, false, NoPivot, B>;
@@ -128,7 +128,7 @@ export type MorphedByMany<R, Pivot = NoPivot, B = unknown> = RelationMarker<
 >;
 
 /**
- * A computed (accessor) attribute — `excerpt: Computed<string>` in the
+ * A computed (accessor) attribute, `excerpt: Computed<string>` in the
  * attributes interface, backed by `static accessors = { excerpt:
  * accessor((post) => …) }`. Reads back off the instance (`post.excerpt`)
  * and, when listed in `appends`, is included in `toJSON()`.
@@ -156,7 +156,7 @@ export type RelationKeys<A> = {
 }[keyof A] &
   string;
 
-/** The relation-marker keys of `A` whose relation is a `morphTo` — for the morph-aware query methods. */
+/** The relation-marker keys of `A` whose relation is a `morphTo`, for the morph-aware query methods. */
 export type MorphToRelationKeys<A> = {
   [K in keyof A]: A[K] extends RelationMarker<"morphTo", any, any, any, any> ? K : never;
 }[keyof A] &
@@ -209,5 +209,5 @@ export type ResolvedAttributes<A> = {
       : A[K];
 };
 
-/** The relation markers of `A`, keyed by relation name — the map `Relations<M>` exposes. */
+/** The relation markers of `A`, keyed by relation name, the map `Relations<M>` exposes. */
 export type RelationMarkers<A> = { [K in RelationKeys<A>]: A[K] };

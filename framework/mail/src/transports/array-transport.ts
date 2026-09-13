@@ -2,12 +2,12 @@ import type { MailTransport, RenderedMail } from "../mail-transport.js";
 import type { SentMessage } from "../sent-message.js";
 
 /**
- * In-memory transport that captures every message instead of sending it —
+ * In-memory transport that captures every message instead of sending it,
  * the mail analogue of `ArrayCacheStore`/`SyncQueueDriver`: correct, zero
  * infra, the ideal default for tests. Point `MAIL_MAILER=array` (or set
  * `mail.default` to `"array"`) in the test environment, resolve the mailer,
- * and assert against `transport.messages` with ordinary Vitest matchers —
- * this is the "fake mode" consumer, and the reason a TS `Mailable` needs
+ * and assert against `transport.messages` with ordinary Vitest matchers.
+ * This is the "fake mode" consumer, and the reason a TS `Mailable` needs
  * none of Laravel's ~30 `assertXxx()` helpers.
  *
  *   const transport = manager.mailer("array") as ArrayTransport;
@@ -34,7 +34,7 @@ export class ArrayTransport implements MailTransport {
     };
   }
 
-  /** Discard all captured messages — handy between tests. */
+  /** Discard all captured messages, handy between tests. */
   flush(): void {
     this.messages.length = 0;
   }

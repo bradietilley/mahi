@@ -6,12 +6,12 @@ import type { CheckOutcome, HealthReport } from "../health-check.js";
 import { HEALTH_TOKEN } from "../health-service-provider.js";
 
 /**
- * `./artisan health` — runs every registered check and reports.
+ * `./artisan health`, runs every registered check and reports.
  *
  * Table by default, matching every other diagnostic command in the
  * framework (`route:list`, `schedule:list`, `migrate:status`, `db:show`).
- * `--json` emits **exactly** the HTTP payload — the same `report.results`
- * object, serialized the same way — so CI and the load balancer are
+ * `--json` emits **exactly** the HTTP payload, the same `report.results`
+ * object, serialized the same way, so CI and the load balancer are
  * looking at the same bytes.
  *
  * The CLI **never redacts** failure messages, unlike the HTTP route. It
@@ -40,8 +40,8 @@ export class HealthCommand extends Command {
     }
 
     // `process.exitCode`, never `process.exit(1)`: the latter truncates
-    // in-flight stdout writes — which on a `--json` run means truncated
-    // JSON — and would take the vitest runner down with it in this
+    // in-flight stdout writes, which on a `--json` run means truncated
+    // JSON, and would take the vitest runner down with it in this
     // package's own tests.
     if (!report.healthy) {
       process.exitCode = 1;

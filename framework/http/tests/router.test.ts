@@ -81,7 +81,7 @@ describe("Router", () => {
    * Group middleware is `hono.use("*")`, and Hono only matches a `use()`
    * handler against routes registered *after* it. Declaring
    * `middleware()` at the bottom of a `group()` callback therefore
-   * guards nothing — and the failure mode is a silently unguarded
+   * guards nothing, and the failure mode is a silently unguarded
    * endpoint, not an error. These two tests pin the ordering
    * requirement documented on `Router.middleware()`.
    */
@@ -117,7 +117,7 @@ describe("Router", () => {
     ).toThrow(/called after routes were registered/);
   });
 
-  it("still allows a path-scoped use() after routes — that has no ordering trap", async () => {
+  it("still allows a path-scoped use() after routes. That has no ordering trap", async () => {
     const hono = new Hono();
     const router = new Router(hono);
     router.get("/open", () => HttpResponse.json({ ok: true }));

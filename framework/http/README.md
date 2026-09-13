@@ -1,6 +1,6 @@
 # @mahiframework/http
 
-HTTP — the router, request/response, middleware, and kernel for Mahi.
+HTTP, the router, request/response, middleware, and kernel for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

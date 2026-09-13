@@ -340,7 +340,7 @@ export class Period implements Iterable<DateTime> {
 
   /**
    * The configured element cap, or `null` when the sequence is bounded by an
-   * end date instead. Carbon's `CarbonPeriod::recurrences()`, read-only —
+   * end date instead. Carbon's `CarbonPeriod::recurrences()`, read-only,
    * use `take()` to change it.
    */
   get recurrences(): number | null {

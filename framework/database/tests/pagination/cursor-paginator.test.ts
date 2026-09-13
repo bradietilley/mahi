@@ -56,7 +56,7 @@ describe("cursorPaginate()", () => {
       // assigned from `page.nextCursor` at the bottom of the loop, so
       // inferring `page` from a call whose argument mentions `cursor` makes
       // `page` depend on itself (TS7022). Annotating the options object
-      // removes it as an inference source. Not specific to this API — the
+      // removes it as an inference source. Not specific to this API, the
       // same loop shape reproduces with any generic function.
       const options: CursorPaginateOptions<WidgetAttributes, "id"> = {
         column: "id",
@@ -121,7 +121,7 @@ describe("cursorPaginate()", () => {
     // (lexically between "01" and "02"), shifting every subsequent
     // offset-based page by one. Cursor pagination is immune: it filters
     // by "> 03" (the last-seen id), which "015" doesn't satisfy, so it
-    // simply never appears in page 2 — no skip, no dupe, for rows that
+    // simply never appears in page 2, no skip, no dupe, for rows that
     // were already fetched or would be fetched next.
     await Widget.create({ id: "015", name: "Inserted" });
 
@@ -175,7 +175,7 @@ describe("cursorPaginate()", () => {
     ])("treats %s as no cursor and returns the first page", async (_label, cursor) => {
       const page = await cursorPaginate(Widget.query(), { column: "id", perPage: 3, cursor });
 
-      // Identical to passing no cursor at all — NOT an empty page, which
+      // Identical to passing no cursor at all, NOT an empty page, which
       // is what a client would otherwise be told the list contains.
       expect(page.data.toArray().map((r) => r.id)).toEqual(["01", "02", "03"]);
     });
@@ -193,7 +193,7 @@ describe("cursorPaginate()", () => {
 
   /**
    * `perPage` is equally client-supplied. The paginator clamps only the
-   * LOWER bound — a maximum page size is an application policy, so
+   * LOWER bound, a maximum page size is an application policy, so
    * callers cap it themselves (see the app's `perPageFrom()`).
    */
   describe("perPage lower bound", () => {
@@ -214,7 +214,7 @@ describe("cursorPaginate()", () => {
       expect(page.data.toArray()).toHaveLength(2);
     });
 
-    it("does NOT impose an upper bound — that is the caller's policy", async () => {
+    it("does NOT impose an upper bound. That is the caller's policy", async () => {
       const page = await cursorPaginate(Widget.query(), { column: "id", perPage: 1000 });
 
       expect(page.data.toArray()).toHaveLength(10);

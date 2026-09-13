@@ -25,7 +25,7 @@ export { AUTH_TOKEN };
 /**
  * Registers the `AuthManager` singleton with the two built-in guards
  * ("token", "session") and the built-in "database" user provider
- * pre-registered via `extend()`/`extendUserProvider()` — the same
+ * pre-registered via `extend()`/`extendUserProvider()`, the same
  * mechanisms a plugin would use to add a JWT or LDAP driver later.
  *
  * Contributes the `personal_access_tokens`/`sessions` migrations and the
@@ -107,7 +107,7 @@ export class AuthServiceProvider extends ServiceProvider {
   }
 
   /**
-   * Static rather than a `migrations()` directory path — see
+   * Static rather than a `migrations()` directory path. See
    * `QueueServiceProvider.migrationSources()`. Names are byte-identical
    * to the filenames they replace, so apps already migrated under the
    * directory form do not re-run them.
@@ -141,8 +141,8 @@ export class AuthServiceProvider extends ServiceProvider {
 
     if (name === "cache") {
       // Resolved by string token rather than importing @mahiframework/cache,
-      // so auth doesn't take a package dependency for one optional store
-      // — the same soft-dependency shape schedule uses for QUEUE_TOKEN.
+      // so auth doesn't take a package dependency for one optional store,
+      // the same soft-dependency shape schedule uses for QUEUE_TOKEN.
       // `CACHE_TOKEN` comes from @mahiframework/core's well-known-tokens,
       // the shared source of truth, not a private string literal here.
       const manager = this.app.make<{ store(): SessionCacheStore }>(CACHE_TOKEN);

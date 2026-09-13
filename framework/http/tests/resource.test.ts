@@ -184,7 +184,7 @@ describe("Resource appended attributes + async toJson", () => {
 
 // A minimal duck-typed stand-in for a `@mahiframework/database` Model: it
 // carries `toJsonResource()` (returning its default resource, or undefined)
-// and `toJSON()` (its own attribute serialization) — the two surfaces
+// and `toJSON()` (its own attribute serialization), the two surfaces
 // `normalizeResourceValue` detects structurally.
 
 class FakeUserResource extends Resource<FakeUserModel, { id: string; name: string }> {
@@ -207,7 +207,7 @@ class FakeUserModel {
   }
 }
 
-/** A collection stand-in — anything with `toArray()` is treated as one. */
+/** A collection stand-in, anything with `toArray()` is treated as one. */
 class FakeCollection<T> {
   constructor(private items: T[]) {}
   toArray(): T[] {
@@ -335,7 +335,7 @@ describe("Resource auto-normalizes toJson() output", () => {
     expect(wire(json)).toEqual({ id: "1" });
   });
 
-  it("is idempotent — an explicitly-mapped nested resource is not double-processed", async () => {
+  it("is idempotent, an explicitly-mapped nested resource is not double-processed", async () => {
     class Outer extends Resource<{ id: string; author: FakeUserModel }, Record<string, unknown>> {
       toJson() {
         return { id: this.model.id, author: new FakeUserResource(this.model.author).toJson() };

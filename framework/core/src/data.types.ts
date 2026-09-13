@@ -1,6 +1,6 @@
 /**
  * Compile-time checks for the path-typed data helpers. Included via
- * `tsconfig` `src/` — not imported at runtime.
+ * `tsconfig` `src/`, not imported at runtime.
  */
 import { dataForget, dataGet, dataHas, dataSet } from "./data.js";
 

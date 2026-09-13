@@ -12,7 +12,7 @@ export interface ServeStoredFileOptions {
   /**
    * The incoming request's headers (for `Range`/`If-None-Match`/
    * `If-Modified-Since`) and abort `signal` (to destroy the read stream if
-   * the client goes away). Optional — omit it and you get a plain 200 with
+   * the client goes away). Optional, omit it and you get a plain 200 with
    * the whole body, same as before.
    */
   request?: { headers?: Headers; signal?: AbortSignal };
@@ -24,7 +24,7 @@ function mimeTypeForPath(path: string): string {
 
 /**
  * Stream `path` off `driver` as an HTTP `Response`. Missing files and
- * path-traversal attempts are both a 404 — the status is the only signal;
+ * path-traversal attempts are both a 404. The status is the only signal;
  * don't leak whether the path escaped the root.
  *
  * Sets `Content-Length`, `Last-Modified`, a weak `ETag` (size+mtime) and
@@ -67,12 +67,12 @@ export async function serveStoredFile(
     baseHeaders["Cache-Control"] = options.cacheControl;
   }
 
-  // Conditional GET — a fresh cache gets a bodyless 304.
+  // Conditional GET. A fresh cache gets a bodyless 304.
   if (reqHeaders && isNotModified(reqHeaders, etag, mtime)) {
     return new Response(null, { status: 304, headers: baseHeaders });
   }
 
-  // Range request — a single satisfiable range becomes a 206.
+  // Range request, a single satisfiable range becomes a 206.
   const range = reqHeaders ? parseRange(reqHeaders.get("range"), size) : null;
 
   if (range === "invalid") {
@@ -109,7 +109,7 @@ export async function serveStoredFile(
   return new Response(body, { status: range ? 206 : 200, headers });
 }
 
-/** Weak validator from size + mtime — cheap and stable, no content hash. */
+/** Weak validator from size + mtime, cheap and stable, no content hash. */
 function weakEtag(size: number, mtime: Date): string {
   return `W/"${size.toString(16)}-${mtime.getTime().toString(16)}"`;
 }
@@ -135,7 +135,7 @@ function isNotModified(headers: Headers, etag: string, mtime: Date): boolean {
     const since = Date.parse(ims);
 
     if (!Number.isNaN(since)) {
-      // Compare at second granularity — HTTP dates have no sub-second part.
+      // Compare at second granularity, HTTP dates have no sub-second part.
       return Math.floor(mtime.getTime() / 1000) <= Math.floor(since / 1000);
     }
   }
@@ -219,7 +219,7 @@ function bindAbort(stream: Readable, signal: AbortSignal | undefined): void {
  * the prefix, e.g. `router.get("/storage/*", servePublicDisk("public"))`.
  *
  * Takes a structural `{ path() }` rather than `@mahiframework/http`'s
- * `Request` so this package doesn't depend on HTTP — Node can point a
+ * `Request` so this package doesn't depend on HTTP. Node can point a
  * thin route at the storage root without Laravel's `storage:link`
  * symlink (which exists to work around PHP web-servers not serving
  * arbitrary app-directory paths).

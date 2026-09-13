@@ -22,15 +22,15 @@ export type RequestMatcher =
 let factory = new HttpClientFactory();
 
 /**
- * `@mahiframework/http-client`'s entry point — a fluent, faketable outbound HTTP
+ * `@mahiframework/http-client`'s entry point, a fluent, faketable outbound HTTP
  * client, port of Laravel's `Illuminate\Http\Client\Factory` (`Http::get()`,
  * `Http::fake()`, `Http::assertSent()`).
  *
  * Built on the platform `fetch`, not a third-party client: `undici` *is*
  * `fetch` on Node 26, and axios would make this a port of axios wearing
- * Laravel's method names. What that costs — no separate connect timeout,
+ * Laravel's method names. What that costs, no separate connect timeout,
  * no cookie jar, no digest auth, proxies via
- * `withFetchOptions({ dispatcher })` — is documented in the package guide.
+ * `withFetchOptions({ dispatcher })`, is documented in the package guide.
  *
  * Static facade over module-level state, mirroring `@mahiframework/process`'s
  * `Process`: no container needed for the common case, and the fake state
@@ -49,8 +49,8 @@ let factory = new HttpClientFactory();
  * Http.restore();
  * ```
  *
- * Every non-assertion method here forwards to a `PendingRequest`, by hand
- * — the house rule for facades (see `@mahiframework/facades`' `Facade()`
+ * Every non-assertion method here forwards to a `PendingRequest`, by hand,
+ * the house rule for facades (see `@mahiframework/facades`' `Facade()`
  * docstring): no `Proxy`, no macros, every method with a real signature.
  */
 export class Http {
@@ -240,7 +240,7 @@ export class Http {
    * Run several requests concurrently, keeping their keys and surfacing a
    * per-entry failure as an `Error` value rather than losing the other
    * results. A thin typed wrapper over `@mahiframework/core`'s `pooled()`, which is
-   * where the mechanics live — pooling has nothing to do with HTTP.
+   * where the mechanics live. Pooling has nothing to do with HTTP.
    *
    *   const { user, repos } = await Http.pool((http) => ({
    *     user: () => http.get("https://api.example.com/user"),
@@ -279,7 +279,7 @@ export class Http {
    *   Http.fake({ "github.com/*": { id: 1 } });      // per-pattern stubs
    *   Http.fake({ "github.com/*": Http.sequence().pushStatus(500).push({ id: 1 }) });
    *
-   * **A request matching no stub never reaches the network** — it raises
+   * **A request matching no stub never reaches the network**. It raises
    * `StrayRequestError`. Laravel falls through to the real handler, so a
    * typo'd pattern silently makes a live call from your test suite; the
    * failure mode there is a slow, flaky, internet-dependent test rather
@@ -301,7 +301,7 @@ export class Http {
     return { body, status, headers };
   }
 
-  /** A FIFO queue of responses for one pattern — "fails twice, then succeeds". */
+  /** A FIFO queue of responses for one pattern, "fails twice, then succeeds". */
   static sequence(): ResponseSequence {
     return new ResponseSequence();
   }
@@ -314,7 +314,7 @@ export class Http {
   }
 
   /**
-   * Let unmatched requests reach the real network — Laravel's default,
+   * Let unmatched requests reach the real network, Laravel's default,
    * which this package inverts. With `patterns`, only matching URLs are
    * allowed through. Allow-list patterns have **no** implicit leading `*`,
    * unlike stub patterns: an explicit escape is worth spelling out.

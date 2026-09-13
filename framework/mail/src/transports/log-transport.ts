@@ -4,7 +4,7 @@ import type { SentMessage } from "../sent-message.js";
 import { formatAddress, formatAddressList } from "../mailables/address.js";
 
 /**
- * Writes the rendered message to the app `Logger` instead of sending it —
+ * Writes the rendered message to the app `Logger` instead of sending it,
  * the mail analogue of a dev-time "print, don't do it" driver. Matches
  * Laravel's `log` mailer: ideal for local development where you want to see
  * exactly what *would* have been sent (subject, recipients, body) in the

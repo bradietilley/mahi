@@ -13,7 +13,7 @@ import type { AbstractEvent } from "@mahiframework/events";
  * Existing `dispatcher.dispatch(new TodoCreated(todo))` calls keep working
  * untouched, and whether an event broadcasts is purely a property of the
  * event class. That's why this lives in `@mahiframework/broadcasting` rather
- * than on `Event` itself in `@mahiframework/events` — `events` has no
+ * than on `Event` itself in `@mahiframework/events`. `events` has no
  * dependency on HTTP or broadcasting today and shouldn't gain one just to
  * host a marker interface (the dependency-direction rule: lower-level
  * packages never depend on higher-level ones).
@@ -24,7 +24,7 @@ export interface ShouldBroadcast {
 
   /**
    * The wire-level event name. Defaults to the class's `constructor.name`
-   * when not implemented — implement it when the client-facing name should
+   * when not implemented, implement it when the client-facing name should
    * survive minification/renaming of the class itself.
    */
   broadcastEventName?(): string;
@@ -34,13 +34,13 @@ export interface ShouldBroadcast {
    * itself (serialized with `JSON.stringify`) when not implemented.
    *
    * ⚠️ THE DEFAULT PUTS THE ENTIRE EVENT ON THE WIRE. If your event holds
-   * a full model — `OrderShipped(order, user)` — its `toJSON()` (every
+   * a full model, `OrderShipped(order, user)`, its `toJSON()` (every
    * column, including internal ones) is what every subscriber receives.
    * Channel authorization (`private-`/`presence-` + `Broadcast.channel()`)
    * controls *who* may subscribe, but this method controls *what* they
    * get. **Implement `broadcastPayload()` to send only the fields the
    * client needs** whenever an event carries anything you wouldn't publish
-   * openly — the two protections are complementary, not interchangeable.
+   * openly. The two protections are complementary, not interchangeable.
    */
   broadcastPayload?(): unknown;
 }
@@ -60,13 +60,13 @@ export function shouldBroadcast(event: unknown): event is AbstractEvent & Should
 
 /**
  * Opt a broadcastable event into being pushed to clients only after the
- * enclosing `DB.transaction()` commits — Laravel's
+ * enclosing `DB.transaction()` commits, Laravel's
  * `ShouldBroadcastAfterCommit`. Two equivalent forms, both read off the
  * event without changing any dispatch call site:
  *
  *   - a `static broadcastAfterCommit = true` on the event class, or
  *   - implementing this marker interface (a truthy `broadcastAfterCommit`
- *     property — mirrors Laravel's marker-interface style).
+ *     property, mirrors Laravel's marker-interface style).
  *
  * When set and a transaction is open, the broadcast is held until commit
  * and dropped on rollback; outside a transaction it broadcasts
@@ -79,7 +79,7 @@ export interface ShouldBroadcastAfterCommit {
 }
 
 /**
- * Whether a broadcastable event opted into after-commit broadcasting — via
+ * Whether a broadcastable event opted into after-commit broadcasting, via
  * a `static broadcastAfterCommit` on its class or an instance
  * `broadcastAfterCommit` property (the marker-interface form).
  */

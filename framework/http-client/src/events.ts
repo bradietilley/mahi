@@ -3,7 +3,7 @@ import type { ClientResponse } from "./client-response.js";
 import type { ConnectionError } from "./errors.js";
 
 /**
- * Dispatched immediately before a request leaves for the transport — port
+ * Dispatched immediately before a request leaves for the transport, port
  * of `Illuminate\Http\Client\Events\RequestSending`. Fires once **per retry
  * attempt**, matching Laravel, since retry wraps the whole pipeline.
  */
@@ -12,7 +12,7 @@ export class RequestSending {
 }
 
 /**
- * Dispatched after a response is received, whatever its status — port of
+ * Dispatched after a response is received, whatever its status, port of
  * `Illuminate\Http\Client\Events\ResponseReceived`.
  */
 export class ResponseReceived {
@@ -23,7 +23,7 @@ export class ResponseReceived {
 }
 
 /**
- * Dispatched when the transport failed outright — port of
+ * Dispatched when the transport failed outright, port of
  * `Illuminate\Http\Client\Events\ConnectionFailed`. A 500 is a
  * `ResponseReceived`, not this.
  */
@@ -39,7 +39,7 @@ export type HttpClientEvent = RequestSending | ResponseReceived | ConnectionFail
 
 /**
  * The slice of `@mahiframework/events`' dispatcher this package needs. Structural,
- * so wiring the real dispatcher costs no dependency edge — `@mahiframework/events`
+ * so wiring the real dispatcher costs no dependency edge. `@mahiframework/events`
  * is not a dependency of `@mahiframework/http-client`.
  */
 export interface EventSink {

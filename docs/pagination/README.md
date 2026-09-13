@@ -11,7 +11,7 @@ each also available as a static shortcut on `Model`.
 
 ## Choosing one
 
-**`paginate()`** when the UI shows page numbers or a total — an admin
+**`paginate()`** when the UI shows page numbers or a total, an admin
 table, a "1 234 results" header. Costs one extra `COUNT(*)` per request,
 and `OFFSET` degrades on deep pages.
 
@@ -25,9 +25,9 @@ Fast at any depth and immune to the shifting-results problem, at the cost
 of no page numbers and a unique-monotonic-column requirement.
 
 The shifting-results problem is worth understanding, because it's the
-usual reason to reach for cursors. With offset paging, if rows are
+usual reason to use cursors. With offset paging, if rows are
 inserted at the top of the ordering between two page loads, page 2 begins
-where page 1 *used to* end — so the reader sees a row twice. Deletions
+where page 1 *used to* end, so the reader sees a row twice. Deletions
 cause the mirror-image problem: a row is skipped entirely. Cursor paging
 anchors on a value rather than a position, so neither happens.
 
@@ -76,7 +76,7 @@ The two queries are not atomic. A concurrent insert between them can make
 almost never worth solving; if it is, wrap the call in a transaction.
 
 `count()` *does* honour `groupBy`/`having`/`distinct`/`union`, by wrapping
-the query as a subquery — so `paginate()` on a grouped or distinct query
+the query as a subquery, so `paginate()` on a grouped or distinct query
 reports the number of groups/distinct rows, which is what the pages
 actually contain.
 
@@ -94,7 +94,7 @@ await Post.paginate(NaN, 20);  // page 1
 These values almost always come straight off a query string, and the
 arithmetic is unforgiving: `(page - 1) * perPage` is a **negative
 `OFFSET`** for any page below 1, which Postgres rejects outright and MySQL
-treats as a syntax error — turning a junk query param into a 500.
+treats as a syntax error, turning a junk query param into a 500.
 Clamping (rather than throwing) matches Laravel and makes a bad link a
 harmless first page. `simplePaginate()` and `cursorPaginate()` do the
 same.
@@ -111,11 +111,11 @@ const page2 = await paginate(builder, 2, 20);   // LIMIT 20 OFFSET 20 — works 
 ```
 
 `limit()` and `offset()` overwrite their previous values, so re-calling
-happens to work — but any `orderBy` accumulated in between is *added*, not
+happens to work, but any `orderBy` accumulated in between is *added*, not
 replaced. Don't reuse a builder across paginator calls. Build a fresh one
 per request, or `clone()`.
 
-`simplePaginate()` and `cursorPaginate()` mutate too — `cursorPaginate()`
+`simplePaginate()` and `cursorPaginate()` mutate too, `cursorPaginate()`
 additionally appends an `orderBy` and, when a cursor is present, a
 `where`.
 
@@ -137,7 +137,7 @@ interface SimplePaginationResult<T> {
 }
 ```
 
-No `total`, no `totalPages` — that's the point.
+No `total`, no `totalPages`. That's the point.
 
 One query. It fetches `perPage + 1` rows, infers `hasMore` from whether
 the extra row came back, and trims it off `data`:
@@ -149,7 +149,7 @@ const data = hasMore ? Collection.make(rows.toArray().slice(0, perPage)) : rows;
 ```
 
 Note that `simplePaginate()` does **not** normalise `perPage`. A zero or
-negative value produces a nonsense `LIMIT`. Clamp before calling — see
+negative value produces a nonsense `LIMIT`. Clamp before calling. See
 [Clamping `perPage`](#clamping-perpage).
 
 ## `cursorPaginate()`
@@ -189,7 +189,7 @@ exists; the extra is trimmed.
 is `WHERE column > lastSeenValue`. If two rows share a value, the boundary
 comparison can't distinguish them, and you get skipped or repeated rows.
 
-Compound cursors — tie-breaking on a second column — are not supported.
+Compound cursors, tie-breaking on a second column, are not supported.
 
 In practice this means the primary key, and it means a **time-sortable**
 one. A `randomUUID()` primary key sorts in random order, which makes the
@@ -218,7 +218,7 @@ A Snowflake is a 63-bit time-ordered id, so `cursorPaginate({ column:
 the `snowflake()` key strategy).
 
 An auto-increment integer primary key works equally well. A `created_at`
-timestamp works **only** if you can guarantee no two rows share one —
+timestamp works **only** if you can guarantee no two rows share one,
 usually you can't.
 
 ### Cursor encoding
@@ -240,7 +240,7 @@ function encodeCursor(payload: CursorPayload): string {
 
 base64url, not standard base64, so cursors are URL-safe without escaping.
 
-It is **opaque, not secret** — anyone can decode it and see the boundary
+It is **opaque, not secret**. Anyone can decode it and see the boundary
 value. Don't put anything sensitive in the cursor column.
 
 ### Why `op` is in the payload
@@ -265,7 +265,7 @@ const hasNext = walkingBackward ? true : hasExtra;
 const hasPrev = walkingBackward ? hasExtra : decoded !== undefined;
 ```
 
-Walking backward implies a subsequent page exists *by construction* — you
+Walking backward implies a subsequent page exists *by construction*. You
 walked backward from it. Walking forward from an explicit cursor implies a
 preceding page exists for the same reason. In each case the other side is
 what the `+1` over-fetch detects.
@@ -273,7 +273,7 @@ what the `+1` over-fetch detects.
 A consequence: on the **first** page (no cursor), `prevCursor` is `null`,
 which is correct. But `hasPrev` for a forward walk is `decoded !==
 undefined`, so any non-first forward page reports a `prevCursor` even if
-the preceding page is empty. That's the right trade — checking would cost
+the preceding page is empty. That's the right trade. Checking would cost
 a query.
 
 ### `decodeCursor()` never throws
@@ -308,7 +308,7 @@ This is defensive for concrete reasons, each a bug that actually shipped:
   fell through the HTTP error handler as a **500** on every paginated
   endpoint. A client typo crashing the request.
 - A payload decoding to a non-object (`[]`, `"str"`) or missing `value`
-  sailed through as a real cursor and produced a silently **empty page** —
+  sailed through as a real cursor and produced a silently **empty page**,
   indistinguishable from "this list is empty".
 - A `value` that was itself an object blew up down in the SQL layer.
 
@@ -330,11 +330,11 @@ function normalizePerPage(perPage: number): number {
 
 `perPage` typically comes from `?per_page=`, so zero, negative and
 fractional values are client mistakes. Left alone, `perPage <= 0` produced
-`LIMIT 1`/`LIMIT 0`-shaped queries returning an empty page —
+`LIMIT 1`/`LIMIT 0`-shaped queries returning an empty page,
 indistinguishable from "this list really is empty".
 
 **Only the lower bound is enforced.** A maximum page size is an
-application policy — how much data one response may carry — not something
+application policy, how much data one response may carry, not something
 a paginator can pick for every app. Left uncapped, `?per_page=999999`
 returns the entire table in one response.
 
@@ -395,8 +395,8 @@ export class ListPostsController extends Controller {
 ```
 
 Note the relation loading happens **after** pagination, via `loadMany()`
-(inside `loadPosts()`), not via `with()` on the builder. Either works —
-`with()` runs during `get()`, which `cursorPaginate()` calls internally —
+(inside `loadPosts()`), not via `with()` on the builder. Either works,
+`with()` runs during `get()`, which `cursorPaginate()` calls internally,
 but loading afterwards is often clearer when the page needs aggregate
 counts or per-user flags alongside relations, since those can't come from
 `with()` at all.
@@ -430,7 +430,7 @@ return HttpResponse.json(await paginatedResource(PostResource, page));
 
 | Option | Effect |
 |---|---|
-| `additional` | Extra top-level fields merged in — Laravel's `->additional([...])`. |
+| `additional` | Extra top-level fields merged in, Laravel's `->additional([...])`. |
 | `nestMeta` | Nest the metadata under `meta` instead of spreading it. |
 
 ```ts
@@ -461,7 +461,7 @@ return HttpResponse.json(await cursorPaginatedResource(PostResource, result));
 }
 ```
 
-Takes `additional` too. There is no `nestMeta` — there are only two
+Takes `additional` too. There is no `nestMeta`. There are only two
 metadata fields.
 
 Both helpers `await` every resource's `toJson()` in parallel via
@@ -490,14 +490,14 @@ await Post.simplePaginate(1, 20);
 await Post.cursorPaginate({ column: "id", perPage: 20, cursor });
 ```
 
-Each proxies to the standalone function with `this.query()` — so global
+Each proxies to the standalone function with `this.query()`, so global
 scopes apply, but there's nowhere to add a `where`. For anything filtered,
 call the standalone function with a builder.
 
 Note these three statics are declared over a loose `Record<string, any>`
 row rather than the model's instance type, so you may need a cast when
 passing the result somewhere expecting instances. `data` really does
-contain live model instances — `EloquentBuilder.get()` hydrates before the
+contain live model instances, `EloquentBuilder.get()` hydrates before the
 paginator sees the rows. Calling the standalone `paginate(builder, …)`
 functions with `Model.query()` keeps the precise instance type.
 

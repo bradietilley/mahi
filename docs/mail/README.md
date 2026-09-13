@@ -73,7 +73,7 @@ interface MailConfig {
 ```
 
 `mailers` is `Record<string, unknown>` because each transport parses its
-own config shape — `MailManager.mailerConfig(name)` hands the raw entry
+own config shape, `MailManager.mailerConfig(name)` hands the raw entry
 to the factory, which casts it. A mailer with no options (`log`, `array`)
 still wants an entry so it's visible in the file.
 
@@ -91,7 +91,7 @@ return {
 ```
 
 Most apps set this once and never call `.from()` on a mailable again. A
-mailable that *does* set `from()` wins — the global is a fallback, not an
+mailable that *does* set `from()` wins. The global is a fallback, not an
 override. If neither is set, `RenderedMail.from` is `undefined` and the
 transport decides what that means (nodemailer will typically reject it;
 the log and array transports don't care).
@@ -99,7 +99,7 @@ the log and array transports don't care).
 A generated app defaults `MAIL_MAILER` to `"log"`, so local development
 and tests never open an SMTP connection by accident.
 
-`themes` configures `MailMessage` rendering — see
+`themes` configures `MailMessage` rendering. See
 [`MailMessage` and themes](#mailmessage-and-themes).
 
 ## The transports
@@ -110,7 +110,7 @@ interface MailTransport {
 }
 ```
 
-One method. A transport never sees a `Mailable` — only the flattened
+One method. A transport never sees a `Mailable`, only the flattened
 `RenderedMail`. That boundary is what makes transports trivially testable
 and mailables independent of delivery.
 
@@ -126,7 +126,7 @@ manager.extend("log", () => new LogTransport(app.logger));
 [2026-08-27 09:14:02] local.INFO: Mail: Welcome to Acme {"from":"Example <hello@example.com>","to":"Ada Lovelace <ada@example.com>","body":"Hi Ada,\n\nWelcome."}
 ```
 
-The body is logged **verbatim** — text preferred, HTML as fallback — so
+The body is logged **verbatim**, text preferred, HTML as fallback, so
 what you see is a faithful preview, not a summary. `messageId` is a
 synthetic `log-1`, `log-2`, ….
 
@@ -134,7 +134,7 @@ Right for: local development, and any environment where you want to see
 what *would* have gone out without configuring a mail server. This is the
 default in a new app.
 
-Note that `LogTransport` takes `app.logger` — the always-available
+Note that `LogTransport` takes `app.logger`, the always-available
 `ConsoleLogger` on `Application`, not a `LOG_TOKEN` channel. That's
 deliberate: it means `MailServiceProvider` has no ordering dependency on
 `LoggingServiceProvider` (which is opt-in and may not be registered at
@@ -170,7 +170,7 @@ This is why there are none of Laravel's ~30 `assertSentTo` /
 `assertQueued` / `assertHasSubject` helpers. The captured `RenderedMail`
 is a plain object; Vitest already knows how to assert on plain objects.
 
-Remember it's a **resolved and cached** driver — the same `ArrayTransport`
+Remember it's a **resolved and cached** driver, the same `ArrayTransport`
 instance is returned on every `mailer("array")`, so call `flush()` between
 tests or build a fresh `Application`.
 
@@ -194,8 +194,8 @@ interface SmtpTransportConfig {
 > **`secure: false` does not mean "no encryption", and it does not mean
 > "encryption guaranteed" either.** It means *opportunistic*: STARTTLS is
 > used when the server advertises it and **silently skipped when it does
-> not**. A relay that stops offering STARTTLS — misconfigured, or
-> impersonated — downgrades you to plaintext with no error, and the call
+> not**. A relay that stops offering STARTTLS, misconfigured, or
+> impersonated, downgrades you to plaintext with no error, and the call
 > site cannot tell the difference. The promise resolves, `accepted` lists
 > the recipient, and the password and body crossed the wire in the clear.
 >
@@ -204,18 +204,18 @@ interface SmtpTransportConfig {
 >
 > `tls.rejectUnauthorized` defaults to `true` and should stay there.
 > Setting it to `false` disables certificate verification entirely, which
-> makes the connection trivially interceptable — it exists for a
+> makes the connection trivially interceptable. It exists for a
 > self-signed cert on an internal relay, not for silencing a certificate
 > error in production.
 
 Call `close()` to tear down a pooled transporter. Only meaningful with
 `pool: true`, where nodemailer keeps sockets open for reuse and those
-sockets hold the event loop open — a short-lived process would otherwise
+sockets hold the event loop open. A short-lived process would otherwise
 hang until they idle out.
 
 The nodemailer `Transporter` is created **lazily on first `send()`**, not
-in the constructor. Merely resolving the `smtp` mailer — which
-`Manager.driver()` does synchronously, possibly during boot — never opens
+in the constructor. Merely resolving the `smtp` mailer, which
+`Manager.driver()` does synchronously, possibly during boot, never opens
 a connection or a pool. That's the same "cheap synchronous construction,
 lazy I/O" contract every driver in the framework follows.
 
@@ -230,16 +230,16 @@ conventions:
 
 Note the capital in `X-Metadata-UserId`: nodemailer title-cases each
 dash-separated segment on the wire. Header names are case-insensitive per
-RFC 5322, so this is correct — but a receiving system doing an exact-match
+RFC 5322, so this is correct, but a receiving system doing an exact-match
 lookup on the lowercase form will miss it.
 
 `SentMessage.accepted` / `rejected` are populated from nodemailer's
-per-recipient response — the SMTP transport is the only built-in one that
+per-recipient response. The SMTP transport is the only built-in one that
 reports genuine per-recipient outcomes. `log` and `array` treat every
 recipient as accepted.
 
 Right for: production, and for a local catch-all like Mailpit or MailHog
-(`SMTP_HOST=127.0.0.1`, `SMTP_PORT=1025` — the defaults in a generated
+(`SMTP_HOST=127.0.0.1`, `SMTP_PORT=1025`, the defaults in a generated
 app's env schema).
 
 ## `Mailable`
@@ -328,7 +328,7 @@ ignores everything `to()`/`subject()`/`tag()` put there.
 Every one returns `this`. `to`/`cc`/`bcc`/`replyTo`/`tag`/`attach`
 **append**; `from`/`subject`/`view`/`html`/`textView`/`text` **replace**.
 `metadata`/`header` set one key at a time, overwriting that key.
-The `metadata` key/value form sets one pair at a time — pass a whole
+The `metadata` key/value form sets one pair at a time, pass a whole
 `metadata` record to `new Envelope({ ... })` if you have many.
 
 ### `Envelope`
@@ -349,7 +349,7 @@ class Envelope {
 ```
 
 Everything except the body and attachments. Mutable, not a frozen value
-object — the fluent path needs to build it incrementally. The
+object. The fluent path needs to build it incrementally. The
 immutability that matters is at the `RenderedMail` boundary handed to a
 transport.
 
@@ -369,14 +369,14 @@ class Content {
 ```
 
 **Bodies are stored as thunks, not strings.** The constructor accepts
-either — a plain string is wrapped into a constant thunk (`() => value`)
-— but internally there is only ever a function, and it is not invoked
+either, a plain string is wrapped into a constant thunk (`() => value`),
+but internally there is only ever a function, and it is not invoked
 until `render()`.
 
 This matters for two reasons.
 
 **Rendering is often async.** Reading a template file, calling out to a
-template engine, fetching something the message needs — all of that is a
+template engine, fetching something the message needs. All of that is a
 promise. If `Content` held a string, constructing a `Mailable` would have
 to be async, and `new WelcomeMailable(user)` would become
 `await WelcomeMailable.make(user)`. A thunk pushes the await to exactly
@@ -416,7 +416,7 @@ name: `view()` takes a **renderer function**, not a template name. It has
 nothing to do with Laravel's `view($name, $data)`.
 
 Either body may be omitted. Both omitted is legal and produces a message
-with no body — the transports won't stop you.
+with no body. The transports won't stop you.
 
 ### Attachments
 
@@ -432,7 +432,7 @@ interface Attachment {
 
 **Exactly one of `content` or `path`.** `content` is the raw bytes (or a
 UTF-8 string); `path` is a filesystem path the transport reads at send
-time. Nothing validates that you supplied precisely one — supplying
+time. Nothing validates that you supplied precisely one, supplying
 neither yields an empty attachment, supplying both is up to the transport
 (nodemailer prefers `content`).
 
@@ -500,7 +500,7 @@ formatAddress({ address, name }): string
 formatAddressList(addresses: Address[]): string
 ```
 
-`Address` is a plain interface, not a class — it carries no behaviour,
+`Address` is a plain interface, not a class. It carries no behaviour,
 only data flowing from an `Envelope` into a `RenderedMail` and out to a
 transport. The one piece of logic is `formatAddress()`, a free function so
 transports can share it.
@@ -521,7 +521,7 @@ formatAddress({ address: "x@example.com", name: 'He said "hi"' })
 
 The quoting rule: if the display name contains any of `,` `<` `>` `"` or
 `@`, wrap it in double quotes and backslash-escape any embedded `"` or
-`\`. Otherwise emit it bare. That's RFC 5322's requirement — an unquoted
+`\`. Otherwise emit it bare. That's RFC 5322's requirement, an unquoted
 comma in a display name would be read as a recipient separator, turning
 `Example, Inc. <ops@example.com>` into two addresses, one of which is
 garbage.
@@ -553,7 +553,7 @@ await Mail.send(
 );
 ```
 
-**`MailMessage` extends `Mailable`.** It is not a parallel type — it goes
+**`MailMessage` extends `Mailable`.** It is not a parallel type. It goes
 anywhere a mailable goes (`Mail.send()`, a notification's `toMail()`, a
 test's `render()`) with the same `to()`/`cc()`/`subject()`/`attach()`
 setters. This is one place the framework is deliberately simpler than
@@ -569,7 +569,7 @@ new MailMessage(new MyTheme())       // an ad-hoc instance, no registration
 ```
 
 The string form is primary, and it is a string for consistency: this is
-how every named thing in the framework is resolved — `Mail.mailer("smtp")`,
+how every named thing in the framework is resolved: `Mail.mailer("smtp")`,
 `Cache.store("redis")`, `queue.connection("redis")`.
 
 A subclass may bake one in via `static theme`, the same class-level
@@ -585,7 +585,7 @@ A constructor argument beats `static theme`.
 
 ### Registering themes
 
-The cheap path is config alone — any name listed under `mail.themes` gets
+The cheap path is config alone, any name listed under `mail.themes` gets
 the built-in renderer configured with those settings:
 
 ```ts
@@ -598,7 +598,7 @@ themes: {
 
 That is enough for `new MailMessage("alternative")` to render in a
 different accent colour with no code. An unknown name **throws** rather
-than falling back to the default theme — a silent fallback would send a
+than falling back to the default theme. A silent fallback would send a
 message in the wrong brand and look like it worked.
 
 For a theme that needs real logic, register a factory from a provider:
@@ -638,24 +638,24 @@ class BrandTheme extends DefaultMailTheme {
 ```
 
 All three plug in identically, and the authoring API is unchanged by the
-choice — changing how mail *looks* never means rewriting the code that
+choice, changing how mail *looks* never means rewriting the code that
 decides what it *says*.
 
 `render()` receives a `MailMessageData`: a `level`, optional `greeting`
 and `salutation`, a `footer` array, and an array of plain-data `blocks`
-(`line`, `button`, `panel`, `table`). No HTML strings, no functions — a
+(`line`, `button`, `panel`, `table`). No HTML strings, no functions. A
 theme gets a description of the message, never a half-rendered fragment.
 
 **Escaping is the theme's job.** `MailMessageData` carries raw text,
 because the correct escaping depends on which half you're producing: a
 `line` needs `&amp;` in HTML and a bare `&` in text. Pre-escaping would
 corrupt the plain-text body. Route every HTML interpolation through
-`escapeHtml()` — message bodies routinely contain user-controlled data,
+`escapeHtml()`, message bodies routinely contain user-controlled data,
 and an unescaped hole is a live XSS vector in webmail clients.
 
 Both halves are produced in one call because a theme derives them from the
 same walk, and because shipping HTML-only mail is a mistake worth making
-structurally awkward — it's penalised by spam filters and unreadable in
+structurally awkward. It's penalised by spam filters and unreadable in
 text-only clients. The bundled theme renders each half independently
 rather than tag-stripping the HTML, since the useful text form of a button
 is `Label: https://url`, which stripping would discard entirely.
@@ -683,7 +683,7 @@ async render(globalFrom?: Address): Promise<RenderedMail>
 
 The whole flattening step, in order:
 
-1. `await this.build()` — the imperative hook, if the subclass has one.
+1. `await this.build()`: the imperative hook, if the subclass has one.
 2. Read `envelope()`, `content()`, `attachments()`.
 3. `await` the `html` and `text` thunks, if present.
 4. Apply `globalFrom` when the envelope set no `from`.
@@ -738,18 +738,18 @@ await Mail.mailer("smtp").send(rendered);
 ```
 
 but prefer `Message` unless you already have a `RenderedMail` in hand.
-The transport path **bypasses `Mailable.validate()` entirely** — no CRLF
+The transport path **bypasses `Mailable.validate()` entirely**, no CRLF
 header-injection guard, no completeness check. It was previously the only
 documented way to set a header, which meant the one route to the classic
 injection sink was also the one route with no injection guard. `header()`
 fixes that; the transport escape hatch remains for callers who genuinely
 need it.
 
-This is not Laravel's `Mail::raw($text, $callback)` — that exists because
+This is not Laravel's `Mail::raw($text, $callback)`. That exists because
 Laravel's `Mailable` can't be instantiated, and its callback form
 conflicts with this package's rule that recipients live on the mailable.
 
-You can also call `render()` yourself — to assert on the output in a test,
+You can also call `render()` yourself, to assert on the output in a test,
 or to inspect a message before sending it:
 
 ```ts
@@ -773,7 +773,7 @@ interface SentMessage {
 }
 ```
 
-The result of a transport *accepting a message for delivery* — not proof
+The result of a transport *accepting a message for delivery*, not proof
 of delivery. `messageId` is transport-assigned (SMTP's `Message-ID`
 header, or a synthetic `log-1`/`array-1`). `original` is the exact
 `RenderedMail` handed over, retained so callers don't have to re-derive
@@ -810,7 +810,7 @@ await mail.send(new WelcomeMailable(user));
 await mail.send(new WelcomeMailable(user), { mailer: "smtp" });
 ```
 
-`MailServiceProvider` registers all three built-ins via `extend()` — the
+`MailServiceProvider` registers all three built-ins via `extend()`, the
 same mechanism a plugin would use to add `ses`:
 
 ```ts
@@ -833,7 +833,7 @@ No `boot()`: no built-in transport needs async warm-up.
 A mailable sent inside a `DB.transaction()` is delivered immediately by
 default. Override `afterCommit()` to return `true` (or set `afterCommit:
 true` in the mail config for a process-wide default) and the send is held
-until the transaction commits — and dropped if it rolls back:
+until the transaction commits, and dropped if it rolls back:
 
 ```ts
 class OrderShipped extends Mailable {
@@ -848,7 +848,7 @@ await DB.transaction(async () => {
 ```
 
 When deferred, `send()` resolves with a placeholder `SentMessage`
-(`{ deferred: true }`) — the transport runs later, so `messageId`/
+(`{ deferred: true }`). The transport runs later, so `messageId`/
 `accepted`/`rejected` aren't known yet. Outside a transaction it sends
 immediately and returns the transport's real result. A mailable's own
 `afterCommit()` beats the config default. Built on `@mahiframework/database`'s
@@ -870,7 +870,7 @@ Two methods. That's the whole facade.
 **There is no `Mail.to(...)`.** Laravel's
 `Mail::to($user)->cc($manager)->send(new InvoicePaid($invoice))` splits
 "who receives this" between the call site and the mailable, and the two
-can silently disagree — a mailable with its own `to()` plus a facade
+can silently disagree, a mailable with its own `to()` plus a facade
 `to()` gives you a message with recipients from both, or from one,
 depending on Laravel's internals.
 
@@ -887,7 +887,7 @@ await Mail.to(user.email).send(new WelcomeMailable(user));
 ```
 
 If a message's recipients genuinely vary per call, pass them into the
-constructor — that's what constructors are for:
+constructor. That's what constructors are for:
 
 ```ts
 export class ReportMailable extends Mailable {
@@ -933,7 +933,7 @@ Rendering at dispatch is better on three counts:
 - **Validation fires at the call site.** A missing subject is a 500 in your
   controller, not a `failed_jobs` row at 3am.
 - **The message cannot drift.** Re-rendering on a worker reads rows that
-  may have changed since dispatch — the source of "why did that email
+  may have changed since dispatch, the source of "why did that email
   quote the old price".
 
 The cost is payload size: the full HTML body rides in the job row, so a
@@ -943,7 +943,7 @@ carrying an id (below).
 In-memory attachments (`{ content: Buffer }`) are **rejected** by
 `queue()`, because `JSON.stringify` turns a Buffer into
 `{"0":137,"1":80,…}`. Use `{ path }` so the worker reads the file at send
-time — it must still exist then. Base64-inlining is deliberately not done
+time. It must still exist then. Base64-inlining is deliberately not done
 for you: a 5MB PDF would become a ~6.7MB row, on every retry.
 
 ### Never queue a message carrying a credential
@@ -955,7 +955,7 @@ readable by anyone with database access for as long as the row lives.
 So: no password-reset links, no magic links, no one-time codes, no
 invitation tokens.
 
-This is not an argument against deferring those flows — it is an argument
+This is not an argument against deferring those flows. It is an argument
 against queueing the *rendered message*. Queue a job that carries an id,
 mints the credential inside `handle()`, and sends immediately:
 
@@ -976,14 +976,14 @@ export class SendResetLink extends Job {
 ```
 
 The token then exists only in the worker's memory. Note `Mail.send()`, not
-`Mail.queue()` — queueing here would defeat the entire point.
+`Mail.queue()`, queueing here would defeat the entire point.
 
 The same reasoning is why the scaffolded auth controllers send
 synchronously; see [Authentication](../authentication/).
 
 ### A hand-written job is still the right tool sometimes
 
-Reach for one over `Mail.queue()` when the payload would be large (bulk
+Write one instead of using `Mail.queue()` when the payload would be large (bulk
 sends), when the message must reflect data as of *delivery* rather than
 dispatch, or when a credential is involved:
 
@@ -1062,7 +1062,7 @@ unreachable. Same for `content()` versus `view()`/`html()`/`text()`, and
 
 **`view()` takes a function, not a template name.** There is no template
 system. `view(() => renderIt())`, never `view("emails.welcome", data)`.
-`MailMessage` is the exception — it has a body system, but it's blocks
+`MailMessage` is the exception. It has a body system, but it's blocks
 plus a theme, still not a template name.
 
 **`MailMessage.html()`/`text()`/`view()`/`textView()` throw.** They are
@@ -1087,7 +1087,7 @@ render, it does not fall back to the default theme.
 guard, no completeness check. Prefer `Message` for ad-hoc sends.
 
 **`Mail.queue()` writes the message body to the database in plaintext.**
-Never queue a reset link, magic link or one-time code — queue a job that
+Never queue a reset link, magic link or one-time code, queue a job that
 mints the credential in `handle()` instead.
 
 **`Mail.queue()` rejects in-memory attachments.** Use `{ path }`; the
@@ -1109,10 +1109,10 @@ with its own `from()` ignores it entirely.
 
 ## Related
 
-- [Notifications](../notifications/) — `toMail()`, the `mail` channel
-- [Queues](../queues/) — `Mail.queue()`, job encoding, retries and backoff
-- [Storage](../storage/) — reading attachment bytes off a disk
-- [Logging](../logging/) — where the `log` mailer writes, and why it uses `app.logger`
-- [Configuration](../configuration/) — `config/mail.ts`, the `MAIL_*`/`SMTP_*` env vars
-- [Providers](../providers/) — registering a custom transport via `extend()`
-- [Testing](../testing/) — the `array` mailer as the test fake
+- [Notifications](../notifications/): `toMail()`, the `mail` channel
+- [Queues](../queues/): `Mail.queue()`, job encoding, retries and backoff
+- [Storage](../storage/): reading attachment bytes off a disk
+- [Logging](../logging/): where the `log` mailer writes, and why it uses `app.logger`
+- [Configuration](../configuration/): `config/mail.ts`, the `MAIL_*`/`SMTP_*` env vars
+- [Providers](../providers/): registering a custom transport via `extend()`
+- [Testing](../testing/): the `array` mailer as the test fake

@@ -18,14 +18,14 @@ import type { SchemaBuilder } from "./schema/schema-builder.js";
  *   DB.connection("analytics");              // a secondary connection
  *
  * Named `DB` (not `Database`) to match Laravel's `DB` facade. This wraps
- * the connection MANAGER — for model reads/writes prefer the Active-Record
+ * the connection MANAGER, for model reads/writes prefer the Active-Record
  * `Model` API; reach here for model-free table queries (`table()`), raw
  * Kysely access, secondary connections, or an explicit `transaction()`
  * boundary around static `Model` calls.
  *
  * Prefer constructor-injecting `DatabaseManager` (via `DATABASE_TOKEN`)
  * where that's practical (e.g. inside a `ServiceProvider`/`Command` that
- * already receives `app`) — reach for this only where threading
+ * already receives `app`), use this only where threading
  * `app`/`DatabaseManager` through is genuinely inconvenient, same guidance
  * as `app()` itself.
  */
@@ -41,15 +41,15 @@ export class DB extends Facade<DatabaseManager>(() => DATABASE_TOKEN) {
   }
 
   /**
-   * A model-free `QueryBuilder` bound to `name` — Laravel's `DB::table()`.
+   * A model-free `QueryBuilder` bound to `name`, Laravel's `DB::table()`.
    *
    *   await DB.table("users").count();
    *   await DB.table<UserTable>("users").where("first_name", "John").get();
    *
    * Unnamed connection: joins an enclosing `DB.transaction()`. Named:
    * resolves that connection directly, ignoring the transaction context.
-   * No hydration, no casts, no events, no relations, no global scopes —
-   * see `DatabaseManager.table()`.
+   * No hydration, no casts, no events, no relations, no global scopes.
+   * See `DatabaseManager.table()`.
    */
   static table<TRow extends Record<string, any> = Record<string, any>>(
     name: string,
@@ -59,7 +59,7 @@ export class DB extends Facade<DatabaseManager>(() => DATABASE_TOKEN) {
   }
 
   /**
-   * A `QueryBuilder` with no table bound yet — Laravel's `DB::query()`.
+   * A `QueryBuilder` with no table bound yet, Laravel's `DB::query()`.
    * Call `.table(name)` before any terminal. Prefer `DB.table(name)`;
    * see `DatabaseManager.query()` for why this one can't stay typed.
    */
@@ -70,7 +70,7 @@ export class DB extends Facade<DatabaseManager>(() => DATABASE_TOKEN) {
   }
 
   /**
-   * Run `callback` in a transaction on the named (default) connection —
+   * Run `callback` in a transaction on the named (default) connection,
    * static `Model` calls made inside automatically participate. See
    * `DatabaseManager.transaction()`.
    */

@@ -19,7 +19,7 @@ export class UsersServiceProvider extends ServiceProvider {
 ```
 
 One crontab entry, however many tasks. The scheduler's job is to answer
-"which of these is due right now" — everything else stays in your
+"which of these is due right now", everything else stays in your
 codebase, under version control, in TypeScript.
 
 ## `Schedule`
@@ -55,7 +55,7 @@ schedule
   .name("prune-sessions");
 ```
 
-### `job(factory)` — and why it takes a factory
+### `job(factory)`: and why it takes a factory
 
 ```ts
 schedule.job(() => new PruneStalePostsJob()).daily();
@@ -65,7 +65,7 @@ schedule.job(() => new PruneStalePostsJob()).daily();
 
 A schedule is built **once**, during boot, and then lives for the life of
 the process (or, for `schedule:run`, is rebuilt every minute in a fresh
-process — but for `schedule:work` it genuinely persists). Passing a single
+process, but for `schedule:work` it genuinely persists). Passing a single
 instance would mean every tick dispatches *that same object*, with fields
 frozen at schedule-definition time. A job constructed with a model loaded
 during boot would carry that stale row forever; a job carrying a
@@ -89,7 +89,7 @@ job(factory: () => JobLike): ScheduledTask {
 ```
 
 Two things follow. First, `@mahiframework/schedule` has **no compile-time
-dependency on `@mahiframework/queue`** — it resolves the string `QUEUE_TOKEN`
+dependency on `@mahiframework/queue`**. It resolves the string `QUEUE_TOKEN`
 and types the result structurally. Register the schedule provider without
 the queue package and everything except `.job()` works; call `.job()` and
 you get a clear error rather than an unresolved-token failure.
@@ -101,7 +101,7 @@ schedule.job(() => new PruneStalePostsJob()).daily();
 // name → "PruneStalePostsJob"
 ```
 
-That default is derived lazily — the first time anything reads the name —
+That default is derived lazily, the first time anything reads the name,
 by building one job purely to read its constructor. Calling `name()`
 yourself skips the probe entirely, and a factory that throws while being
 probed leaves the task unnamed rather than breaking boot.
@@ -116,13 +116,13 @@ schedule.job(() => ({ handle: () => sync() })).daily().name("sync-feed");
 
 **`.job()` dispatches, it does not run.** The task's work is a `push()`;
 the job itself runs whenever a worker picks it up. Under the `sync`
-connection those are the same moment — see [Queues](../queues/).
+connection those are the same moment. See [Queues](../queues/).
 
 ## `ScheduledTask`
 
 A callback plus a 5-field cron expression, built fluently. The fields
 start at `["*", "*", "*", "*", "*"]` and each helper **splices one
-position**, leaving the others alone — which is what makes composition
+position**, leaving the others alone. Which is what makes composition
 work:
 
 ```ts
@@ -165,7 +165,7 @@ Invalid minute offset "75" passed to hourlyAt() — expected 0-59.
 ```
 
 Note `hourlyAt()` and `hourly()` both touch only the minute field, so
-`daily().hourlyAt(30)` gives `30 0 * * *` — half past midnight, not half
+`daily().hourlyAt(30)` gives `30 0 * * *`, half past midnight, not half
 past every hour. Order matters; the last call to touch a field wins.
 
 ### Daily
@@ -176,7 +176,7 @@ past every hour. Order matters; the last call to touch a field wins.
 | `dailyAt(time)` | minute + hour from `"HH:MM"` |
 | `at(time)` | Alias for `dailyAt()`. |
 
-`time` is 24-hour `"HH:MM"` or `"H:M"` — `"9:00"` and `"09:00"` both work.
+`time` is 24-hour `"HH:MM"` or `"H:M"`, `"9:00"` and `"09:00"` both work.
 Validation:
 
 ```
@@ -225,7 +225,7 @@ Invalid dayOfMonth "32" passed to monthlyOn() — expected 1-31.
 ```
 
 `monthlyOn(31)` simply doesn't fire in February, April, June, September or
-November — the day never matches. `lastDayOfMonth()` is the fix, and uses
+November. The day never matches. `lastDayOfMonth()` is the fix, and uses
 the `L` token so it lands on the 28th, 29th, 30th or 31st as appropriate.
 
 ```ts
@@ -244,7 +244,7 @@ schedule.call(nightly).cron("@daily");
 **It replaces all five fields at once**, unlike every other helper. Any
 splicing done before it is discarded.
 
-**The expression is fully validated here**, at registration — not at match
+**The expression is fully validated here**, at registration, not at match
 time. Errors name the field and the offending text:
 
 ```
@@ -305,14 +305,14 @@ schedule
 `filtersPass()` short-circuits: the first failing `when` or the first
 truthy `skip` returns `false` without evaluating the rest.
 
-Filters run **before** the overlap lock is taken — see
+Filters run **before** the overlap lock is taken. See
 [`runDueTasks`](#runduetasks). A filtered-out task never "ran", so it
 never touches a lock file.
 
 ### Webhook pings
 
 All four take a URL and issue a plain `fetch(url, { method: "GET" })`.
-Each is additive — call it more than once for more than one URL.
+Each is additive, call it more than once for more than one URL.
 
 | Method | Fires |
 |---|---|
@@ -333,7 +333,7 @@ schedule
 
 **Ping failures never fail the task.** An unreachable monitoring webhook
 must not break the thing it monitors, and neither does one that answers
-500. They *are* logged at warning, though — a silently-dropped ping means
+500. They *are* logged at warning, though. A silently-dropped ping means
 a dead-man's-switch monitor fires for a task that actually succeeded, and
 you want to be able to tell those apart.
 
@@ -381,7 +381,7 @@ schedule.call(gc).daily().name("auth-gc").withoutOverlapping();
 
 **The name is the lock key**, so a task using `withoutOverlapping()` must
 have one. Without a name there is nothing to distinguish one task's lock
-from another's, and `Schedule.validate()` — which runs at boot — rejects
+from another's, and `Schedule.validate()`, which runs at boot, rejects
 it:
 
 ```
@@ -391,7 +391,7 @@ would share a lock and skip each other. Add .name("something-unique").
 ```
 
 Two overlap-preventing tasks sharing a name are rejected the same way.
-(Duplicate names are fine on tasks that don't prevent overlaps — there the
+(Duplicate names are fine on tasks that don't prevent overlaps. There the
 name is only a label.)
 
 **Order in the chain doesn't matter.** The key is resolved when the task
@@ -403,7 +403,7 @@ schedule.call(gc).daily().withoutOverlapping().name("auth-gc");
 ```
 
 `expiresAfterMinutes` bounds how long the lock survives if the process
-dies without releasing it — otherwise one crash blocks the task forever.
+dies without releasing it, otherwise one crash blocks the task forever.
 It defaults to 60 minutes. **Size it above the task's worst-case
 runtime**: a task still running when its lock lapses can be started again
 concurrently, which is the one case overlap prevention doesn't cover.
@@ -424,13 +424,13 @@ Not the same problem as `withoutOverlapping()`, though they read alike:
 
 | | Prevents |
 |---|---|
-| `withoutOverlapping()` | The task overlapping **itself over time** — a slow run colliding with the next. |
+| `withoutOverlapping()` | The task overlapping **itself over time**. A slow run colliding with the next. |
 | `onOneServer()` | The task running **twice in one tick** across machines. |
 
 A nightly billing job wants both, and they use separate lock keys so you
 can have both.
 
-**Needs a lock every host can see.** That means a shared cache store —
+**Needs a lock every host can see.** That means a shared cache store,
 `CACHE_STORE=redis` plus `schedule.lockStore`. `runDueTasks()` refuses an
 `ArrayCacheStore` (per-process, so no exclusion at all) and falls back to
 lock files, which are only as global as the filesystem underneath them. On
@@ -441,7 +441,7 @@ using it must have a unique one.
 
 > **The claim is deliberately never released.** Releasing it at the end of
 > the run would let a second host whose clock is a few seconds behind take
-> it within the same minute and run the task again — exactly what the
+> it within the same minute and run the task again, exactly what the
 > feature exists to prevent. It expires on its own instead, which is why
 > the key includes the **minute**: every tick gets a fresh key, so a lock
 > left sitting in the store cannot block tomorrow's run. Minute
@@ -461,7 +461,7 @@ schedule.call(slowSync).everyFiveMinutes().name("slow-sync").runInBackground();
 The run still waits for every background task before finishing, so nothing
 is orphaned and the process doesn't exit mid-task.
 
-Unlike Laravel's version this is **not a child process** — it's the same
+Unlike Laravel's version this is **not a child process**. It's the same
 event loop. It buys concurrency for I/O-bound work (HTTP, queries) and
 nothing at all for a CPU-bound loop, which still blocks everything.
 Genuinely long or heavy work belongs on a [queue](../queues/).
@@ -475,7 +475,7 @@ Genuinely long or heavy work belongs on a [queue](../queues/).
 | `run(app)` | Run the callback, firing the pings around it. |
 
 `nextRunAt()` scans forward from `from + 1 minute`, capped at ~1 year, and
-returns `undefined` if nothing matches (`0 0 30 2 *` — February 30th —
+returns `undefined` if nothing matches (`0 0 30 2 *`, February 30th,
 never does). It evaluates in the task's own `timezone()`.
 
 The scan skips whole days and hours that can't match, so a once-a-year
@@ -486,11 +486,11 @@ minutes from the second occurrence walks backwards into the first, which
 can loop.
 
 `run(app)` does **not** check `isDueAt()` or `filtersPass()`. It runs the
-callback unconditionally — which is what `schedule:test` wants, and why
+callback unconditionally. Which is what `schedule:test` wants, and why
 `runDueTasks()` does the checking itself.
 
 `formatNextRun(date, timeZone?)` renders `YYYY-MM-DD HH:MM`, or
-`"unknown"` for `undefined`. Pass the zone to render in it — without one
+`"unknown"` for `undefined`. Pass the zone to render in it, without one
 the output is server-local, which for a zoned task is a different wall
 clock than the expression was written against. `schedule:list` always
 passes it and appends the zone name.
@@ -504,7 +504,7 @@ minute  hour  day-of-month  month  day-of-week
 0-59    0-23  1-31          1-12   0-6 (0 = Sunday)
 ```
 
-Day-of-week `7` is Sunday, the same as `0` — Vixie cron's convention.
+Day-of-week `7` is Sunday, the same as `0`, Vixie cron's convention.
 
 Supported syntax, per comma-separated component:
 
@@ -522,7 +522,7 @@ Supported syntax, per comma-separated component:
 
 A field matches if **any** of its comma components match.
 
-Note `*/n` counts from the field's *minimum*, not from zero — day-of-month
+Note `*/n` counts from the field's *minimum*, not from zero, day-of-month
 starts at 1, so `*/2` there is the 1st, 3rd, 5th, not the 2nd, 4th, 6th.
 
 `L` in the day-of-month field means "the last calendar day of this month",
@@ -545,8 +545,8 @@ scheduler re-evaluated every minute.
 
 ### Validation
 
-Everything above is checked when the expression is registered — by
-`cron()`, or by `parseCronExpression()` directly — and never at match time.
+Everything above is checked when the expression is registered, by
+`cron()`, or by `parseCronExpression()` directly, and never at match time.
 An expression that got past registration cannot throw from `isDueAt()`.
 
 `validateCronExpression(expression)` is the same check, exported for when
@@ -564,7 +564,7 @@ if (cron.dayOfMonth.restricted && cron.dayOfWeek.restricted) {
 return domMatches && dowMatches;
 ```
 
-So `0 0 1 * 1` is "the 1st of the month **or** any Monday" — the same thing
+So `0 0 1 * 1` is "the 1st of the month **or** any Monday", the same thing
 a `crontab` line with that text does, and the same thing Laravel does.
 When only one of the two is restricted, it simply applies. `?` counts as
 unrestricted, so `0 0 ? * 1` is a plain "every Monday".
@@ -594,7 +594,7 @@ Per task, in order:
 4. **Release** the lock in a `finally`.
 
 **Nothing here rethrows.** A failing task, an unevaluatable expression, a
-lock backend that errors — all logged, none fatal. One broken task must
+lock backend that errors, all logged, none fatal. One broken task must
 never disable the rest of your schedule, nor kill the long-lived
 `schedule:work` process. The consequence: `schedule:run` exits `0` even
 when every task threw, so your monitoring has to come from the log or from
@@ -609,7 +609,7 @@ app.logger.error(`Scheduled task failed: ${task.getDescription()}`, {
 });
 ```
 
-Foreground tasks run **sequentially, in registration order** — a slow one
+Foreground tasks run **sequentially, in registration order**, a slow one
 delays every task after it in the same tick, which is what
 [`runInBackground()`](#runinbackground) exists for. Background tasks start
 immediately and are all awaited before the run finishes.
@@ -625,22 +625,22 @@ interface ScheduleLocker {
 }
 ```
 
-Deliberately narrower than a general mutex — there is no "wait until
+Deliberately narrower than a general mutex. There is no "wait until
 available", because a scheduled task already running should be *skipped*
 this tick, not queued behind itself. `acquire()` returns a boolean rather
 than throwing, so "someone else has it" (normal) is distinguishable from a
 broken backend (which still throws).
 
-### `ScheduleLock` — lock files, the default
+### `ScheduleLock`: lock files, the default
 
 The deployment model is why. `schedule:run` is fired by cron, which spawns
 a **fresh Node process every minute**. There is no persistent worker to
-hold "is the previous run still going" in memory — that state has to
+hold "is the previous run still going" in memory. That state has to
 outlive the process, and a file on disk is the simplest thing that does,
 with zero infrastructure.
 
 **Acquisition is atomic**: a single `open(path, "wx")`, which creates the
-file only if it doesn't exist. Not a check followed by a write — two
+file only if it doesn't exist. Not a check followed by a write, two
 `schedule:run` processes started in the same minute (which happens the
 moment a run overruns its slot) would both pass the check and both run.
 
@@ -648,8 +648,8 @@ moment a run overruns its slot) would both pass the check and both run.
 the key, so distinct keys cannot collide. Any description is safe;
 punctuation no longer matters.
 
-The file contains JSON — when it was taken, when it expires, the original
-key, and the PID — so a leftover lock is traceable back to a task. A lock
+The file contains JSON, when it was taken, when it expires, the original
+key, and the PID, so a leftover lock is traceable back to a task. A lock
 past its expiry is treated as abandoned and can be taken over; that
 takeover is itself serialised behind a second marker file, so two
 processes reclaiming the same expired lock can't both win.
@@ -658,7 +658,7 @@ processes reclaiming the same expired lock can't both win.
 have their own `storage/` and will both run every task. Run the scheduler
 on exactly one machine, or use a cache-backed lock.
 
-### `CacheScheduleLocker` — a lock that spans hosts
+### `CacheScheduleLocker`: a lock that spans hosts
 
 ```ts
 export function scheduleConfig(): ScheduleConfig {
@@ -671,14 +671,14 @@ export function scheduleConfig(): ScheduleConfig {
 ```
 
 Setting `schedule.lockStore` moves overlap locks into a cache store. Over
-Redis — whose `add()` is a `SET NX` — the lock becomes global, which is
+Redis, whose `add()` is a `SET NX`, the lock becomes global, which is
 what makes running the scheduler on more than one host safe (Laravel's
 `onOneServer()`, by another name).
 
 That guarantee is only as good as the store's. An in-memory store gives no
 cross-process exclusion at all, so it is **refused** with a warning and
 lock files are used instead, rather than silently pretending to lock.
-A missing or unresolvable store falls back the same way — a misconfigured
+A missing or unresolvable store falls back the same way, a misconfigured
 lock backend should degrade overlap prevention, not stop the schedule.
 
 Release is owner-checked: a task that overran its expiry, and whose lock
@@ -721,7 +721,7 @@ meant.
 ```
 
 Interactively pick one task and run it **immediately**, ignoring its cron
-expression and its filters — it calls `task.run(app)` directly. Reports
+expression and its filters. It calls `task.run(app)` directly. Reports
 `Task complete:` or `Task failed:` with the error message.
 
 Tasks are keyed by index in the picker, so two tasks sharing a description
@@ -737,7 +737,7 @@ that's currently running via `schedule:run` will overlap.
 ./artisan schedule:work --once
 ```
 
-A foreground loop that evaluates the schedule once per wall-clock minute —
+A foreground loop that evaluates the schedule once per wall-clock minute,
 a **local development convenience**, so you don't need a crontab while
 developing. Runs until `SIGINT`/`SIGTERM`.
 
@@ -771,7 +771,7 @@ One crontab entry, on exactly one machine:
 ```
 
 Every minute, unconditionally. The scheduler decides what's actually due.
-The absolute `cd` matters — `artisan` resolves paths (including
+The absolute `cd` matters, `artisan` resolves paths (including
 `storage/schedule-locks`) against `process.cwd()`.
 
 Redirecting output to `/dev/null` is conventional but drops your task
@@ -784,7 +784,7 @@ instead:
 
 Container setups typically run `schedule:run` from a sidecar cron
 container, or `schedule:work` as a long-lived process under the
-orchestrator's restart policy — the latter is simpler in Kubernetes, at
+orchestrator's restart policy. The latter is simpler in Kubernetes, at
 the cost of the shared-process caveat above.
 
 Long-running tasks should be `.job()`s, not `.call()`s. A `schedule:run`
@@ -802,7 +802,7 @@ one. Order in the chain doesn't matter.
 sharing a name is a boot error.
 
 **`job()` defaults the name to the job class.** Object-literal factories
-get no name — set one.
+get no name, so set one.
 
 **`job()` takes a factory.** An instance would go stale.
 
@@ -839,9 +839,9 @@ longer than its expiry can be started again concurrently.
 
 ## Related
 
-- [Queues](../queues/) — `schedule.job()` dispatches into this
-- [Providers](../providers/) — the `schedule()` hook
-- [Console](../console/) — the `Command` base class scheduled callbacks often invoke
-- [Configuration](../configuration/) — `config/schedule.ts`
-- [Deployment](../deployment/) — running the scheduler in production
-- [Cache](../cache/) — `Cache.lock()`, for locking that isn't schedule overlap
+- [Queues](../queues/): `schedule.job()` dispatches into this
+- [Providers](../providers/): the `schedule()` hook
+- [Console](../console/): the `Command` base class scheduled callbacks often invoke
+- [Configuration](../configuration/): `config/schedule.ts`
+- [Deployment](../deployment/): running the scheduler in production
+- [Cache](../cache/): `Cache.lock()`, for locking that isn't schedule overlap

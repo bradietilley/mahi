@@ -1,5 +1,5 @@
 /**
- * Computed-attribute (accessor) definitions — the runtime behind a model's
+ * Computed-attribute (accessor) definitions, the runtime behind a model's
  * `static accessors` map and the `Computed<T>` markers in its attributes
  * interface.
  *
@@ -19,7 +19,7 @@
  * write back to real columns.
  */
 
-/** A resolved accessor definition — a getter, plus an optional setter. */
+/** A resolved accessor definition, a getter, plus an optional setter. */
 export interface AccessorDefinition<M, T> {
   get(model: M): T;
   set?(model: M, value: T): void;

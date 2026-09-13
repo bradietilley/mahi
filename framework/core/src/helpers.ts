@@ -1,14 +1,14 @@
 import { Collection } from "./collection.js";
 
 /**
- * Values `blank()`/`filled()` inspect — every runtime type those helpers
+ * Values `blank()`/`filled()` inspect, every runtime type those helpers
  * actually branch on. `symbol` is omitted; passing one is a type error
  * rather than a silent `false`.
  */
 export type Blankable = string | number | boolean | bigint | object | null | undefined;
 
 /**
- * Laravel's `blank()` — null/empty check that treats `false` and `0` as
+ * Laravel's `blank()`, null/empty check that treats `false` and `0` as
  * **not** blank (matching PHP `empty()`'s exceptions for those two, plus
  * Laravel's own string-trim rule). Empty arrays, empty Collections, empty
  * Maps/Sets, empty plain objects, `null`, `undefined`, and whitespace-only
@@ -40,7 +40,7 @@ export function blank(value: Blankable): boolean {
   }
 
   // Only *plain* objects are "countable" (blank when they have no keys).
-  // A `Date`, class instance, function, etc. is never blank — matching
+  // A `Date`, class instance, function, etc. is never blank, matching
   // Laravel, where only Countables/arrays/strings can be blank and any
   // other object is `filled`. `Object.keys(new Date())` is `[]`, so the
   // old key-count check wrongly reported dates/instances as blank.
@@ -59,7 +59,7 @@ export function filled(value: Blankable): boolean {
 }
 
 /**
- * Resolve a value-or-thunk — Laravel's `value()`. If `val` is a function
+ * Resolve a value-or-thunk, Laravel's `value()`. If `val` is a function
  * it is called with `args`; otherwise `val` is returned as-is.
  */
 export function value<T>(val: T | (() => T)): T;
@@ -77,8 +77,8 @@ export function value<T, A = never, B = never>(
  * Pass `value` through an optional callback and return the callback's
  * result (or `value` itself when no callback is given).
  *
- * Named `withValue` because `with` is a reserved word in JavaScript —
- * this is Laravel's `with($value, $callback)` helper. Distinct from
+ * Named `withValue` because `with` is a reserved word in JavaScript.
+ * This is Laravel's `with($value, $callback)` helper. Distinct from
  * `tap()`, which always returns the original value.
  */
 export function withValue<T, R>(value: T, callback: (value: T) => R): R;
@@ -102,11 +102,11 @@ export function tap<T>(value: T, callback?: (value: T) => void): T {
  * `sleepMs` is a fixed delay between attempts, an array of per-attempt
  * delays (the last value is reused if attempts outlast the array), or a
  * function computing the delay from the attempt number and the error that
- * caused it — which is how a caller honours a server's `Retry-After`.
- * `when` gates whether a thrown error is retryable — returning `false`
+ * caused it. Which is how a caller honours a server's `Retry-After`.
+ * `when` gates whether a thrown error is retryable, returning `false`
  * rethrows immediately.
  *
- * `error` stays `unknown` because `catch` clauses are `unknown` — a
+ * `error` stays `unknown` because `catch` clauses are `unknown`. A
  * callback may throw anything, not only `Error`.
  */
 export async function retry<T>(
@@ -150,14 +150,14 @@ export async function retry<T>(
 /**
  * Run `tasks` with an optional concurrency cap, preserving array position
  * (or record keys) in the result, and surfacing a rejection as an `Error`
- * *value* rather than rejecting the pool — so one failure never discards
+ * *value* rather than rejecting the pool, so one failure never discards
  * the other results. The general form of Laravel's `Http::pool()`, which
  * has nothing HTTP-specific about it: queue batches, storage uploads, and
  * per-model lazy loads want exactly this.
  *
  * Takes **thunks**, not promises. A `Promise` is already running by the
  * time you hold one, so an array of promises cannot be
- * concurrency-limited — Laravel needs its whole `LazyPromise`/`EachPromise`
+ * concurrency-limited. Laravel needs its whole `LazyPromise`/`EachPromise`
  * apparatus precisely to defer construction so it can throttle.
  * `() => Promise<T>` is the same idea in one line of type signature.
  *
@@ -229,7 +229,7 @@ export async function pooled<T>(
 }
 
 /**
- * Shorthand for `Collection.wrap(value)` — `null`/`undefined` become an
+ * Shorthand for `Collection.wrap(value)`, `null`/`undefined` become an
  * empty collection. Purely ergonomic; every call site that currently
  * writes `Collection.make(...)` can use this instead when wrapping a
  * value that might already be a collection, array, or scalar.

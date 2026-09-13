@@ -1,7 +1,7 @@
 /**
  * Plan §29 and §34: the package's *shape* as a contract.
  *
- * These tests fail when the public surface changes, which is the point — an
+ * These tests fail when the public surface changes, which is the point, an
  * export added by accident is as much of a problem as one removed by
  * accident, because everything listed here is something consumers may depend
  * on and semantic versioning must therefore protect.
@@ -118,7 +118,7 @@ describe("runtime expectations", () => {
   });
 
   it("resolves IANA zones, including ones with unusual offsets", () => {
-    // Chatham is UTC+12:45 — a quarter-hour offset that a naive
+    // Chatham is UTC+12:45, a quarter-hour offset that a naive
     // minutes-only implementation would round away.
     expect(api.Timezone.offsetMinutesAt("Pacific/Chatham", Date.UTC(2026, 6, 1))).toBe(765);
     expect(api.Timezone.offsetMinutesAt("Asia/Kolkata", Date.UTC(2026, 6, 1))).toBe(330);

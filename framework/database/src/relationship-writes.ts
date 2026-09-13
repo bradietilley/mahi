@@ -20,7 +20,7 @@ import { transaction } from "./transaction.js";
 /**
  * # Relationship writes
  *
- * The write half of the relation surface — `attach()`/`detach()`/
+ * The write half of the relation surface, `attach()`/`detach()`/
  * `sync()`/`toggle()` on a pivot relation, `associate()`/`dissociate()`
  * on a `belongsTo`/`morphTo`, and `save()`/`create()` through a
  * `hasMany`/`morphMany`. Laravel's `BelongsToMany`, `BelongsTo` and
@@ -30,14 +30,14 @@ import { transaction } from "./transaction.js";
  *
  * ## Why these are mixed in, not a builder subclass
  *
- * The obvious shape — `class BelongsToManyBuilder extends EloquentBuilder`
- * returned by `buildRelationBuilder()` — is wrong here, and the reason
+ * The obvious shape, `class BelongsToManyBuilder extends EloquentBuilder`
+ * returned by `buildRelationBuilder()`, is wrong here, and the reason
  * is `BuilderOf<M>`. A relation accessor returns the *related model's*
  * builder, which for a model declaring `static Builder`/
  * `newEloquentBuilder()` is that model's own custom subclass
  * (`tests/types.test-d.ts`'s `ArticleBuilder`). Returning a fixed
  * `BelongsToManyBuilder` instead would silently drop every custom scope
- * the related model defines — `user.relations.articles().published()`
+ * the related model defines. `user.relations.articles().published()`
  * would stop compiling and stop existing.
  *
  * So the write methods are **attached to the builder the relation
@@ -59,7 +59,7 @@ import { transaction } from "./transaction.js";
  * business filtering which *pivot rows exist*. Reading the current ids
  * for a `sync()` diff through a scoped builder would omit the pivot rows
  * whose related row is soft-deleted, and `sync()` would then cheerfully
- * re-insert them — turning a soft delete into a duplicate-key error, or
+ * re-insert them, turning a soft delete into a duplicate-key error, or
  * worse, a resurrection.
  *
  * ## Pivot attributes are raw
@@ -69,7 +69,7 @@ import { transaction } from "./transaction.js";
  * consult. `withTimestamps` is the one value this layer fills in itself.
  */
 
-/** A pivot row's extra columns — raw DB-shape values, no casts (see the module docstring). */
+/** A pivot row's extra columns, raw DB-shape values, no casts (see the module docstring). */
 export type PivotAttributes = Record<string, SqlBinding>;
 
 /** Anything accepted where a related key is expected: the key itself, or a model instance to read it off. */
@@ -80,13 +80,13 @@ export type RelatedKey = SqlBinding | Model;
  * or a `{ key: pivotAttributes }` map for per-row pivot payloads.
  *
  * The map form is keyed by the *stringified* key, because JS object keys
- * are strings — `{ 1: { weight: 9 } }` and `{ "1": ... }` are the same
+ * are strings, `{ 1: { weight: 9 } }` and `{ "1": ... }` are the same
  * thing. Numeric keys survive the round trip because the value is
  * matched against the DB, not compared in JS; see `normalizeIdMap()`.
  */
 export type AttachIds = RelatedKey | RelatedKey[] | Record<string, PivotAttributes>;
 
-/** What `sync()`/`syncWithoutDetaching()` report — Laravel's three buckets, same names. */
+/** What `sync()`/`syncWithoutDetaching()` report, Laravel's three buckets, same names. */
 export interface SyncResult {
   attached: SqlBinding[];
   detached: SqlBinding[];
@@ -101,7 +101,7 @@ export interface ToggleResult {
 
 /**
  * The write-side view of a pivot relation, normalised across
- * `belongsToMany`, `morphToMany` and `morphedByMany` — the same
+ * `belongsToMany`, `morphToMany` and `morphedByMany`, the same
  * flattening `PivotQuerySpec` does for reads, and for the same reason:
  * the three differ only in which pivot column points where.
  */
@@ -115,7 +115,7 @@ interface PivotWriteSpec {
   localValue: SqlBinding;
   /** Discriminant column on the pivot, for the polymorphic variants. */
   morphType?: string;
-  /** Discriminant value. Which SIDE it names differs per relation — see the option interfaces. */
+  /** Discriminant value. Which SIDE it names differs per relation. See the option interfaces. */
   morphValue?: string;
   /** Whether to stamp `created_at`/`updated_at` on pivot rows. */
   withTimestamps: boolean;
@@ -134,7 +134,7 @@ export interface BelongsToManyWrites {
    *
    * Inserts nothing for an empty list. A duplicate link surfaces the
    * database's own unique-constraint error as
-   * `UniqueConstraintViolationException` — `attach()` does not dedupe,
+   * `UniqueConstraintViolationException`. `attach()` does not dedupe,
    * exactly like Laravel; use `syncWithoutDetaching()` for that.
    */
   attach(ids: AttachIds, pivot?: PivotAttributes): Promise<void>;
@@ -145,7 +145,7 @@ export interface BelongsToManyWrites {
    *
    *   await post.relations.tags().detach();      // all
    *   await post.relations.tags().detach([1]);   // one
-   *   await post.relations.tags().detach([]);    // NOTHING — see below
+   *   await post.relations.tags().detach([]);    // NOTHING. See below
    *
    * `detach([])` is a **no-op**, not "detach all". Laravel has the same
    * rule and it is a well-known footgun: `detach($request->input('ids'))`
@@ -171,11 +171,11 @@ export interface BelongsToManyWrites {
    */
   sync(ids: AttachIds, detaching?: boolean): Promise<SyncResult>;
 
-  /** `sync()` without the delete half — adds and updates, never removes. */
+  /** `sync()` without the delete half, adds and updates, never removes. */
   syncWithoutDetaching(ids: AttachIds): Promise<SyncResult>;
 
   /**
-   * `sync()` applying one shared pivot payload to every id — Laravel's
+   * `sync()` applying one shared pivot payload to every id, Laravel's
    * `syncWithPivotValues()`.
    *
    *   await post.relations.tags().syncWithPivotValues([1, 2], { source: "import" });
@@ -191,7 +191,7 @@ export interface BelongsToManyWrites {
 
   /**
    * Flips each id: attaches the ones not currently linked, detaches the
-   * ones that are — Laravel's `toggle()`. Runs in a transaction.
+   * ones that are, Laravel's `toggle()`. Runs in a transaction.
    */
   toggle(ids: RelatedKey | RelatedKey[]): Promise<ToggleResult>;
 
@@ -212,7 +212,7 @@ export interface BelongsToWrites<TParent = Model> {
    *   post.relations.author().associate(user);
    *   await post.save();
    *
-   * **Does not save** — Laravel doesn't either. It sets an attribute on
+   * **Does not save**. Laravel doesn't either. It sets an attribute on
    * the parent, and persisting the parent is the caller's call (which is
    * what lets several associates and a field edit share one `UPDATE`).
    * Accepts a bare key as well as an instance; passing a key can't set
@@ -253,7 +253,7 @@ export interface HasManyWrites<TRelated = Model, TAttrs = Record<string, any>> {
    * Goes through the related model's `create()`, so its timestamps,
    * generated-id read-back and `creating`/`created` events all fire.
    *
-   * The foreign key is `Partial` here because this call supplies it —
+   * The foreign key is `Partial` here because this call supplies it,
    * requiring the caller to pass the very column the relation is about
    * to overwrite would be nonsense.
    */
@@ -266,8 +266,8 @@ export interface HasManyWrites<TRelated = Model, TAttrs = Record<string, any>> {
 /**
  * The extra methods a relation of each `type` contributes to its
  * accessor's return type. `RelationBuilders` (model.ts) intersects this
- * onto `BuilderOf<Related>` so a custom builder keeps its own scopes —
- * see this module's docstring.
+ * onto `BuilderOf<Related>` so a custom builder keeps its own scopes.
+ * See this module's docstring.
  *
  * `morphTo` maps to `unknown` because its accessor is a `MorphToBuilder`,
  * which declares `associate()`/`dissociate()` as real methods; there is
@@ -306,7 +306,7 @@ function keyList(ids: RelatedKey | RelatedKey[]): SqlBinding[] {
 /**
  * `true` for the `{ key: pivotAttrs }` map form of `AttachIds`.
  *
- * A `Model` is an object too, so instances are excluded explicitly —
+ * A `Model` is an object too, so instances are excluded explicitly.
  * `attach(tag)` must be read as one id, not as a map of its columns.
  * Arrays are likewise objects and are handled before this is reached.
  */
@@ -324,8 +324,8 @@ function isIdMap(ids: AttachIds): ids is Record<string, PivotAttributes> {
  * order and merging in the shared `pivot` payload (per-row attributes
  * win over the shared ones).
  *
- * Map keys come back as strings, which is correct for the write path —
- * they are bound as parameters and compared by the database, where
+ * Map keys come back as strings, which is correct for the write path.
+ * They are bound as parameters and compared by the database, where
  * `'1'` and `1` match an integer column alike. Restoring their original
  * JS type is impossible (the object already stringified them) and
  * unnecessary; `sync()` compares against DB-returned ids through
@@ -344,7 +344,7 @@ function normalizeIdMap(ids: AttachIds, shared?: PivotAttributes): [SqlBinding, 
 }
 
 /**
- * Key equality across the JS/DB type boundary — `1` and `"1"` are the
+ * Key equality across the JS/DB type boundary, `1` and `"1"` are the
  * same row.
  *
  * `sync()` compares ids the caller supplied against ids the driver
@@ -358,7 +358,7 @@ function normalizeIdMap(ids: AttachIds, shared?: PivotAttributes): [SqlBinding, 
 
 /**
  * Derives the write spec for a pivot relation from its definition and
- * the parent instance — the single place the three pivot relations'
+ * the parent instance, the single place the three pivot relations'
  * column layouts are resolved, mirroring `buildPivotQuery()` on the read
  * side so the two cannot drift.
  *
@@ -394,7 +394,7 @@ function pivotSpecFor(parent: Model, definition: RelationDefinition): PivotWrite
       relatedPivotKey: options.relatedPivotKey,
       localValue: parent.getRawAttribute(options.localKey ?? owner.primaryKeyColumn),
       morphType: options.morphType,
-      // The pivot discriminates THIS model — see MorphToManyOptions.
+      // The pivot discriminates THIS model. See MorphToManyOptions.
       morphValue: options.type ?? owner.morphAlias(),
       withTimestamps: options.withTimestamps === true,
     };
@@ -429,7 +429,7 @@ function pivotSpecFor(parent: Model, definition: RelationDefinition): PivotWrite
  * Built straight from the owning model's connection thunk rather than
  * the related model's builder, so it is transaction-aware
  * (`resolveConnection()` swaps in an active transaction) while staying
- * free of the related model's global scopes — see the module docstring.
+ * free of the related model's global scopes. See the module docstring.
  */
 function pivotQuery(owner: AnyModelClass, spec: PivotWriteSpec): QueryBuilder<Record<string, any>> {
   const query = new QueryBuilder<Record<string, any>>(
@@ -445,7 +445,7 @@ function pivotQuery(owner: AnyModelClass, spec: PivotWriteSpec): QueryBuilder<Re
   return query;
 }
 
-/** The pivot columns identifying this parent — the base of every row `attach()` writes. */
+/** The pivot columns identifying this parent, the base of every row `attach()` writes. */
 function parentPivotColumns(spec: PivotWriteSpec): Record<string, SqlBinding> {
   const columns: Record<string, SqlBinding> = { [spec.thisPivotKey]: spec.localValue };
 
@@ -456,7 +456,7 @@ function parentPivotColumns(spec: PivotWriteSpec): Record<string, SqlBinding> {
   return columns;
 }
 
-/** The related-key values currently linked to this parent — one SELECT over the pivot table. */
+/** The related-key values currently linked to this parent, one SELECT over the pivot table. */
 async function currentPivotIds(owner: AnyModelClass, spec: PivotWriteSpec): Promise<SqlBinding[]> {
   const rows = await pivotQuery(owner, spec).select(spec.relatedPivotKey).get();
 
@@ -578,7 +578,7 @@ async function runSync(
       }
 
       // Already linked. Laravel only reports (and only writes) an update
-      // when attributes were actually supplied for this id — a plain
+      // when attributes were actually supplied for this id, a plain
       // `sync([1,2,3])` must not rewrite pivot payloads it said nothing
       // about, nor claim in its result that it did.
       if (Object.keys(attributes).length > 0) {
@@ -618,7 +618,7 @@ function belongsToManyWrites(parent: Model, spec: PivotWriteSpec): BelongsToMany
 
     async detach(ids?: RelatedKey | RelatedKey[]): Promise<number> {
       // `undefined` means "all"; an empty array means "nothing". See the
-      // interface docstring — the distinction is the whole point.
+      // interface docstring. The distinction is the whole point.
       return deletePivotRows(owner, spec, ids === undefined ? undefined : keyList(ids));
     },
 
@@ -708,7 +708,7 @@ function belongsToWrites(
 
 /**
  * Builds the `HasManyWrites` implementation for a `hasOne`/`hasMany`/
- * `morphOne`/`morphMany` relation — the foreign key (and morph
+ * `morphOne`/`morphMany` relation, the foreign key (and morph
  * discriminant) this parent stamps onto its children.
  */
 function hasManyWrites(
@@ -747,7 +747,7 @@ function hasManyWrites(
     }
 
     // `save()` returns the casting proxy, which is what the caller
-    // should hold onto — not the raw target they may have passed in.
+    // should hold onto, not the raw target they may have passed in.
     return model.save();
   };
 

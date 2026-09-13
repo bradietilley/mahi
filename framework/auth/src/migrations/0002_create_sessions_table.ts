@@ -7,7 +7,7 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
  * here, which is what makes a session revocable by deleting its row.
  *
  * `expires_at` is indexed for `gc()`, `user_id` for "log this user out
- * everywhere". No foreign key to `users` — that table is app-owned and
+ * everywhere". No foreign key to `users`. That table is app-owned and
  * the framework can't assume its name.
  */
 const migration: Migration = {

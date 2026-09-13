@@ -8,7 +8,7 @@ import { VerifyEmailMail } from "../../mail/verify-email.mail.js";
 /**
  * POST /auth/verify-email/resend
  *
- * Authenticated, and only ever mails the caller's own address — which is
+ * Authenticated, and only ever mails the caller's own address. Which is
  * why there's no per-mailbox throttle like the forgot-password endpoint
  * has. A stranger cannot point this at someone else's inbox, so the
  * ordinary `throttle()` middleware on the route is the right control.

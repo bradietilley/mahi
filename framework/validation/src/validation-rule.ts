@@ -1,5 +1,5 @@
 /**
- * Custom validation rule — one interface, async-capable, with explicit
+ * Custom validation rule, one interface, async-capable, with explicit
  * `pass()` / `fail(message)` rather than Laravel's three historical
  * Rule / InvokableRule / ValidationRule shapes.
  *

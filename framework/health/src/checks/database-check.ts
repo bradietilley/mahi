@@ -9,7 +9,7 @@ import type { DatabaseManagerLike } from "./contracts.js";
  * `kysely` import) is portable across sqlite/MySQL/Postgres, touches no
  * application table, and cannot be affected by schema state.
  *
- * Deliberately **not** `introspection.getTables()` — what `db:show` uses —
+ * Deliberately **not** `introspection.getTables()`, what `db:show` uses,
  * which is a far heavier query that turns a probe into a load source on a
  * large schema.
  *

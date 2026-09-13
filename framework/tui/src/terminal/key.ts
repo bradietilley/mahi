@@ -55,7 +55,7 @@ export type KeyValue = (typeof Key)[keyof typeof Key];
  * Splits a raw chunk from `process.stdin`'s `'data'` event into
  * individual key tokens (a complete escape sequence, or one printable
  * character). Node's `'data'` event may deliver multiple keystrokes (or
- * a paste burst) in a single chunk — PHP's `Terminal::read()` does one
+ * a paste burst) in a single chunk, PHP's `Terminal::read()` does one
  * blocking `fread(1024)` per key-loop iteration and doesn't need this,
  * see the plan's "Key differences" section.
  */

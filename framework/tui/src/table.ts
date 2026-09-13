@@ -4,7 +4,7 @@ import { writeFinishedFrame } from "./render/finished-frame.js";
 import type { Output } from "./output/output.js";
 
 /**
- * Port of `laravel/prompts`' `Table.php` + `TableRenderer.php` — the
+ * Port of `laravel/prompts`' `Table.php` + `TableRenderer.php`, the
  * one feature with no direct TS equivalent to delegate to (PHP hands
  * grid-drawing off to Symfony Console's `Table` helper). Hand-rolled
  * column-width + box-grid renderer: border set `┌ ┬ ┐ / ├ ┼ ┤ / └ ┴ ┘ /

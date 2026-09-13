@@ -6,8 +6,8 @@ import type { Address } from "./mailables/address.js";
  * `\r`/`\n` (or a bare `\n`) smuggled into an address, display name,
  * subject, tag or metadata key/value can inject arbitrary extra headers
  * (`Bcc:`, `Content-Type:`, a whole second message body). nodemailer
- * strips these for its own SMTP output, but `log`/`array` — and any future
- * transport — are otherwise unprotected, so Mahi rejects them at the
+ * strips these for its own SMTP output, but `log`/`array`, and any future
+ * transport, are otherwise unprotected, so Mahi rejects them at the
  * `Mailable.render()` boundary, before the message reaches any transport.
  */
 const CR_OR_LF = /[\r\n]/;

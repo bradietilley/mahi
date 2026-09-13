@@ -24,7 +24,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
   // never cross-talk.
   const channel = `mahi:test:${Math.random().toString(36).slice(2)}`;
   // Every "process" in this suite belongs to ONE application, so they all
-  // share a key prefix — which the driver prepends to the pub/sub channel
+  // share a key prefix, which the driver prepends to the pub/sub channel
   // name. Giving each its own random prefix models two *different*
   // applications, which are correctly isolated and never see one another's
   // broadcasts.
@@ -125,7 +125,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
     const client = await connect(processA.port);
     await subscribe(client, "posts");
 
-    // Broadcast to a different channel — must not arrive.
+    // Broadcast to a different channel, must not arrive.
     await processB.driver.broadcast({ channel: "other", event: "X", payload: {} });
 
     await expect(nextMessage(client, 300)).rejects.toThrow(/timed out/);
@@ -147,7 +147,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
     // keyPrefix. The pub/sub channel is prefixed, so a broadcast in app B
     // must never reach a client of app A. ioredis does NOT apply a
     // connection's keyPrefix to PUBLISH/SUBSCRIBE (a channel is not a key),
-    // so the driver prepends it by hand — without that, two co-tenants
+    // so the driver prepends it by hand, without that, two co-tenants
     // share the one `mahi:broadcast` channel and leak each other's events.
     const appA = await startProcess({
       keyPrefix: `tsf-appA:${Math.random().toString(36).slice(2)}:`,
@@ -166,7 +166,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
 
   /**
    * A throw inside the subscriber's message pump would, if it escaped, be
-   * an uncaught exception that Node terminates the process for by default —
+   * an uncaught exception that Node terminates the process for by default,
    * so one failed delivery would take the whole server down rather than
    * dropping one frame. The pump swallows a throwing fan-out; the next
    * broadcast still delivers.
@@ -178,7 +178,7 @@ describe.skipIf(REDIS_UNAVAILABLE)("RedisBroadcastDriver (integration)", () => {
     await subscribe(client, "posts");
 
     // Force the local fan-out to throw exactly once, the way a dead socket
-    // mid-send would — the subscriber callback must catch it, not crash.
+    // mid-send would. The subscriber callback must catch it, not crash.
     const driverInternals = process.driver as unknown as {
       deliverLocalFrame: (channel: string, frame: string, excludeSocketId?: string) => void;
     };

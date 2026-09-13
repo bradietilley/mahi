@@ -16,13 +16,13 @@ import type { StorageDriver, StreamSource } from "./storage-driver.js";
  *
  * `disk()`/`url(path, disk?)` come from the `StorageManager`; the plain
  * file operations (`put`/`get`/`exists`/`delete`) are forwarded to the
- * DEFAULT disk — the common case — matching how Laravel's `Storage` facade
+ * DEFAULT disk, the common case, matching how Laravel's `Storage` facade
  * proxies to the default filesystem. For a non-default disk, go through
  * `Storage.disk(name)` (a `StorageDriver`) and call the same methods on it.
  *
  * Prefer constructor-injecting `StorageManager` (via `STORAGE_TOKEN`)
  * where that's practical (e.g. inside a `ServiceProvider`/`Command` that
- * already receives `app`) — reach for this only where threading
+ * already receives `app`), use this only where threading
  * `app`/`StorageManager` through is genuinely inconvenient, same guidance
  * as `app()` itself.
  */
@@ -110,7 +110,7 @@ export class Storage extends Facade<StorageManager>(() => STORAGE_TOKEN) {
 
   /**
    * Client-facing URL for `path` on the named (or default) disk. See
-   * `StorageManager.url()` (throws for a private disk — use `path()`).
+   * `StorageManager.url()` (throws for a private disk, use `path()`).
    */
   static url(path: string, disk?: string): string {
     return this.instance().url(path, disk);

@@ -5,13 +5,13 @@ import { z } from "zod";
  * against this at boot and fails fast with every problem listed at once,
  * rather than surfacing an `undefined` deep inside a request weeks later.
  *
- * Add your own keys here as the app grows — a key that isn't in this
+ * Add your own keys here as the app grows. A key that isn't in this
  * schema isn't on the typed `Env` object, which is the point.
  */
 /**
  * A boolean env var, parsed the way people actually write them.
  *
- * NOT `z.coerce.boolean()`, which is `Boolean(value)` — that makes the
+ * NOT `z.coerce.boolean()`, which is `Boolean(value)`. That makes the
  * string `"false"` come out `true`, so `FLAG=false` would silently enable
  * the thing it was meant to disable.
  */
@@ -29,7 +29,7 @@ export const envSchema = z.object({
   /** Which configured connection to use (`sqlite` | `mysql` | `pgsql`). */
   DB_CONNECTION: z.enum(["sqlite", "mysql", "pgsql"]).default("sqlite"),
 
-  /** SQLite: path relative to the app root — resolved against `process.cwd()`. */
+  /** SQLite: path relative to the app root, resolved against `process.cwd()`. */
   DB_FILENAME: z.string().default("database/database.sqlite"),
 
   /** MySQL / PostgreSQL connection details (unused when DB_CONNECTION=sqlite). */
@@ -50,7 +50,7 @@ export const envSchema = z.object({
 
   /**
    * Comma-separated proxy addresses or CIDR blocks whose
-   * `X-Forwarded-*` headers this app will believe — the load balancer,
+   * `X-Forwarded-*` headers this app will believe, the load balancer,
    * ingress controller, or CDN directly in front of it.
    *
    * Leave it EMPTY when nothing is in front (the default). `request.ip()`
@@ -64,7 +64,7 @@ export const envSchema = z.object({
    *
    * `*` trusts whatever opened the socket. Correct only when the app is
    * genuinely unreachable except through a proxy that OVERWRITES
-   * `X-Forwarded-For` — most managed load balancers on a private
+   * `X-Forwarded-For`, most managed load balancers on a private
    * network. On a directly reachable host it means no trust boundary at
    * all. Prefer the actual CIDR (`10.0.0.0/8`) when you know it.
    */
@@ -90,7 +90,7 @@ export const envSchema = z.object({
   /**
    * Send as `X-Health-Secret` to see real failure messages from
    * `GET /health` in production. Optional: without it, messages there are
-   * always redacted to "Check failed" — which is the safe default, since
+   * always redacted to "Check failed". Which is the safe default, since
    * the endpoint is usually reachable from wherever probes it.
    */
   HEALTH_SECRET: z.string().optional(),
@@ -110,7 +110,7 @@ export const envSchema = z.object({
 
   /**
    * Whether the scaffolded auth controllers send their emails. Off hands
-   * delivery back to you without deleting the controller — see
+   * delivery back to you without deleting the controller. See
    * `config/auth.ts`'s `notifications`.
    */
   AUTH_SEND_RESET_EMAIL: boolish(true),

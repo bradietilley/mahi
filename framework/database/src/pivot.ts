@@ -26,7 +26,7 @@ export function pivotColumns(options: {
   return [...new Set(requested)];
 }
 
-/** Whether a relation asked for any pivot data — the switch between the join and subquery compilations. */
+/** Whether a relation asked for any pivot data, the switch between the join and subquery compilations. */
 export function wantsPivot(options: { withPivot?: string[]; withTimestamps?: boolean }): boolean {
   return pivotColumns(options).length > 0;
 }

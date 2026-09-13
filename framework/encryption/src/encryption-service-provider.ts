@@ -15,12 +15,12 @@ type EncryptionEnv = { APP_KEY: string | undefined; APP_PREVIOUS_KEYS?: string }
  * Registers `Encrypter`, `Hasher`, and `Signer` singletons. `Encrypter`
  * and `Signer` each get their own key, HKDF-derived from the single
  * `APP_KEY` env var (see `app-key.ts`) rather than sharing the raw key
- * directly — a compromised signing key doesn't also expose encrypted
+ * directly, a compromised signing key doesn't also expose encrypted
  * data. No ordering dependency on any other provider.
  *
  * If `APP_PREVIOUS_KEYS` is set (comma-separated, same format as
  * `APP_KEY`), each previous key is HKDF-derived the same way and passed
- * to `Encrypter`/`Signer` as decrypt/verify-only fallbacks — see
+ * to `Encrypter`/`Signer` as decrypt/verify-only fallbacks. See
  * `key:generate --force` and each class's own docstring for the key
  * rotation model.
  */
@@ -37,7 +37,7 @@ export class EncryptionServiceProvider extends ServiceProvider {
       );
     });
 
-    // `hashing` config is optional — the base app ships no such file, so
+    // `hashing` config is optional, the base app ships no such file, so
     // an absent namespace yields an empty options object and the Hasher
     // uses argon2's defaults (with argon2id still pinned explicitly).
     this.app.singleton(

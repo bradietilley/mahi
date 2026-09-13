@@ -25,12 +25,12 @@ interface FanoutEnvelope {
 }
 
 /**
- * The multi-process fix this driver is really about — the
+ * The multi-process fix this driver is really about, the
  * direct answer to `LocalBroadcastDriver`'s "worst possible failure mode"
  * (a broadcast from process A silently never reaching a client on process
- * B). It keeps everything `LocalBroadcastDriver` already does — the
+ * B). It keeps everything `LocalBroadcastDriver` already does, the
  * websocket upgrade endpoint, channel authorization, the in-memory
- * `channel -> sockets` map for *this* process's own clients — and adds one
+ * `channel -> sockets` map for *this* process's own clients. And adds one
  * thing: fanout through Redis pub/sub so every process delivers every frame
  * to its own local sockets.
  *
@@ -45,18 +45,18 @@ interface FanoutEnvelope {
  *      connected sockets.
  *
  * So a frame reaches exactly the sockets subscribed to the channel, no
- * matter which process they connected to — with no process ever delivering
+ * matter which process they connected to, with no process ever delivering
  * to sockets it doesn't own. Presence rosters are likewise shared across
  * processes via a per-channel Redis set (see the `presence*` overrides).
  *
  * The pub/sub channel is namespaced by the connection's `keyPrefix` so two
- * apps sharing one Redis server never cross-deliver — pub/sub channels are
+ * apps sharing one Redis server never cross-deliver, pub/sub channels are
  * NOT keys, so ioredis's own `keyPrefix` does not touch them and the prefix
  * must be applied here explicitly.
  *
  * `instanceof LocalBroadcastDriver` still holds, so
  * `BroadcastServiceProvider` mounts the websocket route and
- * `injectWebSocket()`s it exactly as for the local driver — no entrypoint
+ * `injectWebSocket()`s it exactly as for the local driver. No entrypoint
  * change is needed to switch an app from `local` to `redis`.
  */
 export class RedisBroadcastDriver extends LocalBroadcastDriver implements Connectable {
@@ -95,7 +95,7 @@ export class RedisBroadcastDriver extends LocalBroadcastDriver implements Connec
   }
 
   /**
-   * Publish every outbound frame to Redis instead of delivering locally —
+   * Publish every outbound frame to Redis instead of delivering locally,
    * the subscriber loop (in every process, this one included) relays it
    * back to local sockets. Kept `async` and awaiting the `PUBLISH` so a
    * failure still surfaces to `BroadcastServiceProvider`'s fire-and-forget
@@ -138,7 +138,7 @@ export class RedisBroadcastDriver extends LocalBroadcastDriver implements Connec
         return;
       }
 
-      // Synchronous, in-process delivery — a slow/dead socket must never
+      // Synchronous, in-process delivery, a slow/dead socket must never
       // stall the subscriber's message pump for other deliveries. An
       // escaping throw here would be an uncaught exception in the ioredis
       // event handler and, on Node's defaults, take the process down: one
@@ -164,7 +164,7 @@ export class RedisBroadcastDriver extends LocalBroadcastDriver implements Connec
     try {
       await this.subscriber.unsubscribe(this.pubsubChannel());
     } catch {
-      // Shutdown is best-effort — see RedisConnection.disconnect().
+      // Shutdown is best-effort. See RedisConnection.disconnect().
     }
     // The subscriber was created via `connection.duplicate()`, which
     // tracks it, so `RedisConnection.disconnect()` also closes it; quitting

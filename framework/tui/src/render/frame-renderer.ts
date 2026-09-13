@@ -3,12 +3,12 @@ import { moveCursorToColumn, moveCursorUp } from "../ansi/cursor.js";
 import type { Output } from "../output/output.js";
 
 /**
- * The diff/redraw algorithm — port of `Prompt::render()` in
+ * The diff/redraw algorithm, port of `Prompt::render()` in
  * `laravel/prompts`' `src/Prompt.php`. Given the previously written
  * frame and a newly rendered frame, either no-ops (unchanged), writes
  * the frame in full (first render, `prevFrame === ""`), or moves the
  * cursor up to the start of the previous frame, erases to the end of
- * the screen, and writes the new frame — sliced from the top if it's
+ * the screen, and writes the new frame, sliced from the top if it's
  * taller than the terminal, so the visible render stays pinned to the
  * bottom of the screen.
  *

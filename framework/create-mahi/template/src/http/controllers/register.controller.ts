@@ -15,7 +15,7 @@ export class RegisterController extends Controller<RegisterRequest> {
   async handle(request: RegisterRequest) {
     const payload = request.validated();
 
-    // `create()` hands back a hydrated `User` instance, not a plain row —
+    // `create()` hands back a hydrated `User` instance, not a plain row,
     // so `user.id` below and `new UserResource(user)` both get the real
     // model, casts and methods included.
     const user = await User.create({
@@ -38,7 +38,7 @@ export class RegisterController extends Controller<RegisterRequest> {
    *
    * Failures are swallowed deliberately: the account IS created by this
    * point, so a dead SMTP server must not turn a successful registration
-   * into a 500 that tells the user to try again — the retry would fail
+   * into a 500 that tells the user to try again. The retry would fail
    * `unique(email)` validation and strand them with an account they can't
    * sign into. `/auth/verify-email/resend` is the recovery path.
    *

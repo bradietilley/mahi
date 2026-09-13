@@ -1,7 +1,7 @@
 import type { IdentifierResolver } from "./identifier-resolver.js";
 
 /**
- * Predictable, sequential IDs of realistic snowflake length — for tests
+ * Predictable, sequential IDs of realistic snowflake length, for tests
  * that want auto-increment-like values without giving up the 19-digit
  * string width JSON serialization requires.
  *
@@ -15,7 +15,7 @@ export class SequentialIdentifierResolver implements IdentifierResolver {
   protected models = new Map<string, bigint>();
 
   /**
-   * Reset recorded counters — e.g. after truncating a table, so the
+   * Reset recorded counters, e.g. after truncating a table, so the
    * next test ID starts from `START_ID + 1` again.
    */
   reset(): void {

@@ -13,7 +13,7 @@ import { HASHER_TOKEN } from "./encryption-service-provider.js";
  *
  * Prefer constructor-injecting `Hasher` (via `HASHER_TOKEN`) where that's
  * practical (e.g. inside a `ServiceProvider`/`Command` that already
- * receives `app`) — reach for this only at call sites where threading
+ * receives `app`), use this only at call sites where threading
  * `app`/`Hasher` through is genuinely inconvenient, same guidance as
  * `app()` itself.
  */

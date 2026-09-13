@@ -13,8 +13,8 @@ const maybe = Auth.userOrNull<UserTable>();// null for guests
 if (Auth.check()) { /* ... */ }
 ```
 
-Authentication is the *identity* half. The *permission* half —
-"may this user do this to this thing" — lives in
+Authentication is the *identity* half. The *permission* half,
+"may this user do this to this thing", lives in
 [Authorization](../authorization/).
 
 ## Configuration
@@ -74,7 +74,7 @@ export function authConfig(env: Env): AuthConfig {
 ```
 
 `guards` and `providers` are typed as `Record<string, unknown>` because
-each driver reads its own config shape — `TokenGuardConfig`,
+each driver reads its own config shape: `TokenGuardConfig`,
 `SessionGuardConfig`, `DatabaseUserProviderConfig`. The manager hands the
 raw object to the factory, which casts it.
 
@@ -82,15 +82,15 @@ raw object to the factory, which casts it.
 
 This is topology-dependent, not a preference:
 
-**`token`** — bearer tokens in an `Authorization` header. Correct for a
+**`token`**, bearer tokens in an `Authorization` header. Correct for a
 detached frontend (a SPA on another origin) and for any third-party API
 consumer. Needs no CSRF protection, because browsers never attach an
 `Authorization` header automatically.
 
-**`session`** — a signed cookie plus a server-side session. Correct when
+**`session`**, a signed cookie plus a server-side session. Correct when
 the frontend is served from the **same origin** as the API. Cross-origin
 cookies require `sameSite: "None"` **and** `secure: true`, and `secure`
-means they will not work over plain HTTP — so a cross-origin SPA in local
+means they will not work over plain HTTP, so a cross-origin SPA in local
 development silently gets no session at all. That is a browser rule, not
 a framework limitation. Pair this guard with the [`csrf()`](#csrf)
 middleware.
@@ -127,7 +127,7 @@ manager in the framework for one caller's benefit.
 
 The two axes compose. Both built-in guards share one user provider, so
 swapping SQLite for an external identity service means writing one
-`UserProvider` and changing one config line — neither guard changes.
+`UserProvider` and changing one config line, neither guard changes.
 
 `AuthServiceProvider` registers the built-ins through exactly the same
 public methods a plugin would use:
@@ -144,7 +144,7 @@ manager.extend("token", () => {
 
 Note the asymmetry in how they're named: `extendUserProvider()` registers
 a **driver** (`"database"`), but `userProvider()` resolves by **config
-key** (`"users"`) — matching how `config/auth.ts` names them. Passing a
+key** (`"users"`), matching how `config/auth.ts` names them. Passing a
 driver name to `userProvider()` throws `UnknownUserProviderError`;
 naming a config entry whose `driver` was never registered throws
 `UserProviderNotRegisteredError`.
@@ -160,8 +160,8 @@ export interface Guard<TUser = unknown> {
 ```
 
 Deliberately one method. Laravel's guard also carries
-`check()`/`guest()`/`id()`, but those are pure derivations of `user()` —
-they live on `AuthManager` and the `Auth` facade instead.
+`check()`/`guest()`/`id()`, but those are pure derivations of `user()`.
+They live on `AuthManager` and the `Auth` facade instead.
 
 **Guards are stateless by contract.** A guard is a long-lived singleton
 shared across every concurrent request (one `Application`, resolved once
@@ -193,7 +193,7 @@ export interface UserProvider<TUser = unknown> {
 The split between `retrieveByCredentials()` (look up, don't check the
 secret) and `validateCredentials()` (check the secret) is intentional.
 Do not "simplify" it into one `findByCredentials` that checks the password
-too — keeping lookup and verification separate is what lets
+too, keeping lookup and verification separate is what lets
 [`attempt()`](#attempt) perform constant work when no user was found, so
 response timing doesn't leak whether an account exists.
 
@@ -213,7 +213,7 @@ Bound as a singleton at `AUTH_TOKEN`.
 | `guardConfig(name?)` | `Record<string, unknown>` | The raw config object for a guard. `{}` if absent. |
 | `guardDriver(name?)` | `string` | The driver a named guard uses. |
 | `login(request, userId, opts?)` | `Promise<string>` | Log a user in through a stateful guard. |
-| `attemptLogin<TUser>(request, credentials, opts?)` | `Promise<TUser \| null>` | Verify **and** log in — Laravel's `Auth::attempt()`. |
+| `attemptLogin<TUser>(request, credentials, opts?)` | `Promise<TUser \| null>` | Verify **and** log in, Laravel's `Auth::attempt()`. |
 | `logout(request, guardName?)` | `Promise<void>` | End the current session. |
 | `collectableGuards()` | `Array<[string, { gc() }]>` | Guards that can sweep their own expired rows. Drives `auth:gc`. |
 | `extend(driver, factory)` | `this` | Register a guard **driver**. |
@@ -253,7 +253,7 @@ guards: {
 ```
 
 Factories are registered by **driver** (`extend("session", ...)`), while
-resolved instances are cached by **name** — so `guard("web")` and
+resolved instances are cached by **name**, so `guard("web")` and
 `guard("admin")` are two independently configured session guards, and
 each factory sees its own settings when it calls `guardConfig()` with no
 argument.
@@ -264,7 +264,7 @@ resolves the session driver as before.
 
 ## The `Auth` facade
 
-A hand-written class with real static methods proxying one token — see
+A hand-written class with real static methods proxying one token. See
 the [facades note](../README.md#design-principles) for why this is a
 narrow exception rather than a reversal of "no dynamic facades".
 
@@ -299,8 +299,8 @@ const guard = Auth.guard("token") as TokenGuard<UserTable>;
 const { token } = await guard.createToken(user.id, "login");
 ```
 
-For the session-establishing half, prefer `statefulGuard()` over a cast —
-it is checked, so a guard that can't log anyone in fails with a clear
+For the session-establishing half, prefer `statefulGuard()` over a cast.
+It is checked, so a guard that can't log anyone in fails with a clear
 `NotStatefulGuardError` rather than a `TypeError` deep inside a handler:
 
 ```ts
@@ -310,7 +310,7 @@ await guard.login(request, user.id);
 
 ## The auth context
 
-Laravel's guard is request-scoped and stateful — `Auth::user()` works
+Laravel's guard is request-scoped and stateful. `Auth::user()` works
 because PHP rebuilds the container per request. Mahi boots **one**
 long-lived `Application` and serves every request from it, so a singleton
 holding "the current user" would leak one request's user into another.
@@ -334,7 +334,7 @@ global pipe rather than nesting a second scope.
 
 | Situation | `user()` | `userOrNull()` |
 |---|---|---|
-| **No scope** — queue job, CLI command, forgot the provider | `MissingAuthContextError` | `MissingAuthContextError` |
+| **No scope**: queue job, CLI command, forgot the provider | `MissingAuthContextError` | `MissingAuthContextError` |
 | **In scope, nobody authenticated** | `UnauthenticatedError` | `null` |
 | **In scope, authenticated** | the user | the user |
 
@@ -373,13 +373,13 @@ await Auth.runAs(user, async () => {
 });
 ```
 
-`runAs()` sets `guard: null` — there was no guard involved, so
+`runAs()` sets `guard: null`. There was no guard involved, so
 `Auth.currentGuard()` reports `null` even though `Auth.check()` is `true`.
 
 `Request.user<TUser>()` is a thin delegate to `Auth.userOrNull()` that
 returns `undefined` when `@mahiframework/auth` isn't bound at all. It exists so
 framework code (a rate-limiter key callback, for instance) can ask
-without a hard dependency on the auth package — prefer `Auth.user()` /
+without a hard dependency on the auth package, prefer `Auth.user()` /
 `Auth.id()` in your own controllers. See
 [Requests](../requests/#the-current-user).
 
@@ -399,7 +399,7 @@ guards and middleware that need to *write* to the state.
 ### `authenticate(guardName?)`
 
 Resolves the user with the named guard (or the default) and throws
-`HttpError.unauthorized()` — a 401 — if there is none.
+`HttpError.unauthorized()`, a 401, if there is none.
 
 ```ts
 posts.post("/", CreatePostController).middleware(authenticate());
@@ -431,7 +431,7 @@ by design.
 ### `ensureEmailVerified(column?)`
 
 Requires the authenticated user's `email_verified_at` to be set, else
-403. **Place it after `authenticate()`** — it reads the user that
+403. **Place it after `authenticate()`**: it reads the user that
 `authenticate()` resolved into the ambient scope, and does not resolve
 anyone itself:
 
@@ -439,7 +439,7 @@ anyone itself:
 protectedRoutes.get("/", handler).middleware(authenticate(), ensureEmailVerified());
 ```
 
-A guest (no user in scope) gets a 401, not a 403 — authenticating
+A guest (no user in scope) gets a 401, not a 403, authenticating
 differently could fix a 401; different credentials won't fix a 403.
 
 There is no redirect branch (unlike Laravel's dual API/web
@@ -465,7 +465,7 @@ router.group("/app", (routes) => {
 | `header` | `"X-XSRF-TOKEN"` | Header the client echoes it back in |
 | `field` | `"_token"` | Form field checked when the header is absent; `null` to disable |
 | `sign` | `true` when a `Signer` is bound | HMAC the cookie so forged tokens are rejected |
-| `prefix` | — | `"host"` for a `__Host-` cookie a sibling subdomain can't write |
+| `prefix` |: | `"host"` for a `__Host-` cookie a sibling subdomain can't write |
 | `secure` | `true` | Adds `Secure` to the cookie |
 | `sameSite` | `"Lax"` | Cookie `SameSite` |
 | `path` | `"/"` | Cookie `Path` |
@@ -488,17 +488,17 @@ A cookie whose signature doesn't verify is discarded and re-issued
 rather than trusted.
 
 Plain double-submit accepts *any* value that appears in both the cookie
-and the header. So an attacker who can **write** a cookie — an XSS on a
+and the header. So an attacker who can **write** a cookie, an XSS on a
 sibling subdomain, or a MITM on plain HTTP, which can set cookies for the
-HTTPS origin — simply picks both halves and forges at will. Signing means
+HTTPS origin, simply picks both halves and forges at will. Signing means
 only tokens this server minted count.
 
 This is **not** Laravel/Sanctum's synchronizer token. Laravel binds the
 token to the *session*, so a token is useless in anyone else's. This is
 per-cookie, which is strictly weaker against an attacker who can write
 cookies to the victim's browser. To close that gap, serve over HTTPS and
-set `prefix: "host"` — a `__Host-` cookie cannot be set or overwritten by
-a sibling subdomain — and treat `SameSite=Lax` (the default) as the
+set `prefix: "host"`, a `__Host-` cookie cannot be set or overwritten by
+a sibling subdomain, and treat `SameSite=Lax` (the default) as the
 primary defense.
 
 **The cookie is deliberately not `httpOnly`.** The whole mechanism
@@ -521,7 +521,7 @@ buys nothing and breaks non-browser clients.
 ## Verifying credentials
 
 `Auth.attempt()` verifies credentials and returns the user or `null`. It
-does **not** log anyone in — the caller decides what to issue (a token, a
+does **not** log anyone in, the caller decides what to issue (a token, a
 session):
 
 ```ts
@@ -562,7 +562,7 @@ throw HttpError.unauthorized("Invalid credentials.");
 ```
 
 And so does validation. The base app's `LoginRequest` deliberately has no
-`.min(8)` on the password, unlike registration — rejecting a short
+`.min(8)` on the password, unlike registration, rejecting a short
 password at validation time tells an attacker their guess was too short
 to be this account's password. Login validates *shape* only; correctness
 is decided uniformly by `attempt()`.
@@ -604,11 +604,11 @@ export interface TokenGuardConfig {
 
 The id is `randomUUID()`; the secret is `randomBytes(32)` encoded
 base64url. The plaintext is returned exactly once from `createToken()`
-and is never recoverable afterwards — only the digest is stored.
+and is never recoverable afterwards, only the digest is stored.
 
 **The id prefix exists for lookup.** The stored column is a digest, so it
 can't be looked up by equality. Without an id, verifying a token would
-mean loading every token row and comparing each — O(n) work per request,
+mean loading every token row and comparing each, O(n) work per request,
 trivially DoS-able. The id turns it into one indexed primary-key lookup
 plus exactly one digest comparison.
 
@@ -622,7 +622,7 @@ This is deliberate and is not a performance shortcut taken at the cost of
 security.
 
 argon2 is intentionally slow to make brute-forcing **human-chosen
-passwords** infeasible — passwords occupy a tiny, heavily biased corner
+passwords** infeasible, passwords occupy a tiny, heavily biased corner
 of the keyspace, so the only defense is making each guess expensive. A
 personal access token is 32 bytes of `randomBytes`: there is no
 low-entropy space to brute-force. The slowness buys nothing while costing
@@ -663,7 +663,7 @@ Three security-critical orderings in five lines:
    branch runs. Verifying the digest first means a bogus secret and a
    valid-but-expired token take the same path out.
 2. **`last_used_at` only after a successful verify.** A failed guess must
-   never write to the database — otherwise brute-force attempts show up
+   never write to the database, otherwise brute-force attempts show up
    as touched rows, and every wrong guess costs a write.
 3. **User lookup last.** No user is loaded for a request that failed
    verification.
@@ -680,7 +680,7 @@ Three security-critical orderings in five lines:
 
 The credential itself comes from `Request.bearerToken()`, which parses
 `Authorization: Bearer <token>`. A malformed header yields `undefined`
-rather than throwing — an unparseable header is an unauthenticated
+rather than throwing. An unparseable header is an unauthenticated
 request, not a server error.
 
 ### Issuing and revoking
@@ -704,7 +704,7 @@ if (tokenId !== null) {
 }
 ```
 
-`currentTokenId()` deliberately doesn't verify the secret — the request
+`currentTokenId()` deliberately doesn't verify the secret, the request
 already passed `authenticate()`, so the token is known good by the time a
 controller reads its id.
 
@@ -741,16 +741,16 @@ export interface SessionGuardConfig {
 | Attribute | Value |
 |---|---|
 | Name | `config.cookie ?? "session"`, plus `__Host-`/`__Secure-` if `prefix` is set |
-| Value | `signer.sign(sessionId)` — `<uuid>.<hmac>` |
-| `HttpOnly` | **hardcoded `true`**, not configurable — limits XSS session theft |
-| `Secure` | `config.secure ?? true` — defaults to **on** |
+| Value | `signer.sign(sessionId)`: `<uuid>.<hmac>` |
+| `HttpOnly` | **hardcoded `true`**, not configurable, limits XSS session theft |
+| `Secure` | `config.secure ?? true`: defaults to **on** |
 | `SameSite` | `config.sameSite ?? "Lax"` |
 | `Path` | `config.path ?? "/"` |
 | `Max-Age` | `minutes * 60`, where minutes is the lifetime or remember window |
 | `Domain` | only set if `config.domain` is provided |
 
 Setting `prefix: "host"` yields a `__Host-session` cookie, which the
-browser refuses to let a sibling subdomain set or overwrite — the
+browser refuses to let a sibling subdomain set or overwrite, the
 strongest available defense against session fixation from a compromised
 `other.example.com`. It requires `secure: true`, `path: "/"` and no
 `domain`, so it is opt-in: those constraints break plain-HTTP local
@@ -770,8 +770,8 @@ the cookie through Hono therefore wrote a session row the browser never
 learned the id of: login appeared to succeed, and every subsequent
 request was anonymous.
 
-The same mechanism is available to application code — see
-[`Request` cookies](../requests/#cookies) — and is what `csrf()` uses too.
+The same mechanism is available to application code, see
+[`Request` cookies](../requests/#cookies), and is what `csrf()` uses too.
 
 `secure` defaulting to `true` means the cookie will not be sent over
 plain HTTP unless you explicitly opt out. The base app sets
@@ -779,7 +779,7 @@ plain HTTP unless you explicitly opt out. The base app sets
 works; in production it's on.
 
 `sameSite: "Lax"` is right for same-origin deployments. A cross-origin
-SPA needs `"None"`, which browsers only honour alongside `secure: true` —
+SPA needs `"None"`, which browsers only honour alongside `secure: true`,
 meaning cookie sessions do **not** work over plain HTTP across origins in
 local development. Use the token guard for cross-origin clients.
 
@@ -797,8 +797,8 @@ const renewed = new Date(session.expiresAt).getTime() > new Date(slid).getTime()
 await this.sessions.touch(sessionId, renewed);
 ```
 
-Taking the later of the two is what stops a "remember me" session — whose
-expiry is already far in the future — from being shrunk back to the short
+Taking the later of the two is what stops a "remember me" session, whose
+expiry is already far in the future, from being shrunk back to the short
 lifetime on the next request. An ordinary session still slides forward
 normally: active sessions keep renewing, abandoned ones lapse.
 
@@ -806,7 +806,7 @@ normally: active sessions keep renewing, abandoned ones lapse.
 forward, the guard re-issues the cookie with a fresh `Max-Age`. Without
 that, only the server side slid: the browser still deleted its cookie
 `lifetimeMinutes` after *login*, so an actively-used session died
-mid-use — precisely what sliding expiry exists to prevent.
+mid-use, precisely what sliding expiry exists to prevent.
 
 A remembered session's cookie is *not* re-sent on every request (its
 expiry is already far in the future, so there is nothing to refresh and
@@ -822,7 +822,7 @@ const sessionId = await guard.login(request, user.id, { remember: true });
 
 `login()` **always mints a fresh session id, and destroys any
 pre-existing session first.** That is the defense against session
-fixation — an attacker who plants a known session id in a victim's
+fixation, an attacker who plants a known session id in a victim's
 browser before login must not still know it afterwards. It's the one
 session-specific attack a naive implementation reliably gets wrong; the
 behaviour is covered by a dedicated test. Don't "optimise" it into
@@ -833,7 +833,7 @@ reusing an existing id.
 `{ remember: true }` is deliberately **not** Laravel's recaller-cookie
 mechanism. Laravel keeps a *second*, long-lived credential (an
 `id|token|hmac` cookie plus a `remember_token` column) specifically to
-avoid holding a session row alive for months — a concern that doesn't
+avoid holding a session row alive for months. A concern that doesn't
 apply here, because these sessions are already fully server-side and
 revocable by deleting the row.
 
@@ -862,7 +862,7 @@ one. Before that, a controller that logged a user in and then tried to
 render them hit `UnauthenticatedError` in the handler that had just
 authenticated someone.
 
-`logoutOtherDevices()` re-validates the password before mass-revoking —
+`logoutOtherDevices()` re-validates the password before mass-revoking,
 the standard guard on a security-settings page: confirm it's really the
 account owner. It returns `false` without touching anything if the
 password doesn't check out, if there's no current session, or if the user
@@ -882,7 +882,7 @@ export interface SessionStore {
 }
 ```
 
-`SessionRecord` is `{ id, userId, expiresAt }` — that's all a session
+`SessionRecord` is `{ id, userId, expiresAt }`. That's all a session
 holds. There is no arbitrary session-data bag.
 
 | Store | `store:` value | Survives restart | Multi-process | `destroyForUser` |
@@ -905,7 +905,7 @@ if (new Date(row.expires_at).getTime() <= Date.now()) return null;
 ```
 
 `CacheSessionStore` does it too, even though the cache TTL should already
-have evicted the entry — it keeps all three stores behaviourally
+have evicted the entry. It keeps all three stores behaviourally
 identical.
 
 ### `DatabaseSessionStore`
@@ -913,11 +913,11 @@ identical.
 The default. Sessions in a `sessions` table: survives process restarts,
 works across multiple processes, and is **queryable**, so "log this user
 out everywhere" is one statement. It has no automatic expiry mechanism,
-so `gc()` must be run periodically — see [`auth:gc`](#authgc).
+so `gc()` must be run periodically. See [`auth:gc`](#authgc).
 
 ### `CacheSessionStore`
 
-Sessions in the cache, getting TTL-based expiry for free. Faster than the
+Sessions in the cache, with TTL-based expiry handled by the store. Faster than the
 database store, with two caveats:
 
 - With the `array` cache driver, sessions vanish on restart.
@@ -932,7 +932,7 @@ user out everywhere.
 This is not an implementation gap. A cache is a key–value map: you can
 ask "what is at key `session:abc`", but there is no way to ask "which
 keys hold a value whose `userId` is `x`" without scanning the entire
-keyspace — which most cache drivers don't expose at all, and which is a
+keyspace, which most cache drivers don't expose at all, and which is a
 production hazard on the ones that do (Redis `KEYS`). The alternative
 would be maintaining a parallel `user:<id> → [session ids]` index, which
 is a second source of truth that can drift out of sync with the sessions
@@ -945,7 +945,7 @@ dependency for one optional store. It only needs `get`/`put`/`forget`.
 
 ### `ArraySessionStore`
 
-In-memory sessions in a plain `Map`. Zero setup, no I/O — for tests, where
+In-memory sessions in a plain `Map`. Zero setup, no I/O, for tests, where
 a `SessionGuard` can be exercised end to end without a database round-trip
 or a cache backend. Not for production.
 
@@ -965,7 +965,7 @@ export interface DatabaseUserProviderConfig {
 }
 ```
 
-`AnyModelClass` is the value-side "any model class" type — `typeof Model`
+`AnyModelClass` is the value-side "any model class" type, `typeof Model`
 now names the `Model()` factory function rather than a class, so a config
 that accepts a model class spells it this way.
 
@@ -986,7 +986,7 @@ async retrieveByCredentials(credentials: Credentials): Promise<TUser | null> {
 That single decision means **a soft-deleting user model stops
 authenticating deleted users with no extra code on either side**. The
 soft-delete global scope adds `WHERE deleted_at IS NULL` to every
-`query()`, so a soft-deleted user simply isn't found — by the login
+`query()`, so a soft-deleted user simply isn't found, by the login
 lookup, and by `retrieveById()` on every subsequent authenticated
 request, so existing tokens and sessions stop working too.
 
@@ -1011,7 +1011,7 @@ tables internal to its own guards.
 ## Passwords
 
 `PasswordBroker` handles the reset flow. One broker over one
-`UserProvider` — deliberately narrower than Laravel's multi-broker
+`UserProvider`, deliberately narrower than Laravel's multi-broker
 `PasswordBrokerManager`, since this framework has no multi-user-table
 goal. Resolve it with `Auth.passwordBroker()`; it's cached after first
 resolution.
@@ -1035,8 +1035,8 @@ type SendResetLinkResult =
 
 | Status | When | `token` present |
 |---|---|---|
-| `"sent"` | A user matched — a token was minted and a row written | Yes |
-| `"sent"` | **No user matched** — nothing minted, nothing written | **No** |
+| `"sent"` | A user matched. A token was minted and a row written | Yes |
+| `"sent"` | **No user matched**: nothing minted, nothing written | **No** |
 | `"throttled"` | Only ever returned when a real user was found | No |
 
 **The no-enumeration behavior is the point.** When no user matches, the
@@ -1066,15 +1066,15 @@ owns the UX.
 
 One live reset per email: `sendResetLink()` **upserts**, rather than
 accumulating rows. `email` is the primary key. (It used to
-delete-then-insert, which two concurrent requests — a double-clicked
-form — could interleave into a primary-key violation and a 500.)
+delete-then-insert, which two concurrent requests, a double-clicked
+form, could interleave into a primary-key violation and a 500.)
 
 #### `"throttled"`
 
 `throttled` is returned when a token was minted for this address less
 than `throttleSeconds` ago (default 60, Laravel's value; set `0` to
-disable). It is only ever reachable for a **real** account — an unknown
-address returns `"sent"` above without ever consulting the table — so it
+disable). It is only ever reachable for a **real** account, an unknown
+address returns `"sent"` above without ever consulting the table, so it
 leaks nothing an attacker couldn't already determine.
 
 This is deliberately *in addition to* the `throttle()` HTTP middleware on
@@ -1105,7 +1105,7 @@ expired row is swept even if the presented token is wrong.
 
 The no-row path still performs a hash before returning `invalid-token`.
 Otherwise "no pending reset" would return instantly while "wrong token"
-paid for an argon2 verify (~50–100 ms at 64 MiB) — a timing oracle for
+paid for an argon2 verify (~50–100 ms at 64 MiB), a timing oracle for
 which accounts have a reset pending, and an unthrottled way to make the
 server burn CPU. `attempt()` does the same on its miss path.
 
@@ -1117,13 +1117,13 @@ destroys every session and revokes every personal access token for that
 user.
 
 Without it, the attacker's existing session simply survived the recovery
-that was meant to end it — and these sessions are server-side and
+that was meant to end it, and these sessions are server-side and
 long-lived, with a "remember me" session running to ~400 days.
 
 `AuthManager` wires the revokers automatically from the configured
 guards. Revocation is best-effort per store: `CacheSessionStore` cannot
 revoke by user at all (it throws by design), and that must not turn a
-successful reset into a 500 — the password has already changed by then.
+successful reset into a 500. The password has already changed by then.
 
 To react to a reset (notify the user, write an audit record):
 
@@ -1146,14 +1146,14 @@ const hashed = await this.hasher.make(token);
 A reset token is a short-lived credential a human may paste around, and
 hashing it means a leaked `password_reset_tokens` dump yields nothing
 usable. Verification is a single PK lookup by email plus one
-`Hasher.check()` — once per reset, not once per request, so argon2's cost
+`Hasher.check()`, once per reset, not once per request, so argon2's cost
 is irrelevant here in a way it isn't for API tokens.
 
 ### Rate limiting: use both layers
 
 The broker throttles per **email** (see
 [`"throttled"`](#throttled) above). Add the `throttle()` HTTP middleware
-per **client** on the route as well — they cover different attacks:
+per **client** on the route as well. They cover different attacks:
 
 ```ts
 auth.post("/password/forgot", ForgotPasswordController)
@@ -1163,7 +1163,7 @@ auth.post("/password/forgot", ForgotPasswordController)
 See [Cache](../cache/) and
 [Routing](../routing/#middleware).
 
-Constant-time response is the caller's job too — the "no such account"
+Constant-time response is the caller's job too, the "no such account"
 path returns much faster than "account exists, hash a token, write a row,
 send mail". Wrap the call in
 [`timebox()`](../encryption/#timebox):
@@ -1181,7 +1181,7 @@ Driven by [`auth:gc`](#authgc).
 
 ## Email verification
 
-Plain composable functions, **not** a trait or mixin — `Model` rows are
+Plain composable functions, **not** a trait or mixin, `Model` rows are
 plain objects, so there's no class to mix into. There is deliberately no
 `MustVerifyEmail` interface to implement and no base class: opting a model
 in is just adding the nullable `email_verified_at` column in its
@@ -1192,14 +1192,14 @@ migration.
 | `hasVerifiedEmail(user, column?)` | `boolean` | `column` defaults to `"email_verified_at"`. `undefined` counts as unverified. |
 | `markEmailAsVerified(model, userId, column?)` | `Promise<string>` | Stamps `now` via `model.update()`, returns the timestamp written. |
 
-`markEmailAsVerified()` is idempotent at the storage layer — calling it
+`markEmailAsVerified()` is idempotent at the storage layer, calling it
 twice rewrites the timestamp. Callers that must not "re-verify" should
 guard with `hasVerifiedEmail()` first.
 
 ### `EmailVerificationBroker`
 
 The two helpers above are the state mechanics. `EmailVerificationBroker`
-is the flow around them — the counterpart to `PasswordBroker`, resolved
+is the flow around them, the counterpart to `PasswordBroker`, resolved
 the same way:
 
 ```ts
@@ -1231,7 +1231,7 @@ for a single caller wasn't worth it, so the model is configured instead.
 
 ### No token table
 
-Unlike password reset, this stores nothing — the link is an HMAC-signed
+Unlike password reset, this stores nothing. The link is an HMAC-signed
 URL, so there is no table, no migration and no GC sweep.
 
 That trade is right here and wrong for password reset, because the two
@@ -1239,7 +1239,7 @@ differ decisively. A reset token is a credential that grants the ability
 to **change a password**, so it must be revocable, single-use, and hashed
 at rest. A verification link only ever asserts "whoever received mail at
 this address asked for this", grants no capability beyond flipping one
-boolean, and is naturally idempotent — clicking twice is a no-op.
+boolean, and is naturally idempotent, clicking twice is a no-op.
 
 The cost, stated plainly: a verification link **cannot be revoked** before
 it expires, and re-sending mints a second link without invalidating the
@@ -1253,7 +1253,7 @@ The signed payload carries a hash of the address being verified, and
 
 Without it the flow has a real hole: request a link for `a@example.com`,
 change the account's address to `victim@example.com` before clicking, then
-click — and the account is now "verified" at an address that never
+click, and the account is now "verified" at an address that never
 received anything. The signature does not catch this, because the URL was
 legitimately signed. Only the hash does.
 
@@ -1300,7 +1300,7 @@ posts.post("/", CreatePostController)
 
 `PasswordBroker` has `throttleSeconds`; this has nothing equivalent, and
 that asymmetry is intentional. "Forgot password" is **unauthenticated**,
-so anyone can point it at a stranger's mailbox — the per-mailbox throttle
+so anyone can point it at a stranger's mailbox. The per-mailbox throttle
 is the only thing that stops an inbox flood, because an attacker rotating
 IPs defeats the middleware. A resend endpoint is authenticated and can
 only ever mail the caller's own address, so ordinary `throttle()`
@@ -1322,8 +1322,8 @@ copy, swap the theme, or delete them. This is the same split as
 `register`/`login`/`logout`: the framework owns the mechanism, the app
 owns the UX.
 
-To keep the scaffolded flow but take delivery over yourself — an event
-listener, SMS, an ESP's API — turn the send off:
+To keep the scaffolded flow but take delivery over yourself, an event
+listener, SMS, an ESP's API, turn the send off:
 
 ```bash
 AUTH_SEND_RESET_EMAIL=false
@@ -1341,12 +1341,12 @@ notifications: {
 The broker still mints the token or link and the endpoint still responds
 normally; only the send stops.
 
-### Auth email sends synchronously — don't queue it
+### Auth email sends synchronously: don't queue it
 
 The scaffolded controllers call `Mail.send()`, not a queued job, and that
 is a security decision rather than a simplification.
 
-`sendResetLink()` returns the raw token **once** — only its argon2 hash is
+`sendResetLink()` returns the raw token **once**, only its argon2 hash is
 stored, so the plaintext is unrecoverable afterwards. Queueing the send
 therefore writes a live credential into the `jobs` table, and into
 `failed_jobs` indefinitely if the send fails. Keeping the send inline
@@ -1358,7 +1358,7 @@ a retry costs:
 - **Forgot password** deletes the token row and rethrows. The row is
   written before the email goes out, so a failed send would otherwise
   leave a token the user never received *and* start the per-mailbox
-  throttle — locking them out for a minute over our failure.
+  throttle, locking them out for a minute over our failure.
 - **Registration** logs and swallows. The account already exists by then,
   so a 500 would tell the user to retry, and the retry would fail
   `unique(email)` validation and strand them. The resend endpoint is the
@@ -1367,7 +1367,7 @@ a retry costs:
 ## Tables
 
 `@mahiframework/auth` contributes three migrations via its `migrations()` hook.
-None of them has a foreign key to `users` — that table is app-owned and
+None of them has a foreign key to `users`. That table is app-owned and
 the framework can't assume its name.
 
 ### `personal_access_tokens`
@@ -1417,12 +1417,12 @@ and verification is a single indexed PK read. `token` is an argon2 hash.
 `PersonalAccessToken`, `Session`, and `PasswordResetToken` are exported
 and are ordinary models you can query. All three leave `keyType` at its
 default and supply the key themselves (the PKs are client-generated
-strings), and set `timestamps: false` (no `updated_at` column — `last_used_at` /
+strings), and set `timestamps: false` (no `updated_at` column, `last_used_at` /
 `last_active_at` already mean "when did this last change", more precisely
 than an auto `updated_at` would).
 
 They're framework-owned rather than app-owned because they're internal
-implementation details of the built-in guards — the same ownership
+implementation details of the built-in guards, the same ownership
 rationale as `@mahiframework/queue` owning `jobs`.
 
 ## `auth:gc`
@@ -1435,12 +1435,12 @@ Deletes expired sessions, expired **personal access tokens**, and expired
 password-reset tokens, logging a count for each.
 
 Every one of those stores enforces expiry on read, so a stale row is
-never *honoured* — but nothing deletes them either, so the tables grow
+never *honoured*, but nothing deletes them either, so the tables grow
 unboundedly without this. It's a cleanup job, not a correctness
 guarantee.
 
 Guards are swept by **capability**, not by name: any configured guard
-exposing `gc()` is collected. That matters because guards are app-named —
+exposing `gc()` is collected. That matters because guards are app-named,
 an app following Laravel's `web`/`api` convention has no guard called
 `"session"` at all, and the previous hardcoded lookup silently swept
 nothing while the tables grew.
@@ -1478,7 +1478,7 @@ await Auth.runAs(user, async () => {
 });
 ```
 
-For HTTP-level tests, issue a real token and send it — the guard path is
+For HTTP-level tests, issue a real token and send it. The guard path is
 then exercised end to end:
 
 ```ts
@@ -1495,11 +1495,11 @@ so no database round-trip is needed. See [Testing](../testing/).
 
 ## Related
 
-- [Authorization](../authorization/) — gates, policies, `can()`, `authorize()`
-- [Encryption & hashing](../encryption/) — `Hash`, `Signer`, signed URLs
-- [Routing](../routing/) — where `authenticate()` and `csrf()` are attached
-- [Requests](../requests/) — form requests and their `authorize()` hook
-- [Models](../models/) — global scopes, `softDeletes`
-- [Service providers](../providers/) — the `middleware()`, `migrations()`, and `commands()` hooks
-- [Cache](../cache/) — the `RateLimiter` behind `throttle()`
-- [Scheduling](../scheduling/) — running `auth:gc` daily
+- [Authorization](../authorization/): gates, policies, `can()`, `authorize()`
+- [Encryption & hashing](../encryption/): `Hash`, `Signer`, signed URLs
+- [Routing](../routing/): where `authenticate()` and `csrf()` are attached
+- [Requests](../requests/): form requests and their `authorize()` hook
+- [Models](../models/): global scopes, `softDeletes`
+- [Service providers](../providers/): the `middleware()`, `migrations()`, and `commands()` hooks
+- [Cache](../cache/): the `RateLimiter` behind `throttle()`
+- [Scheduling](../scheduling/): running `auth:gc` daily

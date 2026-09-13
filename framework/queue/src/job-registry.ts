@@ -6,7 +6,7 @@ import type { Job, JobClass } from "./job.js";
  *
  * Jobs are dispatched by INSTANCE (`Bus.dispatch(new SomeJob(...))`) but
  * still travel through a driver as a persisted `{ jobClass: name, state }`
- * pair — so dispatch needs the name for a given job's class (`nameFor`),
+ * pair, so dispatch needs the name for a given job's class (`nameFor`),
  * and the worker needs the class for a persisted name (`resolve`) to
  * rebuild the instance. See `Job`'s docstring for the full lifecycle.
  */
@@ -32,7 +32,7 @@ export class JobRegistry {
   /**
    * The registered name for a job (given the instance or its class).
    * Throws if the job's class was never registered via a provider's
-   * `jobs()` hook — you can't dispatch a job the queue can't later
+   * `jobs()` hook. You can't dispatch a job the queue can't later
    * reconstruct by name in a worker process.
    */
   nameFor(job: Job | JobClass): string {

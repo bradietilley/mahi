@@ -1,15 +1,15 @@
 /**
- * `@mahiframework/http-client` — a fluent, faketable outbound HTTP client, port of
+ * `@mahiframework/http-client`, a fluent, faketable outbound HTTP client, port of
  * Laravel's `Illuminate\Http\Client` (`Http::withToken()->post()`,
  * `Http::fake()`, `Http::assertSent()`).
  *
- * Built on the platform `fetch` — no `undici`, `axios`, or `node-fetch`
+ * Built on the platform `fetch`, no `undici`, `axios`, or `node-fetch`
  * dependency, matching the framework's "minimal dependencies" pattern.
  * Anything `fetch` supports that this doesn't wrap (proxies, TLS options)
  * is reachable through `withFetchOptions()`.
  *
  * Independent of `@mahiframework/http`, which owns the *inbound* `Request`/`Response`
- * names — neither package imports the other; both just speak WHATWG
+ * names, neither package imports the other; both just speak WHATWG
  * `Request`/`Response`.
  *
  * ```ts

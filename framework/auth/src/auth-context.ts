@@ -1,10 +1,10 @@
 /**
- * The per-request "who is logged in" scope, backed by AsyncLocalStorage —
+ * The per-request "who is logged in" scope, backed by AsyncLocalStorage,
  * the same mechanism `@mahiframework/database`'s `transaction-context.ts`
  * uses to make static `Model` calls join an enclosing transaction.
  *
  * WHY THIS EXISTS AT ALL: Laravel's `Guard` is request-scoped and
- * stateful — `Auth::user()` works because PHP rebuilds the container per
+ * stateful. `Auth::user()` works because PHP rebuilds the container per
  * request. This framework boots ONE long-lived `Application` and serves
  * every request from it (`bin/server.ts` → `serve({ fetch: kernel.raw().fetch })`),
  * so a singleton holding "the current user" would leak one request's user
@@ -42,8 +42,8 @@
  * later, in a worker process with no scope at all, and throws
  * `MissingAuthContextError`.
  *
- * That is not a leak between requests — the scope belongs to the caller
- * that is still awaiting the work — but it does mean a job tested against
+ * That is not a leak between requests, the scope belongs to the caller
+ * that is still awaiting the work, but it does mean a job tested against
  * `sync` can break the first time it runs for real. Jobs that need an
  * identity should carry the user id in their payload and re-establish the
  * scope themselves with `Auth.runAs()`, rather than reading an ambient
@@ -150,7 +150,7 @@ export function user<TUser>(): TUser {
 
 /**
  * The authenticated user, or null if this request is anonymous. Still
- * throws `MissingAuthContextError` outside a scope — see the module
+ * throws `MissingAuthContextError` outside a scope. See the module
  * docblock for why that distinction matters.
  */
 export function userOrNull<TUser>(): TUser | null {

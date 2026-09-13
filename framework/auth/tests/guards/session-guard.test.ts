@@ -49,7 +49,7 @@ function cookieFrom(response: Response, name = "session"): string | null {
  * `Response` objects through the framework's own boundary, exactly as an
  * app's do. The previous version of this file registered handlers
  * straight onto Hono, which merges context-queued cookies for responses
- * it builds itself — so the suite passed while `login()` shipped no
+ * it builds itself, so the suite passed while `login()` shipped no
  * cookie at all through a real Mahi route. Anything that only holds when
  * you bypass the router is not tested.
  */
@@ -301,7 +301,7 @@ describe("SessionGuard", () => {
 
     it("re-issues the cookie as the sliding expiry renews", async () => {
       // Without this the browser drops the cookie `lifetimeMinutes`
-      // after LOGIN while the server keeps sliding the row forward — an
+      // after LOGIN while the server keeps sliding the row forward, an
       // actively-used session that dies mid-use, which is precisely what
       // sliding expiry exists to prevent.
       const login = await hono.request("/login", { method: "POST" });
@@ -411,7 +411,7 @@ describe("SessionGuard", () => {
       await app.request("/me", { headers: { Cookie: `session=${cookie}` } });
 
       const after = (await store.read(id))!.expiresAt;
-      // Still far in the future — the sliding renewal must not clamp it to
+      // Still far in the future. The sliding renewal must not clamp it to
       // the short lifetime.
       expect(new Date(after).getTime()).toBeGreaterThanOrEqual(new Date(before).getTime());
       const daysOut = (new Date(after).getTime() - Date.now()) / 86_400_000;
@@ -463,7 +463,7 @@ describe("SessionGuard", () => {
   it("logoutEverywhere() invalidates every session for the user", async () => {
     const first = await hono.request("/login", { method: "POST" });
     const firstCookie = cookieFrom(first)!;
-    // A second, independent browser — no cookie sent, so no regeneration.
+    // A second, independent browser, no cookie sent, so no regeneration.
     const second = await hono.request("/login", { method: "POST" });
     const secondCookie = cookieFrom(second)!;
 

@@ -15,7 +15,7 @@ import {
  * These tests exercise the MySQL and Postgres drivers against the real
  * engines from the repo-root `docker-compose.yml`. They connect once per
  * suite; if the database isn't reachable (CI without docker), the whole
- * suite is skipped rather than failing — the SQLite suites already cover
+ * suite is skipped rather than failing, the SQLite suites already cover
  * the dialect-agnostic behaviour.
  *
  * Connection details, availability probing and the per-file scratch
@@ -158,7 +158,7 @@ for (const engine of engines) {
       });
 
       it("dropAllTables drops FK-linked tables in any order (M10: session variable)", async () => {
-        // The parent is created first, so it is dropped first — which
+        // The parent is created first, so it is dropped first, which
         // only works while FK enforcement is genuinely suspended for
         // the whole sequence, not just the connection the SET landed
         // on.

@@ -90,7 +90,7 @@ export function parseArgs(argv: readonly string[]): Options {
 }
 
 /**
- * npm package name rules, minus the scope handling — a scaffolded app is
+ * npm package name rules, minus the scope handling. A scaffolded app is
  * always unscoped, and the name is only ever written into its own
  * private `package.json`.
  */

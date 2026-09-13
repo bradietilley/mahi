@@ -22,7 +22,7 @@ class WelcomeMailable extends Mailable {
 
 /**
  * A full app with both providers, which is the only way to exercise the
- * handler `QueueServiceProvider.boot()` installs on `MailManager` — the
+ * handler `QueueServiceProvider.boot()` installs on `MailManager`, the
  * failure mode this file exists for lives entirely in that wiring.
  */
 async function buildApp(connection = "sync"): Promise<Application> {
@@ -83,7 +83,7 @@ describe("Mail.queue() through the queue", () => {
   it("survives the driver's encode/decode round-trip", async () => {
     // `SyncQueueDriver` performs the same serialization round-trip as a
     // durable driver even though it never leaves the process, so this
-    // proves a `RenderedMail` is faithfully reconstructible — the property
+    // proves a `RenderedMail` is faithfully reconstructible, the property
     // the whole render-at-dispatch design rests on.
     const app = await buildApp("sync");
     const mail = app.make<MailManager>(MAIL_TOKEN);

@@ -18,7 +18,7 @@ export function httpConfig(env: Env): HttpConfig {
     /**
      * Maximum inbound request body. The framework parses every request
      * body eagerly, before any route decision, so without a ceiling a
-     * single large unauthenticated POST is a memory-exhaustion DoS — on
+     * single large unauthenticated POST is a memory-exhaustion DoS, on
      * paths that don't even exist.
      *
      * Defaults (1 MiB / 10 MiB multipart) suit a JSON API. Raise
@@ -34,19 +34,19 @@ export function httpConfig(env: Env): HttpConfig {
     },
 
     /**
-     * Response security headers — `nosniff`, `Referrer-Policy`,
+     * Response security headers: `nosniff`, `Referrer-Policy`,
      * `X-Frame-Options`, and HSTS on requests already known to be
      * secure. On by default; the object is here so the knobs are
      * discoverable.
      *
      * For a browser-facing app you'd usually also want a
      * Content-Security-Policy, which is app-specific and so not
-     * defaulted — add it via `extra`.
+     * defaulted, add it via `extra`.
      */
     securityHeaders: {},
 
     /**
-     * `GET /up` — liveness. Answers "is this process alive?" with no I/O
+     * `GET /up`, liveness. Answers "is this process alive?" with no I/O
      * at all. Kubernetes' `livenessProbe`; a failure here means *restart
      * the pod*, so it must never touch a dependency: one Redis blip would
      * otherwise restart every pod in the deployment at once.
@@ -54,7 +54,7 @@ export function httpConfig(env: Env): HttpConfig {
     liveness: {},
 
     /**
-     * `GET /health` — readiness. Runs every check registered through a
+     * `GET /health`, readiness. Runs every check registered through a
      * provider's `checks()` hook and returns `200`, or `503` if any
      * failed. Kubernetes' `readinessProbe`; a failure means *drain this
      * instance but leave it running*.

@@ -2,7 +2,7 @@
  * Plan §21.
  *
  * These tests check *wiring*, not CLDR's contents. Asserting that August is
- * "août" in French is fine — that will not change — but asserting exact
+ * "août" in French is fine, that will not change, but asserting exact
  * `dateStyle` layouts would turn a Node upgrade into a build failure for no
  * benefit, so those are checked structurally.
  */

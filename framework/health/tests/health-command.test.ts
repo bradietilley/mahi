@@ -181,8 +181,8 @@ describe("exit code", () => {
   });
 
   it("does not call process.exit()", async () => {
-    // `process.exit()` truncates in-flight stdout writes — on a --json
-    // run that means truncated JSON — and would take the test runner
+    // `process.exit()` truncates in-flight stdout writes, on a --json
+    // run that means truncated JSON, and would take the test runner
     // down with it.
     const exit = vi.spyOn(process, "exit").mockImplementation((() => {}) as never);
 
@@ -215,7 +215,7 @@ describe("command metadata", () => {
     expect(options).toEqual([["--json", "Output the raw JSON payload instead of a table."]]);
   });
 
-  it("is not dev-only — it must exist in a compiled binary", () => {
+  it("is not dev-only. It must exist in a compiled binary", () => {
     expect(HealthCommand.devOnly).toBe(false);
   });
 });

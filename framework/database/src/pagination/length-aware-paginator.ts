@@ -13,17 +13,17 @@ export interface LengthAwarePaginationResult<T> {
 }
 
 /**
- * Offset-based pagination — `page`/`perPage`, returns total count + total
+ * Offset-based pagination, `page`/`perPage`, returns total count + total
  * pages, matching Laravel's `LengthAwarePaginator` (`Model::paginate()`).
  * Simple, familiar, correct for small-to-medium datasets and admin-style
  * UIs with page numbers. Weak point (same as Laravel's): `OFFSET` gets
  * slower on very large tables/deep pages, and results can shift under
- * concurrent writes between page loads — `cursorPaginate()` is the
+ * concurrent writes between page loads. `cursorPaginate()` is the
  * documented answer for that case, not a third paginator type.
  *
  * `builder.count()` counts rows matching the builder's accumulated
  * `where()` conditions but ignores `orderBy()`/`limit()`/`offset()` (see
- * `QueryBuilder.count()`'s docstring) — this is what makes `total`/
+ * `QueryBuilder.count()`'s docstring). This is what makes `total`/
  * `totalPages` correct for a filtered query even though the same builder
  * also has a page-sized `limit`/`offset` applied for the `data` fetch.
  */

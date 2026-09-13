@@ -6,7 +6,7 @@ import type { ChannelRegistry } from "./channel-registry.js";
 import { isPresenceChannel } from "./channel-name.js";
 
 /**
- * Minimal shape of `@mahiframework/auth`'s `AuthManager` this authorizer needs —
+ * Minimal shape of `@mahiframework/auth`'s `AuthManager` this authorizer needs,
  * resolved by the `"auth"` token so `@mahiframework/broadcasting` takes NO
  * compile-time dependency on `@mahiframework/auth`, the same soft-dependency shape
  * `@mahiframework/authorization`'s Gate uses. `guard(name?).user(request)` returns
@@ -53,8 +53,8 @@ export class ContainerBroadcastAuthorizer implements BroadcastAuthorizer {
   /**
    * `signer` may be the signer itself or a thunk that resolves it on first
    * use. The provider passes a thunk: resolving the container's signer
-   * eagerly would construct the encrypter — and fail on a missing
-   * `APP_KEY` — during boot, before `key:generate` has had a chance to run.
+   * eagerly would construct the encrypter, and fail on a missing
+   * `APP_KEY`, during boot, before `key:generate` has had a chance to run.
    */
   constructor(
     private readonly app: Application,

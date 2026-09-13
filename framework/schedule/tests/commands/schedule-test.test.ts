@@ -3,7 +3,7 @@ import { Application } from "@mahiframework/core";
 import { Tui } from "@mahiframework/tui";
 
 // Raw terminal keystrokes (not re-exported from @mahiframework/tui's public
-// surface) — a fake select() is driven by navigation + Enter, so we inline
+// surface), a fake select() is driven by navigation + Enter, so we inline
 // the two we need.
 const DOWN = "\x1b[B";
 const ENTER = "\r";

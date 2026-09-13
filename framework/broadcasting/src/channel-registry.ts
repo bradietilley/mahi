@@ -17,7 +17,7 @@ export type ChannelAuthorizationResult = boolean | object | null | undefined;
 /**
  * A channel-authorization callback, registered against a channel pattern.
  * `user` is whatever the app's auth guard resolved for the connecting
- * socket (`null` for a guest — a guest is denied every protected channel).
+ * socket (`null` for a guest. A guest is denied every protected channel).
  * Trailing args are the values captured from `{param}` placeholders in the
  * pattern, in declaration order.
  */
@@ -60,7 +60,7 @@ function compilePattern(pattern: string): RegExp {
 }
 
 /**
- * The registry of channel-authorization callbacks — the runtime half of
+ * The registry of channel-authorization callbacks, the runtime half of
  * `Broadcast::channel('orders.{orderId}', fn)`. Applications populate it in
  * a provider's `channels()` hook; the broadcast driver consults it on every
  * `subscribe` to a `private-`/`presence-` channel.
@@ -105,7 +105,7 @@ export class ChannelRegistry {
    * authorized without consulting a callback. Protected channels are
    * denied unless a registered pattern matches AND its callback returns a
    * truthy value; a channel with no matching callback fails **closed**
-   * (the safe default — an unregistered `private-` channel is a
+   * (the safe default, an unregistered `private-` channel is a
    * misconfiguration, not an open door).
    */
   async authorize(channel: string, user: unknown): Promise<ChannelAuthorization> {
@@ -135,7 +135,7 @@ export class ChannelRegistry {
       return { authorized: true };
     }
 
-    // No callback claimed this protected channel — fail closed.
+    // No callback claimed this protected channel, fail closed.
     return { authorized: false };
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Plan §15. These assertions pin the *shape* of the output rather than every
- * translated string — the strings come from the host's CLDR data, and
+ * translated string. The strings come from the host's CLDR data, and
  * asserting them exhaustively would turn an ICU upgrade into a failing build
  * for no benefit. The English forms are stable enough to assert directly; the
  * other locales are checked structurally.

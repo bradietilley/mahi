@@ -56,7 +56,7 @@ export default {
 
 /**
  * The `{ name, migration }` form of one of the source strings above,
- * without going through the filesystem — lets a test apply migrations as
+ * without going through the filesystem, lets a test apply migrations as
  * separate batches (one `up()` call each) to exercise `--step`.
  */
 function fromSource(source: string): Migration {
@@ -165,11 +165,11 @@ describe("MigrationRunner", () => {
   it("ignores .d.ts declaration files sitting alongside compiled .js migrations", async () => {
     // Mirrors a published package's `migrations()` directory pointing at
     // its own compiled `dist/` output, which has a `.d.ts` next to every
-    // `.js` file — `.d.ts` also ends in ".ts" so a naive suffix filter
+    // `.js` file, `.d.ts` also ends in ".ts" so a naive suffix filter
     // would try to `import()` it as if it were the migration itself.
     await writeFile(
       path.join(dir, "0001_create_widgets.d.ts"),
-      "export default {} as unknown;", // not a real migration — must be skipped
+      "export default {} as unknown;", // not a real migration, must be skipped
     );
 
     const { runner } = freshRunner();
@@ -248,7 +248,7 @@ export default {
   /**
    * The bundling case. A single-file executable has no migrations
    * directory to `readdir` and no path to `import()`, and `discover()`
-   * treats an unreadable directory as "nothing found" — so without an
+   * treats an unreadable directory as "nothing found", so without an
    * explicit form, a compiled app reports "Nothing to migrate" and then
    * runs against an empty database. These assert the explicit form works
    * everywhere the directory form does, and interoperates with it.
@@ -325,7 +325,7 @@ export default { async up() { await Schema.create("early", (table) => { table.st
      * An app part-way through moving to a static registry may well pass
      * both the registry and the directory it mirrors. Running each
      * migration twice would blow up on the `migrations.name` unique
-     * index — and, worse, run `up()` twice first.
+     * index, and, worse, run `up()` twice first.
      */
     it("deduplicates a migration supplied both explicitly and via a directory", async () => {
       const { runner } = freshRunner();
@@ -442,7 +442,7 @@ export default { async up() { await Schema.create("early", (table) => { table.st
       await expect(runner.up([dir, failing])).rejects.toThrow("boom");
 
       // Each migration is its own transaction, so the two that succeeded
-      // before the failure are durable — matching Laravel.
+      // before the failure are durable, matching Laravel.
       const tableNames = (await driver.kysely.introspection.getTables()).map((t) => t.name);
       expect(tableNames).toEqual(expect.arrayContaining(["widgets", "gadgets"]));
 
@@ -679,7 +679,7 @@ export default { async up() { await Schema.create("underscore", (t) => { t.strin
       expect((await runner.status([dir])).every((s) => !s.ran)).toBe(true);
     });
 
-    it("orders correctly across batches — newest batch first, reversed within each", async () => {
+    it("orders correctly across batches, newest batch first, reversed within each", async () => {
       const { runner } = freshRunner();
 
       // Batch 1 gets two migrations, batch 2 gets one.

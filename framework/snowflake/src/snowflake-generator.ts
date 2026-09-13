@@ -11,7 +11,7 @@ import { Snowflake } from "./snowflake.js";
 /**
  * Applies `snowflake` config to the static `Snowflake` generator on first
  * `id()` call, so `Snowflake.configureSignature()` can still run from a
- * provider's `register()` (before any ID is generated) — matching
+ * provider's `register()` (before any ID is generated), matching
  * php-snowflake's `SnowflakeGenerator`.
  */
 export class SnowflakeGenerator {

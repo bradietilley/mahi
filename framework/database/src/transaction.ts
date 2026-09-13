@@ -16,7 +16,7 @@ import {
  * (`RELEASE SAVEPOINT` on a duplicate name only releases the innermost,
  * silently leaving the outer one open).
  *
- * Plain identifier characters only — this is interpolated into DDL-ish
+ * Plain identifier characters only. This is interpolated into DDL-ish
  * SQL because no dialect accepts a bound parameter as a savepoint name,
  * and `level` is a framework-generated integer, never user input.
  */
@@ -25,7 +25,7 @@ function savepointName(level: number): string {
 }
 
 /**
- * Runs `callback` inside a `SAVEPOINT` on an already-open transaction —
+ * Runs `callback` inside a `SAVEPOINT` on an already-open transaction,
  * the nested-`transaction()` path. Commits by `RELEASE`ing the savepoint
  * and rolls back to it (NOT the whole transaction) on error, so an inner
  * failure the caller catches leaves the outer transaction usable, which
@@ -45,7 +45,7 @@ async function withSavepoint<T>(
   const name = savepointName(level);
   const trx = scope.trx as Transaction<any>;
   // Shared by reference with the outermost scope, so an `afterCommit()`
-  // registered in here runs when the whole transaction commits — not
+  // registered in here runs when the whole transaction commits, not
   // when this savepoint is released, which isn't durable on its own.
   const deferred = scope.deferred;
 
@@ -67,11 +67,11 @@ async function withSavepoint<T>(
     try {
       await sql.raw(`rollback to savepoint ${name}`).execute(trx);
     } catch {
-      // ignored — surface the original error below
+      // ignored, surface the original error below
     }
     // The work this savepoint did is gone, so anything registered to run
     // "after commit" from inside it must go with it. Callbacks from the
-    // enclosing levels are untouched — that transaction is still alive.
+    // enclosing levels are untouched. That transaction is still alive.
     deferred?.discardFrom(level);
     throw error;
   }
@@ -100,7 +100,7 @@ async function drain(callbacks: DeferredCallback[], phase: string): Promise<void
  *
  * `transaction()` is a free function with no `Application` in hand, and
  * the global `app()` throws when nothing is bootstrapped (a unit test
- * driving Kysely directly) — which would turn "a callback threw" into
+ * driving Kysely directly). Which would turn "a callback threw" into
  * "the framework threw", exactly the swallowing this function exists to
  * avoid.
  */
@@ -113,14 +113,14 @@ function report(message: string, error: unknown): void {
 }
 
 /**
- * Wraps Kysely's own `db.transaction().execute(callback)` — the
+ * Wraps Kysely's own `db.transaction().execute(callback)`, the
  * documented, discoverable, framework-blessed way to run a transaction,
  * rather than every consumer needing to know Kysely's transaction API
- * exists and reach past the framework for it.
+ * exists and use it directly.
  *
  * The callback runs inside an AsyncLocalStorage context carrying the
  * transactional Kysely instance (see `transaction-context.ts`), so
- * **static `Model` access automatically participates** — no explicit
+ * **static `Model` access automatically participates**, no explicit
  * wiring needed at call sites:
  *
  *   await transaction(db, async () => {
@@ -154,7 +154,7 @@ function report(message: string, error: unknown): void {
  * Without savepoints that inner call either deadlocks (SQLite, whose
  * single connection is already held by the outer transaction) or takes
  * a second pooled connection and commits **independently** of the outer
- * one (MySQL/Postgres) — so an outer rollback would leave the inner
+ * one (MySQL/Postgres), so an outer rollback would leave the inner
  * writes behind, and deep nesting under load exhausts the pool.
  *
  * Semantics that follow from the savepoint model, and match Laravel:
@@ -163,18 +163,18 @@ function report(message: string, error: unknown): void {
  *   undoes only the inner work; the outer transaction continues.
  * - An outer rollback undoes everything, including already-"committed"
  *   inner work. A nested `transaction()` resolving is NOT durable on
- *   its own — only the outermost commit is.
+ *   its own, only the outermost commit is.
  *
  * Nesting is per-connection: a `transaction()` on a *different*
- * connection opens a real, independent transaction (it has to — the two
+ * connection opens a real, independent transaction (it has to. The two
  * connections can't share a savepoint), and both stay reachable to the
  * models bound to them.
  *
  * ## After-commit callbacks
  *
- * Work that must not happen unless the transaction actually commits —
+ * Work that must not happen unless the transaction actually commits,
  * dispatching a job that reads the rows being written, sending mail,
- * notifying an external system — registers itself with `afterCommit()`
+ * notifying an external system, registers itself with `afterCommit()`
  * (see `transaction-context.ts`) and is drained here, once, after the
  * outermost commit resolves:
  *
@@ -186,7 +186,7 @@ function report(message: string, error: unknown): void {
  * Without that flag the job row commits on its own connection
  * immediately (MySQL/Postgres) and a worker can pop it before the order
  * exists. With it, the push happens after the commit, and never at all
- * if the transaction rolls back — in which case `afterRollback()`
+ * if the transaction rolls back, in which case `afterRollback()`
  * callbacks run instead.
  *
  * Callbacks run in registration order and each is isolated: one that
@@ -197,7 +197,7 @@ function report(message: string, error: unknown): void {
  *
  * A promise **created but not awaited** inside the callback
  * inherits the transaction context and can run its query after the
- * transaction has committed and returned its connection to the pool —
+ * transaction has committed and returned its connection to the pool,
  * on MySQL/Postgres that query then executes on a connection now doing
  * someone else's work. Await everything you start inside the callback.
  */
@@ -227,7 +227,7 @@ export async function transaction<DB, T>(
     );
   }
 
-  // The outermost transaction — the only one that actually commits, and
+  // The outermost transaction, the only one that actually commits, and
   // therefore the only one that drains deferred callbacks.
   const deferred = new DeferredCallbacks();
 
@@ -240,7 +240,7 @@ export async function transaction<DB, T>(
       );
   } catch (error) {
     // Rolled back (by a throwing callback, or by the driver). Whatever
-    // was queued for "after commit" must be discarded — `takeRollback`
+    // was queued for "after commit" must be discarded, `takeRollback`
     // and `takeCommit` both clear, so nothing can run later by accident.
     const rollbackCallbacks = deferred.takeRollback();
     deferred.takeCommit();

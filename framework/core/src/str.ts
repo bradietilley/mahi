@@ -52,7 +52,7 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Minimal English inflector — enough for model/table name derivation
+// Minimal English inflector, enough for model/table name derivation
 // (`make:model`), not a full linguistics engine. Irregulars and the common
 // suffix rules Laravel's Pluralizer covers most often.
 const IRREGULAR_PLURALS: Record<string, string> = {
@@ -210,7 +210,7 @@ export const Str = {
     return index === -1 ? subject : subject.slice(0, index);
   },
 
-  /** Between the first `from` and the last `to` after it — Laravel's `Str::between`. */
+  /** Between the first `from` and the last `to` after it, Laravel's `Str::between`. */
   between(subject: string, from: string, to: string): string {
     return Str.beforeLast(Str.after(subject, from), to);
   },
@@ -254,7 +254,7 @@ export const Str = {
   },
 
   /**
-   * A UUID version 7 — RFC 9562: a 48-bit big-endian millisecond
+   * A UUID version 7, RFC 9562: a 48-bit big-endian millisecond
    * timestamp, then 74 random bits, with the version and variant fields
    * in between.
    *
@@ -266,7 +266,7 @@ export const Str = {
    * `order by created_at` without a second index.
    *
    * The cost is that a v7 leaks its creation time to anyone holding one.
-   * That is usually harmless for a row id and occasionally is not — do
+   * That is usually harmless for a row id and occasionally is not, do
    * not use it for a value that doubles as a capability, like an
    * unguessable share link, where the timestamp narrows a brute-force
    * search.
@@ -299,10 +299,10 @@ export const Str = {
   },
 
   /**
-   * A time-ordered UUID — currently an alias for `uuid7()`.
+   * A time-ordered UUID, currently an alias for `uuid7()`.
    *
    * Named for intent rather than version, matching Laravel's
-   * `Str::orderedUuid()`. Reach for this when what you want is "a UUID
+   * `Str::orderedUuid()`. Use this when what you want is "a UUID
    * that sorts by creation time"; the RFC version delivering that is an
    * implementation detail that has already changed once (Laravel's
    * original used a COMB-style layout predating v7's standardisation).
@@ -483,7 +483,7 @@ export const Str = {
   /**
    * Whether `value` matches `pattern`, where `*` is a wildcard for any run
    * of characters (Laravel's `Str::is`). `pattern` may be one string or a
-   * list — any match returns `true`.
+   * list, any match returns `true`.
    */
   is(pattern: string | readonly string[], value: string): boolean {
     for (const p of wrapNeedles(pattern)) {
@@ -503,7 +503,7 @@ export const Str = {
 
   /**
    * HTML-escape the five characters that are significant in HTML text and
-   * double-quoted attribute contexts (`&`, `<`, `>`, `"`, `'`) — Laravel's
+   * double-quoted attribute contexts (`&`, `<`, `>`, `"`, `'`), Laravel's
    * `e()` / `Str::escape` helper. Use it when interpolating untrusted data
    * into an HTML mail body (or any HTML string) built by hand:
    *

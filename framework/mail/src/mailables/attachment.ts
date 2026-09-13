@@ -7,8 +7,8 @@
  * built in memory) is the caller's concern, not this value object's.
  *
  * Exactly one of `content` / `path` should be provided:
- *   - `content` — the raw bytes (a `Buffer`/`Uint8Array`) or a UTF-8 string.
- *   - `path`    — a filesystem path the transport reads at send time.
+ *   - `content`, the raw bytes (a `Buffer`/`Uint8Array`) or a UTF-8 string.
+ *   - `path`, a filesystem path the transport reads at send time.
  * `filename` is the name the recipient sees; `contentType` overrides the
  * transport's MIME guess when set.
  */

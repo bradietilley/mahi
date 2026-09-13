@@ -24,7 +24,7 @@ import createSessionsTable from "../src/migrations/0002_create_sessions_table.js
  *
  * Everything here is deliberately end to end. The unit suites all
  * constructed guards by hand; this one boots the container, resolves the
- * guard through config, and drives it over HTTP — the only arrangement
+ * guard through config, and drives it over HTTP, the only arrangement
  * that exercises the seam where the cookie was being dropped (handlers
  * return platform `Response` objects, which Hono does not merge its
  * context-queued headers into).
@@ -53,7 +53,7 @@ class SessionAuthProvider extends AuthServiceProvider {
       const manager = request.shared<AuthManager>("auth")!;
       await manager.login(request, String(request.input("id")));
 
-      // Deliberately a framework response, not `c.json()` — that is the
+      // Deliberately a framework response, not `c.json()`. That is the
       // whole point of this test.
       return HttpResponse.json({ ok: true });
     });
@@ -66,7 +66,7 @@ class SessionAuthProvider extends AuthServiceProvider {
     });
 
     // Reads the ambient auth scope right after login, in the SAME
-    // request — the M6 behaviour.
+    // request, the M6 behaviour.
     router.post("/login-and-read", async (request) => {
       const manager = request.shared<AuthManager>("auth")!;
       await manager.login(request, String(request.input("id")));
@@ -211,7 +211,7 @@ describe("session login end to end", () => {
 
   it("makes the user available in the SAME request that logged them in", async () => {
     // `login()` must populate the ambient scope, not just write the
-    // session — otherwise `Auth.user()` throws in the controller that has
+    // session, otherwise `Auth.user()` throws in the controller that has
     // just authenticated someone.
     const response = await request("/login-and-read", {
       method: "POST",

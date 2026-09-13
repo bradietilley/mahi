@@ -126,7 +126,7 @@ describe("AuthManager", () => {
 
     it("mutates the existing scope rather than nesting a new one", async () => {
       // One request must have exactly one identity for its whole
-      // lifetime — the caller's own reference to the state has to see the
+      // lifetime. The caller's own reference to the state has to see the
       // resolved user.
       await runWithAuth({ user: null, guard: null }, async () => {
         const state = currentAuthState()!;
@@ -163,7 +163,7 @@ describe("AuthManager", () => {
       // Timing-attack mitigation: a nonexistent account must cost the
       // same wall-clock time as a wrong password, or response timing
       // reveals which emails have accounts. Nothing visibly depends on
-      // this call, which is exactly why it needs a test — a future
+      // this call, which is exactly why it needs a test. A future
       // refactor would otherwise delete it as dead code.
       const spy = vi.spyOn(hasher, "make");
 

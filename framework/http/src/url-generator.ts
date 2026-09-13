@@ -17,8 +17,8 @@ export type RouteParams = Record<string, RouteParamValue>;
 
 export interface UrlOptions {
   /**
-   * Whether to return an absolute URL (scheme + host + path) — the
-   * default, matching Laravel — or a root-relative path (`false`).
+   * Whether to return an absolute URL (scheme + host + path), the
+   * default, matching Laravel, or a root-relative path (`false`).
    */
   absolute?: boolean;
 }
@@ -40,7 +40,7 @@ export class RouteNotFoundError extends Error {
 }
 
 /**
- * Generates URLs for named routes — the equivalent of Laravel's
+ * Generates URLs for named routes, the equivalent of Laravel's
  * `UrlGenerator`/`route()` helper and the `URL` facade. Bound as a
  * singleton at `URL_GENERATOR_TOKEN`; reach it via the `URL` facade.
  *
@@ -56,7 +56,7 @@ export class UrlGenerator {
   ) {}
 
   /**
-   * Absolute URL for a bare path — `URL.to("/dashboard")`. Passes through
+   * Absolute URL for a bare path, `URL.to("/dashboard")`. Passes through
    * an already-absolute URL unchanged.
    */
   to(path: string, options: UrlOptions = {}): string {
@@ -91,7 +91,7 @@ export class UrlGenerator {
   }
 
   /**
-   * Signed URL for a named route — a tamper-evident link with an optional
+   * Signed URL for a named route, a tamper-evident link with an optional
    * expiry, the equivalent of Laravel's `URL::signedRoute()` /
    * `temporarySignedRoute()`. Verify it on the receiving route with
    * `validateSignature()` / `hasValidSignature()`.

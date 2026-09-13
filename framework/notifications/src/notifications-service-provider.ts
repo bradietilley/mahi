@@ -13,26 +13,26 @@ export { NOTIFICATIONS_TOKEN };
 
 /**
  * Registers the `ChannelManager` singleton and pre-registers each built-in
- * channel whose backing package is actually bound — the same "extend() is
+ * channel whose backing package is actually bound, the same "extend() is
  * optional" pattern queue/cache drivers use. A channel is only wired if its
  * dependency token is present in the container:
  *
- *   - `database` — always (the `notifications` table is this package's own
+ *   - `database`, always (the `notifications` table is this package's own
  *     hard dependency on `@mahiframework/database`).
- *   - `mail` — only if `MAIL_TOKEN` is bound (`MailServiceProvider`
+ *   - `mail`, only if `MAIL_TOKEN` is bound (`MailServiceProvider`
  *     registered). Mail is a hard dependency of `MailChannel` specifically,
  *     not of the package as a whole.
- *   - `broadcast` — only if `EVENTS_TOKEN` is bound. Broadcasting itself is
+ *   - `broadcast`, only if `EVENTS_TOKEN` is bound. Broadcasting itself is
  *     optional: `BroadcastChannel` only needs the `EventDispatcher`, and
  *     `@mahiframework/broadcasting`'s `afterDispatch()` hook (if installed)
  *     forwards the dispatched `NotificationBroadcast` to clients.
  *
  * A `via()` naming a channel that wasn't registered (because its package is
- * absent) throws the standard `DriverNotRegisteredError` — the same
+ * absent) throws the standard `DriverNotRegisteredError`, the same
  * feedback any unregistered driver gives.
  *
  * **Provider ordering:** list this provider after `DatabaseServiceProvider`
- * and — if their channels are used — after `MailServiceProvider`,
+ * and, if their channels are used, after `MailServiceProvider`,
  * `EventsServiceProvider`, and `BroadcastServiceProvider`, since the
  * channel factories resolve those tokens at `register()` time. Same hard-
  * ordering pattern documented for `QueueServiceProvider` needing
@@ -64,7 +64,7 @@ export class NotificationsServiceProvider extends ServiceProvider {
   }
 
   /**
-   * Static rather than a `migrations()` directory path — see
+   * Static rather than a `migrations()` directory path. See
    * `QueueServiceProvider.migrationSources()`.
    */
   migrationSources(): RegisteredMigration[] {

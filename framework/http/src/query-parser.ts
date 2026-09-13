@@ -1,5 +1,5 @@
 /**
- * Bracket-notation parser for query strings and urlencoded form bodies —
+ * Bracket-notation parser for query strings and urlencoded form bodies,
  * the `parse_str()`/`qs` behaviour every HTTP client already assumes.
  *
  * Without it, `?ids[]=1&ids[]=2` arrives as the single string-keyed entry
@@ -31,7 +31,7 @@
  * attacker-controlled (it is just a query string), each level allocates
  * an object, and a single request can otherwise carry thousands of
  * levels for a few hundred bytes. Eight is past anything a real API
- * models and far short of anything that hurts.
+ * models and far short of any memory concern.
  */
 const MAX_DEPTH = 8;
 
@@ -41,7 +41,7 @@ const MAX_DEPTH = 8;
  * otherwise ask for a ten-million-element array.
  *
  * An index past this limit degrades to an object key rather than
- * erroring — the request is still served, it just doesn't get an array.
+ * erroring. The request is still served, it just doesn't get an array.
  */
 const MAX_ARRAY_INDEX = 1000;
 
@@ -62,7 +62,7 @@ function parseKeyPath(key: string): Segment[] | undefined {
     return undefined;
   }
 
-  // `[a]=1` — no root name. Not something any client produces on
+  // `[a]=1`, no root name. Not something any client produces on
   // purpose; keep it literal rather than inventing a root.
   if (open === 0) {
     return undefined;
@@ -106,7 +106,7 @@ function isNode(value: unknown): value is Node {
  *
  * Conflicts (a scalar already sitting where a container is needed, e.g.
  * `a=1&a[b]=2`) resolve in favour of the container, matching PHP. The
- * alternative — throwing — would turn a malformed query string into a
+ * alternative, throwing, would turn a malformed query string into a
  * 500 on a route that never looked at that parameter.
  */
 function assign(root: Node, path: Segment[], value: string): void {
@@ -151,7 +151,7 @@ function segmentKey(node: Node, segment: Segment): string {
  * depth-first. This is the step that makes `ids[]=1&ids[]=2` satisfy an
  * `array()` validation rule rather than merely look like one.
  *
- * Deliberately conservative — a node with a gap (`a[0]`, `a[2]`) or a
+ * Deliberately conservative, a node with a gap (`a[0]`, `a[2]`) or a
  * non-numeric sibling stays an object, so no data is dropped to make the
  * shape tidier.
  */
@@ -189,8 +189,8 @@ function arrayify(value: unknown): unknown {
 }
 
 /**
- * Parse `[key, value]` entries — as produced by `URLSearchParams` or
- * Hono's `c.req.queries()` — into a nested structure.
+ * Parse `[key, value]` entries, as produced by `URLSearchParams` or
+ * Hono's `c.req.queries()`, into a nested structure.
  *
  * Values stay strings; this layer decides *shape*, never type. Coercion
  * is the validator's job (`numberRule().integer()`), and doing it here
@@ -203,7 +203,7 @@ export function parseNestedEntries(entries: Iterable<[string, string]>): Record<
     const path = parseKeyPath(key);
 
     if (path === undefined) {
-      // Plain key. Last occurrence wins, as PHP's `parse_str` does —
+      // Plain key. Last occurrence wins, as PHP's `parse_str` does.
       // `?a=1&a=2` is `2`. A client that wants both values writes
       // `a[]=1&a[]=2`, which is unambiguous.
       root[key] = value;

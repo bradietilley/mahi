@@ -1,5 +1,5 @@
 /**
- * Viewport math for `select()`'s option list — port of `Concerns/
+ * Viewport math for `select()`'s option list, port of `Concerns/
  * Scrolling.php`: `firstVisible` offset tracking, `highlight(index)`
  * (keep-in-viewport snap logic), `highlightNext`/`highlightPrevious`
  * (wraparound). Reusable by a future `multiselect`/`search`.
@@ -55,7 +55,7 @@ export class Scrolling {
     }
   }
 
-  /** Centers the highlighted option in the viewport — used to seed a select's initial scroll position around a `default`. */
+  /** Centers the highlighted option in the viewport, used to seed a select's initial scroll position around a `default`. */
   scrollToHighlighted(total: number): void {
     if (this.highlighted === null || this.highlighted < this.scroll) {
       return;
@@ -75,7 +75,7 @@ export class Scrolling {
 
 /**
  * Returns the row index (within the visible window) where the
- * scrollbar "handle" should be rendered — port of `DrawsScrollbars::
+ * scrollbar "handle" should be rendered, port of `DrawsScrollbars::
  * scrollPosition()`.
  */
 export function scrollPosition(firstVisible: number, height: number, total: number): number {

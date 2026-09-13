@@ -21,7 +21,7 @@ interface rather than to a specific implementation.
 ## The multi-process problem
 
 Three of the framework's defaults are single-process-only. Not as a
-caveat — as their defining limit.
+caveat, as their defining limit.
 
 ### `array` cache: nothing is shared
 
@@ -39,7 +39,7 @@ two Maps and share nothing. Concretely:
   "the" lock. That takes `WithoutOverlapping` job middleware and
   `rememberViaLock()` with it.
 
-`FileCacheStore` fixes both of those *for processes on one host* — its
+`FileCacheStore` fixes both of those *for processes on one host*, its
 `add()` is an atomic `O_EXCL` create and its `increment()` runs under a
 lock file, so locks and rate limits are genuinely shared between a web
 server and a worker on the same machine. What it cannot do is span
@@ -62,7 +62,7 @@ This is the worst of the three, because nothing errors.
 `LocalBroadcastDriver` keeps its `channel → sockets` map in one process's
 memory. With two or more server processes, a broadcast from process A
 **silently never reaches** a client whose websocket landed on process B.
-No exception, no warning, no log line — the message just doesn't arrive.
+No exception, no warning, no log line. The message just doesn't arrive.
 You discover it in production, intermittently, as "notifications sometimes
 don't show up."
 
@@ -74,15 +74,15 @@ exists.
 | | Single-process default | With Redis |
 |---|---|---|
 | Cache reads/writes | per-process `Map` | one shared keyspace |
-| `increment()` | atomic in-process | `INCRBY` — atomic server-side |
-| `add()` / `Lock` | atomic in-process | `SET NX` — genuinely exclusive across processes |
+| `increment()` | atomic in-process | `INCRBY`: atomic server-side |
+| `add()` / `Lock` | atomic in-process | `SET NX`: genuinely exclusive across processes |
 | `RateLimiter` | counts per process | one counter |
 | Broadcast fanout | this process's sockets only | every process, via pub/sub |
 | Queue | `sync` inline, or `database` | Redis lists |
 
 The cache correctness wins are free. `RedisCacheStore.increment` maps to
-`INCRBY` and `add` to `SET key value NX EX ttl` — both single, atomic
-server-side commands — so every `Lock` and `RateLimiter` built on that
+`INCRBY` and `add` to `SET key value NX EX ttl`, both single, atomic
+server-side commands, so every `Lock` and `RateLimiter` built on that
 store becomes multi-process correct without any code above it changing.
 See [Cache](../cache/).
 
@@ -97,7 +97,7 @@ connection.client();                          // the shared command client
 connection.duplicate();                       // a new client, same options, tracked
 ```
 
-### `client()` vs `duplicate()` — the Redis constraint
+### `client()` vs `duplicate()`: the Redis constraint
 
 Redis puts a connection into modes where it can no longer serve ordinary
 commands. Two of them matter:
@@ -108,17 +108,17 @@ socket is an error. So `RedisBroadcastDriver` takes its own subscriber via
 `duplicate()`, and the shared client stays free to `PUBLISH`.
 
 **Blocking commands.** `BRPOP` monopolises its connection for the entire
-block — every other command queued behind it waits. A worker blocking for
+block, every other command queued behind it waits. A worker blocking for
 five seconds on a pop would stall every cache read sharing that socket.
 
-Everything else — `GET`, `SET`, `INCR`, `PUBLISH`, `LPUSH`, `LREM`,
-`SCAN`, `EVAL` — is non-blocking and non-subscribed, so it all shares the
+Everything else, `GET`, `SET`, `INCR`, `PUBLISH`, `LPUSH`, `LREM`,
+`SCAN`, `EVAL`, is non-blocking and non-subscribed, so it all shares the
 single `client()`. That's the whole rule: **one client for normal
 commands, a duplicate for anything that takes the socket hostage.**
 
 `duplicate()` copies the same options and **tracks** the new client, so
 `disconnect()` tears it down too. Don't build clients with `new Redis()`
-yourself unless you're also closing them — an untracked open socket is
+yourself unless you're also closing them, an untracked open socket is
 exactly what keeps a process from exiting.
 
 ### Lazy connection
@@ -128,8 +128,8 @@ this.primary = new Redis(this.options);   // options include lazyConnect: true
 ```
 
 `lazyConnect` keeps the constructor from opening a socket. Resolution
-stays synchronous — constructing a driver handle is cheap, per the
-framework's manager contract — and real I/O waits for `connect()`, exactly
+stays synchronous, constructing a driver handle is cheap, per the
+framework's manager contract, and real I/O waits for `connect()`, exactly
 as `SqliteDriver` defers its own.
 
 `RedisConnection implements Connectable`, so its owning provider connects
@@ -147,13 +147,13 @@ providers sharing one connection is harmless.
 
 `disconnect()` `quit()`s every client it handed out (flushing pending
 commands first), falling back to a hard `disconnect()` for a client that
-never connected — `quit()` on an unconnected client would hang. Shutdown
+never connected, `quit()` on an unconnected client would hang. Shutdown
 is best-effort and never throws; the process is going down anyway, and a
 failed quit shouldn't mask the real exit reason.
 
 ## `RedisManager`
 
-`RedisManager extends Manager<RedisConnection>` — the same synchronous,
+`RedisManager extends Manager<RedisConnection>`, the same synchronous,
 per-name-cached resolver as every other manager.
 
 | Method | Purpose |
@@ -169,7 +169,7 @@ to make it resolvable.
 
 **One resolved connection is shared by all three drivers** that point at
 the same connection name. That's the design: a single client, three thin
-adapters — not three sockets doing the same thing.
+adapters, not three sockets doing the same thing.
 
 ## Configuration
 
@@ -195,7 +195,7 @@ export function redisConfig(env: Env): RedisConfig {
 | `url` | `redis://[user:pass@]host:port[/db]`, or `rediss://` for TLS. **Wins over the discrete fields.** |
 | `host` / `port` / `username` / `password` / `db` | The discrete form. |
 | `keyPrefix` | Applied by ioredis to every key on this connection. |
-| `options` | Straight through to ioredis — `tls`, `sentinels`, `retryStrategy`, anything not modelled here. |
+| `options` | Straight through to ioredis: `tls`, `sentinels`, `retryStrategy`, anything not modelled here. |
 
 `url` is parsed into host/port/username/password/db, and `rediss:` sets
 `tls: {}`. `keyPrefix` is applied regardless of which form you used.
@@ -213,7 +213,7 @@ mahi:                  cache:        feed:global
 
 | | Set in | Default | Protects against |
 |---|---|---|---|
-| **Connection** `keyPrefix` | `config/redis.ts` | none — **set one** | Another *application* on the same Redis |
+| **Connection** `keyPrefix` | `config/redis.ts` | none, **set one** | Another *application* on the same Redis |
 | **Store** `prefix` | `config/cache.ts`, `stores.redis.prefix` | `"cache:"` | The *queue* (and anything else) on the same connection |
 
 Both matter.
@@ -240,7 +240,7 @@ async flush(): Promise<void> {
 
 `RedisQueueDriver` writes `queues:default`, `queues:default:reserved` and
 friends on the **same connection under the same `keyPrefix`**. A `flush()`
-scoped to the connection prefix alone would match every one of them — so
+scoped to the connection prefix alone would match every one of them, so
 `./artisan cache:clear` would delete every queued and every in-flight job.
 Scoping cache keys under their own `cache:` segment makes that
 intersection impossible by construction rather than by convention.
@@ -255,7 +255,7 @@ apply it a second time.
 > **Why the connection prefix is read off the live client, not config.**
 > A separately-configured copy that goes unset yields `""`: `flush()`
 > then scans `MATCH *` (the whole DB, queue included) and `DEL`s each
-> match with the connection prefix applied twice — matching everything and
+> match with the connection prefix applied twice, matching everything and
 > deleting nothing, so `cache:clear` silently does nothing. Dropping the
 > connection prefix from the `DEL` instead turns it into a command that
 > wipes the queue. Deriving both halves from the client's real `keyPrefix`
@@ -278,7 +278,7 @@ Redis connection it uses:
 ```
 
 `connection` omitted means "the `default` connection from
-`config/redis.ts`". An empty `{}` is a valid, complete config — and the
+`config/redis.ts`". An empty `{}` is a valid, complete config, and the
 right one. Change `prefix` only to run two independent caches on one
 connection; setting it to `""` re-opens the "flush can reach the queue"
 hazard.
@@ -294,7 +294,7 @@ register(): void {
 }
 ```
 
-Each `extend*()` is guarded by `this.app.has(TOKEN)` — an app without the
+Each `extend*()` is guarded by `this.app.has(TOKEN)`, an app without the
 queue package simply doesn't get a `redis` queue connection, with no
 error.
 
@@ -307,7 +307,7 @@ tokens must already be bound.
 
 Since `register()` runs before *any* provider's `boot()`, `"redis"` is a
 valid `default` for broadcasting even though `BroadcastServiceProvider.boot()`
-mounts the websocket route — by the time any `boot()` runs, the driver has
+mounts the websocket route, by the time any `boot()` runs, the driver has
 been registered. See [Providers](../providers/).
 
 ### `boot()` only connects when Redis is actually selected
@@ -349,8 +349,8 @@ unconditionally, which contradicted the provider's own documented
 contract and had a very concrete cost:
 
 **An open ioredis socket keeps the Node event loop alive.** Every
-short-lived process that boots the application — `./artisan migrate`,
-`./artisan key:generate`, any CLI command, a `vitest` run — would finish
+short-lived process that boots the application, `./artisan migrate`,
+`./artisan key:generate`, any CLI command, a `vitest` run, would finish
 its work and then **hang**, never exiting, because there was still a live
 handle. The base app lists `RedisServiceProvider` by default precisely so
 that switching to Redis is a config change rather than a code change,
@@ -365,7 +365,7 @@ Two details of the fix worth knowing:
 
 **It only checks the three `default`s.** An app that keeps `cache.default`
 at `"array"` but resolves `cache.store("redis")` by explicit name does
-**not** get a connection from `boot()`. That's fine — the connection
+**not** get a connection from `boot()`. That's fine, the connection
 connects lazily through that driver's own code path the first time it's
 used, exactly as an extra named connection already does. But it means the
 first command on such a store pays the connect latency, and a connection
@@ -387,7 +387,7 @@ async boot(): Promise<void> {
 
 A full `CacheStore`. Values are `JSON.stringify`'d in and `JSON.parse`'d
 out, so anything structured round-trips, and `undefined` (never a stored
-value) stays the miss sentinel — matching `ArrayCacheStore`.
+value) stays the miss sentinel, matching `ArrayCacheStore`.
 
 | Method | Redis command | Note |
 |---|---|---|
@@ -402,14 +402,14 @@ value) stays the miss sentinel — matching `ArrayCacheStore`.
 | `remember` / `rememberViaLock` / `lock` | — | Delegated to the shared helpers exported by `@mahiframework/cache`. |
 
 `releaseLock()` is the one worth understanding. The portable release is a
-`GET` then a `DEL` — two round-trips with a window between them, in which
+`GET` then a `DEL`, two round-trips with a window between them, in which
 the lock's TTL can expire and another process can legitimately acquire it;
 the first holder's `DEL` then deletes *their* lock. The Lua script
 compares and deletes without interleaving, which is the only way that
 window closes. See [Cache](../cache/#the-three-methods).
 
 `increment()` preserving the key's expiry is what `RateLimiter` depends
-on, and Redis gives it for free — `INCRBY` doesn't touch a key's TTL. See
+on, and Redis provides it. `INCRBY` doesn't touch a key's TTL. See
 [Cache](../cache/#increment-preserves-the-existing-expiry).
 
 The counter is stored as a **bare integer string**, not JSON, so `INCRBY`
@@ -423,7 +423,7 @@ rejects `0`. A sub-second TTL becomes one second rather than an error.
 
 `remember`/`rememberViaLock`/`lock` are one-line delegations to the
 `remember`, `rememberViaLock` and `lock` helpers that `@mahiframework/cache`
-exports for exactly this purpose — an out-of-package store gets them by
+exports for exactly this purpose. An out-of-package store gets them by
 delegating rather than re-deriving the logic, identically to the built-in
 array and file stores.
 
@@ -441,7 +441,7 @@ rather than a fire-and-forget `RPOP`. Four keys per named queue:
 
 The `{q}` braces are a Redis Cluster **hash tag**. Every
 Lua script here touches two keys at once, and Cluster rejects a multi-key
-command whose keys hash to different slots — without the tag these
+command whose keys hash to different slots, without the tag these
 scripts work against a single node in development and fail on the first
 day against a cluster.
 
@@ -452,12 +452,12 @@ Three steps, each a single atomic script:
 1. **Migrate due delayed jobs** onto the ready list (`ZRANGEBYSCORE` +
    `ZREM` + `LPUSH` in one round-trip, so two workers can't both migrate
    the same job).
-2. **Reclaim expired reservations** — every member of the reserved zset
+2. **Reclaim expired reservations**: every member of the reserved zset
    whose score (reserved-at + `retryAfter`) has passed goes back onto the
    ready list with `attempts` incremented. This is the crash recovery:
    without it, a worker killed mid-job strands its job in `:reserved`
    forever.
-3. **Reserve** — `RPOP` the oldest ready job and `ZADD` it to the reserved
+3. **Reserve**: `RPOP` the oldest ready job and `ZADD` it to the reserved
    set scored by its expiry, in one script. As two client commands, a
    worker dying in between would lose the job outright.
 
@@ -477,7 +477,7 @@ Scripts are loaded once and invoked by **`EVALSHA`**, with a transparent
 reload on `NOSCRIPT` (a server restart or `SCRIPT FLUSH`). `EVAL` would
 ship the whole script body on every poll of every worker.
 
-`pop()` is **non-blocking**, deliberately — the `queue:work` loop already
+`pop()` is **non-blocking**, deliberately, the `queue:work` loop already
 sleeps when `pop()` returns `undefined`, and a `BRPOP` would tie up a
 whole connection (see [`duplicate()`](#client-vs-duplicate--the-redis-constraint)).
 
@@ -497,23 +497,23 @@ a retry puts the job back exactly where it came from with the work queued
 behind it intact.
 
 The one thing `database` still has that this doesn't is `afterCommit`
-deferral — there is no database transaction here to observe. Dispatch a
+deferral. There is no database transaction here to observe. Dispatch a
 job that reads rows written by the transaction dispatching it on the
 `database` connection, or accept the race.
 
 ### `RedisBroadcastDriver`
 
-`extends LocalBroadcastDriver`, keeping everything it already does — the
+`extends LocalBroadcastDriver`, keeping everything it already does, the
 websocket upgrade endpoint, the in-memory `channel → sockets` map for
-*this* process's clients — and adding one thing: fanout through Redis
+*this* process's clients, and adding one thing: fanout through Redis
 pub/sub.
 
 The flow is deliberately uniform across processes:
 
 1. `broadcast(msg)` does **not** touch local sockets. It `PUBLISH`es to a
    shared channel (default `mahi:broadcast`, prefixed by the connection's
-   `keyPrefix` — see below).
-2. Every process — **including the publisher** — runs a dedicated
+   `keyPrefix`. See below).
+2. Every process, **including the publisher**, runs a dedicated
    subscriber `SUBSCRIBE`d to that channel. On each message it calls the
    inherited `LocalBroadcastDriver.broadcast()` to deliver to its own
    sockets.
@@ -528,7 +528,7 @@ remote" branch entirely.
 `instanceof LocalBroadcastDriver` still holds, so
 `BroadcastServiceProvider` mounts the websocket route and calls
 `injectWebSocket()` exactly as for the local driver. **No entrypoint
-change is needed to switch from `local` to `redis`** — the socket path
+change is needed to switch from `local` to `redis`**. The socket path
 stays whatever you configured.
 
 The subscriber is a `duplicate()` (subscriber mode, see above), connected
@@ -542,7 +542,7 @@ Malformed JSON, or a message missing `channel`/`event`, is dropped
 silently.
 
 **The channel name is prefixed with the connection's `keyPrefix`.**
-ioredis does not do this for you — it prefixes command *keys*, and a
+ioredis does not do this for you. It prefixes command *keys*, and a
 pub/sub channel is not a key. Without it, two applications correctly
 isolated for cache and queue by their differing prefixes still shared the
 one `mahi:broadcast` channel, and each one's events were delivered to the
@@ -552,7 +552,7 @@ namespaced.
 
 **Publishing before the subscriber is connected loses the message.**
 That's why `RedisServiceProvider.boot()` connects the driver before the
-server starts accepting traffic — and why `boot()` checks
+server starts accepting traffic, and why `boot()` checks
 `broadcasting.default === "redis"` specifically.
 
 ## Deploying
@@ -579,14 +579,14 @@ A reasonable target state for a horizontally-scaled app:
 | Broadcasting | `redis` | The silent-message-loss fix. Non-negotiable past one process. |
 | Queue | `database` | Multi-process-safe already, and keeps `queue:failed`/`queue:retry`. |
 
-Switching cache to `redis` also moves the `RateLimiter` — it's bound to
-the app's **default** store — so your HTTP throttles become global rather
+Switching cache to `redis` also moves the `RateLimiter`, it's bound to
+the app's **default** store, so your HTTP throttles become global rather
 than per-process. That's usually the point, but it means limits that were
 effectively N× looser suddenly aren't. Check your numbers.
 
 Everything else stays the same. Workers still run `./artisan queue:work`,
 the scheduler still runs `./artisan schedule:run` from one host's crontab
-(that lock is a file, not a Redis key — see
+(that lock is a file, not a Redis key. See
 [Scheduling](../scheduling/#schedulelock)).
 
 ## Testing
@@ -597,7 +597,7 @@ those are the behaviours worth covering.
 
 Give each test a randomised `mahi-test:<random>:` prefix and delete its
 own keys by prefix afterwards. Prefer that to `FLUSHDB`, which empties the
-whole logical DB — fine against a throwaway container, destructive against
+whole logical DB, fine against a throwaway container, destructive against
 a shared one, and exactly the behaviour `flush()` goes out of its way not
 to have.
 
@@ -606,7 +606,7 @@ have to share a prefix, since the broadcast channel is prefixed too;
 distinct prefixes model two different applications, which correctly do not
 see each other at all.
 
-For application tests, keep `array`/`sync`/`local` — they're faster, need
+For application tests, keep `array`/`sync`/`local`. They're faster, need
 no infrastructure, and `createTestApplication()` defaults to them. Test
 Redis behaviour where it actually differs (cross-process locking,
 broadcast fanout), not everywhere.
@@ -624,7 +624,7 @@ namespace back into the connection's, and `cache:clear` can then reach
 
 **`RedisServiceProvider.boot()` only connects when `cache.default`,
 `queue.default` or `broadcasting.default` is `"redis"`.** A store resolved
-by explicit name connects lazily instead — its first command pays the
+by explicit name connects lazily instead, its first command pays the
 latency, and connection failures surface there.
 
 **An open socket keeps the process alive.** That's why the conditional
@@ -655,9 +655,9 @@ error; `url` just wins.
 
 ## Related
 
-- [Cache](../cache/) — the `CacheStore` contract, `Lock`, `RateLimiter`
-- [Queues](../queues/) — drivers, workers, failed-job commands
-- [Broadcasting](../broadcasting/) — `ShouldBroadcast`, the websocket endpoint
-- [Configuration](../configuration/) — `config/redis.ts` and the three driver blocks
-- [Providers](../providers/) — ordering constraints and `Connectable`
-- [Deployment](../deployment/) — running multiple processes
+- [Cache](../cache/): the `CacheStore` contract, `Lock`, `RateLimiter`
+- [Queues](../queues/): drivers, workers, failed-job commands
+- [Broadcasting](../broadcasting/): `ShouldBroadcast`, the websocket endpoint
+- [Configuration](../configuration/): `config/redis.ts` and the three driver blocks
+- [Providers](../providers/): ordering constraints and `Connectable`
+- [Deployment](../deployment/): running multiple processes

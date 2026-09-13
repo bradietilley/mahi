@@ -26,7 +26,7 @@ interface ArticleAttributes {
 }
 
 /**
- * A self-referential model — `replies` points back at `articles`. The
+ * A self-referential model, `replies` points back at `articles`. The
  * correlated subquery must alias the inner table: without the alias,
  * `whereHas("replies")`/`withCount("replies")` would emit
  * `"articles"."parent_id" = "articles"."id"` and match nothing useful.
@@ -53,7 +53,7 @@ class Author extends Model<AuthorAttributes>()({
   };
 }
 
-describe("Joins, unions and table aliasing", () => {
+describe("Joins: unions and table aliasing", () => {
   let app: Application;
   let kysely: SqliteDriver["kysely"];
   let table: (name: string) => QueryBuilder<Record<string, any>>;

@@ -18,7 +18,7 @@ import "../src/provider-hooks.js";
  * It holds because of the boot sequence: EVERY provider's `register()`
  * runs before ANY provider's `boot()`. So by the time `HttpKernel` tests
  * `app.has(HEALTH_TOKEN)`, the registry is bound regardless of list
- * order — and `HealthServiceProvider.boot()` walks every provider, so it
+ * order, and `HealthServiceProvider.boot()` walks every provider, so it
  * collects `checks()` from providers on both sides of it.
  */
 
@@ -84,7 +84,7 @@ describe("route mounting", () => {
     await app.bootstrap();
 
     // `@mahiframework/http` resolves the registry by token and simply skips the
-    // route when nothing has bound it — no import, no hard dependency.
+    // route when nothing has bound it, no import, no hard dependency.
     const res = await app.make<HttpKernel>(HTTP_KERNEL_TOKEN).raw().request("/health");
     expect(res.status).toBe(404);
   });
@@ -97,13 +97,13 @@ describe("route mounting", () => {
 
     const res = await app.make<HttpKernel>(HTTP_KERNEL_TOKEN).raw().request("/health");
     expect(res.status).toBe(404);
-    // The registry is still bound and usable — `./artisan health` works
+    // The registry is still bound and usable. `./artisan health` works
     // in an app that never exposes the endpoint.
     expect(app.make<HealthRegistry>(HEALTH_TOKEN)).toBeInstanceOf(HealthRegistry);
   });
 
   it("serves /health in an app with no HTTP package by way of the CLI instead", async () => {
-    // The CLI frontend must work with @mahiframework/core alone — no HttpKernel,
+    // The CLI frontend must work with @mahiframework/core alone, no HttpKernel,
     // no routes, no config namespace.
     const app = new Application();
     app.register(HealthServiceProvider);

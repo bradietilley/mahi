@@ -2,7 +2,7 @@ import type { AnyModelClass } from "@mahiframework/database";
 import { DateTime } from "@mahiframework/datetime";
 
 /**
- * Email verification as plain composable functions, NOT a trait/mixin —
+ * Email verification as plain composable functions, NOT a trait/mixin,
  * `Model` rows are plain objects, so there's no class to mix into. These
  * mirror the free-function shape of `requireAuth`/`requireGuest` in
  * `@mahiframework/authorization`, operating on any row that carries an
@@ -26,7 +26,7 @@ const DEFAULT_COLUMN = "email_verified_at";
  * so nothing here can be checked statically anyway, and a `Record`
  * constraint would reject every model instance whose attributes are
  * declared with an `interface` (interfaces have no implicit index
- * signature) — which is exactly how the model docs teach declaring them.
+ * signature). Which is exactly how the model docs teach declaring them.
  */
 export type Verifiable = object;
 
@@ -41,7 +41,7 @@ export function hasVerifiedEmail(user: Verifiable, column: string = DEFAULT_COLU
  * Stamp `email_verified_at = now` for the user with the given primary
  * key, via the model's static `update()`. Returns the timestamp written.
  *
- * Idempotent at the storage layer — calling it twice simply rewrites the
+ * Idempotent at the storage layer, calling it twice simply rewrites the
  * timestamp; callers that must not "re-verify" should guard with
  * `hasVerifiedEmail()` first (that's also where a `Verified` event would
  * be dispatched, if/when events grow one).
@@ -51,7 +51,7 @@ export async function markEmailAsVerified(
   userId: string,
   column: string = DEFAULT_COLUMN,
 ): Promise<string> {
-  // Written as a `DateTime` — the builder converts to UTC and spells it
+  // Written as a `DateTime`, the builder converts to UTC and spells it
   // for the engine, and it is correct whether the app's model declares
   // the column as a cast `DateTime` or as plain text. The ISO string is
   // still what's *returned*, since the column is chosen at runtime and

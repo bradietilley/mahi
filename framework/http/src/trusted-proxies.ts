@@ -4,20 +4,20 @@ import { peerAddressFrom } from "./conninfo.js";
 import type { HttpPipeFn } from "./middleware/pipeline-middleware.js";
 
 /**
- * Trusted-proxy / trusted-host middleware — the equivalent of Laravel's
+ * Trusted-proxy / trusted-host middleware, the equivalent of Laravel's
  * `TrustProxies` and `TrustHosts`. Both are opt-in global pipes (installed
  * via a provider's `middleware()` hook); nothing is trusted unless the app
  * says so.
  *
  * `Request.ip()` returns the socket peer by default and never reads
- * `X-Forwarded-For` on its own — a header is client-supplied, so believing
+ * `X-Forwarded-For` on its own. A header is client-supplied, so believing
  * it without a trust boundary means an attacker chooses their own identity
  * for rate limiting, IP allow-lists, and audit logs. `trustProxies()` IS
  * that boundary: it consults the forwarding headers only when the machine
  * that actually opened the socket is one the app has named as its proxy.
  *
  * Behind a proxy an app must register this, or `ip()` is the load
- * balancer's address for every request (correct, but useless) — that is
+ * balancer's address for every request (correct, but useless). That is
  * the intended failure: wrong-but-safe rather than forgeable.
  */
 
@@ -124,7 +124,7 @@ export interface TrustProxiesOptions {
  *
  * Direction is the crux. Proxies **append**, so the chain reads
  * `<client>, <hop1>, <hop2>` with the most-recent, most-trustworthy hop
- * LAST — everything to its left was copied verbatim from whatever the
+ * LAST, everything to its left was copied verbatim from whatever the
  * previous hop received, including whatever the client made up. Taking
  * the leftmost entry (as most naive implementations do) hands the
  * attacker the answer directly:
@@ -175,7 +175,7 @@ function forwardedChain(header: string | undefined): string[] {
  *
  * `"*"` trusts whatever opened the socket, and is only correct when the
  * app is genuinely unreachable except through a proxy that **overwrites**
- * (not appends to) `X-Forwarded-For` — a platform load balancer on a
+ * (not appends to) `X-Forwarded-For`, a platform load balancer on a
  * private network. On a host reachable directly it is equivalent to
  * having no trust boundary at all, since the "proxy" is then the
  * attacker.
@@ -189,7 +189,7 @@ export function trustProxies(proxies: string[], options: TrustProxiesOptions = {
     // Fail CLOSED when the peer is unknown. `getConnInfo` has no socket
     // to read under an in-process dispatch or a non-Node adapter, and
     // "we couldn't identify the peer" must never widen into "so trust
-    // the headers" — that is precisely the state an attacker would
+    // the headers". That is precisely the state an attacker would
     // engineer if they could. `ip()` then reports undefined, which
     // downstream code treats as an unknown client.
     if (peer === undefined) {
@@ -296,7 +296,7 @@ function sanitizeHost(host: string): string | undefined {
 
 /**
  * Validate the request `Host` header against an allow-list, 403ing
- * otherwise — guards against cache-poisoning and, more concretely,
+ * otherwise, guards against cache-poisoning and, more concretely,
  * password-reset-link poisoning: the URL generator prefers the live
  * request's host, so without this an attacker sends `Host: evil.example`
  * to "forgot password" and the victim receives a real, valid signed link
@@ -309,7 +309,7 @@ function sanitizeHost(host: string): string | undefined {
  */
 export function trustHosts(patterns: string[]): HttpPipeFn {
   return async (request, next) => {
-    // The EFFECTIVE host — `Request.httpHost()`, parsed from the request
+    // The EFFECTIVE host, `Request.httpHost()`, parsed from the request
     // URL and already updated by `trustProxies()` if a trusted proxy
     // sent `X-Forwarded-Host`. Reading the raw `Host` header instead
     // would check a different value than the URL generator uses (so the
@@ -329,7 +329,7 @@ export function trustHosts(patterns: string[]): HttpPipeFn {
 /**
  * Strip the port from a `Host` header value, lowercased.
  *
- * Splitting on `":"` — the obvious implementation — is wrong for an
+ * Splitting on `":"`, the obvious implementation, is wrong for an
  * IPv6 literal: `[::1]:3000` splits at
  * the first colon and yields `"["`, so an IPv6 host can never match any
  * allow-list entry and is 403'd outright.
@@ -362,7 +362,7 @@ export function hostMatches(host: string, pattern: string): boolean {
 }
 
 /**
- * Derive `trustHosts()` patterns from a configured application URL —
+ * Derive `trustHosts()` patterns from a configured application URL.
  * `"https://api.example.com"` becomes `["api.example.com"]`.
  *
  * Exists so the scaffolded app can register host validation from the

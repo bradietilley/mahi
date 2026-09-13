@@ -13,7 +13,7 @@ export interface EmailVerificationConfig {
   identifierColumn?: string;
   /**
    * Path the signed link points at. The user id and email hash are appended
-   * as query params, so the route needs no path parameters — it reads
+   * as query params, so the route needs no path parameters. It reads
    * `?id=` and `?hash=`. Defaults to `/auth/verify-email`.
    */
   path?: string;
@@ -33,9 +33,9 @@ export type SendVerificationResult =
  *
  * Verification already had its state mechanics (`hasVerifiedEmail`,
  * `markEmailAsVerified`) and its gate (`ensureEmailVerified()`), but the
- * security-sensitive middle — minting a tamper-proof link, deciding
+ * security-sensitive middle, minting a tamper-proof link, deciding
  * whether it still refers to the address it was issued for, and applying
- * the transition idempotently — was left entirely to the app, while the
+ * the transition idempotently, was left entirely to the app, while the
  * structurally identical password-reset flow got a fully-tested broker.
  * That asymmetry was the real gap; this closes it.
  *
@@ -48,7 +48,7 @@ export type SendVerificationResult =
  * credential that grants the ability to *change* a password, so it must be
  * revocable, single-use, and hashed at rest. A verification link only ever
  * asserts "whoever received mail at this address asked for this", grants
- * no capability beyond flipping one boolean, and is naturally idempotent —
+ * no capability beyond flipping one boolean, and is naturally idempotent,
  * replaying it a second time is a no-op.
  *
  * The cost is honest: a verification link cannot be revoked before it
@@ -63,7 +63,7 @@ export type SendVerificationResult =
  * `verify()` recomputes it against the user's CURRENT address. Without
  * this, the flow has a real hole: request a link for `a@example.com`,
  * change the account's address to `victim@example.com` before clicking,
- * then click — and the account is now "verified" at an address that never
+ * then click, and the account is now "verified" at an address that never
  * received anything. The signature alone does not catch it, because the
  * URL was legitimately signed. Laravel guards this the same way.
  *
@@ -74,8 +74,8 @@ export type SendVerificationResult =
  * so anyone can point it at a stranger's mailbox and the per-mailbox
  * throttle is the only thing that stops an inbox flood. A "resend
  * verification" endpoint is authenticated and can only ever mail the
- * caller's own address, so the ordinary `throttle()` HTTP middleware —
- * which the app puts on the route anyway — is the correct and sufficient
+ * caller's own address, so the ordinary `throttle()` HTTP middleware,
+ * which the app puts on the route anyway, is the correct and sufficient
  * control.
  */
 export class EmailVerificationBroker<TUser extends object = Record<string, unknown>> {
@@ -110,7 +110,7 @@ export class EmailVerificationBroker<TUser extends object = Record<string, unkno
    * Build the signed verification URL for a user.
    *
    * Returns the URL for the CALLER to deliver, exactly as
-   * `PasswordBroker.sendResetLink()` returns its token — the framework
+   * `PasswordBroker.sendResetLink()` returns its token. The framework
    * owns the mechanism, the app owns the message and the channel.
    *
    * `signerOptions` is threaded through for tests, which need to pass an
@@ -163,7 +163,7 @@ export class EmailVerificationBroker<TUser extends object = Record<string, unkno
    * Consume a verification link's `id` and `hash` and mark the address
    * verified.
    *
-   * The SIGNATURE is not checked here — that is `validateSignature()`
+   * The SIGNATURE is not checked here. That is `validateSignature()`
    * middleware's job on the route, the same split as `authorize()` versus
    * the guard. This checks the two things the signature cannot: that the
    * user still exists, and that the hash still matches their current
@@ -205,7 +205,7 @@ export class EmailVerificationBroker<TUser extends object = Record<string, unkno
   /**
    * SHA-256 of the address, truncated to 40 hex chars.
    *
-   * A fast hash, not argon2, and deliberately so — this is not a secret
+   * A fast hash, not argon2, and deliberately so. This is not a secret
    * and not a credential. It is a tamper-evident binding between the link
    * and the address it was issued for, and the link is already
    * HMAC-signed, so there is nothing here for an attacker to brute-force

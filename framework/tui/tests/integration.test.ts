@@ -12,7 +12,7 @@ import { Key } from "../src/terminal/key.js";
 describe("Tui integration", () => {
   it("runs note, ask, select, progress, spinner, and table in sequence with consistent spacing", async () => {
     const fake = Tui.fake([
-      // ask("What's your name?") — clear the default via Backspace before typing
+      // ask("What's your name?"), clear the default via Backspace before typing
       Key.BACKSPACE,
       Key.BACKSPACE,
       Key.BACKSPACE,
@@ -84,7 +84,7 @@ describe("Tui integration", () => {
     expect(output).toContain("Grace");
 
     // Blocks should never be jammed together with zero blank lines
-    // between them — every finished-frame write starts with at least
+    // between them. Every finished-frame write starts with at least
     // some spacing logic applied (verified indirectly: no line should
     // have both a note's trailing content and the next block's box
     // glued on the same line).

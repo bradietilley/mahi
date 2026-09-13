@@ -13,7 +13,7 @@ export interface SelectOptions<T extends string | number> {
   /** Number of options visible at once before scrolling kicks in. Default 5. */
   scroll?: number;
   hint?: string;
-  /** Default `true` — a select is always effectively required (there's no "no selection" state). */
+  /** Default `true`. A select is always effectively required (there's no "no selection" state). */
   required?: boolean | string;
   validate?: (value: T) => string | undefined | Promise<string | undefined>;
 }

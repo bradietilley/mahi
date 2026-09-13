@@ -55,7 +55,7 @@ describe("Context facade", () => {
     expect(Context.isEmpty()).toBe(true);
   });
 
-  it("resolves off the *current* app — swapping apps swaps the repository", () => {
+  it("resolves off the *current* app, swapping apps swaps the repository", () => {
     const first = new Application();
     setCurrentApp(first);
     Context.add("app", "first");

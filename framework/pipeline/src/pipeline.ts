@@ -1,5 +1,5 @@
 /**
- * Continuation passed to each pipe — call it with the (possibly modified)
+ * Continuation passed to each pipe, call it with the (possibly modified)
  * passable to hand off to the next pipe in the stack, or to the pipeline's
  * `destination` once every pipe has run. A pipe isn't required to call
  * `next` at all: returning its own `TResult` directly short-circuits the
@@ -22,10 +22,10 @@ export type PipeFn<TPassable, TResult> = (
 ) => Promise<TResult> | TResult;
 
 /**
- * A single pipeline stage, as an object/class instance exposing `handle()`
- * — the class-based equivalent of `PipeFn`, for stateful or DI-constructed
+ * A single pipeline stage, as an object/class instance exposing `handle()`,
+ * the class-based equivalent of `PipeFn`, for stateful or DI-constructed
  * pipes (Laravel's class-based pipes, minus container string-name
- * resolution — construct the instance yourself and pass it to `through()`).
+ * resolution, construct the instance yourself and pass it to `through()`).
  *
  *   class Logger implements PipeObject<Request, Response> {
  *     async handle(req: Request, next: Next<Request, Response>) {
@@ -48,7 +48,7 @@ function isPipeObject<TPassable, TResult>(
 }
 
 /**
- * Laravel's `Pipeline` — sends a value (`passable`) through an ordered
+ * Laravel's `Pipeline`, sends a value (`passable`) through an ordered
  * list of pipes, each shaped `(passable, next) => result`. A pipe may:
  *
  * - call `next(passable)` (optionally with a modified passable) to carry
@@ -66,12 +66,12 @@ function isPipeObject<TPassable, TResult>(
  *     .run((req) => handleRequest(req));
  *
  * NOTE: the terminal method is `run()`, **not** `then()`. A `then()` method
- * would make `Pipeline` a thenable — `await`ing an instance (or returning
+ * would make `Pipeline` a thenable, `await`ing an instance (or returning
  * one from an async function) would silently execute it with `resolve` as
  * the destination, and an un-`send()`'d pipeline would hang forever. Keep
  * `then` off this class.
  *
- * Framework-agnostic and has no knowledge of HTTP — `@mahiframework/http`
+ * Framework-agnostic and has no knowledge of HTTP, `@mahiframework/http`
  * builds a Hono-specific adapter on top of this for request middleware
  * (see `HttpKernel`'s global pipeline / the `middleware()` provider hook).
  */
@@ -105,7 +105,7 @@ export class Pipeline<TPassable, TResult = TPassable> {
   /**
    * Runs the pipeline: `passable` flows through every pipe in order,
    * finally reaching `destination` if every pipe called `next()`. Any
-   * pipe returning without calling `next()` short-circuits — `destination`
+   * pipe returning without calling `next()` short-circuits, `destination`
    * (and every pipe after it) never runs.
    *
    * Deliberately named `run` rather than `then`: a `then` method would make
@@ -131,7 +131,7 @@ export class Pipeline<TPassable, TResult = TPassable> {
   /**
    * Convenience for pipelines whose `TResult` is the same shape as
    * `TPassable` (e.g. pipes that only ever transform-and-forward, never
-   * short-circuit with an unrelated result type) — runs with an identity
+   * short-circuit with an unrelated result type), runs with an identity
    * destination.
    */
   async thenReturn(): Promise<TResult> {

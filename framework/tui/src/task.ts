@@ -6,15 +6,15 @@ import type { Output } from "./output/output.js";
 /**
  * Port of Laravel's `Illuminate\Console\View\Components\Task` (the
  * `$this->components->task(...)` helper, and the dotted-line status
- * format `Seeder::call()`/`Migrator::write()` use via `TwoColumnDetail`)
- * — a single status line with a label, a variable-length row of dots
+ * format `Seeder::call()`/`Migrator::write()` use via `TwoColumnDetail`),
+ * a single status line with a label, a variable-length row of dots
  * filling the remaining terminal width, and a right-aligned status word
  * (`RUNNING` while a task is in flight in a live TTY, `DONE`/`FAIL`
  * once it settles). Not part of `laravel/prompts` (this is a Laravel
- * *console component*, not a *prompts* renderer) — added here as the
+ * *console component*, not a *prompts* renderer), added here as the
  * natural small extension the shared color/text-width plumbing already
  * supports. Unlike `note`/`table`, task lines are meant to be printed
- * back-to-back in a tight sequential list (e.g. one per migration) —
+ * back-to-back in a tight sequential list (e.g. one per migration),
  * no forced blank-line spacing between them.
  */
 export type TaskResult = "done" | "failed" | "skipped";
@@ -63,14 +63,14 @@ export function renderTaskLine(
   return `  ${label}${dots ? ` ${dots}` : ""} ${durationColored}${statusColored}`;
 }
 
-/** Writes a single, already-settled task-status line — for when you already know the outcome and don't need a RUNNING state (e.g. reporting a "skipped" result). */
+/** Writes a single, already-settled task-status line, for when you already know the outcome and don't need a RUNNING state (e.g. reporting a "skipped" result). */
 export function writeTaskLine(label: string, result: TaskResult, durationMs?: number): void {
   getOutput().write(`${renderTaskLine(label, result, durationMs)}\n`);
 }
 
 /**
  * Runs `callback`, printing a `label ......... RUNNING` line while it's
- * in flight (overwritten in place once settled — same "erase and
+ * in flight (overwritten in place once settled, same "erase and
  * rewrite" idea `Tui.spinner()` uses, simplified since a task line is
  * always exactly one line tall) and replacing it with
  * `label ......... 12ms DONE` (or `FAIL` if it throws). Falls back to

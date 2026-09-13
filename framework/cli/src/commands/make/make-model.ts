@@ -9,12 +9,12 @@ import { MakeFactoryCommand } from "./make-factory.js";
  * The primary-key style a generated model uses. This one choice drives all
  * three generated files consistently (`make:model -m -f`):
  *
- * - `id`        — DB auto-increment `bigint` (Laravel's default). `id: number`,
+ * - `id`, DB auto-increment `bigint` (Laravel's default). `id: number`,
  *   `keyType` left at its `"increment"` default, `table.id()`, and the
  *   factory omits `id` (the DB assigns it on insert).
- * - `uuid`      — client-generated UUID string. `id: string`,
+ * - `uuid`, client-generated UUID string. `id: string`,
  *   `keyType: "uuid"`, `table.string("id").primary()`, factory omits `id`.
- * - `snowflake` — client-generated Snowflake. `id: string`,
+ * - `snowflake`, client-generated Snowflake. `id: string`,
  *   `keyType: snowflake()` (from `@mahiframework/snowflake`),
  *   `table.string("id").primary()`, factory omits `id`.
  *
@@ -61,7 +61,7 @@ export interface ${className}Attributes {
 
 export class ${className} extends Model<${className}Attributes>()({
 ${configLines.join("\n")}
-  // \`timestamps\` defaults to true (stamps created_at/updated_at) — set it
+  // \`timestamps\` defaults to true (stamps created_at/updated_at), set it
   // to \`false\` if this table has no timestamp columns.
   //
   // Add \`casts: { … }\` for boolean/json/datetime columns, and declare

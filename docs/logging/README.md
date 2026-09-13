@@ -6,7 +6,7 @@ Read this section before anything else. Mahi has **two logging systems**,
 and they are not the same logger unless you deliberately configure them
 to be.
 
-### 1. `app.logger` — always available, zero config
+### 1. `app.logger`: always available, zero config
 
 ```ts
 readonly logger: Logger = new ConsoleLogger(this);
@@ -22,11 +22,11 @@ app.logger.info("Server listening", { port: 8000 });
 this.app.logger.error("auth:gc failed", { error: String(error) });
 ```
 
-This is what the framework itself uses internally — `LogTransport` (the
+This is what the framework itself uses internally, `LogTransport` (the
 `log` mailer), `BroadcastServiceProvider`'s failed-broadcast handler,
 `auth:gc`, `schedule:work`. None of them can assume anything else exists.
 
-### 2. `LOG_TOKEN` / `LogManager` — opt-in, configurable channels
+### 2. `LOG_TOKEN` / `LogManager`: opt-in, configurable channels
 
 ```ts
 import { Log } from "@mahiframework/core";
@@ -41,7 +41,7 @@ This is the channel system: `console`, `single`, `daily`, `array`,
 
 **It requires `LoggingServiceProvider`, which is NOT auto-registered.**
 Unlike every framework that quietly boots its logger for you, Mahi has no
-implicit provider registration anywhere — so an app that wants channels
+implicit provider registration anywhere, so an app that wants channels
 lists the provider explicitly:
 
 ```ts
@@ -64,8 +64,8 @@ Without it, `LOG_TOKEN` is unbound and `Log.info(...)` throws
 
 Wiring `Application.logger` through the container would create a
 bootstrap-ordering hazard for no benefit. Something has to log during
-`bootstrap()` — a provider's `register()` failing, a config problem, a
-connection that won't open — and that something runs *before*
+`bootstrap()`, a provider's `register()` failing, a config problem, a
+connection that won't open, and that something runs *before*
 `LoggingServiceProvider.register()` has necessarily happened. A logger
 that might not exist yet is not a logger you can call unconditionally.
 
@@ -86,7 +86,7 @@ Log.info("B");                  // whatever logging.default resolves to — mayb
 framework message in there, it's because the framework wrote it to
 `app.logger`, which is stdout.
 
-If you want them to be the same, make your default channel `console` —
+If you want them to be the same, make your default channel `console`,
 or accept that `app.logger` output belongs to your process supervisor
 (systemd, Docker, pm2) rather than to your log files. Most deployments
 capture stdout anyway, which is why the split is tolerable in practice.
@@ -116,7 +116,7 @@ Laravel exposes one method per.
 | `info` | Interesting events |
 | `debug` | Detailed debug information |
 
-`warning` — not `warn` — is the canonical name. `warn()` survives as a
+`warning`, not `warn`, is the canonical name. `warn()` survives as a
 `@deprecated` alias that forwards to `warning()`, so the historical
 four-level API (`debug`/`info`/`warn`/`error`) keeps compiling. New code
 should use `warning()`.
@@ -153,7 +153,7 @@ into every call site in the framework and every app, for log writes,
 which is not a trade anyone wants. Same "synchronous is fine, I/O is not
 the bottleneck here" reasoning as `better-sqlite3` in `@mahiframework/database`.
 
-`log(level, ...)` is for when the level itself is a variable — mapping an
+`log(level, ...)` is for when the level itself is a variable, mapping an
 HTTP status class to a severity, say:
 
 ```ts
@@ -226,16 +226,16 @@ output.
 **The timestamp is UTC**, always, regardless of the machine's timezone.
 Log lines from a fleet of servers in different regions are directly
 comparable. (Note the contrast with `DailyLogger`'s rotation, which uses
-**local** date — see [below](#daily).)
+**local** date. See [below](#daily).)
 
 **The `env.` prefix comes from `source.environment()`.** Laravel's
 fallback Monolog channel name is the app environment, which is where
-`production.DEBUG` comes from. When no `source` is supplied — a
-standalone logger constructed outside any `Application` — the prefix is
+`production.DEBUG` comes from. When no `source` is supplied, a
+standalone logger constructed outside any `Application`, the prefix is
 omitted entirely and the line is just `ERROR: message`.
 
 **Empty context is omitted, not rendered as `{}`.** Both the per-call
-context and the global context are skipped when they have no keys —
+context and the global context are skipped when they have no keys,
 matching Monolog's `ignoreEmptyContextAndExtra`. A log line with neither
 is just `[ts] env.LEVEL: message`.
 
@@ -252,7 +252,7 @@ interface LogSource {
 ```
 
 What a logger needs from the outside world. `Application` structurally
-satisfies it — it has `environment()` and a `context` field — so loggers
+satisfies it: it has `environment()` and a `context` field, so loggers
 are constructed with the `Application` instance itself:
 
 ```ts
@@ -267,7 +267,7 @@ formatter, per the framework's DI philosophy. It's also why
 (`environment()`, `context`) are resolved lazily at log time, so even the
 zero-config fallback renders full lines.
 
-Both `ArrayLogger` and `NullLogger` take no source — neither formats
+Both `ArrayLogger` and `NullLogger` take no source, neither formats
 anything.
 
 ## Channels
@@ -313,7 +313,7 @@ interface LogConfig {
 ```
 
 `LogChannelConfig` is a discriminated union, so the `driver` string
-narrows the rest of the object at compile time — a `daily` entry without
+narrows the rest of the object at compile time, a `daily` entry without
 a `path` is a type error, not a runtime surprise.
 
 ### The drivers
@@ -347,7 +347,7 @@ Same class `app.logger` is.
 so resolving the channel creates the directory even before the first write.
 
 **`FileLogger` has no rotation.** It appends to one growing file forever.
-Not "rotates when large", not "truncates on restart" — forever.
+Not "rotates when large", not "truncates on restart", forever.
 
 That's a deliberate scope decision: real rotation (size thresholds,
 compression, retention policy, atomic rename-and-reopen, signalling the
@@ -374,7 +374,7 @@ the file.
 
 Configure `storage_path("logs/mahi.log")` and you get
 `storage/logs/mahi-2026-08-27.log`, `mahi-2026-08-28.log`, and so on.
-`storage/logs/mahi.log` itself stays empty — or, if you also run a
+`storage/logs/mahi.log` itself stays empty, or, if you also run a
 `single` channel at the same path, contains only that channel's output.
 The default config does exactly that, which is deliberate but worth
 knowing: `single` and `daily` in a generated app are configured with the
@@ -407,26 +407,26 @@ rather than at midnight.
 
 **Pruning only runs when the filename changes.** `lastResolvedPath` is
 the guard. A burst of a thousand same-day log calls does one directory
-scan at most — the first one, if the day just turned over. The
+scan at most, the first one, if the day just turned over. The
 consequence: a process that starts and only ever logs on one day never
 prunes at all, because the filename never changed from what the first
 write established.
 
 Pruning keeps the `maxFiles` most recent dated files matching the
 template's base and extension, sorted by the date in the filename
-descending, and `unlink`s the rest. Failures are swallowed — a file
+descending, and `unlink`s the rest. Failures are swallowed, a file
 removed concurrently isn't an error. `maxFiles` omitted means no pruning
 ever.
 
 **The rotation date is LOCAL, not UTC.** `formatDate()` uses
 `getFullYear()`/`getMonth()`/`getDate()`, which read the process's local
-timezone — while `formatLogLine()`'s timestamps are UTC. So on a machine
+timezone, while `formatLogLine()`'s timestamps are UTC. So on a machine
 running `TZ=Asia/Tokyo`, a line stamped `[2026-08-27 16:30:00]` (UTC)
 lands in `mahi-2026-08-28.log`, because it's already the 28th locally.
 
 The two are inconsistent, and knowing which is which is the whole
 mitigation: **the filename tells you the local day; the timestamps inside
-tell you UTC.** If that bothers you, run your servers in UTC — which is
+tell you UTC.** If that bothers you, run your servers in UTC. Which is
 what you want for a dozen other reasons anyway.
 
 #### `array`
@@ -447,7 +447,7 @@ interface ArrayLogEntry {
 }
 ```
 
-Collects entries in memory. Nothing is formatted — the entry keeps the
+Collects entries in memory. Nothing is formatted. The entry keeps the
 raw level, message and context, so assertions are on structure rather
 than on a rendered string. Entries are kept in call order and never
 pruned; dies with the process, like `ArrayCacheStore`.
@@ -483,8 +483,8 @@ Fans every call out to a list of other loggers. Console **and** file, or
 file **and** whatever you added via `extend()`. The default in a
 generated app.
 
-Constituents are resolved through `manager.channel(name)` — not
-`driver()` — so a broken member of a stack falls back to the emergency
+Constituents are resolved through `manager.channel(name)`, not
+`driver()`, so a broken member of a stack falls back to the emergency
 logger rather than taking the whole stack down:
 
 ```ts
@@ -541,11 +541,11 @@ failed is written through the emergency logger.
 
 The rationale is narrow and specific: **a misconfigured log channel must
 not take down the request that was trying to log through it.** Logging is
-what you reach for when something is already going wrong; a logger that
+what you use when something is already going wrong; a logger that
 throws turns a handled error into an unhandled one, and buries the
 original. This is exactly what Laravel's `LogManager::get()` does.
 
-`driver()` — inherited from `Manager` — still throws
+`driver()`, inherited from `Manager`, still throws
 `DriverNotRegisteredError`. If you want the failure loud, call it
 directly.
 
@@ -563,13 +563,13 @@ emergency(): Logger {
 
 **Always a `FileLogger`**, constructed directly. It is never resolved
 through `driver()`/`extend()`, so it cannot fail for the same reason the
-channel it's replacing just did — a broken `extend()` factory, a bad
+channel it's replacing just did, a broken `extend()` factory, a bad
 config entry, a driver name that doesn't exist. The only way to construct
 it is `new FileLogger(path, app)`, and the only way *that* fails is an
 unwritable directory.
 
 Path comes from `config.emergency.path`, defaulting to
-`storage_path("logs/mahi.log")` — the same physical file `single`
+`storage_path("logs/mahi.log")`, the same physical file `single`
 defaults to. Lazily constructed and cached, like any resolved driver.
 
 Nothing stops you calling it directly if you want a guaranteed-file
@@ -595,21 +595,21 @@ const logger: Logger = Log.channel("custom");
 | `Log.channel(name?)` | `manager.channel(name)` |
 | `Log.emergency` … `Log.debug` | Forward to the **default channel** |
 | `Log.log(level, msg, ctx?)` | Forward to the default channel |
-| `Log.warn(msg, ctx?)` | `@deprecated` — forwards to `warning()` |
+| `Log.warn(msg, ctx?)` | `@deprecated`: forwards to `warning()` |
 
 Note there is no `Log.error(msg, ctx, channel)` overload. For a
 non-default channel, go through `Log.channel(name)`, which returns a plain
 `Logger`.
 
 `Log` is hand-written directly against `app()` and `LOG_TOKEN` rather
-than built on `@mahiframework/facades`' `Facade<T>` mixin — because
+than built on `@mahiframework/facades`' `Facade<T>` mixin, because
 `@mahiframework/facades` depends on `@mahiframework/core` (for `app()`), and
 `LOG_TOKEN`/`LogManager` live in core, so importing `Facade` here would
 be a circular package dependency. `LogManager` is a concrete non-generic
 type anyway, so `Facade<T>`'s generic-static workaround buys nothing.
 
 Same guidance as every facade: prefer constructor-injecting `LogManager`
-via `LOG_TOKEN` where you already have `app`. And the same test caveat —
+via `LOG_TOKEN` where you already have `app`. And the same test caveat,
 `Log` always resolves off the *current global* app, so a test with its own
 isolated `Application` should resolve `LOG_TOKEN` off that instance
 directly.
@@ -654,7 +654,7 @@ channels: {
 Three notes:
 
 **Register in `boot()`** if you're extending a manager another provider
-owns — `LOG_TOKEN` has to be bound first.
+owns. `LOG_TOKEN` has to be bound first.
 
 **A custom channel's config is outside `LogChannelConfig`'s union.**
 That union enumerates the built-in drivers, so a custom entry needs a cast
@@ -663,7 +663,7 @@ That union enumerates the built-in drivers, so a custom entry needs a cast
 
 **Never throw from `write()`.** `channel()` catches construction
 failures, not write failures. A `write()` that throws propagates out of
-`logger.info(...)` — a synchronous, void-returning call that nobody
+`logger.info(...)`, a synchronous, void-returning call that nobody
 wraps.
 
 ## Context
@@ -687,7 +687,7 @@ readonly context = new ContextRepository();
 ```
 
 No token, no provider, no registration. `Context` (the facade) works with
-zero setup — it doesn't need `LoggingServiceProvider` or anything else.
+zero setup. It doesn't need `LoggingServiceProvider` or anything else.
 
 ### The two-layer design
 
@@ -707,19 +707,19 @@ private active(): Record<string, unknown> {
 }
 ```
 
-- A **process-global** store — data added at boot (app version, deploy
+- A **process-global** store: data added at boot (app version, deploy
   id, worker name), visible everywhere.
-- A **per-request overlay** — an `AsyncLocalStorage`-scoped store opened
+- A **per-request overlay**, an `AsyncLocalStorage`-scoped store opened
   by `runScoped()`, which starts as a **shallow copy of the global
   store**. A request sees all global context immediately, and every
   subsequent read/write/forget inside the request targets the overlay
-  only. Nothing a request adds — or forgets — leaks into the global store
+  only. Nothing a request adds, or forgets, leaks into the global store
   or into another concurrent request, and the overlay is discarded when
   the request ends.
 
 Every operation goes through `active()`, so **the API is identical
-whether or not a scope is open**. Outside one — boot, a queue job, a CLI
-command, a test — everything falls back to the global store. You never
+whether or not a scope is open**. Outside one, boot, a queue job, a CLI
+command, a test, everything falls back to the global store. You never
 have to check.
 
 ### `runScoped()`
@@ -728,7 +728,7 @@ have to check.
 runScoped<T>(fn: () => T): T
 ```
 
-The HTTP kernel opens exactly one per request, as the **outermost** pipe —
+The HTTP kernel opens exactly one per request, as the **outermost** pipe,
 ahead of even the maintenance-mode check:
 
 ```ts
@@ -739,8 +739,8 @@ pipes.push((request, next) => context.runScoped(() => next(request)));
 so any context added by any downstream pipe or handler is isolated to
 that request. It's cheap: one `AsyncLocalStorage.run` per request.
 
-Reach for it directly only in non-HTTP entry points that want the same
-per-invocation isolation — a queue job, a CLI command, a test:
+Use it directly only in non-HTTP entry points that want the same
+per-invocation isolation, a queue job, a CLI command, a test:
 
 ```ts
 await Context.runScoped(async () => {
@@ -786,7 +786,7 @@ const snapshot = Context.all();
 snapshot.userId = "spoofed";      // no effect on the repository
 ```
 
-That also means `all()` allocates on every call — including once per log
+That also means `all()` allocates on every call, including once per log
 line via `formatLogLine()`. Keep the context small.
 
 **`push()` throws on a non-array:**
@@ -804,8 +804,8 @@ says so. Note that `push()` **replaces** the array with a new one
 previously captured `all()` snapshot doesn't change under you.
 
 **`has()` is `Object.hasOwn`, not truthiness.** A key explicitly set to
-`null`, `0`, `""` or `false` is present. Only a key that was never set —
-or was `forget()`ed — is missing.
+`null`, `0`, `""` or `false` is present. Only a key that was never set,
+or was `forget()`ed, is missing.
 
 ### `scope()` restore semantics
 
@@ -834,8 +834,8 @@ added inside the callback and does not survive. The restore is a full
 snapshot replacement, not a targeted removal of `data`'s keys. That
 matches Laravel's `scope()` semantics.
 
-**It restores even when the callback throws**, and — for async callbacks
-— only after the returned promise settles:
+**It restores even when the callback throws**, and, for async callbacks,
+only after the returned promise settles:
 
 ```ts
 if (result instanceof Promise) {
@@ -849,13 +849,13 @@ real `Promise` restores synchronously, i.e. too early.
 **Async `scope()` outside a request scope is not isolated.** Inside a
 `runScoped()` overlay, `scope()` snapshots and restores the overlay, so
 concurrent requests don't interfere. Outside one it operates on the
-process-global store — and two concurrent async `scope()` calls sharing
+process-global store, and two concurrent async `scope()` calls sharing
 that store will clobber each other's snapshots. Use `runScoped()` for
 genuine isolation; `scope()` is a temporary-overlay convenience, not a
 concurrency primitive.
 
 The restore is done by replacing the store's contents **in place**, not by
-reassigning the reference — an `AsyncLocalStorage` overlay is owned by
+reassigning the reference. An `AsyncLocalStorage` overlay is owned by
 the scope and can't be swapped out.
 
 ### Deliberately omitted
@@ -902,11 +902,11 @@ expect(logger.entries.map((e) => e.level)).toContain("error");
 ```
 
 Channels are cached per name, so the same `ArrayLogger` comes back every
-time — which is what makes this work, and also why you want a fresh
+time. Which is what makes this work, and also why you want a fresh
 `Application` per test rather than clearing `entries` by hand.
 
 For `formatLogLine()` itself, note that the timestamp is `Date.now()` at
-call time in UTC — assert with a regex or fake the clock.
+call time in UTC, assert with a regex or fake the clock.
 
 Context in tests needs no setup at all, since `app.context` always
 exists. If a test leaks context into another, wrap it:
@@ -927,7 +927,7 @@ source of "where did my log line go". `app.logger` is always a
 **`LoggingServiceProvider` is not auto-registered.** `Log.info(...)`
 throws `BindingNotFoundError` without it in `providers[]`.
 
-**`channel()` never throws — it silently degrades to the emergency
+**`channel()` never throws. It silently degrades to the emergency
 logger.** Your logs are then in `storage/logs/mahi.log`, not where you
 configured. Look for the `"Unable to create configured logger"` line.
 
@@ -963,16 +963,16 @@ data you passed in.
 **Async `Context.scope()` outside `runScoped()` isn't isolated.** Two
 concurrent scopes on the global store clobber each other.
 
-**A custom logger's `write()` must not throw.** Nothing catches it —
+**A custom logger's `write()` must not throw.** Nothing catches it,
 `channel()` only guards construction.
 
 ## Related
 
-- [Configuration](../configuration/) — `config/logging.ts`, `storage_path()`
-- [Providers](../providers/) — registering `LoggingServiceProvider`, `extend()`
-- [Lifecycle](../lifecycle/) — why `app.logger` exists before any provider
-- [Container](../container/) — `LOG_TOKEN`, `BindingNotFoundError`
-- [Requests](../requests/) — the per-request `Context` overlay the kernel opens
-- [Mail](../mail/) — the `log` mailer writes through `app.logger`
-- [Queues](../queues/) — using `runScoped()` around a job
-- [Deployment](../deployment/) — capturing stdout, and log shipping
+- [Configuration](../configuration/): `config/logging.ts`, `storage_path()`
+- [Providers](../providers/): registering `LoggingServiceProvider`, `extend()`
+- [Lifecycle](../lifecycle/): why `app.logger` exists before any provider
+- [Container](../container/): `LOG_TOKEN`, `BindingNotFoundError`
+- [Requests](../requests/): the per-request `Context` overlay the kernel opens
+- [Mail](../mail/): the `log` mailer writes through `app.logger`
+- [Queues](../queues/): using `runScoped()` around a job
+- [Deployment](../deployment/): capturing stdout, and log shipping

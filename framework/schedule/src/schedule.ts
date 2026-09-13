@@ -2,7 +2,7 @@ import { QUEUE_TOKEN, type Application } from "@mahiframework/core";
 import { ScheduledTask, type TaskCallback } from "./scheduled-task.js";
 
 /**
- * Structural stand-in for a `@mahiframework/queue` `Job` instance — kept
+ * Structural stand-in for a `@mahiframework/queue` `Job` instance, kept
  * minimal (a nominal marker via `handle`) so `@mahiframework/schedule` never
  * needs a compile-time import of the queue package.
  */
@@ -22,7 +22,7 @@ export interface ScheduleEvaluationError {
 
 /**
  * Registry of every recurring task defined across the app. `.job()`
- * softly depends on `@mahiframework/queue` — resolved via `app.make(QUEUE_TOKEN)`
+ * softly depends on `@mahiframework/queue`, resolved via `app.make(QUEUE_TOKEN)`
  * using the string token only (no compile-time import), so
  * `@mahiframework/schedule` never hard-depends on the queue package. Calling
  * `.job()` without a queue provider registered throws a clear error.
@@ -43,15 +43,15 @@ export class Schedule {
    * Convenience for dispatching a queued job on a schedule. Takes a
    * FACTORY (`() => new SomeJob(...)`) rather than a single instance, so
    * each run enqueues a fresh job built from current state (a job captured
-   * once would carry stale fields — e.g. a model loaded at schedule-define
-   * time — on every subsequent tick).
+   * once would carry stale fields, e.g. a model loaded at schedule-define
+   * time, on every subsequent tick).
    *
    *   schedule.job(() => new PruneStaleRecordsJob()).daily();
    *
    * The task defaults to being named after the job class the factory
    * produces. That default is what makes `schedule:list` readable and
    * gives each job task a distinct
-   * `withoutOverlapping()` lock — a generic `"job"` name would share a
+   * `withoutOverlapping()` lock, a generic `"job"` name would share a
    * single lock with every other scheduled job in the app. `name()`
    * overrides it, and skips deriving it at all.
    */
@@ -74,7 +74,7 @@ export class Schedule {
    * A task whose expression throws while being evaluated is **excluded and
    * reported**, not propagated: `runDueTasks()` calls this once for the
    * whole schedule, so letting one expression's error escape would abort
-   * the entire tick — every other due task silently skipped, and
+   * the entire tick, every other due task silently skipped, and
    * `schedule:work` dead. Expressions are validated at registration now,
    * so reaching this is a bug rather than a typo; it still must not be
    * able to take the scheduler down.
@@ -158,7 +158,7 @@ export class Schedule {
  *
  * A factory is normally cheap (`() => new SomeJob()`), but it is
  * application code running at registration time, and a factory that reads
- * a request-scoped binding or hits a database would throw here — where
+ * a request-scoped binding or hits a database would throw here, where
  * "we couldn't derive a nice default name" must not become "your app
  * won't boot". So: failures fall back to no name, and the task keeps its
  * cron expression as its description. Anonymous classes and plain object

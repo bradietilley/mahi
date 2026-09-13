@@ -32,11 +32,11 @@ export type AfterCallback<TUser = unknown> = (
 
 // The token `@mahiframework/auth` binds its `AuthManager` under, resolved by
 // string at runtime rather than by importing `@mahiframework/auth`, so this
-// package takes NO compile-time dependency on it — authorization is useful
+// package takes NO compile-time dependency on it. Authorization is useful
 // against a user from anywhere (a third-party identity provider, a queue
 // job, a test), and `forUser()` covers those. The token literal comes from
 // `@mahiframework/core`'s `well-known-tokens` (imported above), the shared
-// source of truth both this package and `@mahiframework/auth` agree on — so
+// source of truth both this package and `@mahiframework/auth` agree on, so
 // a typo can't silently diverge into a `BindingNotFoundError`. Same
 // soft-dependency shape `@mahiframework/schedule` uses for `QUEUE_TOKEN`.
 
@@ -73,7 +73,7 @@ export class GateRegistry {
    * The model is named by CLASS, not by string: a class reference is
    * compile-checked and survives renames, whereas a typo'd string would
    * fail closed and silently (see the resolution rules below), which is
-   * the worst failure mode an authorization system can have — it looks
+   * the worst failure mode an authorization system can have. It looks
    * like it's working.
    */
   policy(model: ModelClass, policy: PolicyClass): this {
@@ -108,7 +108,7 @@ export class GateRegistry {
     return this.policies.has(model);
   }
 
-  /** A gate bound to an explicit user — for queue jobs, CLI commands, tests. */
+  /** A gate bound to an explicit user, for queue jobs, CLI commands, tests. */
   forUser<TUser = unknown>(user: TUser | null): UserGate {
     return new UserGate(this, user);
   }
@@ -123,7 +123,7 @@ export class GateRegistry {
 
   /**
    * Throws when denied, honouring an `AuthorizationResponse`'s `status`
-   * and `message` if the policy returned one — so `denyAsNotFound()`
+   * and `message` if the policy returned one, so `denyAsNotFound()`
    * throws a 404, a plain deny throws 403. Falls back to a generic 403
    * for a bare `false`.
    */
@@ -133,7 +133,7 @@ export class GateRegistry {
   }
 
   /**
-   * Resolve several abilities for one target at once — for embedding a
+   * Resolve several abilities for one target at once, for embedding a
    * `can: { update: true, delete: false }` block in an API response so a
    * detached frontend can render correctly (hide the delete button)
    * without replicating the policy logic client-side.
@@ -154,7 +154,7 @@ export class GateRegistry {
   }
 
   /**
-   * Boolean form of the resolution pipeline — the common case. Delegates
+   * Boolean form of the resolution pipeline, the common case. Delegates
    * to `inspect()` and collapses the response to its `allowed` flag.
    */
   async check(user: unknown | null, ability: string, args: unknown[]): Promise<boolean> {
@@ -166,7 +166,7 @@ export class GateRegistry {
    * `AuthorizationResponse` so a policy's custom message/status survives
    * all the way to `authorize()`.
    *
-   * 1. `before()` hooks, in registration order — a non-null result wins
+   * 1. `before()` hooks, in registration order, a non-null result wins
    *    immediately and skips `after()`.
    * 2. If `args[0]` is a model class WITH A REGISTERED POLICY, dispatch to
    *    `policy[ability](user, ...rest)`. A missing method denies.
@@ -176,7 +176,7 @@ export class GateRegistry {
    *
    * Steps 2 and 4 are deliberately FAIL-CLOSED. Throwing on an unknown
    * ability would surface typos more loudly, but a typo that 500s in
-   * production is worse than one that 403s — and step 2 must not throw
+   * production is worse than one that 403s, and step 2 must not throw
    * regardless, because policies legitimately implement only a subset of
    * abilities.
    *
@@ -218,7 +218,7 @@ export class GateRegistry {
     const [first, ...rest] = args;
 
     // Dispatch keys off the policy registry by exact identity rather than
-    // inspecting the argument's shape — model classes are ordinary
+    // inspecting the argument's shape, model classes are ordinary
     // constructor functions, so there's no heuristic guessing about what
     // "looks like" a model.
     if (typeof first === "function" && this.policies.has(first as ModelClass)) {
@@ -241,7 +241,7 @@ export class GateRegistry {
     return (await registered(user, ...args)) as PolicyResult;
   }
 
-  /** Instantiated once and cached — see `Policy`'s statelessness contract. */
+  /** Instantiated once and cached. See `Policy`'s statelessness contract. */
   private policyFor(model: ModelClass): Policy {
     const policyClass = this.policies.get(model)!;
 
@@ -262,7 +262,7 @@ export class GateRegistry {
    *
    * Returns null when auth isn't installed at all, so a gate can still be
    * used in an app with no authentication (every check then sees a
-   * guest). It does NOT swallow `MissingAuthContextError` — being outside
+   * guest). It does NOT swallow `MissingAuthContextError`, being outside
    * a request scope entirely is a programming error that should surface,
    * and `forUser()` is the supported way to authorize without one.
    */
@@ -302,7 +302,7 @@ export class UserGate {
  * Names that are never abilities, however a policy is written.
  *
  * `constructor` is an own property of every class prototype, so a plain
- * lookup for it finds the class itself — `allows("constructor", Post)`
+ * lookup for it finds the class itself, `allows("constructor", Post)`
  * then called that constructor without `new` and threw a `TypeError` out
  * of the gate. The rest live on `Object.prototype` and would resolve to
  * built-ins that return nonsense (`toString` is a function, so it would
@@ -329,7 +329,7 @@ const RESERVED_ABILITY_NAMES = new Set([
  *
  * Walks the prototype chain so an ability inherited from a shared base
  * policy still resolves, but stops at `Object.prototype` and refuses the
- * reserved names above — the two ways a lookup could escape the policy's
+ * reserved names above, the two ways a lookup could escape the policy's
  * own surface. Fails closed: anything that isn't a function found on the
  * policy itself is "no such ability", i.e. a deny.
  */
@@ -357,7 +357,7 @@ function policyMethod(policy: Policy, ability: string): PolicyMethod | undefined
  * Coerce a policy/ability/hook return value into an `AuthorizationResponse`.
  *
  * A returned `AuthorizationResponse` passes through untouched. Everything
- * else must be STRICTLY `true` to allow — a stray truthy non-boolean (a
+ * else must be STRICTLY `true` to allow, a stray truthy non-boolean (a
  * promise, an object, the string `"yes"`) is treated as denial, the same
  * fail-closed rule the boolean-only pipeline enforced before rich
  * responses existed.

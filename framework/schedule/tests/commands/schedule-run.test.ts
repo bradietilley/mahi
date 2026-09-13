@@ -207,7 +207,7 @@ describe("ScheduleRunCommand", () => {
       .name("exclusive")
       .withoutOverlapping();
 
-    // Two `schedule:run` invocations in the same minute — what cron does
+    // Two `schedule:run` invocations in the same minute, what cron does
     // the moment a run overruns its slot.
     await Promise.all([new ScheduleRunCommand(app).handle(), new ScheduleRunCommand(app).handle()]);
 
@@ -459,7 +459,7 @@ describe("ScheduleRunCommand", () => {
         new ScheduleRunCommand(app).handle(),
       ]);
 
-      // The store was consulted — not silently bypassed for lock files —
+      // The store was consulted, not silently bypassed for lock files,
       // and it, not the filesystem, is what serialised the two runs.
       expect(added).toEqual(["schedule-overlap:shared_lock", "schedule-overlap:shared_lock"]);
       expect(await readdir(dir)).toEqual([]);

@@ -15,7 +15,7 @@ interface GadgetAttributes {
 /** The cast-aware instance shape (DB `active: number` -> model `boolean`). */
 type GadgetInstance = { id: string; name: string; active: boolean };
 
-/** A model with no default resource — the base `toJsonResource()` behavior. */
+/** A model with no default resource, the base `toJsonResource()` behavior. */
 class Gadget extends Model<GadgetAttributes>()({
   table: "gadgets",
   primaryKey: "id",
@@ -23,7 +23,7 @@ class Gadget extends Model<GadgetAttributes>()({
   casts: { active: Cast.boolean() },
 }) {}
 
-/** Minimal resource stand-in — reads a cast column off the wrapped model. */
+/** Minimal resource stand-in, reads a cast column off the wrapped model. */
 class GadgetResource {
   constructor(private model: GadgetInstance) {}
   toJson() {
@@ -36,7 +36,7 @@ class Widget extends Gadget {
   static override table = "widgets";
 
   override toJsonResource(): GadgetResource {
-    // `this.self` is the casting proxy — reading `this.model.active` in the
+    // `this.self` is the casting proxy, reading `this.model.active` in the
     // resource must yield the cast boolean, not the raw DB number.
     return new GadgetResource(this.self as unknown as GadgetInstance);
   }

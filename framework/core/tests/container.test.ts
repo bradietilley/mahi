@@ -138,7 +138,7 @@ describe("Container", () => {
       expect((caught as CircularDependencyError).cycle).toEqual(["a", "b", "a"]);
     });
 
-    it("recovers cleanly — a later independent resolution still works", () => {
+    it("recovers cleanly, a later independent resolution still works", () => {
       const container = new Container();
       container.singleton("a", (c) => c.make("b"));
       container.singleton("b", (c) => c.make("a"));

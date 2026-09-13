@@ -5,15 +5,15 @@ import {
 } from "./event-suppression.js";
 
 /**
- * Base class for application events. An event is just a typed payload —
+ * Base class for application events. An event is just a typed payload,
  * subclass it and add whatever properties are relevant.
  *
  *   class TodoCreated extends AbstractEvent {
  *     constructor(public readonly todoId: string) { super(); }
  *   }
  *
- * `Event.suppress()`/`Event.isSuppressed()` are static (not per-subclass)
- * — see their own docstrings below. `eventName` is an instance getter —
+ * `Event.suppress()`/`Event.isSuppressed()` are static (not per-subclass).
+ * See their own docstrings below. `eventName` is an instance getter,
  * override it on a subclass to participate in wildcard suppression
  * patterns under a name other than the default (its constructor name):
  *
@@ -26,7 +26,7 @@ export abstract class AbstractEvent {
    * A stable, explicit name for this event class, used to key listener
    * registrations and queued-listener ids. Set it on any event that will
    * have a **queued** listener, or that could collide with a same-named
-   * class in another module — `constructor.name` is neither collision-safe
+   * class in another module. `constructor.name` is neither collision-safe
    * across modules nor survives a minifier that mangles class names:
    *
    *   class OrderPlaced extends AbstractEvent {
@@ -40,7 +40,7 @@ export abstract class AbstractEvent {
 
   /**
    * This event instance's name for `Event.suppress()`/`isSuppressed()`
-   * pattern matching — the class's stable `static eventName` when set,
+   * pattern matching, the class's stable `static eventName` when set,
    * otherwise the constructor's name (`"TodoCreated"`, ...).
    * `@mahiframework/database`'s `ModelLifecycleEvent` overrides this getter to
    * `"model.{table}.{event}"` (e.g. `"model.posts.created"`), so
@@ -53,7 +53,7 @@ export abstract class AbstractEvent {
 
   /**
    * Runs `callback` with event dispatch suppressed for every name
-   * matching one of `patterns` (default `["*"]` — everything) — every
+   * matching one of `patterns` (default `["*"]`, everything), every
    * `EventDispatcher.dispatch()` call made synchronously or via nested
    * async calls inside `callback` becomes a no-op for a matching event
    * (listeners never run), with zero call-site changes needed inside it.
@@ -63,7 +63,7 @@ export abstract class AbstractEvent {
    * can `await` uniformly.
    *
    * Patterns are dot-segmented with `*` as a wildcard matching any run of
-   * characters — `"model.posts.*"` matches `"model.posts.created"`,
+   * characters. `"model.posts.*"` matches `"model.posts.created"`,
    * `"model.posts.updated"`, etc.; a bare `"*"` (the default) matches
    * every event name. Nested `suppress()` calls stack (patterns
    * concatenate, they don't replace what's already active), so
@@ -74,7 +74,7 @@ export abstract class AbstractEvent {
    * `@mahiframework/database`'s `ModelObserver`/`Model.on()` hooks, invoked
    * directly rather than as `Event` instances) check `isSuppressed(name)`
    * themselves at their own dispatch point, passing the equivalent
-   * `"model.{table}.{event}"` name — see `Model.withoutEvents()`, which
+   * `"model.{table}.{event}"` name. See `Model.withoutEvents()`, which
    * delegates to this with a `"model.{table}.*"` (or `"model.*"` when
    * called on the base `Model` class) pattern.
    *
@@ -90,10 +90,10 @@ export abstract class AbstractEvent {
 
   /**
    * With no argument: whether ANY suppression is currently active at all
-   * (inside any `suppress()` call, scoped or not) — the simple boolean
+   * (inside any `suppress()` call, scoped or not), the simple boolean
    * check most callers want. Pass a specific event name (e.g.
    * `"model.posts.created"`) to check whether THAT name matches an
-   * active suppression pattern instead — see `suppress()`'s docstring
+   * active suppression pattern instead. See `suppress()`'s docstring
    * for the wildcard pattern syntax.
    */
   static isSuppressed(name?: string): boolean {
@@ -107,7 +107,7 @@ export type EventClass<E extends AbstractEvent = AbstractEvent> = (new (...args:
 };
 
 /**
- * Opt an event class into after-commit dispatch — Laravel's
+ * Opt an event class into after-commit dispatch, Laravel's
  * `ShouldDispatchAfterCommit`. Set the **static** marker and every
  * `Events.dispatch(new OrderPlaced(...))` inside a `DB.transaction()`
  * holds its listeners until the transaction commits, and drops them

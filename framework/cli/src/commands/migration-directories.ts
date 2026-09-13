@@ -5,7 +5,7 @@ import type { MigrationSource, RegisteredMigration } from "@mahiframework/databa
  * Gathers every migration source in play, in the order the runner should
  * consider them:
  *
- *   1. the app's own migrations — either a static list under
+ *   1. the app's own migrations, either a static list under
  *      `database.migrationSources` (set by an app that intends to be
  *      bundled; see `MigrationSource`) or the `database.migrationsPath`
  *      directory, which defaults to `"database/migrations"` relative to
@@ -17,7 +17,7 @@ import type { MigrationSource, RegisteredMigration } from "@mahiframework/databa
  * The static forms exist for the compiled-binary case: a directory path
  * resolves to nothing inside a single-file executable, and the runner
  * treats an unreadable directory as "nothing to discover" rather than an
- * error — so a bundled app silently migrates zero tables and then runs
+ * error, so a bundled app silently migrates zero tables and then runs
  * against an empty database. Both forms are accepted here and may be
  * mixed; the runner deduplicates by name.
  */

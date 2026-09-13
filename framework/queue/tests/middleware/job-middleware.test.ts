@@ -236,7 +236,7 @@ describe("WithoutOverlapping", () => {
     });
 
     // A zero delay means the blocked job is popped, finds the lock still
-    // held, and is released again immediately — a hot loop for the whole
+    // held, and is released again immediately, a hot loop for the whole
     // duration of the first job's run.
     const error = await mw
       .handle({ app, job: dummyJob }, async () => {})
@@ -398,7 +398,7 @@ describe("WithoutOverlapping", () => {
     });
     expect(ran).toBe(true);
 
-    // Second run after release proceeds too — proving the resolved store
+    // Second run after release proceeds too, proving the resolved store
     // is a real, shared one that the lock was released on.
     await mw.handle({ app: containerApp, job: dummyJob }, async () => {});
   });
@@ -406,7 +406,7 @@ describe("WithoutOverlapping", () => {
   it("keys the lock on the registry name, not constructor.name", async () => {
     // A minifier is free to rename two distinct job classes to the same
     // short identifier. Keying on `constructor.name` then collapses their
-    // locks into one and each blocks the other — the exact cross-class
+    // locks into one and each blocks the other, the exact cross-class
     // collision the class prefix exists to prevent. Both classes below are
     // literally named "n", as minified output would be.
     const store = new ArrayCacheStore();
@@ -534,7 +534,7 @@ describe("ThrottlesExceptions", () => {
     await expect(boom()).rejects.toThrow("downstream");
     await expect(boom()).rejects.toThrow("downstream");
 
-    // Circuit now open — further runs are released without executing handle().
+    // Circuit now open. Further runs are released without executing handle().
     await expect(boom()).rejects.toBeInstanceOf(ReleaseJobError);
   });
 

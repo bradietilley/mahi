@@ -3,7 +3,7 @@ import { Application } from "@mahiframework/core";
 import { HealthRegistry } from "../src/health-registry.js";
 
 /**
- * Fake timers throughout — this suite must never actually sleep. A test
+ * Fake timers throughout. This suite must never actually sleep. A test
  * that waits five real seconds to prove a five-second deadline works is a
  * test people delete.
  */
@@ -15,7 +15,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-/** A check that never settles on its own — only the deadline can end it. */
+/** A check that never settles on its own, only the deadline can end it. */
 const never = () => new Promise<void>(() => {});
 
 describe("per-check timeouts", () => {
@@ -97,7 +97,7 @@ describe("timer hygiene", () => {
     await registry.run();
 
     // A leaked timer keeps the Node process alive after `./artisan
-    // health` has printed its table — a hang, not a slow exit.
+    // health` has printed its table, a hang, not a slow exit.
     expect(vi.getTimerCount()).toBe(0);
   });
 

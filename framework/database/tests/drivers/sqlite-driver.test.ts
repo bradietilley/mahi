@@ -40,7 +40,7 @@ describe("SqliteDriver", () => {
 
   /**
    * WAL permits concurrent readers but only ONE writer, and sqlite's own
-   * default `busy_timeout` is 0 — so a second process writing at the same
+   * default `busy_timeout` is 0, so a second process writing at the same
    * moment fails instantly with SQLITE_BUSY rather than waiting for the lock.
    *
    * That is not an exotic condition, it is simply what two simultaneous writes
@@ -73,7 +73,7 @@ describe("SqliteDriver", () => {
     expect(pragma(driver, "foreign_keys")).toBe(1);
   });
 
-  it("has no connect() — construction is fully synchronous", () => {
+  it("has no connect(). Construction is fully synchronous", () => {
     const driver = new SqliteDriver({ filename: ":memory:" });
     expect((driver as any).connect).toBeUndefined();
   });
@@ -94,7 +94,7 @@ describe("SqliteDriver", () => {
 
   /**
    * `terminate()` is idempotent and a test's `cleanup()` may close a
-   * driver something else already closed — so a second `disconnect()` has
+   * driver something else already closed, so a second `disconnect()` has
    * to be a no-op. Kysely's own `destroy()` is not: it throws
    * `db.prepare is not a function` the second time.
    */

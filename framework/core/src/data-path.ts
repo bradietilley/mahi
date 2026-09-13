@@ -124,7 +124,7 @@ type PathValueInner<T, P extends string> = [unknown] extends [T]
               : Index<T, P>;
 
 /**
- * The type sitting at dotted path `P` on `T` — what `dataGet` returns.
+ * The type sitting at dotted path `P` on `T`, what `dataGet` returns.
  * Wildcard segments (`*`) wrap the remainder in an array (and collapse
  * one extra array level when another `*` remains, matching runtime).
  */

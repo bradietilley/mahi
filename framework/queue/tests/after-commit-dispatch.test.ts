@@ -73,7 +73,7 @@ describe("dispatching inside a transaction", () => {
 
     await transaction(db.kysely, async () => {
       await queue.dispatch(new ChargeOrderJob("o1"));
-      // Already pushed — this is the pre-existing (racy) behaviour, kept
+      // Already pushed. This is the pre-existing (racy) behaviour, kept
       // as the default so nothing silently changes meaning.
       expect(fake.pushed(ChargeOrderJob)).toHaveLength(1);
     });
@@ -106,7 +106,7 @@ describe("dispatching inside a transaction", () => {
     fake.assertNothingPushed();
   });
 
-  it("pushes exactly once — not once per nested transaction level", async () => {
+  it("pushes exactly once, not once per nested transaction level", async () => {
     const { queue, fake, db } = context;
 
     await transaction(db.kysely, async () => {

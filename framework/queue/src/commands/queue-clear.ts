@@ -5,11 +5,11 @@ import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsClearing } from "../queue-driver.js";
 
 /**
- * `queue:clear` — delete every pending job on a queue without running it.
+ * `queue:clear`, delete every pending job on a queue without running it.
  *
  * Destructive and irreversible: the jobs are gone, not failed, so nothing
  * records that they existed. It exists for the case where a bad deploy
- * enqueued a mountain of work that must not run — the alternative being
+ * enqueued a mountain of work that must not run, the alternative being
  * to let workers grind through it or to hand-write DELETE statements.
  *
  * Confirmation goes through `confirmToProceed()`, the same guard the

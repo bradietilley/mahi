@@ -1,11 +1,11 @@
 /**
- * `@mahiframework/process` — a reusable process-execution wrapper, port
+ * `@mahiframework/process`, a reusable process-execution wrapper, port
  * of Laravel's `Illuminate\Process` component (`Process::run()`/
  * `Process::fake()`/`Process::assertRan()`), scoped to synchronous
  * `run()` (no `pipe()`/`pool()`/async background processes).
- * Thin wrapper over Node's built-in `node:child_process` — no
+ * Thin wrapper over Node's built-in `node:child_process`, no
  * `execa` dependency. No dependency on `@mahiframework/core` or any
- * other framework package — usable standalone.
+ * other framework package, usable standalone.
  *
  * ```ts
  * import { Process } from "@mahiframework/process";

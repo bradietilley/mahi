@@ -9,13 +9,13 @@ export interface UserJson {
 }
 
 /**
- * The primary, explicit shaper of the user wire format — it simply never
+ * The primary, explicit shaper of the user wire format. It simply never
  * reads `password`, so the hash can't reach a response through here.
  *
  * Defense-in-depth: `User` also declares `hidden: ["password"]`,
  * so even a stray `HttpResponse.json(user)` won't leak the hash. This
  * resource is still the canonical way to render a user (camelCase keys,
- * computed fields) — `hidden` is the safety net, not a replacement.
+ * computed fields). `hidden` is the safety net, not a replacement.
  */
 export class UserResource extends Resource<User, UserJson> {
   toJson(): UserJson {

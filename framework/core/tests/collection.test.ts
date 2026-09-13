@@ -12,7 +12,7 @@ const items: Item[] = [
   { id: 3, category: "a" },
 ];
 
-describe("Collection — construction", () => {
+describe("Collection: construction", () => {
   it("make() from a plain array keys items 0, 1, 2, ...", () => {
     const c = Collection.make(["x", "y"]);
     expect(c.keys().toArray()).toEqual([0, 1]);
@@ -68,7 +68,7 @@ describe("Collection — construction", () => {
   });
 });
 
-describe("Collection — basic accessors", () => {
+describe("Collection: basic accessors", () => {
   it("toArray()/all() return a plain array of values", () => {
     expect(Collection.make(items).toArray()).toEqual(items);
     expect(Collection.make(items).all()).toEqual(items);
@@ -100,7 +100,7 @@ describe("Collection — basic accessors", () => {
   });
 });
 
-describe("Collection — key-based access", () => {
+describe("Collection: key-based access", () => {
   it("get() returns the value at a key, or the default if missing", () => {
     const c = Collection.make(["x", "y"]);
     expect(c.get(0)).toBe("x");
@@ -162,7 +162,7 @@ describe("Collection — key-based access", () => {
   });
 });
 
-describe("Collection — structural mutation", () => {
+describe("Collection: structural mutation", () => {
   it("push()/add() append items and mutate in place, returning this", () => {
     const c = Collection.make([1, 2]);
     const result = c.push(3, 4);
@@ -226,7 +226,7 @@ describe("Collection — structural mutation", () => {
   });
 });
 
-describe("Collection — iteration/transformation", () => {
+describe("Collection: iteration/transformation", () => {
   it("each() iterates and stops early on `false`", () => {
     const seen: number[] = [];
     Collection.make([1, 2, 3, 4]).each((n) => {
@@ -368,7 +368,7 @@ describe("Collection — iteration/transformation", () => {
   });
 });
 
-describe("Collection — filtering/searching", () => {
+describe("Collection: filtering/searching", () => {
   it("filter() keeps matching items; with no args drops falsy items", () => {
     expect(
       Collection.make([1, 2, 3, 4])
@@ -501,7 +501,7 @@ describe("Collection — filtering/searching", () => {
   });
 });
 
-describe("Collection — grouping/keying", () => {
+describe("Collection: grouping/keying", () => {
   it("groupBy() groups items by key into a Collection, preserving duplicates within a group", () => {
     const grouped = Collection.make(items).groupBy((i) => i.category);
     expect(grouped).toBeInstanceOf(Collection);
@@ -555,7 +555,7 @@ describe("Collection — grouping/keying", () => {
   });
 });
 
-describe("Collection — aggregates", () => {
+describe("Collection: aggregates", () => {
   it("sum() totals values, optionally via a selector", () => {
     expect(Collection.make([1, 2, 3]).sum()).toBe(6);
     expect(Collection.make(items).sum((i) => i.id)).toBe(6);
@@ -593,7 +593,7 @@ describe("Collection — aggregates", () => {
   });
 });
 
-describe("Collection — slicing/paging", () => {
+describe("Collection: slicing/paging", () => {
   it("take() takes from the front (or end, if negative)", () => {
     expect(Collection.make([1, 2, 3, 4]).take(2).toArray()).toEqual([1, 2]);
     expect(Collection.make([1, 2, 3, 4]).take(-2).toArray()).toEqual([3, 4]);
@@ -645,7 +645,7 @@ describe("Collection — slicing/paging", () => {
   });
 });
 
-describe("Collection — chunking/splitting", () => {
+describe("Collection: chunking/splitting", () => {
   // Generic in the item type: `Collection` is invariant in its value
   // parameter (its methods take `this`), so a
   // `Collection<Collection<number, …>, …>` is NOT assignable to a
@@ -697,7 +697,7 @@ describe("Collection — chunking/splitting", () => {
   });
 });
 
-describe("Collection — ordering", () => {
+describe("Collection: ordering", () => {
   it("sort() sorts ascending by default, or with a custom comparator", () => {
     expect(Collection.make([3, 1, 2]).sort().toArray()).toEqual([1, 2, 3]);
     expect(
@@ -791,7 +791,7 @@ describe("Collection — ordering", () => {
   });
 });
 
-describe("Collection — uniqueness", () => {
+describe("Collection: uniqueness", () => {
   it("unique() without a selector dedupes by identity/value", () => {
     expect(Collection.make([1, 2, 2, 3, 1]).unique().toArray()).toEqual([1, 2, 3]);
   });
@@ -802,7 +802,7 @@ describe("Collection — uniqueness", () => {
   });
 });
 
-describe("Collection — merging/combining/set ops", () => {
+describe("Collection: merging/combining/set ops", () => {
   it("merge() overwrites matching keys, adds new ones", () => {
     const a = Collection.make(
       new Map<string, number>([
@@ -944,7 +944,7 @@ describe("Collection — merging/combining/set ops", () => {
   });
 });
 
-describe("Collection — flatten/collapse", () => {
+describe("Collection: flatten/collapse", () => {
   it("flatten() recursively flattens, respecting an optional depth", () => {
     expect(
       Collection.make([1, [2, [3, [4]]]])
@@ -975,7 +975,7 @@ describe("Collection — flatten/collapse", () => {
   });
 });
 
-describe("Collection — column extraction", () => {
+describe("Collection: column extraction", () => {
   it("pluck() extracts a single column into a Collection", () => {
     const result = Collection.make(items).pluck("id");
     expect(result).toBeInstanceOf(Collection);
@@ -994,7 +994,7 @@ describe("Collection — column extraction", () => {
   });
 });
 
-describe("Collection — string conversion", () => {
+describe("Collection: string conversion", () => {
   it("implode() concatenates a column's values, or the whole item for scalars", () => {
     expect(Collection.make(items).implode("category", ",")).toBe("a,b,a");
     expect(Collection.make([1, 2, 3]).implode((n) => n, "-")).toBe("1-2-3");
@@ -1008,7 +1008,7 @@ describe("Collection — string conversion", () => {
   });
 });
 
-describe("Collection — flow control/conditionals", () => {
+describe("Collection: flow control/conditionals", () => {
   it("pipe() passes the collection to a callback and returns its result", () => {
     const result = Collection.make([1, 2, 3]).pipe((c) => c.count());
     expect(result).toBe(3);
@@ -1043,7 +1043,7 @@ describe("Collection — flow control/conditionals", () => {
   });
 });
 
-describe("Collection — immutability contract", () => {
+describe("Collection: immutability contract", () => {
   it("non-mutating methods never affect the original collection", () => {
     const original = Collection.make([3, 1, 2]);
     original.map((n) => n * 2);

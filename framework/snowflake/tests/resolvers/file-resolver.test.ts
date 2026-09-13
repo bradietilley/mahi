@@ -22,7 +22,7 @@ afterEach(async () => {
 describe("FileSequenceResolver", () => {
   it("resolves a sequence and advances after the per-microsecond budget is exhausted", async () => {
     // File resolver increments then returns, so the first sequence in a
-    // microsecond is 1. Default maxSequence is 7 (3 bits) — 7 IDs then wait.
+    // microsecond is 1. Default maxSequence is 7 (3 bits), 7 IDs then wait.
     const base = Date.now() * 1000;
     const times = [
       base, // seq 1
@@ -32,7 +32,7 @@ describe("FileSequenceResolver", () => {
       base, // seq 5
       base, // seq 6
       base, // seq 7
-      base, // exhausted — consumed by the wait loop
+      base, // exhausted, consumed by the wait loop
       base + 1, // seq 1 of the next microsecond
     ];
 

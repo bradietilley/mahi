@@ -7,8 +7,8 @@ import type { SessionRecord, SessionStore } from "./session-store.js";
  * restarts, works across multiple processes, and is queryable (so "log
  * this user out everywhere" is one statement).
  *
- * Has no automatic expiry mechanism, so `gc()` must be run periodically —
- * see the `auth:gc` command.
+ * Has no automatic expiry mechanism, so `gc()` must be run periodically.
+ * See the `auth:gc` command.
  */
 export class DatabaseSessionStore implements SessionStore {
   async read(id: string): Promise<SessionRecord | null> {
@@ -18,7 +18,7 @@ export class DatabaseSessionStore implements SessionStore {
       return null;
     }
 
-    // Expiry is enforced on read rather than relying on gc() having run —
+    // Expiry is enforced on read rather than relying on gc() having run,
     // gc() is a cleanup job, not a correctness guarantee. Treating a
     // stale row as valid because the cron hasn't fired would be a real
     // vulnerability.

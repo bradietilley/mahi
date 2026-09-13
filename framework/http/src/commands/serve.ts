@@ -34,7 +34,7 @@ function envMtime(envFile: string): number | undefined {
 
 /**
  * Bind the already-booted Application and return the listening server
- * without waiting for SIGINT — used by the worker path and by tests.
+ * without waiting for SIGINT, used by the worker path and by tests.
  */
 export async function startServeWorker(
   app: Application,
@@ -72,7 +72,7 @@ async function waitForExit(child: ChildProcess): Promise<void> {
 }
 
 /**
- * Path to `tsx/dist/cli.mjs` — the real Node entry, not `node_modules/.bin/tsx`.
+ * Path to `tsx/dist/cli.mjs`, the real Node entry, not `node_modules/.bin/tsx`.
  * The bin file is a POSIX shim; `spawn(process.execPath, [shim, console.ts])`
  * makes Node run `console.ts` natively, which does not rewrite `.js` imports
  * to `.ts` and fails with `Cannot find module '.../bootstrap.js'`.
@@ -101,7 +101,7 @@ export function resolveTsxCli(cwd = process.cwd()): string | undefined {
  * The compiled case is the one that needs stating. Such a binary reports
  * `argv[1]` as a path inside its virtual filesystem (`/$bunfs/root/<name>`)
  * which does not exist on disk, so the old fallback of `argv.slice(1)` handed
- * that path back to the binary as its first argument — and Commander, which
+ * that path back to the binary as its first argument, and Commander, which
  * sees it as a subcommand name, exited with
  * `error: unknown command '/$bunfs/root/hivemind'`. The binary re-executes
  * itself, so everything before the command word must simply be dropped.
@@ -130,14 +130,14 @@ export function serveWorkerArgs(argv = process.argv, cwd = process.cwd()): strin
 }
 
 /**
- * `./artisan serve` — Laravel's development HTTP server. Binds
+ * `./artisan serve`, Laravel's development HTTP server. Binds
  * `@hono/node-server` in-process (this process already booted the
  * Application). Without `--no-reload`, a supervisor parent watches
  * `.env` and respawns a worker child of the same command.
  */
 export class ServeCommand extends Command {
   // Re-executes the app through a development runner and supervises `.env`
-  // for live reload — a checkout-only workflow (`command.ts`/`runtime-mode.ts`
+  // for live reload, a checkout-only workflow (`command.ts`/`runtime-mode.ts`
   // call this out explicitly), so a shipped binary should not offer it.
   static override devOnly = true;
 
@@ -167,7 +167,7 @@ export class ServeCommand extends Command {
     // Closing the listener releases the HTTP server and nothing else. A
     // dev server booted against MySQL/Postgres/Redis still holds those
     // pools and sockets, and each of them keeps Node's event loop alive
-    // on its own — so without this the process sits there after Ctrl+C
+    // on its own, so without this the process sits there after Ctrl+C
     // instead of exiting. `ConsoleKernel.run()` also terminates in a
     // `finally`, and `terminate()` is idempotent; the explicit call here
     // keeps `serve` correct for a caller that drives the command
@@ -183,7 +183,7 @@ export class ServeCommand extends Command {
     };
 
     // Pin SERVER_PORT only when the user (or SERVER_PORT itself) chose
-    // the port — otherwise the worker must keep `--tries` walking.
+    // the port, otherwise the worker must keep `--tries` walking.
     if (binding.portWasExplicit) {
       env.SERVER_PORT = String(binding.port);
     }

@@ -2,7 +2,7 @@
 
 Two builders, layered.
 
-`QueryBuilder<TRow>` is the low-level, table-scoped builder — Laravel's
+`QueryBuilder<TRow>` is the low-level, table-scoped builder, Laravel's
 `Illuminate\Database\Query\Builder`. No model awareness at all: a table
 name, a lazily-resolved connection, and accumulated where/order/limit
 state, executed on demand.
@@ -10,7 +10,7 @@ state, executed on demand.
 `EloquentBuilder<TRow, TRelations>` wraps it by **composition**, adding
 model awareness: hydration into instances, `retrieved` events,
 `whereKey()`, eager loading, and the relation-existence family. It
-manually redefines every chainable method and delegates — no `__call`
+manually redefines every chainable method and delegates, no `__call`
 forwarding, so renaming a method on `QueryBuilder` is a compile error, not
 a runtime surprise.
 
@@ -21,7 +21,7 @@ Post.query().toBase()        // QueryBuilder<PostTable>
 
 ## Starting a query
 
-Three entry points, in the order you should reach for them:
+Three entry points, in the order you should prefer them:
 
 ```ts
 Post.query()                 // EloquentBuilder — a model exists for this table
@@ -34,7 +34,7 @@ loading, relation-existence queries, and any global scopes the model
 declares.
 
 `DB.table(name)` hands you the low-level builder directly, for tables with
-no model — pivots, reporting views, ad-hoc reads. Everything below applies
+no model, pivots, reporting views, ad-hoc reads. Everything below applies
 to it except the `EloquentBuilder`-only sections. It is model-free in every
 sense, which includes **skipping global scopes**:
 
@@ -136,7 +136,7 @@ where(callback)                       // grouped
 | `where` | `orWhere` | |
 | `whereNot` | `orWhereNot` | Wraps the expression in `NOT` |
 
-Operators are a closed union — no arbitrary strings:
+Operators are a closed union, no arbitrary strings:
 
 ```ts
 type WhereOperator = "=" | "!=" | ">" | ">=" | "<" | "<=" | "like" | "is" | "is not";
@@ -147,8 +147,8 @@ type WhereOperator = "=" | "!=" | ">" | ">=" | "<" | "<=" | "like" | "is" | "is 
 ### Bound values
 
 You do not serialise values yourself. Every place the builder binds a
-value — a `where()` comparand, a `whereIn()` list, a `whereBetween()`
-bound, a raw binding, a `having()`, an `insert()`/`update()` payload —
+value, a `where()` comparand, a `whereIn()` list, a `whereBetween()`
+bound, a raw binding, a `having()`, an `insert()`/`update()` payload,
 accepts a `Bindable`:
 
 ```ts
@@ -173,12 +173,12 @@ PersonalAccessToken.query().where("expires_at", "<=", DateTime.now("UTC").toISOS
 ```
 
 **Datetime columns are assumed to store UTC**, and conversion happens on
-the way in — so `DateTime.now()` (which carries the *system* zone) and
+the way in, so `DateTime.now()` (which carries the *system* zone) and
 `DateTime.now("UTC")` bind identically. This matters more than it looks:
 `DateTime.toISOString()` renders in the instance's own zone, so a
 hand-serialised `DateTime.now()` in a `+08:00` zone produces
 `...T14:30:00.000+08:00`, which MySQL rejects outright and which SQLite
-and Postgres `timestamp` store as 14:30 *UTC* — an eight-hour silent
+and Postgres `timestamp` store as 14:30 *UTC*, an eight-hour silent
 shift. Letting the builder do it removes that class of bug.
 
 A model instance binds as its key, so a foreign-key comparison reads
@@ -189,14 +189,14 @@ Post.query().where("user_id", user).get();      // same as user.getKey()
 Post.query().whereIn("user_id", [alice, bob]).get();
 ```
 
-Normalisation is **unconditional** — it does not depend on the model
+Normalisation is **unconditional**. It does not depend on the model
 declaring a cast, and it applies to `DB.table()` queries that have no
 model at all. It is also independent of the [cast](../models/README.md)
 layer: a column declaring `Cast.datetime()` converts through the cast,
 everything else through this. Either way the value reaching the driver
 is UTC text.
 
-Plain objects and arrays are deliberately *not* auto-serialised — use
+Plain objects and arrays are deliberately *not* auto-serialised, use
 `Cast.json()` / `Cast.array()`, so a mistyped value fails loudly instead
 of silently landing in the column as `[object Object]`.
 
@@ -212,7 +212,7 @@ whereNotIn
 orWhereNotIn
 ```
 
-The second argument accepts a plain array **or** a `Subquery` — a
+The second argument accepts a plain array **or** a `Subquery`, a
 callback, an already-built `QueryBuilder`, or an `Expression`. There is
 deliberately no separate `whereInSubquery()` name; this matches Laravel's
 own overload.
@@ -231,7 +231,7 @@ Post.query().whereIn("id", Expression.raw("select post_id from likes where user_
 
 Inside a subquery callback you get a fresh, unbound `QueryBuilder`. Call
 `table()` to bind it (the equivalent of Kysely's `selectFrom()`) and
-`select()` to project a single column — a single-column projection is what
+`select()` to project a single column. A single-column projection is what
 makes the compiled SQL valid as an `IN (...)` operand. The callback's
 return value is ignored; the passed-in builder's final state is what
 compiles.
@@ -246,7 +246,7 @@ await Post.query().whereIn("id", []).get();      // []
 await Post.query().whereNotIn("id", []).get();   // every row
 ```
 
-This matters because these lists usually come from user input — a filter
+This matters because these lists usually come from user input, a filter
 built from an empty selection shouldn't 500.
 
 ### `NULL`
@@ -269,7 +269,7 @@ whereNotBetween(column, min, max)    orWhereNotBetween
 whereColumn(first, operator, second)     orWhereColumn
 ```
 
-Operator is required here — there's no two-argument form.
+Operator is required here. There's no two-argument form.
 
 ### `EXISTS`
 
@@ -310,7 +310,7 @@ whereRaw(): 2 binding(s) provided but the SQL has 1 "?" placeholder(s).
 ```
 
 The same validation applies to `orderByRaw()`, `groupByRaw()`,
-`havingRaw()`, `selectRaw()` and `Expression.raw()` — they all share
+`havingRaw()`, `selectRaw()` and `Expression.raw()`. They all share
 `buildRawSqlExpression()`.
 
 ### Date parts
@@ -375,13 +375,13 @@ Compiled SQL:
 | `whereJsonContainsKey` | `json_type(col, path) is not null` | `ifnull(json_contains_path(col, 'one', path), 0)` | `(col->'tags')::jsonb is not null` |
 | `whereJsonLength` | `json_array_length(col, path)` | `json_length(col, path)` | `jsonb_array_length((col->'tags')::jsonb)` |
 
-Only `->` segments are supported — no bracket or array-index syntax.
+Only `->` segments are supported, no bracket or array-index syntax.
 
 On Postgres the path is cast to `jsonb`, so these work against both
 `json` and `jsonb` columns (`@>` and `jsonb_array_length()` are
 `jsonb`-only).
 
-### `whereKey()` — EloquentBuilder only
+### `whereKey()`: EloquentBuilder only
 
 ```ts
 whereKey(id)   // where(model.primaryKey, id)
@@ -430,17 +430,17 @@ posts.first()!.comments_count;   // number — typed, not `any`
 posts.first()!.body;             // still typed from PostTable
 ```
 
-The SQL **must** alias its result — there's no separate alias argument.
+The SQL **must** alias its result. There's no separate alias argument.
 Use a correlated subquery rather than a join, so the result stays one row
 per table row with no ambiguous column names.
 
 ### `table()` is QueryBuilder-only
 
-`table()` isn't redefined on `EloquentBuilder`, on purpose — a model
+`table()` isn't redefined on `EloquentBuilder`, on purpose. A model
 builder is bound to `model.table`. Reach it through `toBase()`, which is
 what the subquery callbacks do, or start from `DB.table()`.
 
-`table()` returns `QueryBuilder<Record<string, any>>` rather than `this` —
+`table()` returns `QueryBuilder<Record<string, any>>` rather than `this`,
 switching tables invalidates the original `TRow`, so column names widen to
 accept anything afterwards.
 
@@ -457,7 +457,7 @@ projection necessary rather than optional (see below).
 | `crossJoin<TJoined>(table)` | `TRow & TJoined` |
 
 A join mixes columns from two tables into one row, so it widens the row
-type — the same thing `selectRaw<TExtra>()` already does, for the same
+type, the same thing `selectRaw<TExtra>()` already does, for the same
 reason:
 
 ```ts
@@ -477,7 +477,7 @@ with `selectRaw()`.
 ### `leftJoin` widens with `Partial`
 
 An unmatched left row nulls every joined column, so the honest type is
-`Partial<TJoined>` — the joined fields are possibly-`undefined`:
+`Partial<TJoined>`. The joined fields are possibly-`undefined`:
 
 ```ts
 const rows = await Article.query()
@@ -491,7 +491,7 @@ rows.first()!.author_name;   // string | undefined
 ### Multi-condition joins
 
 The callback form takes a `JoinClause`, which mirrors the where-tree
-design — each condition carries its own `and`/`or` connector:
+design, each condition carries its own `and`/`or` connector:
 
 | Method | Compares |
 |---|---|
@@ -511,7 +511,7 @@ await DB.table("tags")
 
 `JoinClause` is deliberately narrower than Laravel's, which is a full
 query builder accepting every `where*()` method. A join predicate complex
-enough to need `whereIn`/`whereExists` is a filter — put it in the outer
+enough to need `whereIn`/`whereExists` is a filter, put it in the outer
 `where()`.
 
 ### Aliases and self-joins
@@ -543,7 +543,7 @@ every table and duplicate names collide. Always project explicitly when
 the two tables share a column name (`id` and `created_at`, usually).
 
 On an `EloquentBuilder`, rows are still hydrated into **this** model's
-instances — joined columns land as ordinary attributes, not a nested
+instances, joined columns land as ordinary attributes, not a nested
 object. For a relation you want as a real instance, use `with()`.
 
 ### Joins are select-only
@@ -567,7 +567,7 @@ const rows = await DB.table("posts")
 | `union(subquery)` | Deduplicates |
 | `unionAll(subquery)` | Keeps duplicates |
 
-Takes the same `Subquery` shapes as `whereIn`/`whereExists` — a callback,
+Takes the same `Subquery` shapes as `whereIn`/`whereExists`, a callback,
 a built `QueryBuilder`, or an `Expression`.
 
 Both sides must project the same column set in the same order. The builder
@@ -581,7 +581,7 @@ SQL's own semantics.
 ### Locks are real on MySQL/Postgres, no-ops on SQLite
 
 `lock()`, `lockForUpdate()` and `sharedLock()` compile to `SELECT ...
-FOR UPDATE` / `FOR SHARE` on MySQL and Postgres — the standard
+FOR UPDATE` / `FOR SHARE` on MySQL and Postgres. The standard
 read-modify-write guard against two transactions both reading a balance
 before either writes it back:
 
@@ -596,15 +596,15 @@ Only meaningful **inside a transaction**: a lock taken by an
 autocommitted statement is released the moment it finishes.
 
 A string is emitted verbatim for engine-specific modifiers the builder
-doesn't model — `lock("for update skip locked")`,
+doesn't model: `lock("for update skip locked")`,
 `lock("for update nowait")`.
 
 **On SQLite the clause is not emitted at all.** The database is a single
 file with one writer, there is no row-level lock to take, and the engine
 rejects the syntax; Laravel's own `SQLiteGrammar::compileLock()` returns
 `''` for the same reason. The intent is still recorded, so the same code
-runs unchanged against SQLite in tests and MySQL/Postgres in production
-— but **do not rely on `lockForUpdate()` for correctness on SQLite**.
+runs unchanged against SQLite in tests and MySQL/Postgres in production,
+but **do not rely on `lockForUpdate()` for correctness on SQLite**.
 Use a transaction, or an atomic `UPDATE ... WHERE` that encodes the
 precondition.
 
@@ -649,7 +649,7 @@ Three consequences worth stating plainly:
 
 **`count()` ignores `orderBy`/`limit`/`offset`.** This is what makes
 pagination's "total across all pages" correct even though the same builder
-also carries a page-sized `limit`/`offset` for the data fetch — it mirrors
+also carries a page-sized `limit`/`offset` for the data fetch. It mirrors
 Laravel's `getCountForPagination()`. It also means
 `.limit(10).count()` returns the *full* matching count, not `10`.
 
@@ -659,7 +659,7 @@ whole query as a subquery (`select count(*) from (…)`). So
 `paginate()` reports the right `total` for a grouped or distinct query.
 
 **`first()` compiles its own `LIMIT 1`.** Kysely's `executeTakeFirst()`
-is `const [row] = await execute()` — without the limit the database
+is `const [row] = await execute()`, without the limit the database
 materialises and ships the entire result set to discard all but one row.
 `offset` is honoured, so `.offset(10).first()` is the eleventh row.
 
@@ -669,7 +669,7 @@ Be deliberate.
 ### `countBy()`
 
 `GROUP BY column` + `COUNT(*)` returned as a map. This framework's own
-addition — Eloquent has no single-call equivalent:
+addition. Eloquent has no single-call equivalent:
 
 ```ts
 const counts = await Like.query().whereIn("post_id", ids).countBy("post_id");
@@ -678,7 +678,7 @@ counts.get(post.id) ?? 0;
 
 It's the batched answer to "counts per parent" without an N+1, for cases
 outside a declared relation. For a filtered count of a *declared*
-relation, `withCount()` takes a constraining callback —
+relation, `withCount()` takes a constraining callback,
 `withCount({ comments: (q) => q.where("approved", 1) })`. See
 [Relationships](../relationships/#withcount).
 
@@ -703,8 +703,8 @@ for await (const post of Post.query().orderBy("id").lazy()) {
 
 **These are not true streaming.** All four use `LIMIT size OFFSET n`
 paging internally, issuing one query per page until a short page comes
-back. `cursor()` is a plain alias for `lazy()` — better-sqlite3 has no
-incremental cursor API through Kysely — and exists so call sites stay
+back. `cursor()` is a plain alias for `lazy()`, better-sqlite3 has no
+incremental cursor API through Kysely, and exists so call sites stay
 portable if a streaming driver ever lands.
 
 Consequences:
@@ -714,10 +714,10 @@ Consequences:
 - **Mutating rows mid-iteration shifts the window.** Deleting rows as you
   chunk means later pages skip records. There is no `chunkById()`. Fetch
   the ids up front if you're mutating.
-- A pre-set `limit`/`offset` is ignored — these methods manage them.
+- A pre-set `limit`/`offset` is ignored. These methods manage them.
 
 On `EloquentBuilder` all four hydrate each row into an instance and fire
-`retrieved`. **They do *not* run queued `with()` relations** — chunking is
+`retrieved`. **They do *not* run queued `with()` relations**. Chunking is
 for large batch processing, not display. Call `loadMany()` per page if you
 need relations:
 
@@ -743,7 +743,7 @@ await Post.query().orderBy("id").chunk(200, async (posts) => {
 | `decrementEach(columns, extra?)` | `Promise<number>` | |
 
 **`insert()` does not read back a generated id** on any engine, and
-stays that way deliberately — the model layer's
+stays that way deliberately, the model layer's
 `insertAndReadGeneratedId()` handles the read-back for `Model.create()`
 (via `RETURNING` on SQLite/Postgres, `LAST_INSERT_ID()` on MySQL).
 Bypassing the model means bypassing that.
@@ -752,9 +752,9 @@ Bypassing the model means bypassing that.
 guard. Be deliberate.
 
 `updateOrInsert()` returns `true` even when `values` is empty and nothing
-was written — matching Laravel. It adds its `attributes` predicates to a
+was written, matching Laravel. It adds its `attributes` predicates to a
 **clone**, so calling it doesn't permanently narrow the builder it was
-called on (this builder mutates in place — see [Every chainable method
+called on (this builder mutates in place. See [Every chainable method
 mutates `this`](#every-chainable-method-mutates-this)).
 
 `upsert()` compiles to `ON CONFLICT (cols) DO UPDATE` on SQLite and
@@ -790,7 +790,7 @@ raw(): SelectQueryBuilder<any, any, any>
 ```
 
 **QueryBuilder only.** The underlying Kysely SELECT builder with every
-accumulated clause already applied — the escape hatch for joins, window
+accumulated clause already applied, the escape hatch for joins, window
 functions, and anything else not modelled here:
 
 ```ts
@@ -805,14 +805,14 @@ const rows = await Post.query()
 
 For a builder with no model attached, start from `DB.table(name)`. For a
 fully raw query with no builder at all, go straight to
-`DB.connection().kysely` — see [Database](../database/#the-db-facade).
+`DB.connection().kysely`. See [Database](../database/#the-db-facade).
 
 ## Introspection and cloning
 
 | Method | Returns |
 |---|---|
 | `toSql()` | Compiled SQL with `?` placeholders |
-| `toRawSql()` | Compiled SQL with values inlined — **debugging only** |
+| `toRawSql()` | Compiled SQL with values inlined, **debugging only** |
 | `getBindings()` | `readonly SqlBinding[]`, in placeholder order |
 | `clone()` | An independent copy |
 
@@ -829,7 +829,7 @@ q.getBindings();   // [1, 10]
 (escaping single quotes only) and exists purely for logging.
 
 All three compile the SELECT, so they reflect the state at the moment you
-call them — and because chaining mutates, calling `toSql()` mid-chain
+call them, and because chaining mutates, calling `toSql()` mid-chain
 shows a partial query.
 
 `clone()` copies every accumulated array by value, so mutating the clone
@@ -852,7 +852,7 @@ Post.query()
 
 A function `value` is invoked with the builder to produce the condition;
 anything else is used as-is. The callback's return is kept when it isn't
-`null`/`undefined`, otherwise the builder is returned — so a `void`
+`null`/`undefined`, otherwise the builder is returned, so a `void`
 callback still chains. Both accept an optional third `default` callback
 for the else branch.
 
@@ -861,7 +861,7 @@ so it can call `with()`, scopes, and other model-aware methods.
 
 ## `Expression.raw()`
 
-A standalone, reusable raw SQL fragment — the port of Laravel's
+A standalone, reusable raw SQL fragment, the port of Laravel's
 `DB::raw()`. Unlike `whereRaw()` and friends, which are bolted onto a
 specific clause, an `Expression` is a *value* you can pass anywhere a
 subquery is accepted:
@@ -885,7 +885,7 @@ Expression.raw(): 1 binding(s) provided but the SQL has 2 "?" placeholder(s).
 ```
 
 When compiled into an `IN`/`EXISTS` position, an `Expression` is
-explicitly wrapped in `(...)` — a hand-written fragment has no
+explicitly wrapped in `(...)`. A hand-written fragment has no
 parentheses of its own, unlike a compiled `QueryBuilder` subquery.
 
 `toKysely()` exposes the underlying Kysely expression. It's for
@@ -916,7 +916,7 @@ Plus behaviour changes to inherited methods:
 - `where(callback)` nests into a fresh builder of the same subclass.
 - `clone()` preserves the builder subclass and the eager-load queue.
 
-It also **omits** `table()` and `raw()` — reach those via `toBase()`.
+It also **omits** `table()` and `raw()`, reach those via `toBase()`.
 
 See [Relationships](../relationships/) for `with`, `withCount` and the
 existence family in detail.
@@ -942,7 +942,7 @@ export default class PostBuilder extends EloquentBuilder<PostAttributes> {
 ```
 
 The builder is parameterised by the model's attributes interface, the same
-one the model itself is declared over — there is no separate row type to
+one the model itself is declared over. There is no separate row type to
 keep in sync.
 
 Wire it up on the model by overriding `static query()`, the single builder
@@ -984,7 +984,7 @@ be typed and are exactly the hidden dispatch this codebase avoids.
 **No `insertGetId()`.** `QueryBuilder.insert()` deliberately has no
 read-back; that lives in the model layer.
 
-**Locks compile to nothing on SQLite** (only there) — see above.
+**Locks compile to nothing on SQLite** (only there). See above.
 
 `toBase()`, `DB.table()`, `raw()`, `Expression.raw()` and
 `DB.connection().kysely` are the escape hatches, in increasing order of

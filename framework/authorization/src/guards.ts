@@ -13,14 +13,14 @@
  *       return user !== null && post.user_id === user.id;
  *     }
  *
- *     // Owner-only — `user` is non-null inside the callback:
+ *     // Owner-only. `user` is non-null inside the callback:
  *     update = requireAuth<UserRow, [PostTable]>((user, post) => post.user_id === user.id);
  *
  *     // Guests only (e.g. "may this visitor see the signup form"):
  *     register = requireGuest<[]>(() => true);
  *   }
  *
- * Both styles behave identically at the call site — these are a
+ * Both styles behave identically at the call site. These are a
  * convenience, not required ceremony.
  */
 
@@ -40,7 +40,7 @@ export function requireAuth<TUser, TArgs extends unknown[] = unknown[]>(
 /**
  * Deny authenticated users; the callback never receives a user at all.
  *
- * The mirror image of `requireAuth` — for abilities that only make sense
+ * The mirror image of `requireAuth`, for abilities that only make sense
  * for anonymous visitors.
  */
 export function requireGuest<TArgs extends unknown[] = unknown[]>(

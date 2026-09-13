@@ -10,7 +10,7 @@ export type MailableClass<M extends Mailable = Mailable> = abstract new (...args
  * The mail equivalent of Laravel's `Mail::fake()`.
  *
  * A drop-in `MailManager` subclass that **records** every `send()` call and
- * then **suppresses** the real delivery — no transport is resolved, nothing
+ * then **suppresses** the real delivery. No transport is resolved, nothing
  * leaves the process. Because a transport only ever sees the flattened
  * `RenderedMail` (the `Mailable` class identity is lost at that boundary),
  * the fake has to intercept at `send(mailable)` and keep the actual
@@ -37,7 +37,7 @@ export class RecordingMailManager extends MailManager {
 
   /**
    * Record the mailable and return a synthetic `SentMessage` without
-   * resolving a transport, rendering, or validating — deliberately: a
+   * resolving a transport, rendering, or validating, deliberately: a
    * fake proves the *intent* to send, so it must accept a half-built
    * mailable (no body, no global `mail.from`) that `render()` would
    * rightly reject. `build()` is still run so the envelope's
@@ -106,7 +106,7 @@ export class RecordingMailManager extends MailManager {
    * behaviour change. Use `queued()` / `assertQueued()` when the
    * distinction is what's under test.
    *
-   * Like `send()`, this skips `render()` — so a mailable that would fail
+   * Like `send()`, this skips `render()`, so a mailable that would fail
    * the real `queue()`'s in-memory-attachment guard still records here. A
    * fake proves intent; it is not a validation harness.
    */
@@ -253,7 +253,7 @@ export class RecordingMailManager extends MailManager {
     }
   }
 
-  /** Discard all recorded mailables — handy from a `beforeEach()` for per-test isolation. */
+  /** Discard all recorded mailables, handy from a `beforeEach()` for per-test isolation. */
   reset(): void {
     this.recorded = [];
     this.queuedMailables = [];

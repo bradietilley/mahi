@@ -34,7 +34,7 @@ export class StepError extends Error {}
 
 /**
  * True when `dir` doesn't exist, or exists and contains nothing that
- * would be clobbered. A lone `.git` is tolerated — cloning an empty repo
+ * would be clobbered. A lone `.git` is tolerated, cloning an empty repo
  * and scaffolding into it is a normal flow.
  */
 export async function directoryIsUsable(dir: string): Promise<boolean> {
@@ -48,7 +48,7 @@ export async function directoryIsUsable(dir: string): Promise<boolean> {
       return true;
     }
 
-    // The path exists but is a FILE, not a directory — `readdir` throws a
+    // The path exists but is a FILE, not a directory. `readdir` throws a
     // raw `ENOTDIR` here. Turn it into something a user can act on rather
     // than leaking the errno through the top-level handler.
     if (code === "ENOTDIR") {
@@ -77,7 +77,7 @@ export async function copyTemplate(templateDir: string, target: string): Promise
     await rm(source, { force: true });
   }
 
-  // `cp` preserves mode, but a published tarball may not — make sure
+  // `cp` preserves mode, but a published tarball may not, make sure
   // `./artisan` is executable regardless of how the template arrived.
   const artisan = path.join(target, "artisan");
 
@@ -87,7 +87,7 @@ export async function copyTemplate(templateDir: string, target: string): Promise
 }
 
 /**
- * Set the project name, and — with `linkWorkspace` — repoint every
+ * Set the project name, and, with `linkWorkspace`, repoint every
  * `@mahiframework/*` dependency at `workspace:*` so an app scaffolded inside the
  * framework monorepo resolves against the local packages rather than the
  * registry.

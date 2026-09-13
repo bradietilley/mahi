@@ -16,7 +16,7 @@ export interface Listener<E extends AbstractEvent = AbstractEvent> {
 }
 
 /**
- * An inline closure listener for a class event — the lightweight
+ * An inline closure listener for a class event, the lightweight
  * alternative to a full `Listener` class:
  *
  *   events.listen(TodoCreated, (event) => log(event.todoId));

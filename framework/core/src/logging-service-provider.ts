@@ -12,8 +12,8 @@ export const LOG_TOKEN = "log";
 /**
  * Registers the `LogManager` singleton with the built-in channel drivers
  * ("console", "single", "daily", "array", "null", "stack") pre-registered
- * via `extend()` — same mechanism a plugin would use to add e.g. a
- * "sentry" channel later. No `boot()` needed — none of the built-in
+ * via `extend()`, same mechanism a plugin would use to add e.g. a
+ * "sentry" channel later. No `boot()` needed, none of the built-in
  * channels need async warm-up.
  *
  * Driver names/semantics mirror Laravel's `config/logging.php` channels
@@ -22,13 +22,13 @@ export const LOG_TOKEN = "log";
  * discards everything, and "stack" fans out to other named channels.
  *
  * Lives in `@mahiframework/core` (not a downstream package) since `Logger`
- * itself is core, and this is a natural extension of it — but, unlike
+ * itself is core, and this is a natural extension of it, but, unlike
  * every other provider in this framework, is NOT registered implicitly:
  * an app must explicitly add `LoggingServiceProvider` to `providers[]`
  * like any other provider (consistent with there being no implicit
  * provider registration anywhere else in this framework, and with keeping
- * `Application.logger` as the always-available zero-config fallback —
- * see `LogManager`'s docstring for the full "these are two different
+ * `Application.logger` as the always-available zero-config fallback.
+ * See `LogManager`'s docstring for the full "these are two different
  * loggers" design decision).
  */
 export class LoggingServiceProvider extends ServiceProvider {

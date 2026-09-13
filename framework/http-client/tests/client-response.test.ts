@@ -139,7 +139,7 @@ describe("headers and cookies", () => {
     headers.append("set-cookie", "theme=dark; Expires=Wed, 21 Oct 2026 07:28:00 GMT");
     const response = await makeClientResponse(new Response(null, { headers }), request, 1);
 
-    // getSetCookie() is the only correct read — headers.get() comma-joins
+    // getSetCookie() is the only correct read, headers.get() comma-joins
     // them, which is ambiguous with the comma inside an Expires date.
     expect(response.cookies()).toEqual({ session: "abc", theme: "dark" });
   });
@@ -187,7 +187,7 @@ describe("failure handling", () => {
 
   it("throwIfStatus fires even on a successful status", async () => {
     const response = await respond("x", { status: 200 });
-    // Unconditional by design, matching Laravel — narrowing it to failures
+    // Unconditional by design, matching Laravel, narrowing it to failures
     // would make it useless for "this status is unexpected here".
     expect(() => response.throwIfStatus(200)).toThrow(RequestFailedError);
   });

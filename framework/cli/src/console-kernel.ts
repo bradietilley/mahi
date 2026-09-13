@@ -8,7 +8,7 @@ export interface ConsoleKernelOptions {
    * What the CLI calls itself in `--help` and in Commander's errors. Defaults
    * to the basename of `argv[1]` (see `deriveProgramName()`), which is right
    * for a compiled binary and for `npx <app>`, and wrong for an app invoked
-   * through a wrapper script with a different name — those should pass this
+   * through a wrapper script with a different name. Those should pass this
    * explicitly.
    */
   name?: string;
@@ -18,7 +18,7 @@ export interface ConsoleKernelOptions {
 
   /**
    * Enables `--version` / `-V`. Omitted, the flag does not exist and asking
-   * for it is an error — which is right for an app that has no meaningful
+   * for it is an error. Which is right for an app that has no meaningful
    * version, and wrong for anything distributed.
    */
   version?: string;
@@ -32,7 +32,7 @@ export interface ConsoleKernelOptions {
   /**
    * Whether `run()` calls `app.terminate()` when the command finishes.
    * Defaults to `true`, which is what makes a CLI process exit rather
-   * than hang on an open database pool — see `run()`.
+   * than hang on an open database pool. See `run()`.
    *
    * Set `false` only when one Application outlives several `run()` calls
    * (a REPL, an in-process test harness), where terminating after the
@@ -48,7 +48,7 @@ export interface ConsoleKernelOptions {
  * Commander program. Provider command classes are instantiated fresh per
  * CLI invocation (with the booted Application passed to their constructor).
  *
- * The kernel is the SAME object in development and in a shipped binary — that
+ * The kernel is the SAME object in development and in a shipped binary. That
  * is the point, and it is why commands are written once. Only two things
  * differ between the two, both handled here: what the program calls itself,
  * and whether commands that only work inside a checkout are offered.
@@ -111,7 +111,7 @@ export class ConsoleKernel {
    * The commands that will actually be registered, in order.
    *
    * A command declares `devOnly = true` when it cannot work outside a
-   * checkout — it writes into the source tree (`make:*`), shells out to a
+   * checkout. It writes into the source tree (`make:*`), shells out to a
    * dev dependency (`test`), or re-executes the app through `tsx` (`serve`).
    * In `user` mode those are dropped rather than hidden, so that `--help`
    * lists nothing that would fail if it were typed.
@@ -128,7 +128,7 @@ export class ConsoleKernel {
     // Providers are collected in `config/app.ts` order, and the framework's
     // come first, so "later" means "the app's". Without this Commander throws
     // `cannot add command 'serve' as already have command 'serve'` and the app
-    // does not boot AT ALL — not the command, the whole CLI, including
+    // does not boot AT ALL, not the command, the whole CLI, including
     // `--help`.
     //
     // The framework cannot know which names an application needs, which is
@@ -174,7 +174,7 @@ export class ConsoleKernel {
    * Name the program after the argv being parsed, not after the argv this
    * process happened to start with.
    *
-   * They differ whenever argv is passed explicitly — most often in
+   * They differ whenever argv is passed explicitly, most often in
    * tests, where deriving from `process.argv` yields the test runner's name
    * (`Usage: forks`) rather than the app's, and the derivation therefore goes
    * untested. An explicit `name` always wins.
@@ -206,7 +206,7 @@ export class ConsoleKernel {
       instance.configure(sub);
     }
 
-    // `list` — an explicit command that prints the same help Commander shows
+    // `list`, an explicit command that prints the same help Commander shows
     // for `--help`, matching Laravel's `artisan list`. Registered here (not
     // as a `Command` subclass) because it needs the program itself.
     //
@@ -218,7 +218,7 @@ export class ConsoleKernel {
     //
     // Skipped when the application already registered a `list` of its own.
     // `registeredCommands()` dedupes by name precisely so an app can replace a
-    // framework command, but this one is registered outside that map — so
+    // framework command, but this one is registered outside that map, so
     // without this guard an app owning the bare verb `list` (a task runner, a
     // package manager) makes Commander throw `cannot add command 'list' as
     // already have command 'list'` and the CLI does not boot AT ALL: not that
@@ -252,7 +252,7 @@ export class ConsoleKernel {
    *
    * Termination is in a `finally` and applies to every command, including
    * one that threw, because the failure mode it prevents is not
-   * command-specific: any open pool or socket — MySQL, Postgres, Redis —
+   * command-specific: any open pool or socket, MySQL, Postgres, Redis,
    * keeps Node's event loop alive, so a command that finishes its work
    * and returns leaves the process running with nothing to do. Measured:
    * `migrate` against MySQL never exited at all.
@@ -264,16 +264,16 @@ export class ConsoleKernel {
    * closes) is not penalised for it.
    *
    * Set `terminate: false` in the kernel options for the rare embedder
-   * that runs several commands against one long-lived application — a
-   * REPL, a test harness driving the CLI in-process — where tearing the
+   * that runs several commands against one long-lived application, a
+   * REPL, a test harness driving the CLI in-process, where tearing the
    * app down after the first command would break the second.
    */
   async run(argv: string[] = process.argv): Promise<void> {
     this.applyProgramName(argv);
     this.build();
 
-    // A bare `./artisan` (no command, no flags) prints help and exits 0 —
-    // the help is what the user asked for. Commander's own default would
+    // A bare `./artisan` (no command, no flags) prints help and exits 0.
+    // The help is what the user asked for. Commander's own default would
     // print help and set exit code 1.
     if (this.hasNoCommand(argv)) {
       this.program.outputHelp();
@@ -298,7 +298,7 @@ export class ConsoleKernel {
 /**
  * Render a failed command as ONE readable line, not the ~40-line
  * Kysely/driver stack a raw throw produces. The full stack is still
- * available on demand — set `DEBUG`, or pass `-v`/`--verbose` — for the
+ * available on demand, set `DEBUG`, or pass `-v`/`--verbose`, for the
  * cases where the message alone is not enough.
  *
  * Exported so every entrypoint (`bin/console.ts`) renders a failed command

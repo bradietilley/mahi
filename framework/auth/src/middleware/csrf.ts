@@ -4,7 +4,7 @@ import { SIGNER_TOKEN, type Signer } from "@mahiframework/encryption";
 import { HttpError, type CookieOptions, type HttpPipe } from "@mahiframework/http";
 
 export interface CsrfOptions {
-  /** Cookie holding the token. Readable by JS by design — see below. */
+  /** Cookie holding the token. Readable by JS by design. See below. */
   cookie?: string;
   /** Header the client must echo it back in. */
   header?: string;
@@ -20,7 +20,7 @@ export interface CsrfOptions {
   domain?: string;
   /**
    * `__Host-`/`__Secure-` cookie prefix. `"host"` is the strongest
-   * option — a `__Host-` cookie cannot be written by a sibling subdomain,
+   * option. A `__Host-` cookie cannot be written by a sibling subdomain,
    * which closes the one hole double-submit CSRF otherwise leaves open
    * (see below).
    *
@@ -48,13 +48,13 @@ const DEFAULT_SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
  * A random token is set in a cookie that JS CAN read (deliberately not
  * `httpOnly`), and unsafe requests must send it back in a header or form
  * field. An attacker's cross-origin page can make the browser *send* the
- * cookie but cannot *read* it, so it cannot produce the matching header —
- * that asymmetry is the entire mechanism.
+ * cookie but cannot *read* it, so it cannot produce the matching header.
+ * That asymmetry is the entire mechanism.
  *
  * SIGNED, not bare. The cookie value is `<token>.<hmac>` via the app's
  * `Signer`, and a cookie whose signature doesn't verify is discarded and
  * re-issued rather than trusted. Without that, plain double-submit
- * accepts *any* value that appears in both places — so an attacker able
+ * accepts *any* value that appears in both places, so an attacker able
  * to write a cookie (an XSS on a sibling subdomain, a MITM on plain HTTP,
  * which can set cookies for the HTTPS origin) can pick both halves and
  * forge freely. Signing means only tokens this server minted count.
@@ -68,7 +68,7 @@ const DEFAULT_SAFE_METHODS = ["GET", "HEAD", "OPTIONS"];
  * defense.
  *
  * The cookie is queued on the `Request`, so it is written by the HTTP
- * boundary regardless of what the handler returns — see `@mahiframework/http`'s
+ * boundary regardless of what the handler returns. See `@mahiframework/http`'s
  * `cookies.ts`.
  */
 export function csrf(options: CsrfOptions = {}): HttpPipe {
@@ -123,7 +123,7 @@ export function csrf(options: CsrfOptions = {}): HttpPipe {
  * An unprefixed CSRF cookie can be overwritten by a sibling subdomain (via
  * XSS there, or a MITM on plain HTTP setting a cookie for the HTTPS
  * origin), which is exactly the write primitive double-submit can't defend
- * against on its own. `__Host-` forbids that — but it also forbids a
+ * against on its own. `__Host-` forbids that, but it also forbids a
  * `Domain` attribute and a non-root `Path`, so we can only default to it
  * when the cookie isn't scoped that way; otherwise `__Secure-` is the
  * strongest compatible choice. On plain HTTP (`secure: false`) no prefix
@@ -191,7 +191,7 @@ function readToken(cookie: string | undefined, signer: Signer | null): string | 
 /**
  * The token the client presented: the header first, then the form field.
  *
- * The field fallback is what makes this usable from a plain HTML form —
+ * The field fallback is what makes this usable from a plain HTML form,
  * a client with no JavaScript cannot set a header at all, so a
  * header-only check silently restricts the app to fetch/XHR callers.
  */
@@ -219,7 +219,7 @@ function cookieOptions(options: CsrfOptions, prefix: "secure" | "host" | undefin
   return {
     // Deliberately NOT httpOnly: the client has to read this one to echo
     // it back. That is safe precisely because the token is not itself a
-    // credential — it proves same-origin, not identity.
+    // credential. It proves same-origin, not identity.
     httpOnly: false,
     secure: options.secure ?? true,
     sameSite: options.sameSite ?? "Lax",

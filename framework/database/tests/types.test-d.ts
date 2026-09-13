@@ -1,5 +1,5 @@
 /**
- * Compile-time assertions for the redesigned model type layer — the half
+ * Compile-time assertions for the redesigned model type layer, the half
  * of the contract the runtime tests structurally cannot cover. `tsc` is
  * the assertion; nothing here runs.
  *
@@ -203,7 +203,7 @@ async function loaded() {
   // `author` is now non-undefined (the essence of `Loaded<Post, "author">`).
   expectTypeOf(post.author).toEqualTypeOf<User>();
   // ...and the terminal's type IS that narrowing, not merely something
-  // shaped like it — `Loaded` is exported, so the equivalence is public.
+  // shaped like it. `Loaded` is exported, so the equivalence is public.
   expectTypeOf(post).toEqualTypeOf<Loaded<Post, "author">>();
   // `comments` (not loaded) stays optional.
   expectTypeOf(post.comments).toEqualTypeOf<Collection<Comment> | undefined>();
@@ -298,7 +298,7 @@ class MNote extends Model<MNoteAttributes>()({ table: "m_notes", primaryKey: "id
 
 async function morphToStopsThePath() {
   // A `morphTo` is a leaf for path purposes. Both targets here declare
-  // `owner`, so the shared name would otherwise look walkable — but the
+  // `owner`, so the shared name would otherwise look walkable, but the
   // loader resolves a morph node's children per discriminant and throws
   // on a dot path through one. `morphWith()` is how those nest.
   await MNote.query().with("notable").get();
@@ -321,7 +321,7 @@ async function softDeletes() {
   Post.onlyTrashed();
 
   // A non-soft-delete model still exposes `trashed()` (it returns `false`
-  // at runtime — the question is meaningful, the answer is "no"), matching
+  // at runtime. The question is meaningful, the answer is "no"), matching
   // Laravel. The config only gates the meaningful cases.
   const user = await User.findOrFail("x");
   expectTypeOf(user.trashed()).toEqualTypeOf<boolean>();
@@ -398,7 +398,7 @@ class RenamedTimestampsModel extends Model<{
 void RenamedTimestampsModel;
 
 // `primaryKey` naming a relation is rejected by `ModelConfig` itself
-// (the field is typed `ColumnKeys<A>`), not by a lint rule — so the
+// (the field is typed `ColumnKeys<A>`), not by a lint rule, so the
 // error is a plain assignability one. Pinned here so that if the field's
 // type is ever loosened, this starts compiling and fails the build.
 interface PkIsRelation {
@@ -466,7 +466,7 @@ void WrongRelModel;
 // `RelationBuildersFor` intersects each accessor with `RelationWritesFor`,
 // so the write API is present exactly where the relation kind supports
 // it. These are the assertions that keep `attach()` off a `belongsTo`
-// and `associate()` off a pivot — a runtime test cannot see either,
+// and `associate()` off a pivot. A runtime test cannot see either,
 // because neither line would ever be written by a passing test.
 
 interface AuthorAttributes {
@@ -606,7 +606,7 @@ async function relationWritesAreKindSpecific(post: WritablePost) {
 void relationWritesAreKindSpecific;
 
 // A `morphTo` accessor is a MorphToBuilder, which declares its own
-// associate()/dissociate() — instance-only, since a bare key cannot
+// associate()/dissociate(), instance-only, since a bare key cannot
 // supply the discriminant.
 async function morphToWrites(comment: WComment, post: WritablePost) {
   comment.relations.commentable().associate(post);

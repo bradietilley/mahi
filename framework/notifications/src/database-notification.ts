@@ -41,7 +41,7 @@ export class DatabaseNotification extends Model<DatabaseNotificationAttributes>(
   }
 
   /**
-   * Stamp `read_at` (and `updated_at`) now and persist — a no-op if it was
+   * Stamp `read_at` (and `updated_at`) now and persist, a no-op if it was
    * already read. The instance counterpart to the bulk `markAllAsRead()`.
    */
   async markAsRead(): Promise<void> {
@@ -52,7 +52,7 @@ export class DatabaseNotification extends Model<DatabaseNotificationAttributes>(
     await this.updateInstance({ read_at: new Date().toISOString() });
   }
 
-  /** Clear `read_at` and persist — a no-op if it was already unread. */
+  /** Clear `read_at` and persist, a no-op if it was already unread. */
   async markAsUnread(): Promise<void> {
     if (this.unread()) {
       return;
@@ -62,7 +62,7 @@ export class DatabaseNotification extends Model<DatabaseNotificationAttributes>(
   }
 
   /**
-   * A query scoped to one recipient's notifications, newest first —
+   * A query scoped to one recipient's notifications, newest first.
    * `(notifiable_type, notifiable_id)` is the composite-indexed pair the
    * table exists to serve. Pass the discriminant + id the way
    * `DatabaseChannel` wrote them.

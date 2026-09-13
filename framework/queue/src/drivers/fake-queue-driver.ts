@@ -8,7 +8,7 @@ import type { JobRegistry } from "../job-registry.js";
  * How a test names the job it's asserting on: either the registered name
  * (`"posts:log-created"`) or the class itself (`LogPostCreatedJob`).
  *
- * The class form is the one you actually want — it's what the dispatch
+ * The class form is the one you actually want. It's what the dispatch
  * site says, it survives a rename, and a typo is a compile error rather
  * than a silently-passing `assertNotPushed()`. It requires the driver to
  * know the `JobRegistry` (to map class -> registered name); when the
@@ -17,7 +17,7 @@ import type { JobRegistry } from "../job-registry.js";
 export type JobIdentifier = string | JobClass;
 
 /**
- * A record of one `push()` call captured by `FakeQueueDriver` — the job's
+ * A record of one `push()` call captured by `FakeQueueDriver`, the job's
  * registered name, its serialized `state` (the job-instance fields, with
  * any `Model` encoded to a `{ __model, __id }` reference), the
  * `delaySeconds` it was pushed with (0 when dispatched without a delay),
@@ -28,13 +28,13 @@ export interface PushedJob {
   state: JobState;
   delaySeconds: number;
   chain: ChainedJob[];
-  /** The named queue it was pushed onto — `"default"` unless one was given. */
+  /** The named queue it was pushed onto, `"default"` unless one was given. */
   queue: string;
   /**
    * Whether the push was deferred until an enclosing transaction commits
    * (`Bus.dispatch(job, { afterCommit: true })`). The fake records the
    * push at the point it was *made*, which for a deferred dispatch is
-   * after the commit — so seeing `true` here means "this really was
+   * after the commit, so seeing `true` here means "this really was
    * deferred and the transaction really did commit".
    */
   afterCommit: boolean;
@@ -45,7 +45,7 @@ export interface PushedJob {
  *
  * Unlike `SyncQueueDriver` (which runs jobs immediately and *for real*,
  * side effects and all), this driver **records** every `push()` into an
- * in-memory array and never executes anything — so a test can assert
+ * in-memory array and never executes anything, so a test can assert
  * *what would have been dispatched* without the job's real work happening.
  * `pop()` therefore always returns `undefined` (nothing is ever worked),
  * and `release`/`delete`/`fail` are no-ops, exactly as with the sync
@@ -67,8 +67,8 @@ export interface PushedJob {
  * The class form needs a `JobRegistry` (to resolve class -> registered
  * name); `createTestApplication({ fakeQueue: true })` wires it up, and
  * so does the `"fake"` connection registered by `QueueServiceProvider`.
- * Constructed bare (`new FakeQueueDriver()`), only the string form works
- * — passing a class then throws a message saying so, rather than quietly
+ * Constructed bare (`new FakeQueueDriver()`), only the string form works,
+ * passing a class then throws a message saying so, rather than quietly
  * matching nothing.
  *
  * Assertions throw a plain `Error` on failure (not a vitest matcher) so
@@ -111,7 +111,7 @@ export class FakeQueueDriver implements QueueDriver {
 
   /**
    * Defers the recording until the enclosing transaction commits, exactly
-   * as a durable driver defers the real push — so a test can assert that
+   * as a durable driver defers the real push, so a test can assert that
    * a rolled-back transaction pushed nothing, which is the entire point
    * of `afterCommit`. Runs immediately outside a transaction.
    */
@@ -147,23 +147,23 @@ export class FakeQueueDriver implements QueueDriver {
 
   // The parameters are declared (and ignored) rather than omitted: dropping
   // them satisfies `QueueDriver` structurally, but callers holding the
-  // concrete class — the normal way a fake is used in a test — would then
+  // concrete class, the normal way a fake is used in a test, would then
   // get "Expected 0 arguments" for the very calls the interface mandates.
   async release(_job: QueuedJob, _delaySeconds?: number): Promise<void> {
     // No-op: a fake never works jobs, so nothing is ever released.
   }
 
   async delete(_job: QueuedJob): Promise<void> {
-    // No-op — see release().
+    // No-op. See release().
   }
 
   async fail(_job: QueuedJob, _error: Error): Promise<void> {
-    // No-op — see release().
+    // No-op. See release().
   }
 
   /**
    * Every recorded push of `job` (a job class or its registered name), in
-   * dispatch order — all pushes when called with no argument. Optionally
+   * dispatch order, all pushes when called with no argument. Optionally
    * filtered by a predicate on the recorded
    * `{ jobClass, state, delaySeconds }` tuple.
    */
@@ -235,7 +235,7 @@ export class FakeQueueDriver implements QueueDriver {
   }
 
   /**
-   * Assert `job` was pushed **after a transaction committed** — i.e.
+   * Assert `job` was pushed **after a transaction committed**, i.e.
    * dispatched with `{ afterCommit: true }` (or a connection configured
    * `afterCommit: true`) and the transaction did commit.
    *
@@ -263,7 +263,7 @@ export class FakeQueueDriver implements QueueDriver {
     }
   }
 
-  /** Discard all recorded pushes — handy from a `beforeEach()` for per-test isolation. */
+  /** Discard all recorded pushes, handy from a `beforeEach()` for per-test isolation. */
   reset(): void {
     this.jobs = [];
   }

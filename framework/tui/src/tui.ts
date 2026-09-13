@@ -31,7 +31,7 @@ export interface FakeTuiHandle {
 }
 
 /**
- * The `@mahiframework/tui` public facade — one static method per feature.
+ * The `@mahiframework/tui` public facade, one static method per feature.
  * Talks directly to `process.stdin`/`process.stdout` (through the
  * module-level indirection in `context.ts`); no dependency on
  * `@mahiframework/core`, the container, or any other framework package.
@@ -65,7 +65,7 @@ export class Tui {
     writeNote(getOutput(), message, "outro");
   }
 
-  /** Low-level entry point matching `renderNote`'s full `NoteType` set — `note`/`error`/etc. above are thin wrappers over this. */
+  /** Low-level entry point matching `renderNote`'s full `NoteType` set, `note`/`error`/etc. above are thin wrappers over this. */
   static display(message: string, type: NoteType): void {
     writeNote(getOutput(), message, type);
   }
@@ -81,12 +81,12 @@ export class Tui {
     return select(label, options);
   }
 
-  /** Boolean yes/no prompt — port of Laravel's `$this->confirm($question, $default = false)` / `laravel/prompts`' `confirm()`. Toggle with y/n or arrow/tab keys, submit with Enter. */
+  /** Boolean yes/no prompt, port of Laravel's `$this->confirm($question, $default = false)` / `laravel/prompts`' `confirm()`. Toggle with y/n or arrow/tab keys, submit with Enter. */
   static async confirm(label: string, options: ConfirmOptions = {}): Promise<boolean> {
     return confirm(label, options);
   }
 
-  /** Masked (`•`) text input — port of Laravel's `$this->secret($question)` / `laravel/prompts`' `password()`, for values that shouldn't echo to the terminal (passwords, tokens). */
+  /** Masked (`•`) text input, port of Laravel's `$this->secret($question)` / `laravel/prompts`' `password()`, for values that shouldn't echo to the terminal (passwords, tokens). */
   static async secret(label: string, options: SecretOptions = {}): Promise<string> {
     return secret(label, options);
   }
@@ -128,7 +128,7 @@ export class Tui {
   /**
    * Runs `callback`, printing a `label ......... RUNNING` line while
    * it's in flight and replacing it with `label ......... 12ms DONE`
-   * (or `FAIL` if it throws) once it settles — port of Laravel's
+   * (or `FAIL` if it throws) once it settles, port of Laravel's
    * `$this->components->task(...)`. See `task.ts` for the non-TTY
    * fallback and in-place-overwrite behavior.
    */
@@ -136,7 +136,7 @@ export class Tui {
     return task(label, callback);
   }
 
-  /** Prints a single, already-settled task-status line (no RUNNING state) — e.g. to report a "skipped" outcome. */
+  /** Prints a single, already-settled task-status line (no RUNNING state), e.g. to report a "skipped" outcome. */
   static taskLine(label: string, result: TaskResult, durationMs?: number): void {
     writeTaskLine(label, result, durationMs);
   }
@@ -156,7 +156,7 @@ export class Tui {
 
   /**
    * Force the TTY-detection result every feature checks before deciding
-   * whether to run interactively — matches PHP's `Prompt::interactive()`.
+   * whether to run interactively, matches PHP's `Prompt::interactive()`.
    * `Tui.fake()` calls this internally with `true` so `ask()`/`select()`
    * take the interactive code path even under a non-TTY test runner.
    *
@@ -165,7 +165,7 @@ export class Tui {
    *   Tui.clearInteractive();   // back to real TTY detection
    *
    * Clearing is a separate method rather than `interactive(undefined)`
-   * because a default parameter fires on an explicit `undefined` too — so
+   * because a default parameter fires on an explicit `undefined` too, so
    * with `value = true` the "clear" call was indistinguishable from
    * "force on", and silently did the opposite of what it read as.
    *
@@ -184,7 +184,7 @@ export class Tui {
   /**
    * Swaps in a `BufferedOutput` + a `FakeTerminal` that yields `keys`
    * one at a time instead of reading real stdin, and forces
-   * `Tui.interactive(true)`. Public API (not test-only internals) —
+   * `Tui.interactive(true)`. Public API (not test-only internals),
    * mirrors `Prompt::fake([...keys])` being part of `laravel/prompts`'
    * own public surface, so consumers' tests (e.g. `@mahiframework/cli`
    * command tests) can simulate a terminal without a real TTY.
@@ -192,7 +192,7 @@ export class Tui {
   static fake(keys: string[] = []): FakeTuiHandle {
     const buffered = new BufferedOutput();
     setOutput(buffered);
-    // One shared FakeTerminal for the whole fake() session — every
+    // One shared FakeTerminal for the whole fake() session, every
     // prompt constructed while faked (e.g. ask() then select() in the
     // same test) draws from the same queue, matching PHP's single
     // static `Prompt::$terminal` mock shared across every Prompt
@@ -206,7 +206,7 @@ export class Tui {
     // it again via `resetContext()`.
     setColorOverride(true);
     setCancelHandler(() => {
-      /* no-op under Tui.fake() — matches PHP's mocked Terminal::exit() */
+      /* no-op under Tui.fake(), matches PHP's mocked Terminal::exit() */
     });
     setDimensionsOverride({ cols: 80, rows: 24 });
 

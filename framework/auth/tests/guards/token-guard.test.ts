@@ -129,7 +129,7 @@ describe("TokenGuard", () => {
   });
 
   it("does not touch last_used_at when verification fails", async () => {
-    // A failed guess must not write — otherwise the column becomes a log
+    // A failed guess must not write, otherwise the column becomes a log
     // of attack attempts rather than of genuine use.
     const { token, record } = await guard.createToken(alice.id, "cli");
     const [id] = token.split("|") as [string, string];

@@ -9,8 +9,8 @@ export interface ContentOptions {
  * The body half of a message: an HTML renderer, a text renderer, or both.
  *
  * Each is stored as a thunk (`() => string | Promise<string>`) rather than
- * an eager string so that rendering — which may be async (reading a
- * template file, awaiting an app-chosen template engine) — happens lazily
+ * an eager string so that rendering, which may be async (reading a
+ * template file, awaiting an app-chosen template engine), happens lazily
  * inside `Mailable.render()`, not when the `Mailable` is constructed. This
  * is the deliberate departure from Laravel's Blade-`view`-name approach:
  * there is no bundled component/template system, the app supplies whatever

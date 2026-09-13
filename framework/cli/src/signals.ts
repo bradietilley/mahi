@@ -1,5 +1,5 @@
 /**
- * Generic, reusable signal registration — port of Laravel's
+ * Generic, reusable signal registration, port of Laravel's
  * `Illuminate\Console\Concerns\InteractsWithSignals::trap()`
  * (`$this->trap([SIGINT, SIGTERM], fn () => ...)`), simplified: PHP
  * needs `pcntl_signal()` plus a whole `Signals`/`SignalRegistry`
@@ -9,13 +9,13 @@
  * port of any real machinery.
  */
 
-/** Any signal name Node's `process.on()`/`process.off()` accept — re-exported under a shorter name for call sites. */
+/** Any signal name Node's `process.on()`/`process.off()` accept, re-exported under a shorter name for call sites. */
 export type Signal = NodeJS.Signals;
 
 /**
  * Registers `callback` to run when any of `signals` is delivered to
  * this process. Returns an `untrap()` function that removes exactly
- * the handlers this call registered — always call it once the
+ * the handlers this call registered, always call it once the
  * trapped work is done (e.g. in a `finally` block) to avoid leaking
  * listeners, matching Laravel's paired `trap()`/`untrap()`.
  *

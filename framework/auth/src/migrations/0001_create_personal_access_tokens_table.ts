@@ -3,7 +3,7 @@ import { Schema, type Migration, type Blueprint } from "@mahiframework/database"
 /**
  * `personal_access_tokens` backing `TokenGuard`.
  *
- * `token` stores a SHA-256 digest, never the plaintext secret — a leaked
+ * `token` stores a SHA-256 digest, never the plaintext secret, a leaked
  * database dump therefore yields no usable credentials. The primary key
  * is the token id that clients send as the `"<id>|<secret>"` prefix, so
  * authenticating a request is one indexed PK lookup (see `token-hash.ts`

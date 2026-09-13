@@ -14,7 +14,7 @@ import type { RenderedMail } from "../src/mail-transport.js";
  * The only transport with no coverage, and the only one whose failures are
  * invisible from the outside: an `ArrayTransport` test proves a message was
  * *assembled*, but nothing proved the assembled message survives a real
- * SMTP conversation — that auth is offered and accepted, that STARTTLS is
+ * SMTP conversation. That auth is offered and accepted, that STARTTLS is
  * negotiated before credentials go out, that attachments and headers arrive
  * intact on the wire.
  *
@@ -25,7 +25,7 @@ import type { RenderedMail } from "../src/mail-transport.js";
  *
  * TLS uses a throwaway certificate minted per run rather than
  * smtp-server's bundled pair, which is hard-coded with a fixed expiry and
- * has already lapsed — using it fails with "certificate has expired"
+ * has already lapsed, using it fails with "certificate has expired"
  * regardless of `rejectUnauthorized`, and would have made this suite start
  * failing on a date nobody chose. The client passes
  * `rejectUnauthorized: false` because the cert is self-signed: correct for
@@ -89,7 +89,7 @@ describe("SmtpTransport", () => {
   function startServer(
     options: {
       requireAuth?: boolean;
-      /** Remove the STARTTLS verb entirely — a plaintext-only relay. */
+      /** Remove the STARTTLS verb entirely, a plaintext-only relay. */
       noTls?: boolean;
       credentials?: { user: string; pass: string };
       rejectData?: boolean;
@@ -252,7 +252,7 @@ describe("SmtpTransport", () => {
     it("upgrades the connection BEFORE sending credentials", async () => {
       // The security property that matters. If nodemailer authenticated
       // first and upgraded afterwards, the password would cross the wire
-      // in plaintext — and every assertion in the auth block above would
+      // in plaintext, and every assertion in the auth block above would
       // still pass. `session.secure` at the moment of AUTH is the only
       // thing that distinguishes the two.
       const { port, capture } = await startServer({ requireAuth: true });
@@ -274,7 +274,7 @@ describe("SmtpTransport", () => {
       // The opposite of the test below, and the reason the option exists.
       // Opportunistic STARTTLS silently accepts a plaintext session when
       // the server does not offer an upgrade, which is indistinguishable
-      // from success at the call site — the mail sends, and the password
+      // from success at the call site, the mail sends, and the password
       // crossed the wire in the clear. `requireTLS` turns that into an
       // error.
       const { port, capture } = await startServer({ requireAuth: false, noTls: true });
@@ -331,7 +331,7 @@ describe("SmtpTransport", () => {
       const sent = await transport.send(makeMail());
 
       expect(sent.accepted).toEqual(["rcpt@example.com"]);
-      // Delivered, but in the clear — which is precisely why `requireTLS`
+      // Delivered, but in the clear. Which is precisely why `requireTLS`
       // exists. The call site cannot tell this apart from an encrypted
       // send: same resolved promise, same `accepted` list.
       expect(capture.secureAtData[0]).toBe(false);
@@ -448,7 +448,7 @@ describe("SmtpTransport", () => {
 
       const raw = capture.raw[0] ?? "";
       expect(raw).toContain("notes.txt");
-      // Base64 of "attachment contents" — the bytes survived the encode.
+      // Base64 of "attachment contents", the bytes survived the encode.
       expect(raw).toContain(Buffer.from("attachment contents").toString("base64"));
     });
   });
@@ -536,7 +536,7 @@ describe("SmtpTransport", () => {
       await transport.send(makeMail({ subject: "Second" }));
 
       expect(capture.raw).toHaveLength(2);
-      // One connection, so one authentication — the point of pooling.
+      // One connection, so one authentication, the point of pooling.
       expect(capture.auth).toHaveLength(1);
     });
   });

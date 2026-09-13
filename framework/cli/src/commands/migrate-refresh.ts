@@ -35,7 +35,7 @@ export class MigrateRefreshCommand extends Command {
     }
 
     if (options.seed) {
-      // Already confirmed above for the whole operation — do not prompt twice.
+      // Already confirmed above for the whole operation, do not prompt twice.
       await new DbSeedCommand(this.app).handle({ force: true });
     }
   }

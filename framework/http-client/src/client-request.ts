@@ -62,7 +62,7 @@ export class ClientRequest {
 
   /**
    * A single header's value, or `undefined` if absent. Returns a string
-   * (comma-joined if multi-valued), never an array — Laravel's
+   * (comma-joined if multi-valued), never an array, Laravel's
    * `Request::header()` returning an array while `Response::header()`
    * returns a string is a foot-gun this port declines to reproduce.
    */
@@ -71,7 +71,7 @@ export class ClientRequest {
   }
 
   /**
-   * Whether the header is present, and — if `value` is given — whether it
+   * Whether the header is present, and, if `value` is given, whether it
    * matches exactly. Port of `Request::hasHeader($key, $value)`.
    */
   hasHeader(name: string, value?: string): boolean {
@@ -87,7 +87,7 @@ export class ClientRequest {
   /**
    * The serialized request body as a string. Empty for a body-less request
    * (`GET`), for a `FormData` multipart body (whose serialization is the
-   * transport's job — use `hasFile()`/`data()` instead), and for a stream.
+   * transport's job, use `hasFile()`/`data()` instead), and for a stream.
    */
   body(): string {
     if (typeof this._body === "string") {
@@ -102,7 +102,7 @@ export class ClientRequest {
   }
 
   /**
-   * The decoded payload exactly as passed to `post()`/`put()`/`patch()` —
+   * The decoded payload exactly as passed to `post()`/`put()`/`patch()`,
    * the object, not a re-parsed body string. This is the ergonomic win that
    * `laravel_data` exists to provide in Laravel; keeping it on the request
    * directly beats smuggling it through a transport option.
@@ -129,8 +129,8 @@ export class ClientRequest {
   }
 
   isMultipart(): boolean {
-    // A `FormData` body has no explicit Content-Type yet — `fetch` generates
-    // one with the boundary at send time — so the body type is the signal.
+    // A `FormData` body has no explicit Content-Type yet, `fetch` generates
+    // one with the boundary at send time, so the body type is the signal.
     return this._body instanceof FormData;
   }
 
@@ -203,7 +203,7 @@ export class ClientRequest {
 
   /**
    * The platform `Request` handed to the transport. `duplex: "half"` is set
-   * automatically for a `ReadableStream` body — `fetch` throws without it,
+   * automatically for a `ReadableStream` body. `fetch` throws without it,
    * and it is exactly the kind of detail that should not be the caller's
    * problem.
    */
@@ -232,7 +232,7 @@ export class ClientRequest {
 
 /**
  * Links a platform `Request` back to the `ClientRequest` that produced it,
- * so the stub transport can match on `data()`/`hasFile()` — a `Request` has
+ * so the stub transport can match on `data()`/`hasFile()`. A `Request` has
  * lost the decoded payload, and re-parsing its body is both async and
  * lossy. A `WeakMap`, so it never keeps a request alive.
  */
@@ -240,7 +240,7 @@ export const currentClientRequest = new WeakMap<Request, ClientRequest>();
 
 /**
  * Text contents of `File`s built by `attach()`, so `hasFile(name, contents)`
- * can compare synchronously — `File.text()` is async and an assertion
+ * can compare synchronously. `File.text()` is async and an assertion
  * callback is not. A `WeakMap`, so it never keeps a file alive.
  */
 export const attachedText = new WeakMap<File, string>();

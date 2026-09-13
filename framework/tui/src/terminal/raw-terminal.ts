@@ -13,7 +13,7 @@ export interface KeySource {
 }
 
 /**
- * Wraps `process.stdin` in raw mode into an async key source — port of
+ * Wraps `process.stdin` in raw mode into an async key source, port of
  * the read-loop half of `Terminal::read()` from `laravel/prompts`'
  * `Terminal.php`, adapted for Node's event-driven `'data'` stream (see
  * the plan's "Key differences" #4: PHP's blocking `fread()` doesn't

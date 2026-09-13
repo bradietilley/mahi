@@ -4,7 +4,7 @@ import { Tui } from "@mahiframework/tui";
 import { Command } from "../command.js";
 
 /**
- * `db:wipe` — drop every table and stop.
+ * `db:wipe`, drop every table and stop.
  *
  * `migrate:fresh` without the re-migrate: it leaves an empty schema, with
  * no migrations table and so no record that anything ever ran. Useful
@@ -12,7 +12,7 @@ import { Command } from "../command.js";
  * you want gone.
  *
  * The most destructive command here, and unlike `migrate:reset` there is
- * no `down()` involved — the tables are dropped directly, so nothing in
+ * no `down()` involved. The tables are dropped directly, so nothing in
  * the migrations can object.
  */
 export class DbWipeCommand extends Command {

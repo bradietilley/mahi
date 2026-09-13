@@ -144,7 +144,7 @@ describe("Model relationships", () => {
       .values([
         { post_id: "p1", tag_id: "t1", weight: 3 },
         { post_id: "p1", tag_id: "t2", weight: 7 },
-        // t2 again, with a DIFFERENT weight — the same tag carries
+        // t2 again, with a DIFFERENT weight, the same tag carries
         // different pivot data per post.
         { post_id: "p2", tag_id: "t2", weight: 11 },
       ] as never)
@@ -324,7 +324,7 @@ describe("Model relationships", () => {
 
     it("still honours the related model's global scopes", async () => {
       // Tag has no SoftDeletes, but the join form must not bypass
-      // scopes the subquery form respected — it starts from query().
+      // scopes the subquery form respected. It starts from query().
       const post = await Post.findOrFail("p1");
       expect(await post.relations.tagsWithPivot().count()).toBe(2);
     });

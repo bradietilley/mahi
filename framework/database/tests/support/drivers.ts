@@ -14,7 +14,7 @@ import type { Blueprint } from "../../src/schema/blueprint.js";
 import type { Dialect } from "../../src/schema/dialect.js";
 
 /**
- * The MySQL/Postgres instances the integration suites run against —
+ * The MySQL/Postgres instances the integration suites run against,
  * `docker-compose.yml` at the repo root, and the same services CI
  * starts. Overridable by env for a differently-provisioned box.
  */
@@ -41,7 +41,7 @@ export interface TestEngine {
   readonly external: boolean;
   /**
    * Connect to this engine. `database`, when given, overrides the
-   * default one — see `withDatabase()`.
+   * default one. See `withDatabase()`.
    */
   make(database?: string): DatabaseDriver;
 }
@@ -67,7 +67,7 @@ export const ENGINES: readonly TestEngine[] = [
  * They otherwise share one `mahi_test`, and each calls
  * `dropAllTables()` in its own `beforeAll`/`afterAll`. Vitest runs test
  * *files* in parallel, so one suite's teardown would drop the tables
- * another was mid-way through using — an intermittent
+ * another was mid-way through using, an intermittent
  * `relation "widgets" does not exist` in roughly one full-suite run in
  * ten, and worse on a busier machine.
  *
@@ -75,7 +75,7 @@ export const ENGINES: readonly TestEngine[] = [
  * is real (not a convention future tests must remember), and the suite
  * keeps its parallelism.
  *
- * SQLite needs none of this — every harness gets its own `:memory:`
+ * SQLite needs none of this. Every harness gets its own `:memory:`
  * database already.
  */
 export async function withDatabase(engine: TestEngine, label: string): Promise<string | undefined> {
@@ -96,7 +96,7 @@ export async function withDatabase(engine: TestEngine, label: string): Promise<s
       .raw(`create database ${ifNotExists}${quoteIdentifier(engine, name)}`)
       .execute(admin.kysely);
   } catch (error) {
-    // 42P04 / "already exists" — a previous crashed run left it behind,
+    // 42P04 / "already exists". A previous crashed run left it behind,
     // which is fine: the suite drops all tables on start anyway.
     const message = (error as Error).message;
 
@@ -121,8 +121,8 @@ export async function dropDatabase(engine: TestEngine, name: string | undefined)
     await admin.connect?.();
     await sql.raw(`drop database if exists ${quoteIdentifier(engine, name)}`).execute(admin.kysely);
   } catch {
-    // A leftover scratch database is harmless — `withDatabase()` reuses
-    // it next run — and failing teardown would mask the real result.
+    // A leftover scratch database is harmless, `withDatabase()` reuses
+    // it next run, and failing teardown would mask the real result.
   } finally {
     await admin.disconnect?.().catch(() => {});
   }
@@ -151,7 +151,7 @@ function quoteIdentifier(engine: TestEngine, name: string): string {
  *
  * **Except under `CI_STRICT_MODE=true`**, where the services are
  * provisioned and an unreachable database means the harness is
- * misconfigured — silently skipping there would turn the entire
+ * misconfigured, silently skipping there would turn the entire
  * cross-dialect suite into a no-op that still reports green, which is
  * exactly the failure this plan exists to prevent. So that job rethrows.
  *
@@ -209,7 +209,7 @@ export class EngineHarness {
 
   /**
    * `label` names the scratch database this harness gets, and must be
-   * unique per test *file* — pass something derived from the filename.
+   * unique per test *file*, pass something derived from the filename.
    * See `withDatabase()` for why.
    */
   static async start(engine: TestEngine, label: string): Promise<EngineHarness> {
@@ -238,7 +238,7 @@ export class EngineHarness {
 
   /**
    * Empties every table this harness created, leaving the schema in
-   * place — the between-tests reset.
+   * place, the between-tests reset.
    *
    * Uses `DELETE` rather than `TRUNCATE` because `TRUNCATE` is DDL on
    * MySQL (it would implicitly commit an open transaction) and needs

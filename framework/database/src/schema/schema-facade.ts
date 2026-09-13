@@ -13,7 +13,7 @@ import { SCHEMA_TOKEN } from "../database-service-provider.js";
  *   });
  *
  * Prefer constructing `SchemaBuilder` (or `DatabaseManager.schema()`)
- * where a connection is already in hand — reach for this at migration
+ * where a connection is already in hand, use this at migration
  * call sites, same guidance as `app()` itself.
  */
 export class Schema extends Facade<SchemaBuilder>(() => SCHEMA_TOKEN) {

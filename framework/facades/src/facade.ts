@@ -18,7 +18,7 @@ import { app } from "@mahiframework/core";
  * {...} }` with `class Events extends Facade<EventDispatcher>`, because
  * TypeScript categorically disallows a generic class's *static* side from
  * referencing that class's own type parameter (`error TS2302: Static
- * members cannot reference class type parameters`) — this holds for a
+ * members cannot reference class type parameters`). This holds for a
  * base class's statics as seen by a subclass too, so there is no way to
  * write a single generic `Facade<T>` class with a working generic
  * `static instance(): T` for subclasses to inherit. Calling `Facade<T>`
@@ -39,24 +39,24 @@ import { app } from "@mahiframework/core";
  *     dispatch chain is what the existing docs actually warn against, not
  *     a facade with plainly-named, statically-typed methods.
  *   - Every facade method (`Events.dispatch`, etc.) is written out by
- *     hand on the subclass with a normal static method signature — no
+ *     hand on the subclass with a normal static method signature, no
  *     runtime reflection, no `Proxy`, no forwarding of arbitrary
  *     properties/methods that happen to exist on the resolved instance.
  *     Renaming or removing a method on the underlying service is a
  *     normal TypeScript compile error at the facade's own method body
  *     (`this.instance().thatMethod(...)`), not a silent runtime failure,
  *     and calling a method that was never defined on the facade itself
- *     (`Events.notAMethod()`) is a compile error too — there's no dynamic
+ *     (`Events.notAMethod()`) is a compile error too. There's no dynamic
  *     forwarding for a typo to silently fall through to.
  *   - The token `getFacadeKey()` returns must already be bound via
  *     `app.singleton()`/`app.bind()` by that service's own
- *     ServiceProvider — `Facade()` never binds anything itself.
+ *     ServiceProvider, `Facade()` never binds anything itself.
  *   - `instance()` re-resolves on every call (never cached on the facade
- *     itself) — the container's own `singleton()`/`bind()` already
+ *     itself). The container's own `singleton()`/`bind()` already
  *     controls whether the underlying resolution is cached.
  *   - Like `app()` itself, a facade built with this is unsafe to rely on
  *     inside the test suite when a test constructs its own isolated
- *     `Application` instance — `instance()` always calls the *current*
+ *     `Application` instance, `instance()` always calls the *current*
  *     global `app()`, exactly the same caveat `app()` itself already
  *     documents. Prefer resolving the service directly off the test's own
  *     `Application`/`TestApplication` instance instead.
@@ -69,20 +69,20 @@ export function Facade<T>(getFacadeKey: () => string) {
      * Held on the facade class rather than rebound in the container,
      * deliberately. Rebinding would also change what
      * `app().make(TOKEN)` returns for code that resolves the service
-     * directly — constructor injection, a provider, another service's
-     * dependency — so a swap intended to intercept `Cache.get()` would
+     * directly, constructor injection, a provider, another service's
+     * dependency, so a swap intended to intercept `Cache.get()` would
      * silently alter unrelated call paths. Keeping it here means
      * `swap()` does exactly what it says: it changes what *this facade*
      * returns, and nothing else.
      *
      * The cost is that a swap is invisible to direct container
-     * resolution, which is the right trade for a facade — but means
+     * resolution, which is the right trade for a facade. But means
      * `swap()` is not a substitute for binding a fake in tests that
      * exercise the container itself.
      *
      * Public rather than `protected` because TypeScript cannot emit a
      * non-public member on an *anonymous* exported class (TS4094), and
-     * this class is anonymous by necessity — see the note above on why
+     * this class is anonymous by necessity. See the note above on why
      * `Facade<T>` must be a mixin factory. Underscore-prefixed and
      * `@internal` to say what the modifier cannot.
      *

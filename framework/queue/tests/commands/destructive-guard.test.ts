@@ -8,7 +8,7 @@ import { QUEUE_TOKEN } from "../../src/tokens.js";
 import type { QueueDriver } from "../../src/queue-driver.js";
 
 /**
- * `queue:clear` deletes pending jobs outright — they are gone, not failed,
+ * `queue:clear` deletes pending jobs outright. They are gone, not failed,
  * so nothing records that they existed. `queue:flush` empties
  * `failed_jobs`, which is the forensic record you read *after* an incident.
  * Both are unrecoverable in production.

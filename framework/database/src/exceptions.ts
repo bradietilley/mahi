@@ -119,7 +119,7 @@ function isForeignKeyViolation(dialect: Dialect, error: unknown): boolean {
     case "sqlite":
       return /FOREIGN KEY constraint failed/i.test(message);
     case "mysql":
-      // 1451/1452 = cannot delete/add — FK constraint fails.
+      // 1451/1452 = cannot delete/add, FK constraint fails.
       return (
         code === "1451" ||
         code === "1452" ||

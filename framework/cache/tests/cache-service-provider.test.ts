@@ -55,7 +55,7 @@ describe("CacheServiceProvider", () => {
 
     await limiter.hit("shared-key");
     // The RateLimiter writes through the same CacheStore instance
-    // CacheManager.store() resolves — visible directly via the store.
+    // CacheManager.store() resolves, visible directly via the store.
     expect(await manager.store().get<number>("shared-key")).toBe(1);
   });
 

@@ -1,6 +1,6 @@
 # @mahiframework/cli
 
-Console — the artisan-style command kernel and code generators for Mahi.
+Console, the artisan-style command kernel and code generators for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

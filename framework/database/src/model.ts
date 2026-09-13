@@ -96,25 +96,25 @@ interface InstanceState {
   /** Dirty-tracking snapshot as of the last DB sync. */
   original: Record<string, any>;
   /**
-   * DB-shape attributes written by the LAST successful `save()` — the
+   * DB-shape attributes written by the LAST successful `save()`, the
    * **post**-save counterpart to `original`'s pre-save window. Populated
    * by `syncChanges()` (which must run BEFORE `syncOriginal()`, while
    * `getDirty()` can still see the difference) and read by
    * `getChanges()`/`wasChanged()`. Empty after an INSERT, matching
-   * Laravel — see `getChanges()`.
+   * Laravel. See `getChanges()`.
    */
   changes: Record<string, any>;
-  /** Whether the last `save()` on this instance was an INSERT — see `Model.wasRecentlyCreated`. */
+  /** Whether the last `save()` on this instance was an INSERT. See `Model.wasRecentlyCreated`. */
   wasRecentlyCreated: boolean;
   /** Loaded relations by name. */
   relations: Map<string, unknown>;
-  /** Appended (non-column) values by name — see `Model.append()`/`setAppended()`. */
+  /** Appended (non-column) values by name. See `Model.append()`/`setAppended()`. */
   computed: Map<string, unknown>;
   /** Whether a corresponding DB row exists. */
   exists: boolean;
-  /** The Proxy wrapping the target — the value returned from methods and used as the event payload. */
+  /** The Proxy wrapping the target, the value returned from methods and used as the event payload. */
   self: Model;
-  /** Lazily-built `relations` namespace (query-side accessors) — see `Model.relations` getter. `morphTo` contributes a `MorphToBuilder`, every other type an `EloquentBuilder`. */
+  /** Lazily-built `relations` namespace (query-side accessors). See `Model.relations` getter. `morphTo` contributes a `MorphToBuilder`, every other type an `EloquentBuilder`. */
   relationBuilders?: Record<
     string,
     () => EloquentBuilder<Record<string, any>> | MorphToBuilder<Model>
@@ -124,7 +124,7 @@ interface InstanceState {
 const instanceState = new WeakMap<object, InstanceState>();
 
 /**
- * The minimal structural contract a `Model`'s default resource satisfies —
+ * The minimal structural contract a `Model`'s default resource satisfies,
  * declared here (rather than importing `Resource` from `@mahiframework/http`)
  * so `@mahiframework/database` keeps no dependency on the HTTP layer. The
  * real `Resource` (in `@mahiframework/http`) is structurally assignable to
@@ -144,7 +144,7 @@ export class ModelNotFoundError extends Error {
 
 /**
  * Thrown when `strictRelations` is on and a **declared** relation is read
- * off an instance that never loaded it — Laravel's
+ * off an instance that never loaded it, Laravel's
  * `LazyLoadingViolationException`, the N+1 tripwire.
  *
  * Without it the read silently yields `undefined`, which is
@@ -167,12 +167,12 @@ export class RelationNotLoadedError extends Error {
 
 /**
  * Thrown when a mass-assignment (`create()`/`fill()`/`new Model({...})`)
- * tries to set a non-fillable attribute on a **totally guarded** model —
+ * tries to set a non-fillable attribute on a **totally guarded** model,
  * one that declares neither `fillable` nor a relaxed `guarded` (i.e.
  * `fillable = []` and `guarded = ["*"]`). Mirrors Laravel's
  * `MassAssignmentException`. A model left at the framework default
  * (`guarded = []`) is never totally guarded, so this never fires unless a
- * model opts into the stricter posture — see `Model.fillable`/`guarded`.
+ * model opts into the stricter posture. See `Model.fillable`/`guarded`.
  */
 export class MassAssignmentError extends Error {
   constructor(modelName: string, key: string) {
@@ -186,9 +186,9 @@ export class MassAssignmentError extends Error {
  * INSTANCES (`Todo.find(id): Promise<Todo | undefined>`, not a plain
  * `TodoTable` object), attribute access goes through a per-instance
  * `Proxy` (so casts apply transparently), and instances carry
- * change tracking in both directions — pre-save (`getDirty()`/
+ * change tracking in both directions, pre-save (`getDirty()`/
  * `isDirty()`/`getOriginal()`/`discardChanges()`) and post-save
- * (`getChanges()`/`wasChanged()`/`wasRecentlyCreated`) — plus
+ * (`getChanges()`/`wasChanged()`/`wasRecentlyCreated`), plus
  * `save()`/`refresh()`/`replicate()`. Typed attributes ride on the
  * instance via a per-model `interface Todo extends TodoTable {}`
  * declaration-merge. Both the static shortcuts
@@ -197,17 +197,17 @@ export class MassAssignmentError extends Error {
  * events).
  *
  * Access is **static** for queries: `Todo.all()`, `Todo.find(id)`,
- * `Todo.query()...` — not `new Todo(db).all()`. The connection is
+ * `Todo.query()...`, not `new Todo(db).all()`. The connection is
  * resolved internally via the global `app()` container lookup
  * (`@mahiframework/core`), the one deliberate piece of "magic" this
  * framework allows for `Model` access (the "no magic" rule targets
  * hidden dispatch like magic `whereName()` methods, not a single
- * documented static-resolution point) — `app.bootstrap()` must have run
+ * documented static-resolution point). `app.bootstrap()` must have run
  * before any static `Model` method is called.
  * A model resolves the default `DatabaseManager` driver unless it sets
  * `connection: "name"` in its config, in which case every read, write,
  * timestamp and transaction lookup it performs goes through that named
- * connection instead — see `resolveConnection()`.
+ * connection instead. See `resolveConnection()`.
  *
  *   interface TodoTable { id: string; title: string; done: number }
  *
@@ -225,7 +225,7 @@ export class MassAssignmentError extends Error {
  *   await Todo.query().where("done", 0).orderBy("created_at", "desc").get();
  *
  * Static calls made inside a `transaction()` callback automatically
- * participate in that transaction — `resolveConnection()` below checks
+ * participate in that transaction, `resolveConnection()` below checks
  * the active AsyncLocalStorage transaction context
  * (`transaction-context.ts`) before falling back to the default driver
  * connection, so no call site changes.
@@ -237,7 +237,7 @@ export class MassAssignmentError extends Error {
  * the relation helpers call; overriding it alone will NOT change what
  * `query()` returns.
  *
- * `factory()` is overridden the same way, and throws if it hasn't been —
+ * `factory()` is overridden the same way, and throws if it hasn't been,
  * unlike `query()`, a factory's `definition()` is inherently
  * model-specific, so there is no sensible default to fall back to. Note
  * the model -> factory -> model import cycle an override creates. It is
@@ -246,7 +246,7 @@ export class MassAssignmentError extends Error {
  * `factory()`'s body (call time), and `protected model` is an instance
  * field initializer (construction time). Assigning the factory to a
  * STATIC field instead (`static Factory = PostFactory`) would NOT be
- * safe — static field initializers run at class-definition time and hit
+ * safe, static field initializers run at class-definition time and hit
  * a TDZ `ReferenceError` when the factory module is the entry into the
  * cycle.
  *
@@ -262,10 +262,10 @@ export class MassAssignmentError extends Error {
  * `$post->comments()` (query) vs `$post->comments` (loaded value):
  * `post.relations.comments()` is the related model's own builder scoped
  * to this row, and `post.comments` is the loaded result populated by
- * `with()`/`load()`/`loadMissing()`. The same namespace writes —
+ * `with()`/`load()`/`loadMissing()`. The same namespace writes,
  * `attach()`/`detach()`/`sync()`/`toggle()` on a pivot relation,
  * `associate()`/`dissociate()` on a `belongsTo`/`morphTo`, and
- * `save()`/`create()` through a `hasMany`/`morphMany` — with each
+ * `save()`/`create()` through a `hasMany`/`morphMany`, with each
  * accessor carrying only the methods its relation kind supports.
  *
  * Two deliberate non-goals there. **No key-name guessing:** every
@@ -279,18 +279,18 @@ export class MassAssignmentError extends Error {
  * full guides.
  */
 export abstract class BaseModel {
-  /** The table name — set by the `Model<A>()(config)` factory from `config.table`. */
+  /** The table name, set by the `Model<A>()(config)` factory from `config.table`. */
   static table: string;
 
   /**
-   * The primary-key column used by `find()`/`whereKey()` — Laravel's
+   * The primary-key column used by `find()`/`whereKey()`, Laravel's
    * `$primaryKey`. Set by the factory from `config.primaryKey` (default
    * `"id"`). `primaryKeyColumn` is a permanent internal alias so the
    * builder / eager loader / morph modules keep one spelling.
    */
   static primaryKey = "id";
 
-  /** Internal alias for `primaryKey` — read by the builder, eager loader, morph-to builder, and relation helpers. */
+  /** Internal alias for `primaryKey`, read by the builder, eager loader, morph-to builder, and relation helpers. */
   static get primaryKeyColumn(): string {
     return this.primaryKey;
   }
@@ -304,7 +304,7 @@ export abstract class BaseModel {
 
   /**
    * The named `DatabaseManager` connection this model reads and writes
-   * through (`config.connection`) — Laravel's `$connection`. `undefined`
+   * through (`config.connection`), Laravel's `$connection`. `undefined`
    * (the default) means the manager's default driver.
    *
    *   class Event extends Model<EventAttributes>()({
@@ -314,18 +314,18 @@ export abstract class BaseModel {
    *
    * Read by `resolveConnection()` and `rootConnection()`, which every
    * query, timestamp and transaction lookup on this model funnels
-   * through — so a transaction opened on a *different* connection
+   * through, so a transaction opened on a *different* connection
    * correctly does not capture this model's writes.
    */
   static connection: string | undefined = undefined;
 
-  /** The declared attribute casts — set by the factory from `config.casts`, merged with implicit timestamp/datetime casts. */
+  /** The declared attribute casts, set by the factory from `config.casts`, merged with implicit timestamp/datetime casts. */
   static casts: Record<string, Cast<any, any>> = {};
 
-  /** Computed-attribute definitions — the subclass's `static accessors` map. */
+  /** Computed-attribute definitions, the subclass's `static accessors` map. */
   static accessors: AccessorMap<any> = {};
 
-  /** Computed attributes included in `toJSON()` — set by the factory from `config.appends`. */
+  /** Computed attributes included in `toJSON()`, set by the factory from `config.appends`. */
   static appends: string[] = [];
 
   /**
@@ -343,13 +343,13 @@ export abstract class BaseModel {
 
   /**
    * Stable, deploy-durable name used to (de)serialize a model reference
-   * inside a queued job's payload — the morph key written to disk as
+   * inside a queued job's payload, the morph key written to disk as
    * `{ __model, __id }` and looked up in the `ModelRegistry` to rehydrate
    * `Class.findOrFail(id)` before the job's `handle()` runs. Deliberately
    * decoupled from `table` (renaming a table must not break in-flight
    * jobs) and from the JS class name (survives minification/renames).
    *
-   * `undefined` by default — a model with no `morphName` cannot appear in
+   * `undefined` by default, a model with no `morphName` cannot appear in
    * a job payload (the codec throws at dispatch, loudly, rather than
    * silently persisting a full attribute dump). Opt in per model:
    *
@@ -358,14 +358,14 @@ export abstract class BaseModel {
    *     morphName: "User",
    *   }) {}
    *
-   * Treat values as append-only, like an enum member — changing an
+   * Treat values as append-only, like an enum member, changing an
    * existing `morphName` invalidates any job already enqueued against it.
    */
   static morphName: string | undefined = undefined;
 
   /**
    * The discriminant value this model is stored as in a polymorphic
-   * column (`commentable_type`, `notifiable_type`, ...) — Laravel's
+   * column (`commentable_type`, `notifiable_type`, ...), Laravel's
    * `getMorphClass()`. Resolves in three steps, first match winning:
    *
    *   1. a `Relation.morphMap()` entry for this class
@@ -374,7 +374,7 @@ export abstract class BaseModel {
    *
    *   Post.morphAlias();   // "post" if mapped, else morphName, else "posts"
    *
-   * Always resolves — rung 3 can't fail — so a model needs no extra
+   * Always resolves, rung 3 can't fail, so a model needs no extra
    * declaration to participate in a polymorphic relation. That changes
    * under `Relation.requireMorphMap()`, which disables rungs 2 and 3 and
    * makes an unmapped model throw `ClassMorphViolationError`.
@@ -383,7 +383,7 @@ export abstract class BaseModel {
    * `static::class` fallback here. `morphName` is unique by construction
    * (`ModelRegistry` throws on collision) but opt-in; `table` always
    * exists but two models can share one. Register a morph map if you
-   * need the stored values pinned independently of both — see
+   * need the stored values pinned independently of both. See
    * `morph-map.ts`.
    */
   static morphAlias(this: typeof BaseModel): string {
@@ -406,10 +406,10 @@ export abstract class BaseModel {
    * controls what the queue does:
    *
    *   - `false` (default): rehydration throws `ModelNotFoundError`, so the
-   *     job fails/retries like any other error — the safe default, since a
+   *     job fails/retries like any other error, the safe default, since a
    *     missing row is usually a genuine bug (e.g. a dangling FK).
    *   - `true`: the job is silently, successfully removed from the queue
-   *     without ever calling `handle()` — Laravel's `deleteWhenMissingModels`
+   *     without ever calling `handle()`, Laravel's `deleteWhenMissingModels`
    *     behavior, for jobs where "the subject is gone, so there's nothing
    *     to do" is the correct outcome (e.g. "send welcome email to user"
    *     when the user has since been deleted).
@@ -421,7 +421,7 @@ export abstract class BaseModel {
   static deleteWhenMissingModels = false;
 
   /**
-   * Global scopes applied automatically to every `query()` call — see the
+   * Global scopes applied automatically to every `query()` call. See the
    * class docstring's "Global scopes" section. Empty by default, so a
    * model with no declared scopes produces the exact same query as
    * calling `queryWithoutScopes()`.
@@ -429,7 +429,7 @@ export abstract class BaseModel {
   static scopes: GlobalScope[] = [];
 
   /**
-   * Per-class hooks run once by `bootIfNotBooted()` — the factory pushes
+   * Per-class hooks run once by `bootIfNotBooted()`, the factory pushes
    * built-in behaviour installers here (the soft-delete global scope,
    * implicit casts). Custom reusable behaviour is a plain TS mixin.
    */
@@ -440,7 +440,7 @@ export abstract class BaseModel {
    * identity), derived from `config.keyType` (`"increment"` → `true`,
    * `"uuid"`/a `KeyStrategy` → `false`). Read by the insert path to decide
    * whether to read the generated key back. An internal accessor over
-   * `keyStrategy` — set `keyType` on the config, not this.
+   * `keyStrategy`, set `keyType` on the config, not this.
    */
   static get incrementing(): boolean {
     return this.keyStrategy.incrementing;
@@ -460,10 +460,10 @@ export abstract class BaseModel {
   }
 
   /**
-   * Automatic `createdAtColumn`/`updatedAtColumn` stamping — **on by
+   * Automatic `createdAtColumn`/`updatedAtColumn` stamping, **on by
    * default, matching Laravel** (whose `$timestamps` defaults to `true`).
    * A model whose table has `created_at`/`updated_at` columns gets them
-   * stamped for free; a model whose table has *no* timestamp columns must
+   * stamped automatically; a model whose table has *no* timestamp columns must
    * set `static timestamps = false` (otherwise the insert/update would
    * write columns that don't exist). When on, `create()` stamps both
    * columns and `update()` stamps `updatedAtColumn`, in both cases only
@@ -472,7 +472,7 @@ export abstract class BaseModel {
    * overrides win" convention).
    *
    * A table that has only one of the two columns keeps `timestamps = true`
-   * and sets the missing side to `null` — see `createdAtColumn`/
+   * and sets the missing side to `null`. See `createdAtColumn`/
    * `updatedAtColumn`.
    */
   static timestamps = true;
@@ -481,7 +481,7 @@ export abstract class BaseModel {
    * Column `create()` stamps with the current UTC time (see
    * `currentTimestamp()`) when `timestamps` is true. Set to `null` to
    * disable created-at stamping while still stamping `updatedAtColumn`
-   * (Laravel's `const CREATED_AT = null`) — for a table that has an
+   * (Laravel's `const CREATED_AT = null`), for a table that has an
    * `updated_at` column but no `created_at`.
    */
   static createdAtColumn: string | null = "created_at";
@@ -490,7 +490,7 @@ export abstract class BaseModel {
    * Column `create()`/`update()` stamp with the current UTC time (see
    * `currentTimestamp()`) when `timestamps` is true. Set to `null` to
    * disable updated-at stamping while still stamping `createdAtColumn`
-   * (Laravel's `const UPDATED_AT = null`) — the common "create-only"
+   * (Laravel's `const UPDATED_AT = null`), the common "create-only"
    * table that has a `created_at` column but no `updated_at` (e.g. an
    * append-only like/follow/repost row that is only ever inserted or
    * deleted, never updated).
@@ -498,10 +498,10 @@ export abstract class BaseModel {
   static updatedAtColumn: string | null = "updated_at";
 
   /**
-   * Laravel's `$dispatchesEvents` — maps a lifecycle event name to an
+   * Laravel's `$dispatchesEvents`, maps a lifecycle event name to an
    * `@mahiframework/events` `Event` subclass to dispatch through the app's
    * `EventDispatcher` (in addition to the always-fires generic
-   * `ModelCreated`/`ModelUpdated`/etc. events — see `model-events.ts`).
+   * `ModelCreated`/`ModelUpdated`/etc. events. See `model-events.ts`).
    * Empty by default; only declared events are dispatched.
    *
    *   class Post extends Model {
@@ -513,7 +513,7 @@ export abstract class BaseModel {
   static dispatchesEvents: DispatchesEventsMap = {};
 
   /**
-   * Laravel's `$afterCommit` on the model — when `true`, this model's
+   * Laravel's `$afterCommit` on the model, when `true`, this model's
    * lifecycle events (`created`/`updated`/`saved`/`deleted`/`restored` and
    * their `-ing` counterparts, plus any `dispatchesEvents`-mapped classes
    * and `ModelObserver`/`on()` listeners) fire only after the enclosing
@@ -533,7 +533,7 @@ export abstract class BaseModel {
   static dispatchesEventsAfterCommit = false;
 
   /**
-   * The **single** declaration point for a model's relations — a name ->
+   * The **single** declaration point for a model's relations, a name ->
    * `{ type, related, options }` map (see `relations.ts`'s
    * `RelationDefinition`). Drives everything: the per-row `relations`
    * namespace (`post.relations.comments()`, the query builder), the loaded
@@ -542,14 +542,14 @@ export abstract class BaseModel {
    * `whereHas()`). Empty by default; declare it as `static override
    * relations = {...} satisfies RelationDefinitions` and both accessor
    * families and `with()` narrow to the specific relation names and
-   * related types automatically — the framework reads the relation shape
+   * related types automatically. The framework reads the relation shape
    * straight off `typeof this.relations` (via `RelationsOf<M>`), so no
    * companion `declare static Relations` marker is needed. See the class
    * "Relationships" docstring section for the full usage example.
    *
    * Typed permissively on the base (`Record<string, any>`) so a subclass's
    * precise `Relationships<A>` (branded helper definitions) stays
-   * assignable to `typeof BaseModel` — the precise type lives on
+   * assignable to `typeof BaseModel`. The precise type lives on
    * `ModelStatics`. The runtime shape is always `RelationDefinitions`.
    */
   static relationships: Record<string, any> = {};
@@ -557,7 +557,7 @@ export abstract class BaseModel {
   /**
    * Turns an unloaded-relation read into a thrown
    * `RelationNotLoadedError` instead of `undefined` (`config.
-   * strictRelations`) — Laravel's `preventLazyLoading()`, per model.
+   * strictRelations`): Laravel's `preventLazyLoading()`, per model.
    *
    *   class Post extends Model<PostAttributes>()({
    *     table: "posts",
@@ -565,21 +565,21 @@ export abstract class BaseModel {
    *   }) {}
    *
    *   const post = await Post.first();
-   *   post.comments;                    // throws — never loaded
-   *   post.relations.comments();        // fine — an explicit query
+   *   post.comments;                    // throws, never loaded
+   *   post.relations.comments();        // fine, an explicit query
    *   (await Post.query().with("comments").first()).comments;   // fine
    *
    * The point is N+1 detection: `undefined` and "loaded, and empty" are
    * otherwise the same value, so the bug reads as an empty list. Only
    * *declared* relations (keys of `relationships`) are affected, and only
-   * when no real column shadows the name — a `withCount()` alias or a
+   * when no real column shadows the name, a `withCount()` alias or a
    * genuine column still reads through. Off by default; the natural
    * posture is on in dev/test, off in production.
    */
   static strictRelations = false;
 
   /**
-   * Internal alias for `relationships` — the runtime relation map the
+   * Internal alias for `relationships`, the runtime relation map the
    * eager loader, the instance `relations` getter and existence
    * subqueries read. The public declaration point is
    * `static relationships`.
@@ -590,7 +590,7 @@ export abstract class BaseModel {
 
   /**
    * Attribute names omitted from `toJSON()` (and therefore from any JSON
-   * response serializing an instance directly) — Laravel's `$hidden`.
+   * response serializing an instance directly), Laravel's `$hidden`.
    * The canonical use is `static hidden = ["password"]` so a `User`
    * instance never leaks its password hash when serialized. Ignored when
    * `visible` is non-empty (an allow-list takes precedence).
@@ -598,21 +598,21 @@ export abstract class BaseModel {
   static hidden: string[] = [];
 
   /**
-   * Allow-list counterpart to `hidden` — when non-empty, ONLY these
+   * Allow-list counterpart to `hidden`, when non-empty, ONLY these
    * attributes appear in `toJSON()` (Laravel's `$visible`). Empty by
    * default (every non-`hidden` attribute is serialized).
    */
   static visible: string[] = [];
 
   /**
-   * Mass-assignment allow-list — Laravel's `$fillable`. When non-empty,
+   * Mass-assignment allow-list, Laravel's `$fillable`. When non-empty,
    * ONLY these attributes may be set through a mass-assignment call
    * (`new Model({...})`, `create()`, `fill()`, `firstOrNew()`,
    * `firstOrCreate()`, `updateOrCreate()`, `updateInstance()`); any other
-   * key is silently dropped (or throws, if the model is *totally guarded*
-   * — see `guarded`). Empty by default, and `guarded` defaults to `[]`
+   * key is silently dropped (or throws, if the model is *totally guarded*.
+   * See `guarded`). Empty by default, and `guarded` defaults to `[]`
    * (nothing guarded), so a model left at the framework defaults accepts
-   * every attribute exactly as before this protection existed — opt in by
+   * every attribute exactly as before this protection existed, opt in by
    * declaring `fillable`.
    *
    *   class Post extends Model {
@@ -622,17 +622,17 @@ export abstract class BaseModel {
    * `fillable` takes precedence over `guarded` when both are declared:
    * `isFillable()` first honors an explicit allow-list. Direct attribute
    * writes (`post.user_id = ...`, the proxy `set` trap) and internal
-   * hydration (`hydrate()`/`setRawAttributes()`) bypass this entirely —
-   * it guards *mass* assignment only, never a deliberate single-column
+   * hydration (`hydrate()`/`setRawAttributes()`) bypass this entirely.
+   * It guards *mass* assignment only, never a deliberate single-column
    * assignment.
    */
   static fillable: string[] = [];
 
   /**
-   * Mass-assignment block-list — Laravel's `$guarded`. Attributes named
+   * Mass-assignment block-list, Laravel's `$guarded`. Attributes named
    * here (or `["*"]` for "guard everything") are rejected by
    * mass-assignment when no `fillable` allow-list is declared. **Defaults
-   * to `[]`** — i.e. *nothing* guarded, so out of the box every attribute
+   * to `[]`**, i.e. *nothing* guarded, so out of the box every attribute
    * is mass-assignable (preserving the framework's historical
    * no-protection behavior); tighten per model.
    *
@@ -700,7 +700,7 @@ export abstract class BaseModel {
 
   /**
    * User hook for one-time per-class setup. Empty on the base. Override
-   * on a subclass without calling `super.boot()` — the factory's boot
+   * on a subclass without calling `super.boot()`, the factory's boot
    * hooks already ran in `bootIfNotBooted()` before this.
    */
   static boot(this: typeof BaseModel): void {}
@@ -708,8 +708,8 @@ export abstract class BaseModel {
   /**
    * Resolves the Kysely instance this model's queries execute against:
    * this model's connection (`static connection`, from `config.
-   * connection` — the default `DatabaseManager` driver when unset), or —
-   * if a `transaction()` is open **on that same connection** — its
+   * connection`, the default `DatabaseManager` driver when unset), or,
+   * if a `transaction()` is open **on that same connection**, its
    * transactional instance (see `transaction-context.ts`). Called fresh
    * on every query execution (not cached), so a builder constructed
    * before a `transaction()` call but executed inside one still picks up
@@ -728,7 +728,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * This model's **root** (non-transactional) Kysely instance — the key the
+   * This model's **root** (non-transactional) Kysely instance, the key the
    * transaction context registry is keyed by. Unlike `resolveConnection()`,
    * this never swaps in an active transaction's instance, so it's the
    * correct handle for `afterCommitOn()`: "defer against THIS model's
@@ -740,7 +740,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * "Now", spelled the way this model's connection will accept it —
+   * "Now", spelled the way this model's connection will accept it,
    * used for `created_at`/`updated_at`/`deleted_at` stamping.
    *
    * Goes through the connection rather than formatting an ISO string
@@ -752,7 +752,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The columns this model treats as instants — its auto-managed
+   * The columns this model treats as instants, its auto-managed
    * timestamps plus every column declared with `DateTimeCast`.
    *
    * Used by `prepareWrite()` to fix up their spelling per engine. Only
@@ -784,7 +784,7 @@ export abstract class BaseModel {
 
   /**
    * `values` with its datetime columns spelled the way this model's
-   * connection accepts — the last step before any insert/update.
+   * connection accepts, the last step before any insert/update.
    *
    * A no-op on every engine but MySQL, which rejects the ISO-8601 `Z`
    * suffix that `DateTimeCast` produces. See `toDriverTimestamp()`.
@@ -798,14 +798,14 @@ export abstract class BaseModel {
   }
 
   /**
-   * Registers a `ModelObserver` — instantiated once, immediately, with no
+   * Registers a `ModelObserver`, instantiated once, immediately, with no
    * constructor arguments. Every overridden method on it fires at the
    * matching lifecycle point for THIS model class only (registration is
    * keyed by class identity, not `table`, so a subclass doesn't
    * accidentally inherit its base class's observers or vice versa).
    * Multiple `observe()` calls stack; observers run in registration order,
-   * before `on()` listeners and before any `EventDispatcher` dispatch —
-   * see `model-events.ts`'s `dispatchModelEvent()` for the full ordering.
+   * before `on()` listeners and before any `EventDispatcher` dispatch.
+   * See `model-events.ts`'s `dispatchModelEvent()` for the full ordering.
    *
    *   class PostObserver extends ModelObserver<PostTable> {
    *     override created(post: PostTable): void { ... }
@@ -821,7 +821,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Registers a single ad-hoc listener for one lifecycle event — a
+   * Registers a single ad-hoc listener for one lifecycle event, a
    * lighter-weight alternative to `observe()` for a one-off/test-only
    * hook that doesn't warrant declaring a whole `ModelObserver` subclass.
    * See `model-events.ts`'s `ModelEventPayload` docstring for what each
@@ -838,25 +838,25 @@ export abstract class BaseModel {
   }
 
   /**
-   * Runs `callback` with this model's lifecycle events suppressed — a
+   * Runs `callback` with this model's lifecycle events suppressed, a
    * thin proxy to `@mahiframework/events`' `Event.suppress()`, scoped via
    * a wildcard pattern built from `table`: `Post.withoutEvents(cb)`
    * suppresses only `"model.posts.*"`, leaving every other model's
    * events (and non-model events) unaffected. Called on the base `Model`
-   * class directly (no `table` set), the pattern widens to `"model.*"`
-   * — every model's events. AsyncLocalStorage-scoped (nested/async calls
+   * class directly (no `table` set), the pattern widens to `"model.*"`,
+   * every model's events. AsyncLocalStorage-scoped (nested/async calls
    * made inside `callback` also see events suppressed, with no
    * call-site changes needed), and patterns stack with any enclosing
-   * `Event.suppress()`/`withoutEvents()` call rather than replacing it —
-   * see `Event.suppress()`'s docstring.
+   * `Event.suppress()`/`withoutEvents()` call rather than replacing it.
+   * See `Event.suppress()`'s docstring.
    *
    * Observers and `on()` listeners (invoked directly, checking
-   * `Event.isSuppressed(name)` themselves — see `model-events.ts`'s
+   * `Event.isSuppressed(name)` themselves. See `model-events.ts`'s
    * `dispatchModelEvent()`) and `EventDispatcher` dispatch (both the
    * generic `ModelLifecycleEvent` subclasses and any
    * `dispatchesEvents`-mapped class, both of which set `eventName` to
    * the same `"model.{table}.{event}"` scheme) are all suppressed alike.
-   * Timestamp stamping is NOT suppressed — that's a separate concern
+   * Timestamp stamping is NOT suppressed. That's a separate concern
    * (`Factory.createQuietly()` relies on this: rows still get
    * `created_at`/`updated_at`, just without firing events).
    */
@@ -867,7 +867,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Constructs a bare `EloquentBuilder` for this model — the low-level
+   * Constructs a bare `EloquentBuilder` for this model, the low-level
    * *construction* hook, with no global scopes applied.
    *
    * This is not the customisation point for a per-model builder;
@@ -883,7 +883,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Constructs this model's `Factory` — see the class docstring's "Model
+   * Constructs this model's `Factory`. See the class docstring's "Model
    * factories" section. No default implementation: unlike
    * `newEloquentBuilder()`, there's no sensible generic `Factory` to fall
    * back to (a factory's `definition()` is inherently model-specific), so
@@ -896,7 +896,7 @@ export abstract class BaseModel {
    * builders because `query()` does real work around the constructed
    * builder (applying global scopes), so the construction hook and the
    * public entry point are genuinely different methods. `factory()` does
-   * no such work — it would be a bare `return this.newFactory()` — so the
+   * no such work, it would be a bare `return this.newFactory()`, so the
    * split would be pure ceremony, forcing every model to write the same
    * thing twice (once as a type, once as a value). Overriding this
    * directly is one declaration that supplies both:
@@ -912,7 +912,7 @@ export abstract class BaseModel {
    * `Factory<typeof Post>` is NOT assignable to `Factory<typeof BaseModel>`.
    * Using `any` lets an override narrow to its own factory without
    * tripping "class static side incorrectly extends base class static
-   * side" — which would otherwise poison EVERY static on the model, since
+   * side". Which would otherwise poison EVERY static on the model, since
    * a single bad static member makes the whole class's static side
    * unassignable to `typeof BaseModel`.
    */
@@ -923,14 +923,14 @@ export abstract class BaseModel {
   }
 
   /**
-   * Start a fluent, chainable query — `where`/`whereIn`/`orderBy`/
+   * Start a fluent, chainable query, `where`/`whereIn`/`orderBy`/
    * `limit`/`skip`/`get`/`first`/`count`/`update`/`delete`. `all`/`find`/
    * `create`/`update`/`delete` cover the 80% case as direct static
-   * calls; reach for `query()` when you need to compose conditions
+   * calls; use `query()` when you need to compose conditions
    * before executing.
    *
    * Every declared `scopes` entry is applied automatically (see the
-   * class docstring's "Global scopes" section) — use
+   * class docstring's "Global scopes" section), use
    * `queryWithoutScopes()`/`withoutGlobalScope()` to bypass them.
    */
   static query<M extends typeof BaseModel>(this: M): EloquentBuilder<any> {
@@ -954,7 +954,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The **persistence** builder — Laravel's `newModelQuery()`. Same as
+   * The **persistence** builder, Laravel's `newModelQuery()`. Same as
    * `queryWithoutScopes()`, under a name that says why: writing a row
    * you already hold must not be filtered by the scopes that decide
    * which rows are *readable*.
@@ -962,8 +962,8 @@ export abstract class BaseModel {
    * `save()`, the static `update()`/`delete()`, `refresh()` and the
    * instance delete path all go through here rather than `query()`. Via
    * `query()` a `SoftDeletes` model compiles `UPDATE ... WHERE id = ?
-   * AND deleted_at IS NULL`, so calling `save()` on a trashed instance —
-   * or `Post.update(id, {...})` on a trashed row — matches zero rows and
+   * AND deleted_at IS NULL`, so calling `save()` on a trashed instance,
+   * or `Post.update(id, {...})` on a trashed row, matches zero rows and
    * silently writes nothing. The same applies to any global scope
    * (multi-tenancy, publish state) whose column the write itself is
    * changing.
@@ -996,7 +996,7 @@ export abstract class BaseModel {
 
   /**
    * Like `withoutGlobalScope()`, but bypasses SEVERAL scope classes at
-   * once (or, called with no arguments, every declared scope — the same
+   * once (or, called with no arguments, every declared scope, the same
    * result as `queryWithoutScopes()`, provided for API symmetry with
    * Laravel's `withoutGlobalScopes()`, which accepts an empty array for
    * the same "bypass everything" behavior).
@@ -1034,8 +1034,8 @@ export abstract class BaseModel {
    *
    * The read-only counterpart to `primaryKeyColumn`. Exists because the
    * column is otherwise only reachable through the scope internals, which
-   * left anything outside this package — a test assertion, a custom
-   * builder — hardcoding `"deleted_at"` and silently missing a model that
+   * left anything outside this package, a test assertion, a custom
+   * builder, hardcoding `"deleted_at"` and silently missing a model that
    * configured something else.
    */
   static get softDeleteColumn(): string | undefined {
@@ -1043,7 +1043,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * A query builder including soft-deleted rows — Laravel's `withTrashed()`.
+   * A query builder including soft-deleted rows, Laravel's `withTrashed()`.
    * Present on every model, but only meaningful when `softDeletes` is
    * configured; drops just the soft-delete scope, leaving any other global
    * scope in place. Throws on a model that doesn't soft-delete, so a typo
@@ -1066,7 +1066,7 @@ export abstract class BaseModel {
 
   /**
    * Proxies to `query().whereKey(id).first()`, returning a hydrated model
-   * INSTANCE (or `undefined`) — typed as `InstanceType<M>`, i.e. the model
+   * INSTANCE (or `undefined`), typed as `InstanceType<M>`, i.e. the model
    * class itself (`Post.find(id)` returns a `Post | undefined`). A model's
    * typed attributes are derived from the `PostAttributes` map its config
    * was built with, so `find()` needs no special `this: { Row } & typeof
@@ -1078,7 +1078,7 @@ export abstract class BaseModel {
 
   /**
    * Finds every row whose primary key is in `ids`, in a single
-   * `whereIn()` query (never one query per id) — matches Laravel's
+   * `whereIn()` query (never one query per id), matches Laravel's
    * `findMany()`. Rows for any id with no matching row are simply
    * absent from the result (same as Eloquent's `findMany()`); use
    * `findOrFail()` in a loop instead if a missing id should throw.
@@ -1125,21 +1125,21 @@ export abstract class BaseModel {
 
   /**
    * Inserts a row. If `timestamps` is enabled, stamps `createdAtColumn`/
-   * `updatedAtColumn` (unless the caller already supplied them — explicit
+   * `updatedAtColumn` (unless the caller already supplied them, explicit
    * values always win). Fires `saving` → `creating` → insert → `created`
    * → `saved`, in that order, via `dispatchModelEvent()` (see
-   * `model-events.ts`) — suppressed entirely inside `withoutEvents()`.
+   * `model-events.ts`), suppressed entirely inside `withoutEvents()`.
    * `creating`/`saving` hooks receive the SAME object about to be
    * inserted, so mutating it in place (e.g. an observer normalizing a
    * field) changes what actually gets written.
    *
    * If `incrementing` is true (the default), reads back the DB-generated
    * `primaryKeyColumn` value via Kysely's `InsertResult.insertId` and
-   * merges it into the returned row — unless the caller already supplied
+   * merges it into the returned row, unless the caller already supplied
    * that column explicitly, in which case the DB won't have
    * auto-generated anything and the caller's value passes through
    * unchanged. Declare `keyType` on models with a client-generated
-   * primary key — `"uuid"`, or `snowflake()` from `@mahiframework/snowflake`;
+   * primary key, `"uuid"`, or `snowflake()` from `@mahiframework/snowflake`;
    * `incrementing` is a read-only accessor derived from it.
    *
    * When `incrementing` is false and the payload has no primary key,
@@ -1148,7 +1148,7 @@ export abstract class BaseModel {
    * Accepts MODEL-shape values (casts apply on the way in) and returns a
    * saved model INSTANCE. Builds a `new this(values)` and `save()`s it,
    * so the whole lifecycle (timestamps, generated-id read-back, and the
-   * `saving`/`creating`/`created`/`saved` events — now receiving the
+   * `saving`/`creating`/`created`/`saved` events, now receiving the
    * instance as payload) runs through the one instance code path.
    */
   static async create<M extends typeof BaseModel>(
@@ -1165,7 +1165,7 @@ export abstract class BaseModel {
 
   /**
    * Builds the `where(attributes)` chain `firstOrNew`/`firstOrCreate`/
-   * `updateOrCreate` all start from — one `where()` per key in
+   * `updateOrCreate` all start from, one `where()` per key in
    * `attributes`. Not marked `private`/`protected`: `Model<A>()(config)`
    * returns an anonymous generated class, and TypeScript disallows an
    * exported function's return type from containing a private/protected
@@ -1186,8 +1186,8 @@ export abstract class BaseModel {
   }
 
   /**
-   * Returns the first row matching `attributes` as an instance, or — if
-   * none matches — a NEW, UNSAVED instance filled with `{ ...attributes,
+   * Returns the first row matching `attributes` as an instance, or, if
+   * none matches, a NEW, UNSAVED instance filled with `{ ...attributes,
    * ...values }` (matches Laravel's `firstOrNew()`: it builds an unsaved
    * model instance, never writes). Call `.save()` on the result to
    * persist it.
@@ -1212,17 +1212,17 @@ export abstract class BaseModel {
 
   /**
    * Creates a row, and on a unique-constraint collision re-reads the row
-   * that beat us to it instead of propagating the error — the
+   * that beat us to it instead of propagating the error. The
    * read-then-insert race guard shared by `firstOrCreate()` and
    * `updateOrCreate()` (Laravel 10+ does the same).
    *
    * Both of those methods are "check, then write", which is not atomic:
    * two concurrent requests can both see no row, both insert, and one
-   * loses to the unique index. Callers reach for these methods precisely
+   * loses to the unique index. Callers use these methods precisely
    * to express "make sure this exists", so a 500 on the losing request
    * is the wrong answer when the row now demonstrably does exist.
    *
-   * Only `UniqueConstraintViolationException` is caught — the portable
+   * Only `UniqueConstraintViolationException` is caught, the portable
    * exception `translateDatabaseError()` raises for SQLite's
    * `SQLITE_CONSTRAINT_UNIQUE`, MySQL's 1062 and Postgres' 23505 alike.
    * Everything else (a NOT NULL violation, a bad column) is a real bug
@@ -1238,7 +1238,7 @@ export abstract class BaseModel {
    *
    * Safe under concurrency: if another request inserts the same row
    * between this method's read and its write, the resulting unique
-   * violation is recovered by re-reading — see
+   * violation is recovered by re-reading. See
    * `createOrRecoverFromCollision()`.
    */
   static async firstOrCreate<M extends typeof BaseModel>(
@@ -1265,7 +1265,7 @@ export abstract class BaseModel {
    * `{ ...attributes, ...values }` if none matches. Matches Laravel's
    * `updateOrCreate()`.
    *
-   * Safe under concurrency the same way `firstOrCreate()` is — with the
+   * Safe under concurrency the same way `firstOrCreate()` is, with the
    * addition that a recovered collision still applies `values` to the
    * row that won, so "update or create" holds either way rather than
    * degrading into "create, or silently do nothing".
@@ -1301,7 +1301,7 @@ export abstract class BaseModel {
    * it). Fires `saving` → `updating` → update → `updated` → `saved`.
    * Every hook receives `values` merged with `{ [primaryKeyColumn]: id }`
    * (the same object reference used for the actual `UPDATE ... SET`, so
-   * in-place mutations are reflected in what gets written) — hooks always
+   * in-place mutations are reflected in what gets written), hooks always
    * know which row without a separate `id` parameter.
    *
    * `values` are MODEL-shape and run through each column's `casts` on
@@ -1310,7 +1310,7 @@ export abstract class BaseModel {
    * hooks see the cast (DB-shape) object, matching what `save()` passes
    * them.
    *
-   * Runs through `newModelQuery()`, not `query()` — see that method for
+   * Runs through `newModelQuery()`, not `query()`. See that method for
    * why persistence must not inherit read-side global scopes.
    */
   static async update<M extends typeof BaseModel>(
@@ -1348,13 +1348,13 @@ export abstract class BaseModel {
 
   /**
    * Not generic over `M` (its return type, `void`, doesn't depend on the
-   * row type) — deliberately, so `SoftDeletes` can override it with a
+   * row type), deliberately, so `SoftDeletes` can override it with a
    * plain `this: typeof BaseModel` signature without a static-side variance
    * error. If you need to override `delete()` in your own extension,
    * follow the same non-generic-`this` shape.
    *
    * Fires `deleting` → delete → `deleted`, passing the model **INSTANCE**
-   * as the payload — matching Laravel, whose delete events always receive
+   * as the payload, matching Laravel, whose delete events always receive
    * the model (not a bare `{ [primaryKeyColumn]: id }` object). The row is
    * loaded first so the payload is the real, fully-attributed instance; a
    * listener can therefore read any column (`post.user_id`), not just the
@@ -1364,7 +1364,7 @@ export abstract class BaseModel {
    *
    * The optional `preloaded` instance lets the instance-side
    * `deleteInstance()` pass the model it already has in hand, avoiding a
-   * redundant read — external callers pass just the id.
+   * redundant read, external callers pass just the id.
    */
   static async delete(this: typeof BaseModel, id: SqlBinding, preloaded?: Model): Promise<void> {
     this.bootIfNotBooted();
@@ -1376,7 +1376,7 @@ export abstract class BaseModel {
     const payload: ModelEventPayload = instance ?? { [this.primaryKeyColumn]: id };
 
     await dispatchModelEvent(this, "deleting", payload);
-    // Soft-delete when the model is configured with `softDeletes` — the
+    // Soft-delete when the model is configured with `softDeletes`, the
     // config scope carries the column; otherwise a real DELETE.
     const scope = findSoftDeleteScope(this.scopes);
     const query = (
@@ -1394,7 +1394,7 @@ export abstract class BaseModel {
 
   /**
    * Many-to-one: the foreign key lives on **this** model's table. Returns
-   * the related model's builder filtered to the single owning row — call
+   * the related model's builder filtered to the single owning row, call
    * `.first()` to resolve it.
    *
    *   static user(row: TodoTable) {
@@ -1402,7 +1402,7 @@ export abstract class BaseModel {
    *   }
    *
    * If `row[foreignKey]` is `null` (a nullable FK), the resulting query
-   * is `WHERE owner_key = NULL`, which matches nothing — `.first()`
+   * is `WHERE owner_key = NULL`, which matches nothing, `.first()`
    * yields `undefined`, the same answer Eloquent gives, without a special
    * case here.
    */
@@ -1440,7 +1440,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * One-to-one — identical to `hasMany()` in every respect except intent
+   * One-to-one, identical to `hasMany()` in every respect except intent
    * (and that you'd call `.first()` rather than `.get()` on the result).
    * Provided so a model's own method reads as the relationship it is;
    * there is no separate uniqueness enforcement, which is the database's
@@ -1471,12 +1471,12 @@ export abstract class BaseModel {
    *   }
    *
    * Implemented as `WHERE tags.id IN (SELECT tag_id FROM todo_tag WHERE
-   * todo_id = ?)` rather than a JOIN — one query either way, but the
+   * todo_id = ?)` rather than a JOIN, one query either way, but the
    * subquery form keeps the result rows exactly `TRelatedRow` (no pivot
    * columns bleeding in, no ambiguous duplicate column names) and keeps
    * the return value the related model's ordinary builder, so global
    * scopes and further chaining work unchanged. See `QueryBuilder.
-   * whereIn()`'s `Subquery` overload — the same overload real
+   * whereIn()`'s `Subquery` overload, the same overload real
    * Laravel's `whereIn($column, $subquery)` uses.
    *
    * Requesting pivot columns via `withPivot`/`withTimestamps` switches
@@ -1504,7 +1504,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic many-to-many from a row — the **morphed** side. See
+   * Polymorphic many-to-many from a row, the **morphed** side. See
    * `relations.ts`'s `MorphToManyOptions`, and note the `type`-defaulting
    * asymmetry against `morphedByMany()`.
    */
@@ -1530,7 +1530,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic many-to-many from a row — the **inverse** side. `type`
+   * Polymorphic many-to-many from a row, the **inverse** side. `type`
    * names the RELATED model here, not this one; see
    * `relations.ts`'s `MorphedByManyOptions`.
    */
@@ -1569,7 +1569,7 @@ export abstract class BaseModel {
    *   }
    *
    * Unlike Eloquent, the `{morphType}`/`{morphId}` column names are
-   * explicit — no `{name}_type`/`{name}_id` guessing, matching every
+   * explicit, no `{name}_type`/`{name}_id` guessing, matching every
    * other relation here. `type` is the one exception, and only because
    * it isn't a *column* name: it defaults to this model's
    * `morphAlias()`, which is a declared property of the model rather
@@ -1592,7 +1592,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic one-to-one — identical to `morphMany()` except intent
+   * Polymorphic one-to-one, identical to `morphMany()` except intent
    * (call `.first()` rather than `.get()`). See `morphMany()`.
    */
   static morphOne<M extends typeof BaseModel, R extends typeof BaseModel>(
@@ -1632,7 +1632,7 @@ export abstract class BaseModel {
    * a bare `Model`.
    *
    * Returns `undefined` (a resolved promise) when the discriminant
-   * resolves to nothing or its `morphId` is null — matching
+   * resolves to nothing or its `morphId` is null, matching
    * `belongsTo()`'s "missing owner resolves to undefined" behavior.
    * Unlike the other relation helpers this returns a `Promise` of the
    * resolved instance, not a builder: the target model isn't known until
@@ -1669,10 +1669,10 @@ export abstract class BaseModel {
 
   /**
    * Has-many-through: reaches a distant related model via an intermediate
-   * ("through") model — e.g. `Country.posts(country)` returns posts made
+   * ("through") model, e.g. `Country.posts(country)` returns posts made
    * by the country's users. Compiled as `WHERE related.secondKey IN
    * (SELECT through.secondLocalKey FROM through WHERE through.firstKey =
-   * ?)` — one subquery, so the result rows stay exactly the related
+   * ?)`, one subquery, so the result rows stay exactly the related
    * model's shape and its global scopes/further chaining apply.
    *
    *   static posts(row: CountryTable) {
@@ -1697,7 +1697,7 @@ export abstract class BaseModel {
     );
   }
 
-  /** Has-one-through — identical to `hasManyThrough()` except intent (call `.first()`). See `hasManyThrough()`. */
+  /** Has-one-through, identical to `hasManyThrough()` except intent (call `.first()`). See `hasManyThrough()`. */
   static hasOneThrough<M extends typeof BaseModel, R extends typeof BaseModel>(
     this: M,
     related: R,
@@ -1712,7 +1712,7 @@ export abstract class BaseModel {
     );
   }
 
-  /** Offset-based pagination — see `pagination/length-aware-paginator.ts`'s docstring. */
+  /** Offset-based pagination. See `pagination/length-aware-paginator.ts`'s docstring. */
   static async paginate<M extends typeof BaseModel>(
     this: M,
     page: number,
@@ -1725,7 +1725,7 @@ export abstract class BaseModel {
     ) as unknown as Promise<LengthAwarePaginationResult<Record<string, any>>>;
   }
 
-  /** Offset-based pagination without a count query — see `pagination/simple-paginator.ts`'s docstring. */
+  /** Offset-based pagination without a count query. See `pagination/simple-paginator.ts`'s docstring. */
   static async simplePaginate<M extends typeof BaseModel>(
     this: M,
     page: number,
@@ -1738,7 +1738,7 @@ export abstract class BaseModel {
     ) as unknown as Promise<SimplePaginationResult<Record<string, any>>>;
   }
 
-  /** Cursor-based pagination — see `pagination/cursor-paginator.ts`'s docstring. */
+  /** Cursor-based pagination. See `pagination/cursor-paginator.ts`'s docstring. */
   static async cursorPaginate<
     M extends typeof BaseModel,
     K extends keyof Record<string, any> & string,
@@ -1760,7 +1760,7 @@ export abstract class BaseModel {
    * stores raw DB values and marks the instance as existing).
    *
    * Returns a `Proxy` so `post.body`/`post.published` read/write casted
-   * attributes directly — see `MODEL_PROXY_HANDLER`. Instance state lives
+   * attributes directly. See `MODEL_PROXY_HANDLER`. Instance state lives
    * in a `WeakMap` (`instanceState`) keyed by BOTH the target and the
    * proxy, so class methods (bound to the target), the proxy handler
    * (holding the target), and callers (holding the proxy) all reach the
@@ -1782,7 +1782,7 @@ export abstract class BaseModel {
     state.self = proxy;
     instanceState.set(proxy, state);
     // Honor mass-assignment protection (`fillable`/`guarded`) for the
-    // `new Model({...})` / `create()` path — a no-op for models left at
+    // `new Model({...})` / `create()` path, a no-op for models left at
     // the framework defaults (everything fillable). `hydrate()`/`Factory`
     // construct with no attributes and use the unguarded raw-attribute
     // setters instead, so those paths are unaffected.
@@ -1797,14 +1797,14 @@ export abstract class BaseModel {
   }
 
   /**
-   * Hydrates an instance from a raw DB row — values are stored as-is (DB
+   * Hydrates an instance from a raw DB row. Values are stored as-is (DB
    * shape, no cast-in), the dirty-tracking snapshot is taken, and the
    * instance is marked as existing. This is what `EloquentBuilder`/the
    * static finders use to turn query results into instances.
    *
    * Any `pivot__*` columns (projected by a `withPivot()` relation's join)
-   * are split off into a `pivot` object rather than kept as attributes —
-   * see `pivot.ts`. They belong to the join, not to this table, so
+   * are split off into a `pivot` object rather than kept as attributes.
+   * See `pivot.ts`. They belong to the join, not to this table, so
    * leaving them in `attributes`/`original` would make them
    * dirty-trackable and write them back on the next `save()`.
    */
@@ -1838,7 +1838,7 @@ export abstract class BaseModel {
 
   /**
    * Fires the `retrieved` lifecycle event for an instance just hydrated
-   * from a query — called by `EloquentBuilder.get()`/`first()` after
+   * from a query, called by `EloquentBuilder.get()`/`first()` after
    * hydration. The read-side hook (cache-warming, audit-on-read); no-ops
    * unless a listener/observer for `retrieved` is registered, so ordinary
    * query reads stay cheap.
@@ -1851,14 +1851,14 @@ export abstract class BaseModel {
     await dispatchModelEvent(this, "retrieved", instance as never);
   }
 
-  /** The raw (DB-shape) value of an attribute, bypassing casts — used for relation keys. */
+  /** The raw (DB-shape) value of an attribute, bypassing casts, used for relation keys. */
   getRawAttribute(key: string): any {
     return this.$state.attributes[key];
   }
 
   /**
    * Sets one attribute in its raw (DB-shape) form, bypassing the column's
-   * cast — the singular counterpart to `setRawAttributes()`, and the
+   * cast, the singular counterpart to `setRawAttributes()`, and the
    * write-side mirror of `getRawAttribute()`. For a caller that already
    * holds the stored representation (a driver-shaped value, a
    * pre-serialised JSON string) and would otherwise pay a pointless
@@ -1872,7 +1872,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Replaces the raw (DB-shape) attribute store wholesale — no casts
+   * Replaces the raw (DB-shape) attribute store wholesale, no casts
    * applied. Used by `Factory` (whose `definition()` already returns
    * DB-shape rows) and by the insert read-back path. Does NOT touch the
    * dirty-tracking snapshot; call `markPersisted()` after a save.
@@ -1882,7 +1882,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Marks the instance as persisted and resets dirty tracking — the
+   * Marks the instance as persisted and resets dirty tracking, the
    * post-**insert** transition, used by `Factory`'s batched insert path
    * (which writes rows itself rather than going through `save()`). Sets
    * `wasRecentlyCreated`, and leaves `getChanges()` empty, for the same
@@ -1911,7 +1911,7 @@ export abstract class BaseModel {
     }
 
     // `strictRelations`: a DECLARED relation that was never loaded is a
-    // mistake, not an empty result — see `RelationNotLoadedError`. Guarded
+    // mistake, not an empty result. See `RelationNotLoadedError`. Guarded
     // on the key not also being a real column so a `withCount()` alias or
     // a column that happens to share a relation's name still reads
     // through. Checked before `computed`/accessors because a relation
@@ -1973,8 +1973,8 @@ export abstract class BaseModel {
    * Whether `key` may be set through a mass-assignment call, per this
    * model's `fillable`/`guarded` policy (Laravel's `isFillable()`):
    *
-   *   - A non-empty `fillable` is an allow-list — only its members pass.
-   *   - Otherwise `guarded` is a block-list — everything passes except its
+   *   - A non-empty `fillable` is an allow-list, only its members pass.
+   *   - Otherwise `guarded` is a block-list, everything passes except its
    *     members (and `["*"]` blocks everything).
    *
    * The framework default (`fillable = []`, `guarded = []`) makes every
@@ -1993,7 +1993,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * True when this model guards *everything* — an empty `fillable` and a
+   * True when this model guards *everything*, an empty `fillable` and a
    * `guarded` that blocks every column (`["*"]`). A mass-assignment onto a
    * totally-guarded model throws `MassAssignmentError` instead of silently
    * dropping the disallowed key. Matches Laravel's `totallyGuarded()`.
@@ -2023,7 +2023,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Sets attributes bypassing the `fillable`/`guarded` policy — the
+   * Sets attributes bypassing the `fillable`/`guarded` policy, the
    * unguarded counterpart to `fill()`, for framework-internal paths (the
    * constructor's initial hydration of a `new Model({...})`) and callers
    * that have already vetted their input. Marks assigned attributes
@@ -2039,7 +2039,7 @@ export abstract class BaseModel {
 
   /**
    * Whether `key`'s current value is, for dirty-tracking purposes, the
-   * same as its snapshot value — Laravel's `originalIsEquivalent()`, and
+   * same as its snapshot value, Laravel's `originalIsEquivalent()`, and
    * the single comparison `getDirty()`/`isDirty()` are built on.
    *
    * A plain `Object.is` on the two DB-shape values is right for most
@@ -2058,7 +2058,7 @@ export abstract class BaseModel {
    *     `1` looks changed. See critical-database-mysql-postgres M3.
    *
    * The comparison is therefore layered: identity first (the common case,
-   * no allocation), then — for a column carrying a `Cast` — equality of
+   * no allocation), then, for a column carrying a `Cast`, equality of
    * the two *model-shape* values (which is what makes JSON, `DateTime`,
    * boolean and decimal columns compare by meaning rather than by
    * spelling), then instant equality for a declared temporal column
@@ -2107,7 +2107,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The DB-shape attributes that differ from the last-synced snapshot —
+   * The DB-shape attributes that differ from the last-synced snapshot,
    * exactly the columns the next `save()` would write. Values are DB-shape
    * (the persistence path consumes this directly); `getDirtyAttributes()`
    * is the cast-aware view of the same set.
@@ -2124,14 +2124,14 @@ export abstract class BaseModel {
     return dirty;
   }
 
-  /** `getDirty()` with each value run through its column's cast — model-shape. */
+  /** `getDirty()` with each value run through its column's cast, model-shape. */
   getDirtyAttributes(): Record<string, any> {
     return this.castAll(this.getDirty());
   }
 
   /**
-   * True when any attribute differs from the snapshot, or — given a key or
-   * a list of keys — when **any** of those does (Laravel's `isDirty()`,
+   * True when any attribute differs from the snapshot, or, given a key or
+   * a list of keys, when **any** of those does (Laravel's `isDirty()`,
    * which is an OR across the list, not an AND).
    */
   isDirty(key?: string | string[]): boolean {
@@ -2145,7 +2145,7 @@ export abstract class BaseModel {
 
   /**
    * The last-synced value of an attribute (or the whole snapshot), run
-   * through that column's cast — the **model-shape** counterpart to the
+   * through that column's cast, the **model-shape** counterpart to the
    * live `post.meta`, so a hook can compare the two without knowing
    * whether the column is cast:
    *
@@ -2161,13 +2161,13 @@ export abstract class BaseModel {
    *
    * It should be the cast's model type (`getOriginal("meta")` typing as
    * `Meta`), and under the current model surface it cannot be. The
-   * obvious spelling — `getOriginal<K extends keyof this & string>(key:
-   * K): this[K]` — is defeated by `CastedAttributes`: the finders return
+   * obvious spelling, `getOriginal<K extends keyof this & string>(key:
+   * K): this[K]`, is defeated by `CastedAttributes`: the finders return
    * a **mapped copy** of the instance type, and mapping re-binds the
    * polymorphic `this` inside every method signature to the original
    * class, whose declaration merge (`interface Post extends PostTable`)
    * carries DB types. The overload therefore resolves to `string` for a
-   * `json<Meta>()` column and `number` for a `BooleanCast` one — the
+   * `json<Meta>()` column and `number` for a `BooleanCast` one, the
    * exact opposite of what it claims, and a confidently-wrong type is
    * worse than an honest `any` (it would silently typecheck
    * `const s: string = post.getOriginal("meta")` against an object).
@@ -2200,8 +2200,8 @@ export abstract class BaseModel {
   }
 
   /**
-   * The DB-shape attributes written by the LAST `save()` on this instance
-   * — the post-save window `getDirty()` closes. This is what lets an
+   * The DB-shape attributes written by the LAST `save()` on this instance,
+   * the post-save window `getDirty()` closes. This is what lets an
    * `updated`/`saved` hook react to a specific transition, which is
    * otherwise unknowable once `syncOriginal()` has run:
    *
@@ -2210,7 +2210,7 @@ export abstract class BaseModel {
    *   });
    *
    * **Empty after an INSERT** (matching Laravel): a create didn't *change*
-   * anything, it brought the row into existence — `wasRecentlyCreated`
+   * anything, it brought the row into existence. `wasRecentlyCreated`
    * is the flag for that branch. Also empty on a never-saved instance.
    *
    * A `save()` that finds nothing dirty leaves this alone rather than
@@ -2222,14 +2222,14 @@ export abstract class BaseModel {
     return { ...this.$state.changes };
   }
 
-  /** `getChanges()` with each value run through its column's cast — model-shape. */
+  /** `getChanges()` with each value run through its column's cast, model-shape. */
   getChangedAttributes(): Record<string, any> {
     return this.castAll(this.$state.changes);
   }
 
   /**
-   * True when the last `save()` wrote any attribute, or — given a key or a
-   * list of keys — **any** of those (Laravel's `wasChanged()`). The
+   * True when the last `save()` wrote any attribute, or, given a key or a
+   * list of keys, **any** of those (Laravel's `wasChanged()`). The
    * post-save counterpart to `isDirty()`.
    */
   wasChanged(key?: string | string[]): boolean {
@@ -2238,7 +2238,7 @@ export abstract class BaseModel {
 
   /**
    * Whether the last `save()` on this instance was an INSERT rather than
-   * an UPDATE — Laravel's `$model->wasRecentlyCreated`, the way to tell
+   * an UPDATE, Laravel's `$model->wasRecentlyCreated`, the way to tell
    * which branch `firstOrCreate()`/`updateOrCreate()` took:
    *
    *   const user = await User.firstOrCreate({ email });
@@ -2249,7 +2249,7 @@ export abstract class BaseModel {
    * caller's point of view); `refresh()` resets it, as does re-reading the
    * row into a new instance.
    *
-   * Read-only, and — like `exists` — a **reserved name**: a column called
+   * Read-only, and, like `exists`, a **reserved name**: a column called
    * `was_recently_created` is fine, but an attribute literally named
    * `wasRecentlyCreated` would be shadowed by this accessor.
    */
@@ -2258,7 +2258,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Copies the current dirty set into the post-save `changes` record —
+   * Copies the current dirty set into the post-save `changes` record,
    * Laravel's `syncChanges()`. Called by `save()`/`restore()` immediately
    * BEFORE `syncOriginal()`, which is the only moment both windows are
    * open: after the write has landed, while the snapshot still holds the
@@ -2273,14 +2273,14 @@ export abstract class BaseModel {
 
   /**
    * Throws away every unsaved change, restoring the attributes to the
-   * last-synced snapshot — Laravel's `discardChanges()`. The escape hatch
+   * last-synced snapshot, Laravel's `discardChanges()`. The escape hatch
    * for a `saving` hook that decides the write should not happen, and for
    * a failed validation pass that filled the instance before checking it.
    *
    * Also clears the post-save `changes` record: discarding puts the
    * instance back to "nothing has happened since the last sync", and a
    * lingering `wasChanged()` would contradict that. `wasRecentlyCreated`
-   * is untouched — the row was still created.
+   * is untouched. The row was still created.
    */
   discardChanges(): Model {
     const state = this.$state;
@@ -2290,7 +2290,7 @@ export abstract class BaseModel {
     return state.self;
   }
 
-  /** Every entry of `values` run through its column's cast — the shared body of the model-shape views. */
+  /** Every entry of `values` run through its column's cast, the shared body of the model-shape views. */
   private castAll(values: Record<string, any>): Record<string, any> {
     const casts = (this.constructor as AnyModelClass).casts;
     const out: Record<string, any> = {};
@@ -2313,7 +2313,7 @@ export abstract class BaseModel {
    * ## Where the snapshot is synced (and why the update path is late)
    *
    * On the **update** path `syncChanges()` runs immediately after the
-   * write — while the dirty window is still open — and `syncOriginal()`
+   * write, while the dirty window is still open, and `syncOriginal()`
    * runs only after `updated`/`saved` have fired, mirroring Laravel's
    * `finishSave()`. That ordering is what makes the past-tense hooks
    * useful: inside `updated`, `getChanges()`/`wasChanged("status")`
@@ -2330,7 +2330,7 @@ export abstract class BaseModel {
    * value and make that comparison impossible to express. The cost is that
    * the instance still reads as dirty inside those hooks (the snapshot has
    * not moved yet), so a hook that calls `save()` on the same instance
-   * re-issues the write rather than no-opping — don't; mutate in the
+   * re-issues the write rather than no-opping, don't; mutate in the
    * `-ing` hooks (`saving`/`updating`), which run before the write and
    * whose mutations are picked up by it.
    *
@@ -2368,7 +2368,7 @@ export abstract class BaseModel {
         .whereKey(this.getKey())
         .update(ModelClass.prepareWrite(changed));
 
-      // Reads the dirty window while it is still open — see the docstring.
+      // Reads the dirty window while it is still open. See the docstring.
       this.syncChanges();
       await dispatchModelEvent(ModelClass, "updated", state.self as never);
       await dispatchModelEvent(ModelClass, "saved", state.self as never);
@@ -2409,7 +2409,7 @@ export abstract class BaseModel {
 
     state.exists = true;
     // An INSERT reports itself through `wasRecentlyCreated`, not through
-    // `getChanges()` — a create didn't change anything, it brought the row
+    // `getChanges()`. A create didn't change anything, it brought the row
     // into being. Matches Laravel; see `getChanges()`.
     state.wasRecentlyCreated = true;
     state.changes = {};
@@ -2420,7 +2420,7 @@ export abstract class BaseModel {
     return state.self;
   }
 
-  /** `fill()` then `save()` — the instance counterpart to the static `update()`. */
+  /** `fill()` then `save()`, the instance counterpart to the static `update()`. */
   async updateInstance(attributes: Record<string, any>): Promise<Model> {
     this.fill(attributes);
 
@@ -2429,7 +2429,7 @@ export abstract class BaseModel {
 
   /**
    * Deletes this instance's row. Routes through the model class's static
-   * `delete()` so `SoftDeletes` (which overrides that static) applies —
+   * `delete()` so `SoftDeletes` (which overrides that static) applies,
    * an instance `delete()` on a soft-deleting model soft-deletes.
    */
   async deleteInstance(): Promise<void> {
@@ -2439,7 +2439,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The soft-delete scope this model declares, or `undefined` — the
+   * The soft-delete scope this model declares, or `undefined`, the
    * instance-side gate for `trashed()`/`restore()`/`forceDelete()`.
    */
   private softDeleteScope(): SoftDeleteScopeLike | undefined {
@@ -2450,7 +2450,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Whether THIS instance is soft-deleted — Laravel's `trashed()`.
+   * Whether THIS instance is soft-deleted, Laravel's `trashed()`.
    * Reads the loaded attribute, so it reflects the row as of the last
    * read (call `refresh()` first if another process may have deleted it
    * since).
@@ -2469,7 +2469,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Un-deletes THIS instance — Laravel's instance `restore()`. Clears
+   * Un-deletes THIS instance, Laravel's instance `restore()`. Clears
    * `deleted_at` both in the database and on the loaded attributes, so
    * `trashed()` is immediately false without a `refresh()`.
    *
@@ -2507,7 +2507,7 @@ export abstract class BaseModel {
 
   /**
    * Permanently deletes THIS instance's row, even on a soft-deleting
-   * model — Laravel's instance `forceDelete()`. Fires `deleting`/
+   * model, Laravel's instance `forceDelete()`. Fires `deleting`/
    * `deleted` with the instance as the payload, like every other delete
    * path.
    *
@@ -2533,7 +2533,7 @@ export abstract class BaseModel {
    *
    * Reads through `newModelQuery()` (no global scopes): you already hold
    * the instance, so a scope that would have hidden the row is not a
-   * reason to refuse to re-read it — that's what makes `refresh()` work
+   * reason to refuse to re-read it. That's what makes `refresh()` work
    * on a trashed model, and it's what Laravel does too.
    */
   async refresh(): Promise<Model> {
@@ -2560,7 +2560,7 @@ export abstract class BaseModel {
 
   /**
    * A fresh, UNSAVED copy of this instance with the primary key and
-   * timestamp columns stripped — Laravel's `replicate()`.
+   * timestamp columns stripped, Laravel's `replicate()`.
    *
    * Returns `this` (the polymorphic type), not the base `Model`: the copy
    * is constructed from `this.constructor`, so it really is the same
@@ -2588,7 +2588,7 @@ export abstract class BaseModel {
     return clone as this;
   }
 
-  /** Copies attributes into the snapshot — the post-save/refresh dirty-tracking reset. */
+  /** Copies attributes into the snapshot, the post-save/refresh dirty-tracking reset. */
   syncOriginal(): void {
     const state = this.$state;
     state.original = { ...state.attributes };
@@ -2603,7 +2603,7 @@ export abstract class BaseModel {
 
   /**
    * Clears a loaded relation, so it reads back as not-loaded rather than
-   * as a stale value — the counterpart to `setRelation()`.
+   * as a stale value, the counterpart to `setRelation()`.
    *
    * Used by `dissociate()` (and by `associate()` given a bare key): once
    * the foreign key has moved, the previously loaded owner is wrong, and
@@ -2628,7 +2628,7 @@ export abstract class BaseModel {
 
   /**
    * Lazily loads relations onto this instance (batched via the eager
-   * loader). Takes the same three forms as `EloquentBuilder.with()` —
+   * loader). Takes the same three forms as `EloquentBuilder.with()`,
    * names, dot paths, and a constraining map:
    *
    *   await post.load("author.team");
@@ -2642,7 +2642,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Like `load()`, but skips any relation already loaded — Laravel's
+   * Like `load()`, but skips any relation already loaded, Laravel's
    * `loadMissing()`. A cheap guard against re-querying a relation a prior
    * `with()`/`load()` already attached.
    *
@@ -2660,13 +2660,13 @@ export abstract class BaseModel {
   }
 
   /**
-   * Attaches a named, non-column value onto this instance — an "appended
+   * Attaches a named, non-column value onto this instance, an "appended
    * attribute". The value then reads back off the instance
    * (`instance.name`) and is available to a `Resource` via
    * `whenAppended(name)`, but is deliberately NOT part of `toJSON()`'s
    * default column serialization (shaping the wire format is the
    * resource's job, not the model's). Alias-friendly form of
-   * `setAppended()` — for a value the caller already has in hand:
+   * `setAppended()`, for a value the caller already has in hand:
    *
    *   post.append("special_thing", computeSpecialThing(post));
    *   // in the resource: special: this.whenAppended("special_thing")
@@ -2679,7 +2679,7 @@ export abstract class BaseModel {
     return this.setAppended(name, value);
   }
 
-  /** Attaches a pre-computed appended value onto this instance — see `append()`. */
+  /** Attaches a pre-computed appended value onto this instance. See `append()`. */
   setAppended(name: string, value: unknown): Model {
     this.$state.computed.set(name, value);
 
@@ -2702,14 +2702,14 @@ export abstract class BaseModel {
   }
 
   /**
-   * The attribute-casting proxy wrapping this instance — the value callers
+   * The attribute-casting proxy wrapping this instance, the value callers
    * actually hold (finders/builder terminals return it), as opposed to the
    * raw target `this` inside an instance method. An instance method's `this`
    * is bound to the underlying target, not the proxy, so reading cast
    * columns off `this` won't resolve (this is why `Post.can()` passes
    * `this.toObject()` to the gate). A subclass that constructs an object
-   * from this instance — most notably `toJsonResource()`, whose `Resource`
-   * reads `this.model.someCastColumn` — must hand it `this.self` so those
+   * from this instance, most notably `toJsonResource()`, whose `Resource`
+   * reads `this.model.someCastColumn`, must hand it `this.self` so those
    * reads go through the casting proxy.
    */
   protected get self(): this {
@@ -2726,7 +2726,7 @@ export abstract class BaseModel {
    *   }
    *
    * Deliberately a single overridable method (return type IS the
-   * declaration) rather than a type-only marker + hook split — same
+   * declaration) rather than a type-only marker + hook split, same
    * reasoning as `factory()`: no framework work wraps the construction, so
    * a split would be pure ceremony. The model -> resource -> model import
    * cycle this creates in an app is safe for the same reason `factory()`'s
@@ -2754,7 +2754,7 @@ export abstract class BaseModel {
 
   /**
    * Model-shape serialization honoring `hidden`/`visible`, with loaded
-   * relations serialized recursively — what `JSON.stringify(instance)`
+   * relations serialized recursively, what `JSON.stringify(instance)`
    * (and therefore any JSON response) uses.
    */
   toJSON(): Record<string, any> {
@@ -2773,7 +2773,7 @@ export abstract class BaseModel {
       }
     }
 
-    // Declared computed attributes listed in `appends` — Laravel's
+    // Declared computed attributes listed in `appends`, Laravel's
     // `$appends`. Serialized through the accessor getter.
     for (const key of ModelClass.appends) {
       if (include(key) && !(key in out)) {
@@ -2793,7 +2793,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The **query-side** relation namespace — Laravel's `$post->comments()`.
+   * The **query-side** relation namespace, Laravel's `$post->comments()`.
    * One nullary method per relation declared in `static relations`, each
    * returning that relation's builder scoped to THIS row (the related
    * model's own builder, so global scopes and any custom `Builder`
@@ -2804,14 +2804,14 @@ export abstract class BaseModel {
    *   await post.relations.comments().where("approved", 1).get();
    *
    * Distinct from the loaded value accessor `post.comments` (a
-   * `Collection` populated by `with()`/`load()`/`loadMissing()`) — this is
+   * `Collection` populated by `with()`/`load()`/`loadMissing()`). This is
    * always a fresh query, `post.comments` is the already-fetched result.
    * Built lazily from `static relations` and cached per instance; each
    * relation is dispatched through the matching generic instance helper
    * (`this.belongsTo(...)`/`this.hasMany(...)`/...) for its `type`.
    *
    * A declared `morphTo` yields a `MorphToBuilder` rather than an
-   * `EloquentBuilder` — its target model isn't known until the
+   * `EloquentBuilder`, its target model isn't known until the
    * discriminant is read, so there's no `TRow` to parameterise on. The
    * typed `RelationBuilders` mapping narrows per name, so callers see the
    * right one; this runtime signature is the union of both.
@@ -2844,7 +2844,7 @@ export abstract class BaseModel {
 
   /**
    * Many-to-one from an instance: the foreign key lives on THIS row.
-   * Returns the related model's builder scoped to the single owner —
+   * Returns the related model's builder scoped to the single owner,
    * call `.first()` to resolve it (or declare it in `static relations`
    * and use `with()`/`load()` for the loaded-accessor form).
    */
@@ -2871,7 +2871,7 @@ export abstract class BaseModel {
     return builder as EloquentBuilder<any>;
   }
 
-  /** One-to-one from an instance — `hasMany` with a `.first()` at the call site. */
+  /** One-to-one from an instance, `hasMany` with a `.first()` at the call site. */
   hasOne<R extends typeof BaseModel>(
     related: R,
     options: HasOneOptions<Record<string, any>, Record<string, any>>,
@@ -2898,7 +2898,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic many-to-many from an instance — the **morphed** side.
+   * Polymorphic many-to-many from an instance, the **morphed** side.
    * See `relations.ts`'s `MorphToManyOptions` for the pivot layout and
    * the `type`-defaulting asymmetry against `morphedByMany`.
    */
@@ -2916,7 +2916,7 @@ export abstract class BaseModel {
       localValue: this.getRawAttribute(localKey),
       relatedKey: options.relatedKey ?? related.primaryKeyColumn,
       morphType: options.morphType,
-      // The pivot discriminates THIS model — see MorphToManyOptions.
+      // The pivot discriminates THIS model. See MorphToManyOptions.
       morphValue: options.type ?? owner.morphAlias(),
       withPivot: options.withPivot,
       withTimestamps: options.withTimestamps,
@@ -2924,7 +2924,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic many-to-many from an instance — the **inverse** side.
+   * Polymorphic many-to-many from an instance, the **inverse** side.
    * See `relations.ts`'s `MorphedByManyOptions`; note `type` names the
    * RELATED model here, not this one.
    */
@@ -2948,7 +2948,7 @@ export abstract class BaseModel {
     }) as EloquentBuilder<any>;
   }
 
-  /** Polymorphic one-to-many from an instance — see the static `morphMany()`. */
+  /** Polymorphic one-to-many from an instance. See the static `morphMany()`. */
   morphMany<R extends typeof BaseModel>(
     related: R,
     options: MorphManyOptions<Record<string, any>, Record<string, any>>,
@@ -2962,7 +2962,7 @@ export abstract class BaseModel {
     return builder as EloquentBuilder<any>;
   }
 
-  /** Polymorphic one-to-one from an instance — `morphMany` with a `.first()` at the call site. */
+  /** Polymorphic one-to-one from an instance, `morphMany` with a `.first()` at the call site. */
   morphOne<R extends typeof BaseModel>(
     related: R,
     options: MorphOneOptions<Record<string, any>, Record<string, any>>,
@@ -2971,7 +2971,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * Polymorphic inverse from an instance (`morphTo`) — resolves the parent
+   * Polymorphic inverse from an instance (`morphTo`), resolves the parent
    * model by this row's `morphType` discriminant. Returns the resolved
    * instance (a union of the mapped models' instance types) or `undefined`.
    * See the static `morphTo()`.
@@ -3000,7 +3000,7 @@ export abstract class BaseModel {
   }
 
   /**
-   * The deferred, chainable form of `morphTo()` — returns a
+   * The deferred, chainable form of `morphTo()`, returns a
    * `MorphToBuilder` rather than resolving immediately, so per-type
    * constraints and soft-delete variants can be applied before the query
    * runs:
@@ -3022,7 +3022,7 @@ export abstract class BaseModel {
     return new MorphToBuilder(this.$state.self, options as any, relationName);
   }
 
-  /** Has-many-through from an instance — see the static `hasManyThrough()`. */
+  /** Has-many-through from an instance. See the static `hasManyThrough()`. */
   hasManyThrough<R extends typeof BaseModel>(
     related: R,
     options: HasManyThroughOptions<Record<string, any>, Record<string, any>, Record<string, any>>,
@@ -3039,7 +3039,7 @@ export abstract class BaseModel {
     return builder as EloquentBuilder<any>;
   }
 
-  /** Has-one-through from an instance — `hasManyThrough` with a `.first()` at the call site. */
+  /** Has-one-through from an instance, `hasManyThrough` with a `.first()` at the call site. */
   hasOneThrough<R extends typeof BaseModel>(
     related: R,
     options: HasOneThroughOptions<Record<string, any>, Record<string, any>, Record<string, any>>,
@@ -3053,8 +3053,8 @@ export abstract class BaseModel {
  *
  * Used by the instance proxy to decide what must not be bound. Class
  * constructors are the only functions reachable through a model instance
- * that are not methods — `constructor` itself, plus anything a model
- * stores as a static class reference — and binding one destroys its
+ * that are not methods, `constructor` itself, plus anything a model
+ * stores as a static class reference, and binding one destroys its
  * static side (see the proxy's `get` trap).
  *
  * `class X {}` compiles to a function whose source starts with `class`,
@@ -3071,7 +3071,7 @@ function isClassConstructor(value: (...args: any[]) => any): boolean {
  * casts transparently (`post.published` reads the DB `0`/`1` as a
  * `boolean`; assigning a `boolean` writes back the int) while real
  * methods (`save()`, `fill()`, ...) and loaded relations still resolve.
- * A small, documented use of a `Proxy` — the payoff (Eloquent-style
+ * A small, documented use of a `Proxy`, the payoff (Eloquent-style
  * attribute ergonomics with full type safety) is exactly the case the
  * "no magic" guideline was never meant to forbid.
  *
@@ -3085,8 +3085,8 @@ function isClassConstructor(value: (...args: any[]) => any): boolean {
  *
  * The `constructor` property is deliberately returned UNBOUND (the raw
  * class), so `Object.getPrototypeOf(instance).constructor` and
- * `instance.constructor.table` still reach the model class's statics —
- * a bound function would lose them.
+ * `instance.constructor.table` still reach the model class's statics.
+ * A bound function would lose them.
  */
 const MODEL_PROXY_HANDLER: ProxyHandler<Model> = {
   get(target, prop, receiver) {
@@ -3103,7 +3103,7 @@ const MODEL_PROXY_HANDLER: ProxyHandler<Model> = {
 
       // A class constructor must NOT be bound. `Function.prototype.bind`
       // returns an exotic wrapper whose prototype is the bound target's
-      // *prototype chain entry*, not the class itself — so
+      // *prototype chain entry*, not the class itself, so
       // `instance.constructor` came back as something that is neither
       // `Post` nor carries any of its statics: `.table`,
       // `.primaryKeyColumn` and `.morphAlias()` all read `undefined`,
@@ -3116,7 +3116,7 @@ const MODEL_PROXY_HANDLER: ProxyHandler<Model> = {
         return value;
       }
 
-      // Everything else binds to the RECEIVER — the proxy, when that is
+      // Everything else binds to the RECEIVER, the proxy, when that is
       // what the caller holds. This is what makes `this` inside an
       // instance method read casted attributes (`this.published` as a
       // `boolean`). Falls back to the target when there is no receiver.
@@ -3173,7 +3173,7 @@ const MODEL_PROXY_HANDLER: ProxyHandler<Model> = {
 /**
  * Dispatches a single `RelationDefinition` for `instance` through the
  * matching generic instance relation helper, returning the relation's
- * builder scoped to that row — the runtime behind the `relations`
+ * builder scoped to that row, the runtime behind the `relations`
  * namespace getter.
  *
  * Returns a `MorphToBuilder` for `morphTo` and an `EloquentBuilder` for
@@ -3185,15 +3185,15 @@ const MODEL_PROXY_HANDLER: ProxyHandler<Model> = {
  * attached (`attach()`/`associate()`/`create()`, per relation kind) by
  * `attachRelationWrites()`. They are added to the builder the relation
  * already produced rather than swapping in a write-capable subclass,
- * because that builder may be the related model's own custom `Builder`
- * — see `relationship-writes.ts`'s docstring. `morphTo` needs no such
+ * because that builder may be the related model's own custom `Builder`.
+ * See `relationship-writes.ts`'s docstring. `morphTo` needs no such
  * step: `MorphToBuilder` declares its own `associate()`/`dissociate()`.
  *
  * `relationName` is threaded through solely so `associate()`/
  * `dissociate()` can set and clear the *loaded* relation under the name
  * the caller knows it by.
  *
- * NB: `definition.related()` is resolved per-case, not up front —
+ * NB: `definition.related()` is resolved per-case, not up front.
  * `morphTo` is the one member with no `related` thunk.
  */
 function buildRelationBuilder(
@@ -3212,7 +3212,7 @@ function buildRelationBuilder(
   return attachRelationWrites(instance, relationName, definition, builder);
 }
 
-/** The read-side builder for one relation — the per-`type` dispatch `buildRelationBuilder()` wraps. */
+/** The read-side builder for one relation, the per-`type` dispatch `buildRelationBuilder()` wraps. */
 function buildRelationReadBuilder(
   instance: Model,
   definition: Exclude<RelationDefinition, { type: "morphTo" }>,
@@ -3273,12 +3273,12 @@ function buildRelationReadBuilder(
 
 /**
  * Applies `intermediate`'s global scopes to a **subquery over that
- * model's own table** — the fix for through/pivot links that silently
+ * model's own table**, the fix for through/pivot links that silently
  * ignored them.
  *
  * A `hasManyThrough` compiles to `related.second_key IN (SELECT
  * second_local_key FROM through WHERE first_key = ?)`, and that inner
- * `SELECT` is built as a bare `QueryBuilder` over `through.table` — it
+ * `SELECT` is built as a bare `QueryBuilder` over `through.table`. It
  * never went through `Through.query()`, so a soft-deleted (or otherwise
  * scoped-out) *through* row still linked its related rows to the parent.
  * A deleted `User` kept their `Country`'s `Post`s attached, which is
@@ -3287,7 +3287,7 @@ function buildRelationReadBuilder(
  *
  * Scopes are written for an `EloquentBuilder`, so a throwaway one is
  * built for `intermediate` and its accumulated where-tree merged into
- * the subquery as a single group — the same merge `where(callback)` uses.
+ * the subquery as a single group, the same merge `where(callback)` uses.
  * Models with no scopes (the common case, and every pivot table without
  * a model) add nothing and emit identical SQL to before.
  */
@@ -3315,7 +3315,7 @@ function applyIntermediateScopes(
  * through `options.through()` from this row.
  *
  * Shared by both statics because they differ only in intent (`.first()`
- * vs `.get()`), never in the SQL — and because the through model's
+ * vs `.get()`), never in the SQL, and because the through model's
  * global scopes have to be applied in exactly one place to stay
  * consistent (see `applyIntermediateScopes()`).
  */
@@ -3364,7 +3364,7 @@ interface PivotQuerySpec {
   relatedKey: string;
   /** Discriminant column on the pivot, for the polymorphic variants. */
   morphType?: string;
-  /** Discriminant value to filter the pivot by. Which SIDE it names differs per relation — see the option interfaces. */
+  /** Discriminant value to filter the pivot by. Which SIDE it names differs per relation. See the option interfaces. */
   morphValue?: string;
   withPivot?: string[];
   withTimestamps?: boolean;
@@ -3376,13 +3376,13 @@ interface PivotQuerySpec {
  *
  * Two compilations, chosen by whether pivot columns were requested:
  *
- * - **No pivot columns** — a subquery (`where id in (select ... from
+ * - **No pivot columns**, a subquery (`where id in (select ... from
  *   pivot where ...)`). Keeps the result rows exactly the related
  *   model's, with no join-multiplied duplicates and no ambiguous column
  *   names, and leaves the related model's global scopes and custom
  *   builder untouched. This is the long-standing behaviour and stays the
  *   default.
- * - **Pivot columns requested** — an inner join projecting
+ * - **Pivot columns requested**, an inner join projecting
  *   `pivot.{col} as pivot__{col}`, because the values have to travel back
  *   with the row. `select("{related}.*")` keeps the related model's own
  *   columns unambiguous.
@@ -3430,7 +3430,7 @@ function buildPivotQuery(
 }
 
 /**
- * Resolves a `morphTo` discriminant value to the model class it names —
+ * Resolves a `morphTo` discriminant value to the model class it names,
  * the single place the local-`types`-then-global-map precedence lives, so
  * the static helper, the instance helper and the eager loader can't
  * disagree about it.
@@ -3447,7 +3447,7 @@ function buildPivotQuery(
  */
 /**
  * Creates a row and, on a unique-constraint collision, re-reads the row
- * that beat us to it — the read-then-insert race guard shared by
+ * that beat us to it. The read-then-insert race guard shared by
  * `firstOrCreate()`/`updateOrCreate()`. A module-level helper (not a
  * private static) so it stays off the class's public type, keeping
  * `typeof Subclass` assignable to `typeof BaseModel`.
@@ -3512,7 +3512,7 @@ function normalizeLoadArgs(args: [EagerLoadRequest] | string[]): EagerLoadReques
 
 /**
  * `true` when `record` has any entry at all (no `key`), the named entry
- * (`key: string`), or **any** of the named entries (`key: string[]`) —
+ * (`key: string`), or **any** of the named entries (`key: string[]`),
  * the shared body of `isDirty()`/`wasChanged()`, whose Laravel semantics
  * for a list are OR, not AND.
  */
@@ -3529,7 +3529,7 @@ function containsAny(record: Record<string, any>, key?: string | string[]): bool
 }
 
 /**
- * `true` for a value that is (or spells) a finite number — the guard for
+ * `true` for a value that is (or spells) a finite number, the guard for
  * Laravel's numeric-string rule in `originalIsEquivalent()`, which treats
  * a column read back as `"1"` and re-assigned as `1` as unchanged.
  * Deliberately excludes booleans (`Number(true)` is `1`, but a `true`
@@ -3553,18 +3553,18 @@ function isNumericLike(value: unknown): boolean {
 }
 
 /**
- * Compares two DB-shape values through `cast`'s **model** side — the
+ * Compares two DB-shape values through `cast`'s **model** side, the
  * "same meaning, different spelling" test `originalIsEquivalent()` needs
  * for JSON, `DateTime`, boolean and decimal columns.
  *
  * Model values are compared by `Object.is` first (primitives: booleans,
  * decimal strings, numbers), then by `valueOf()` for the wrapper types
- * that define one (`DateTime`, `Date` — both reduce to an epoch
+ * that define one (`DateTime`, `Date`, both reduce to an epoch
  * millisecond count, which is exactly the equality wanted), and finally
  * structurally via a canonical JSON encoding for objects and arrays.
  *
  * A cast that throws on a malformed stored value (`JSON.parse` on a
- * column someone wrote by hand) must not take `save()` down with it — an
+ * column someone wrote by hand) must not take `save()` down with it. An
  * un-decodable value is reported as *not* equivalent, i.e. as a change,
  * which is the safe direction: the write still happens.
  */
@@ -3607,7 +3607,7 @@ function castedValuesAreEquivalent(
 }
 
 /**
- * A stable JSON encoding — object keys sorted at every depth — so two
+ * A stable JSON encoding, object keys sorted at every depth, so two
  * structurally equal values compare equal regardless of the key order
  * their serialisation happened to use. `{a:1,b:2}` and `{b:2,a:1}` are
  * the same JSON document, and re-assigning one over the other is not a
@@ -3662,22 +3662,22 @@ function serializeRelation(value: unknown): unknown {
  * agree on the mechanism:
  *
  * - **Postgres/SQLite** use `RETURNING`. Postgres has no `insertId`
- *   concept at all — Kysely's driver leaves `InsertResult.insertId`
- *   `undefined` there — so without this branch `post.id` was
+ *   concept at all, Kysely's driver leaves `InsertResult.insertId`
+ *   `undefined` there, so without this branch `post.id` was
  *   `undefined` after `create()`, and the next `save()` compiled to
  *   `UPDATE ... WHERE id = NULL`.
  * - **MySQL** has no `RETURNING`, so it keeps `LAST_INSERT_ID()` via
  *   `insertId`. That value is a `bigint`; it is narrowed to a `number`
  *   only when exactly representable, so an id past 2^53 is preserved as
- *   a string rather than silently rounded — an unconditional `Number()`
+ *   a string rather than silently rounded, an unconditional `Number()`
  *   would truncate it.
  *
  * Skips the read-back entirely if the caller already supplied the
- * primary key — there is nothing to read back, the value came from the
+ * primary key. There is nothing to read back, the value came from the
  * caller rather than the DB.
  *
  * Bypasses `QueryBuilder.insert()` (which has no read-back support and
- * stays that way — see its own docstring). A standalone function (not a
+ * stays that way. See its own docstring). A standalone function (not a
  * `Model` static) so both `Model.create()` and `Factory`'s insert path
  * can share it without either calling into the other.
  */
@@ -3717,7 +3717,7 @@ export async function insertAndReadGeneratedId(
   const key = modelClass.primaryKeyColumn;
   const insert = db.insertInto(modelClass.table).values(modelClass.prepareWrite(values) as any);
 
-  // The caller already chose the key — no generated value to read back.
+  // The caller already chose the key, no generated value to read back.
   if (values[key] !== undefined) {
     await insert.executeTakeFirst();
 
@@ -3741,7 +3741,7 @@ export async function insertAndReadGeneratedId(
 }
 
 /**
- * A model instance for an attributes map `A` — the base runtime plus the
+ * A model instance for an attributes map `A`, the base runtime plus the
  * resolved attribute shape (columns as declared, relation markers as
  * their loaded value, computed markers as their type) and the query-side
  * `relations` namespace. This is the "one type" a finder, a builder
@@ -3760,7 +3760,7 @@ export type ModelInstance<A> = BaseModel &
 export type Model = BaseModel;
 
 /**
- * Any model **class** (constructor + statics) — the value-side counterpart
+ * Any model **class** (constructor + statics), the value-side counterpart
  * to the `Model` instance type. The morph map, the model registry and
  * relation helpers use this rather than `typeof Model`, which names the
  * factory function, not a class.
@@ -3815,8 +3815,8 @@ type PrimaryKeyColumn<A, C> = C extends { primaryKey: infer P extends ColumnKeys
 export type Key<M> = M extends { id: infer I } ? I : string | number;
 
 /**
- * `M` with the relations named by `K` guaranteed present (non-`undefined`)
- * — what `with()`/`load()`/`loadMissing()` return.
+ * `M` with the relations named by `K` guaranteed present (non-`undefined`),
+ * what `with()`/`load()`/`loadMissing()` return.
  */
 export type Loaded<M, K extends PropertyKey> = M & {
   [P in K & keyof M]-?: Exclude<M[P], undefined>;
@@ -3833,14 +3833,14 @@ export type LoadedRelationValues<A> = { [K in RelationKeys<A>]: LoadedValueOf<A[
  * Each accessor is **intersected** with that relation kind's write API
  * (`RelationWritesFor`), so `post.relations.tags()` offers `attach()`
  * while `post.relations.author()` offers `associate()` and not
- * `attach()` — and a read-only `hasManyThrough` offers neither. The
+ * `attach()`, and a read-only `hasManyThrough` offers neither. The
  * intersection is what keeps a custom builder intact: replacing the type
  * with a fixed write-capable subclass would silently delete the related
  * model's own scopes from the accessor. The runtime half is
  * `attachRelationWrites()`; see `relationship-writes.ts`.
  *
  * `RelationWritesFor` discriminates on a `{ type }` field, which is the
- * shape a `RelationDefinition` has — a marker carries the same kind under
+ * shape a `RelationDefinition` has, a marker carries the same kind under
  * `KindOf`, so it is re-wrapped here rather than duplicating the mapping.
  */
 export type RelationBuildersFor<A> = {
@@ -3860,14 +3860,14 @@ export type RelationBuildersFor<A> = {
 };
 
 /**
- * A constructor type for a marker's related instance — what
+ * A constructor type for a marker's related instance, what
  * `RelationWritesFor`'s `HasManyWrites` needs to recover the related
  * model from a synthesised definition shape.
  */
 type RelatedClassOfMarker<V> = abstract new (...args: any[]) => RelatedOf<V>;
 
 /**
- * `Attributes<Row, C>` and `RelationAccessors<R>` — retained names the
+ * `Attributes<Row, C>` and `RelationAccessors<R>`, retained names the
  * `EloquentBuilder` and legacy call sites import. Under the redesign these
  * are permissive shims: the builder threads the resolved instance type
  * `TInstance` for precision, so these only need to stay structurally
@@ -3885,7 +3885,7 @@ export type RelationAccessors<_R> = { relations: Record<string, (...args: any[])
 /* eslint-enable @typescript-eslint/no-unused-vars */
 
 /**
- * The shape `EloquentBuilder` needs from its owning model class — kept
+ * The shape `EloquentBuilder` needs from its owning model class, kept
  * minimal to avoid a circular type dependency. Structurally satisfied by
  * every factory-produced class.
  */
@@ -3897,11 +3897,11 @@ export interface ModelClass {
   readonly scopes: readonly GlobalScope[];
   readonly timestamps: boolean;
   readonly updatedAtColumn: string | null;
-  /** The model's cast map — read by the builder to cast where/write bindings. See `EloquentBuilder`'s "Casts" section. */
+  /** The model's cast map, read by the builder to cast where/write bindings. See `EloquentBuilder`'s "Casts" section. */
   readonly casts: Record<string, Cast<any, any>>;
   morphAlias(): string;
   currentTimestamp(): string;
-  /** Datetime columns respelled for this model's engine — the last step before any builder insert/update. */
+  /** Datetime columns respelled for this model's engine, the last step before any builder insert/update. */
   prepareWrite<T extends Record<string, any>>(values: T): T;
   resolveConnection(): Kysely<any>;
   newEloquentBuilder(): EloquentBuilder<any>;
@@ -3912,7 +3912,7 @@ export interface ModelClass {
 
 /**
  * The configuration object passed to the curried `Model<A>()(config)`
- * factory — the single place a model's runtime shape is declared. Every
+ * factory, the single place a model's runtime shape is declared. Every
  * key but `table` is optional and type-checked against the attributes map
  * `A` (column keys are checked against real columns; the primary key must
  * be a column; casts' model types must equal the declared attribute type).
@@ -3936,12 +3936,12 @@ export interface ModelConfig<A> {
 }
 
 declare const MODEL_TYPE_ERROR: unique symbol;
-/** A branded `never`-like carrying a human-readable message — surfaces a type-lint failure at the class declaration. */
+/** A branded `never`-like carrying a human-readable message, surfaces a type-lint failure at the class declaration. */
 export type ModelTypeError<Msg extends string> = { readonly [MODEL_TYPE_ERROR]: Msg };
 
 /**
  * Column keys of `A` that are `boolean` and have no cast (and aren't a
- * timestamp/soft-delete column) — those need an explicit `Cast.boolean()`
+ * timestamp/soft-delete column). Those need an explicit `Cast.boolean()`
  * because SQLite/MySQL return `0`/`1`.
  */
 type BooleanColumnsNeedingCast<A, Casts> = {
@@ -3986,7 +3986,7 @@ type ReservedCollisions<A> = Extract<ColumnKeys<A>, ReservedKeys>;
  * back a string (or a JS `Date`), so `post.published_at.addDays(1)`
  * throws `not a function` at runtime while the type says it is fine.
  *
- * The timestamp and soft-delete columns are excluded — the factory
+ * The timestamp and soft-delete columns are excluded, the factory
  * installs their casts implicitly from `timestamps`/`softDeletes`, so
  * demanding an explicit one would be wrong.
  */
@@ -4026,7 +4026,7 @@ type SoftDeleteColumn<A, C> = C extends { softDeletes: infer S }
  * There is deliberately NO rule for "`primaryKey` names a relation or a
  * computed key". `ModelConfig` already types that field as
  * `ColumnKeys<A>`, which excludes both, so the assignment is rejected
- * before a lint rule could ever see it — such a rule is unreachable by
+ * before a lint rule could ever see it, such a rule is unreachable by
  * construction, and writing one would only imply a check that isn't
  * doing any work. The error you get instead is a plain "Type '"author"'
  * is not assignable to type '"id"'", pointed at the offending line.
@@ -4049,7 +4049,7 @@ type KeyTypeMismatch<A, C extends ModelConfig<A>> = C extends { keyType: infer K
  * `relationships` keys must be relation-marker keys of `A`, and
  * `accessors` keys must be `Computed<>` keys. Both are declared as
  * statics on the class body rather than in the config, so neither is
- * checked by `ModelConfig` — a typo'd or stale key there is silently
+ * checked by `ModelConfig`, a typo'd or stale key there is silently
  * dead code (`with("athor")` then fails at runtime with a confusing
  * "no such relation").
  *
@@ -4058,7 +4058,7 @@ type KeyTypeMismatch<A, C extends ModelConfig<A>> = C extends { keyType: infer K
  * `accessors`, both of which are already keyed on the right union.
  */
 
-/** The soft-delete column must be nullable — `restore()` writes `null` to it. */
+/** The soft-delete column must be nullable. `restore()` writes `null` to it. */
 type SoftDeleteColumnNotNullable<A, C extends ModelConfig<A>> =
   SoftDeleteColumn<A, C> extends infer K
     ? K extends ColumnKeys<A>
@@ -4211,7 +4211,7 @@ export interface ModelStatics<A, C extends ModelConfig<A>> extends Omit<
 
   // This-polymorphic like the finders above: the builder terminates in
   // the *subclass* instance type, so `Post.query()...firstOrFail()` and
-  // `Post.find()` hand back the same `Post` — methods included.
+  // `Post.find()` hand back the same `Post`, methods included.
   //
   // The `DefaultBuilder<A>` overload comes SECOND but is what a custom
   // `static query(): PostBuilder` override is checked against: an
@@ -4233,7 +4233,7 @@ export interface ModelStatics<A, C extends ModelConfig<A>> extends Omit<
 
   /**
    * Soft-delete query entry points. Present on every model (inherited from
-   * the base), but only meaningful — and only non-throwing — when
+   * the base), but only meaningful, and only non-throwing, when
    * `softDeletes` is configured. Typed to return this model's builder.
    */
   withTrashed<T extends abstract new (...a: any) => any>(this: T): BuilderFor<A, InstanceType<T>>;
@@ -4241,14 +4241,14 @@ export interface ModelStatics<A, C extends ModelConfig<A>> extends Omit<
 }
 
 /**
- * The runtime relation-definition map derived from a model's markers —
+ * The runtime relation-definition map derived from a model's markers,
  * the branded helper definitions are structurally `RelationDefinition`s,
  * so threading this into the builder lets `with()`/`whereHas()` name-check
  * against the real relation names.
  */
 export type RelationDefsOf<A> = Relationships<A>;
 
-/** The default builder for a model with attributes `A` — threads the resolved instance and relation map. */
+/** The default builder for a model with attributes `A`, threads the resolved instance and relation map. */
 /**
  * This model's builder, terminating in instance type `I`.
  *
@@ -4256,7 +4256,7 @@ export type RelationDefsOf<A> = Relationships<A>;
  * entry points can stay this-polymorphic: `Post.query()` must terminate
  * in `Post` (subclass methods and all), exactly as `Post.find()` does.
  * Without it a builder terminal and a finder result would disagree about
- * the same row — the "one type everywhere" guarantee this redesign is
+ * the same row, the "one type everywhere" guarantee this redesign is
  * built on.
  */
 export type BuilderFor<A, I> = EloquentBuilder<
@@ -4297,7 +4297,7 @@ type SoftDeleteInstanceMethods<C> =
  *   class Post extends Model<PostAttributes>()({ table: "posts", … }) { … }
  *
  * The `()` is required because TypeScript has no partial type-argument
- * inference — the empty call fixes `A` explicitly, the second call infers
+ * inference, the empty call fixes `A` explicitly, the second call infers
  * `const C` from the config literal (preserving `primaryKey: "id"`,
  * `softDeletes: true`, and the casts map as literal types the derivation
  * depends on). See the plan's spike S1.
@@ -4327,7 +4327,7 @@ export function Model<A>() {
 }
 
 /**
- * The runtime behind `Model<A>()(config)` — builds and returns a subclass
+ * The runtime behind `Model<A>()(config)`, builds and returns a subclass
  * of `BaseModel` with the config baked into statics. Validation mirrors
  * the type-level lint so a plain-JS consumer gets the same guarantees.
  */
@@ -4403,15 +4403,15 @@ type A_ANY = Record<string, any>;
  * type-checker: plain JS, a config assembled dynamically, or a `as any`.
  *
  * **This deliberately does not mirror the type-level lint.** Every rule
- * in `ModelLint` is a statement about `A` — "this column is a `boolean`
- * and has no cast" — and `A` is a type parameter that does not exist at
+ * in `ModelLint` is a statement about `A`, "this column is a `boolean`
+ * and has no cast", and `A` is a type parameter that does not exist at
  * runtime. There is no attributes map to inspect: a model declares its
  * columns in an interface, not a value. Claiming to mirror the lint
  * would mean claiming checks that cannot be written.
  *
  * What it does instead is check the config *object*, which is a real
  * value, for the malformed shapes that would otherwise fail later and
- * far from the cause — a bad `keyType` surfacing as a missing primary
+ * far from the cause, a bad `keyType` surfacing as a missing primary
  * key on the first insert, a `casts` entry that isn't a `Cast` throwing
  * `toModelType is not a function` inside hydration.
  */

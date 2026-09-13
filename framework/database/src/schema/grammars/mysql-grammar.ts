@@ -63,7 +63,7 @@ const { compileCreate, compileAlter } = makeNativeAlterGrammar({
  * Runs inside `db.connection()` because `FOREIGN_KEY_CHECKS` is a
  * **session** variable: issued straight against the pool it applies to
  * whichever connection happened to serve that statement, while the
- * `DROP`s that follow may be handed different ones — leaving FK
+ * `DROP`s that follow may be handed different ones, leaving FK
  * enforcement on for them and failing on the first table another
  * references. It only worked before because a single idle connection
  * was being reused. Pinning one connection makes the whole sequence

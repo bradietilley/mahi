@@ -77,7 +77,7 @@ describe("LocalBroadcastDriver hardening (B3)", () => {
       sockets.push(socket);
 
       await socket.subscribe("a");
-      // Re-subscribe to the same channel — still allowed.
+      // Re-subscribe to the same channel, still allowed.
       await socket.subscribe("a");
     });
   });

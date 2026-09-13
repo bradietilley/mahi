@@ -12,7 +12,7 @@ export interface ScheduleRunConfig {
   /**
    * Name of a cache store to back `withoutOverlapping()` with instead of
    * lock files. Only worth setting for a store shared between hosts
-   * (Redis) — see `CacheScheduleLocker`.
+   * (Redis). See `CacheScheduleLocker`.
    */
   lockStore?: string;
 }
@@ -22,7 +22,7 @@ export interface ScheduleRunConfig {
  * filters and `withoutOverlapping()` locks. Shared by `schedule:run` (one
  * shot) and `schedule:work` (once per minute) so both behave identically.
  *
- * Foreground tasks run **sequentially, in registration order** — the same
+ * Foreground tasks run **sequentially, in registration order**, the same
  * ordering guarantee the scheduler has always had, which tasks written
  * against it may rely on. Tasks marked `runInBackground()` are started
  * immediately and run alongside the rest, so one slow task no longer
@@ -126,7 +126,7 @@ function resolveLocker(app: Application): ScheduleLocker {
 
 /**
  * Runs one task: filters, then lock, then the callback. Swallows
- * everything — see `runDueTasks()`.
+ * everything. See `runDueTasks()`.
  */
 async function runTask(
   app: Application,
@@ -135,7 +135,7 @@ async function runTask(
   at: Date,
 ): Promise<void> {
   // Skip tasks whose when()/skip() filters reject this run before
-  // acquiring any lock — a filtered-out task never "ran".
+  // acquiring any lock, a filtered-out task never "ran".
   try {
     if (!(await task.filtersPass(app))) {
       return;
@@ -214,7 +214,7 @@ async function runTask(
       // alone frequently isn't.
       stack: (error as Error).stack,
     });
-    // deliberately does NOT rethrow — one failing task must not
+    // deliberately does NOT rethrow, one failing task must not
     // block the run from evaluating/running the rest.
   } finally {
     if (overlapKey !== undefined) {

@@ -25,12 +25,12 @@ const DEFERRABLE_EVENTS: ReadonlySet<ModelEventName> = new Set([
 /**
  * The lifecycle events a `Model` fires, at the points documented on
  * `Model.create()`/`update()`/`delete()`/hydration and `SoftDeletes`'
- * `restore()` — mirrors Laravel's Eloquent event names
+ * `restore()`, mirrors Laravel's Eloquent event names
  * (`retrieved`/`creating`/`created`/`updating`/`updated`/`saving`/`saved`/
  * `deleting`/`deleted`/`restoring`/`restored`).
  *
  * `retrieved` fires once per instance hydrated from a query (the only
- * read-side hook — e.g. cache-warming/audit-on-read). `restoring`/
+ * read-side hook, e.g. cache-warming/audit-on-read). `restoring`/
  * `restored` wrap `SoftDeletes.restore()`.
  */
 export type ModelEventName =
@@ -51,13 +51,13 @@ export type ModelEventName =
  * `ModelLifecycleEvent`) receives for a given event.
  *
  * For instance-driven writes (`instance.save()`, `Model.create()`,
- * `Factory`) this is the model **INSTANCE** itself — so a `creating`/
+ * `Factory`) this is the model **INSTANCE** itself, so a `creating`/
  * `saving` hook can mutate attributes in place (`post.body = ...`) and
  * the change is what gets written, and a `created`/`saved` hook sees the
  * persisted instance (with any DB-generated primary key).
  *
  * The delete/restore lifecycle (`deleting`/`deleted`/`restoring`/
- * `restored`) also receives the model **INSTANCE** now — the static
+ * `restored`) also receives the model **INSTANCE** now, the static
  * `Model.delete()`/`SoftDeletes` load the row first (see
  * `Model.delete()`'s docstring), matching Laravel, so a listener can read
  * any column, not just the key. Only when no row matches the id (nothing
@@ -73,18 +73,18 @@ export type ModelEventListener<TModel = Record<string, any>> = (
 
 /**
  * The `Event.suppress()`/`isSuppressed()` name for one model's one
- * lifecycle event — `"model.{table}.{event}"` (e.g.
+ * lifecycle event, `"model.{table}.{event}"` (e.g.
  * `"model.posts.created"`). `Model.withoutEvents()` suppresses the
  * `"model.{table}.*"` pattern built from this same scheme (or
  * `"model.*"` when called on the base `Model` class, which has no
- * `table`) — see `Model.withoutEvents()`'s docstring.
+ * `table`). See `Model.withoutEvents()`'s docstring.
  */
 export function modelEventName(modelClass: AnyModelClass, event: ModelEventName): string {
   return `model.${modelClass.table}.${event}`;
 }
 
 /**
- * Override the events you care about — every method is optional, so a
+ * Override the events you care about. Every method is optional, so a
  * `PostObserver` interested only in `created` overrides just that one:
  *
  *   class PostObserver extends ModelObserver<PostTable> {
@@ -96,7 +96,7 @@ export function modelEventName(modelClass: AnyModelClass, event: ModelEventName)
  *   Post.observe(PostObserver);
  *
  * Instantiated once, immediately, when `observe()` is called (no
- * constructor arguments) — same statelessness contract as
+ * constructor arguments), same statelessness contract as
  * `@mahiframework/authorization`'s `Policy`: don't hold per-request state
  * on an observer instance, it's shared across every call.
  *
@@ -120,7 +120,7 @@ export abstract class ModelObserver<TModel = Record<string, any>> {
 export type ModelObserverClass<TModel = Record<string, any>> = new () => ModelObserver<TModel>;
 
 /**
- * A model's `static dispatchesEvents` map — Laravel's
+ * A model's `static dispatchesEvents` map, Laravel's
  * `protected $dispatchesEvents` equivalent. Maps a lifecycle event name to
  * an `@mahiframework/events` `Event` subclass constructed with that event's
  * `ModelEventPayload` and dispatched through the app's `EventDispatcher`:
@@ -136,7 +136,7 @@ export type ModelObserverClass<TModel = Record<string, any>> = new () => ModelOb
  *   }
  *
  * Only fires when `@mahiframework/events`' `EventsServiceProvider` has been
- * registered (i.e. `EVENTS_TOKEN` is bound) — a `Model` used in a test or
+ * registered (i.e. `EVENTS_TOKEN` is bound), a `Model` used in a test or
  * script that never bootstrapped events support simply never dispatches,
  * same graceful-no-op precedent as `@mahiframework/authorization`'s
  * `GateRegistry.currentUser()` no-op'ing when `AUTH_TOKEN` isn't bound.
@@ -145,7 +145,7 @@ export type DispatchesEventsMap = Partial<Record<ModelEventName, EventClass<Abst
 
 /**
  * Generic, always-fires event dispatched through the `EventDispatcher` for
- * EVERY model write (independent of `dispatchesEvents`) — the seam for
+ * EVERY model write (independent of `dispatchesEvents`), the seam for
  * app-wide cross-cutting listeners (audit logging, cache invalidation,
  * search-index syncing) that want to react to "something was created",
  * not one specific model's own named event.
@@ -166,7 +166,7 @@ export abstract class ModelLifecycleEvent extends AbstractEvent {
   }
 
   /**
-   * `"model.{table}.{event}"` — e.g. `"model.posts.created"` — so
+   * `"model.{table}.{event}"`, e.g. `"model.posts.created"`, so
    * `Post.withoutEvents()`'s `"model.posts.*"` pattern suppresses this
    * event through `EventDispatcher` too, not just the direct
    * `ModelObserver`/`on()` invocations `dispatchModelEvent()` gates
@@ -210,7 +210,7 @@ const LIFECYCLE_EVENT_CLASSES: Record<
   restored: ModelRestored,
 };
 
-// Keyed by the model CLASS itself (exact identity, not `table`) — same
+// Keyed by the model CLASS itself (exact identity, not `table`), same
 // dispatch-by-class-reference approach `@mahiframework/authorization`'s
 // `GateRegistry` uses for policies, so a typo'd/renamed model can't
 // silently register against the wrong table string.
@@ -219,7 +219,7 @@ const listenerRegistry = new Map<AnyModelClass, Map<ModelEventName, ModelEventLi
 
 /**
  * True when at least one observer or `on()` listener is registered for
- * `modelClass`'s given `event` — a cheap guard so hot read paths
+ * `modelClass`'s given `event`, a cheap guard so hot read paths
  * (`retrieved`, fired once per hydrated instance) can skip the whole
  * dispatch (including the always-on `ModelLifecycleEvent` through
  * `EventDispatcher`) when nothing is listening. Does NOT account for
@@ -260,7 +260,7 @@ export function registerModelListener(
 }
 
 /**
- * Fires `event` for `modelClass` with `payload` — in order: registered
+ * Fires `event` for `modelClass` with `payload`, in order: registered
  * `ModelObserver` methods, then `Model.on()` listeners, then (if
  * `EVENTS_TOKEN` is bound) the generic `ModelLifecycleEvent` subclass,
  * then (if declared) the model's own `dispatchesEvents[event]` class.
@@ -268,8 +268,8 @@ export function registerModelListener(
  * `modelEventName(modelClass, event)` (e.g. `"model.posts.created"`)
  * matches an active `Event.suppress()` pattern (see
  * `Model.withoutEvents()`, which delegates to `Event.suppress()` in
- * `@mahiframework/events` with a `"model.{table}.*"`/`"model.*"` pattern)
- * — `ModelObserver`/`on()` listeners are invoked directly rather than
+ * `@mahiframework/events` with a `"model.{table}.*"`/`"model.*"` pattern),
+ * `ModelObserver`/`on()` listeners are invoked directly rather than
  * through `EventDispatcher`, so they check the shared suppression
  * pattern list here rather than relying on `EventDispatcher.dispatch()`'s
  * own check (which only covers the `ModelLifecycleEvent`/
@@ -288,9 +288,9 @@ export async function dispatchModelEvent(
   // has its PAST-tense events held until its own connection's transaction
   // commits (dropped on rollback). The suppression check above already ran,
   // so a deferred event honours "as if never dispatched" for suppression.
-  // `-ing` hooks and `retrieved` are never deferred — see DEFERRABLE_EVENTS.
+  // `-ing` hooks and `retrieved` are never deferred. See DEFERRABLE_EVENTS.
   if (modelClass.dispatchesEventsAfterCommit && DEFERRABLE_EVENTS.has(event)) {
-    // The ROOT (non-transactional) connection — the key the transaction
+    // The ROOT (non-transactional) connection, the key the transaction
     // scope is registered under, NOT `resolveConnection()` which returns
     // the transactional instance while inside one. `afterCommitOn` runs
     // the callback immediately when this connection has no open
@@ -306,7 +306,7 @@ export async function dispatchModelEvent(
 
 /**
  * Run a model lifecycle event through observers, `on()` listeners, and the
- * `EventDispatcher` — the actual delivery, split out so the immediate and
+ * `EventDispatcher`, the actual delivery, split out so the immediate and
  * after-commit-deferred paths share it. See `dispatchModelEvent()` for the
  * suppression/deferral gating that precedes it.
  */

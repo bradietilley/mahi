@@ -7,7 +7,7 @@ import { secretMatches } from "./secret-compare.js";
  * Container token for `@mahiframework/health`'s `HealthRegistry`.
  *
  * Resolved here by string rather than imported, so `@mahiframework/http` keeps no
- * dependency on `@mahiframework/health` — the same one-way arrangement this package
+ * dependency on `@mahiframework/health`, the same one-way arrangement this package
  * already has with `MAINTENANCE_MODE_TOKEN` and `BROADCAST_TOKEN`. The
  * readiness route is simply not registered when nothing has bound it.
  */
@@ -28,7 +28,7 @@ export const REDACTED_MESSAGE = "Check failed";
  * Whether failure messages must be stripped before they leave the process.
  *
  * Redacted in production unless the request carries the configured
- * `X-Health-Secret`. Never redacted outside production — a developer
+ * `X-Health-Secret`. Never redacted outside production. A developer
  * needs the real error, and `isProduction()` is the same gate the rest of
  * the framework uses for safety defaults.
  */
@@ -50,14 +50,14 @@ export function shouldRedact(
 
 /**
  * Replace every failure message with a constant, leaving `true` and
- * `null` — and the shape of the object — untouched. Which checks exist and
+ * `null`, and the shape of the object, untouched. Which checks exist and
  * which failed stays visible; only the message goes.
  *
  * This exists because the failure strings are, by construction, driver
  * errors: `connect ECONNREFUSED 10.0.1.4:5432`, `getaddrinfo ENOTFOUND
  * prod-redis.internal`, `SQLITE_CANTOPEN: unable to open database file
  * /srv/app/storage/prod.sqlite`. That is internal topology, and `/health`
- * is by definition reachable from whatever is probing it — often a load
+ * is by definition reachable from whatever is probing it, often a load
  * balancer, sometimes the internet, and always before anyone remembers to
  * put an ACL on it.
  */

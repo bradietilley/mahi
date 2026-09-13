@@ -4,7 +4,7 @@ import { User } from "../../src/models/user.model.js";
 
 /**
  * The `password` default is a PRE-COMPUTED argon2 hash of "password", not
- * a call to `Hash.make()` — `definition()` is synchronous, and hashing
+ * a call to `Hash.make()`. `definition()` is synchronous, and hashing
  * per generated row would make every test that creates a user pay ~100ms
  * of deliberate argon2 slowness. Pass an override when a test needs a
  * specific password to log in with.
@@ -17,7 +17,7 @@ export class UserFactory extends Factory<typeof User> {
   protected model = User;
 
   protected definition() {
-    // A random token only for a locally-unique email default — the real
+    // A random token only for a locally-unique email default, the real
     // primary key `id` is filled by the `snowflake()` key strategy on
     // insert, and `created_at`/`updated_at` are auto-stamped.
     const token = randomUUID();

@@ -13,7 +13,7 @@ import type { Schedule } from "@mahiframework/schedule";
 import { servePublicDisk } from "@mahiframework/storage";
 import type { Env } from "../../config/env.js";
 // `AuthGcCommand` is invoked directly by the scheduled task below rather
-// than re-registered via `commands()` — `AuthServiceProvider` already
+// than re-registered via `commands()`, `AuthServiceProvider` already
 // contributes it, and registering the same signature twice makes the
 // ConsoleKernel throw at startup.
 import { AuthGcCommand } from "@mahiframework/auth";
@@ -22,22 +22,22 @@ import { registerAuthRoutes } from "../routes/auth.routes.js";
 import { DatabaseSeeder } from "../../database/seeders/database-seeder.js";
 
 /**
- * Your application's service provider — the single place to wire up
+ * Your application's service provider, the single place to wire up
  * everything the app owns. As the app grows, split this into one provider
  * per feature and list them all in `config/app.ts`.
  *
  * Every method below is an optional hook, collected by the framework
  * during boot:
  *
- * - `register()` — bind services into the container. Runs for *every*
+ * - `register()`, bind services into the container. Runs for *every*
  *   provider before any `boot()` does, so never resolve another
  *   provider's bindings here.
- * - `boot()`     — everything is registered; safe to resolve.
- * - `routes()`   — receives the root `Router`.
- * - `models()`   — models that can appear in queued job payloads.
- * - `seeders()`  — seeders `db:seed` can run.
- * - `schedule()` — recurring tasks.
- * - `checks()`   — readiness checks for `/health` and `./artisan health`.
+ * - `boot()`. Everything is registered; safe to resolve.
+ * - `routes()`, receives the root `Router`.
+ * - `models()`, models that can appear in queued job payloads.
+ * - `seeders()`, seeders `db:seed` can run.
+ * - `schedule()`, recurring tasks.
+ * - `checks()`, readiness checks for `/health` and `./artisan health`.
  *
  * Others exist too: `commands()`, `listeners()`, `jobs()`, `gates()`,
  * `middleware()`, `migrations()`.
@@ -47,7 +47,7 @@ export class AppServiceProvider extends ServiceProvider {
   // before any provider's `boot()`. One thing worth pinning in it is the
   // discriminant values polymorphic relations write into `*_type` columns
   // (`commentable_type`, `notifiable_type`, ...). Without a map those
-  // values fall back to the model's `morphName`, then its `table` — which
+  // values fall back to the model's `morphName`, then its `table`, which
   // couples what's stored in your database to how your code is named, so
   // renaming a table orphans existing rows:
   //
@@ -59,7 +59,7 @@ export class AppServiceProvider extends ServiceProvider {
   //
   // `User` sets `morphName = "User"`, so notifications sent to a `User`
   // store `notifiable_type = "User"` by default. Map it to something else
-  // if you'd rather store a different string — do it before any rows
+  // if you'd rather store a different string, do it before any rows
   // exist, or migrate the existing ones.
   //
   // `Relation.enforceMorphMap({ ... })` additionally makes the map
@@ -104,7 +104,7 @@ export class AppServiceProvider extends ServiceProvider {
    * registered first on purpose: everything downstream (rate limiting,
    * generated links, audit logs) is built on the answers.
    *
-   * `trustProxies()` — decides whether `X-Forwarded-*` may be read at
+   * `trustProxies()`, decides whether `X-Forwarded-*` may be read at
    * all. Without it `request.ip()` is the socket peer, which behind a
    * load balancer is the balancer, so every client shares one rate-limit
    * bucket; with it wrongly set to `*` on a directly reachable host,
@@ -114,7 +114,7 @@ export class AppServiceProvider extends ServiceProvider {
    * `secure()` true and generated links `https://` behind a TLS
    * terminator.
    *
-   * `trustHosts()` — rejects a request whose `Host` isn't one of yours.
+   * `trustHosts()`, rejects a request whose `Host` isn't one of yours.
    * The URL generator prefers the live request's host, so without this
    * an attacker POSTs to "forgot password" with `Host: evil.example`
    * and the victim gets a genuine signed link to the attacker's site.
@@ -138,8 +138,8 @@ export class AppServiceProvider extends ServiceProvider {
 
       // Outside production, also accept the other names the same machine
       // answers to. `APP_URL` is `http://localhost:8000`, so deriving
-      // the allow-list from it alone means curling `127.0.0.1:8000` —
-      // which is the same server — gets a 403 "Untrusted host." That
+      // the allow-list from it alone means curling `127.0.0.1:8000`,
+      // which is the same server, gets a 403 "Untrusted host." That
       // reads as a broken app rather than a deliberate policy, and the
       // usual fix a developer reaches for is to delete this middleware.
       // Production gets no such widening.
@@ -163,7 +163,7 @@ export class AppServiceProvider extends ServiceProvider {
     // Serve the `public` storage disk at its configured `url` prefix
     // (`/storage/*`), so `Storage.disk("public").url(path)` resolves to a
     // real download. The `default` disk is `local` (private) and is
-    // deliberately NOT served here — stream from it through your own
+    // deliberately NOT served here, stream from it through your own
     // authorised route with `serveStoredFile` when a file needs a check.
     router.get("/storage/*", servePublicDisk("public")).name("storage.public");
   }
@@ -192,7 +192,7 @@ export class AppServiceProvider extends ServiceProvider {
    */
 
   /**
-   * Models listed here can be passed directly into queued jobs — they
+   * Models listed here can be passed directly into queued jobs. They
    * serialize to `{ __model, __id }` and rehydrate before `handle()`
    * runs. Requires a `static morphName` on the model.
    */
@@ -206,12 +206,12 @@ export class AppServiceProvider extends ServiceProvider {
   }
 
   /**
-   * Readiness checks — the things that must be working for this instance
+   * Readiness checks. The things that must be working for this instance
    * to serve traffic. Surfaced by `GET /health` and `./artisan health`.
    *
    * `@mahiframework/health` already checks the cache, database and default storage
    * disk under the `core` group. Add the dependencies only your app knows
-   * about — a third-party API, a background daemon, a licence that
+   * about, a third-party API, a background daemon, a licence that
    * expires:
    *
    *   checks(): HealthCheck[] {
@@ -227,7 +227,7 @@ export class AppServiceProvider extends ServiceProvider {
    *   }
    *
    * Throw or return a string to fail, return nothing to pass, return
-   * `null` to skip. Checks must be CHEAP and constant-cost — this runs on
+   * `null` to skip. Checks must be CHEAP and constant-cost. This runs on
    * every probe interval, on every instance. Never a table scan.
    *
    * Adding it also needs the type import at the top of this file:
@@ -236,7 +236,7 @@ export class AppServiceProvider extends ServiceProvider {
 
   /**
    * Sessions and password-reset tokens expire on read, but nothing
-   * deletes the stale rows — so run the framework's `auth:gc` daily.
+   * deletes the stale rows. So run the framework's `auth:gc` daily.
    *
    * `name()` is required here, not decorative: it is the key of the
    * `withoutOverlapping()` lock, and the app refuses to boot without one.

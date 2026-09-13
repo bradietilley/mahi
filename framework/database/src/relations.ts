@@ -1,11 +1,11 @@
 /**
  * Relationship option shapes for `Model`'s `belongsTo`/`hasMany`/
- * `hasOne`/`belongsToMany` helpers — see `model.ts`'s "Relationships"
+ * `hasOne`/`belongsToMany` helpers. See `model.ts`'s "Relationships"
  * docstring section for the full rationale and usage.
  *
  * Every key is an explicit column name. There is **no convention-based
  * key guessing** (Eloquent's "`post_id` because the parent class is
- * `Post`") — deliberately, matching this codebase's stance against
+ * `Post`"), deliberately, matching this codebase's stance against
  * name-derived magic elsewhere (`gates()` requires an explicit
  * `gate.policy(Todo, TodoPolicy)` rather than guessing `TodoPolicy` from
  * `Todo`; the container has no auto-wiring). The only defaults are the
@@ -48,7 +48,7 @@ export interface HasManyOptions<
   localKey?: keyof TRow & string;
 }
 
-/** `hasOne` is `hasMany` with a `.first()` at the end — same key shape. */
+/** `hasOne` is `hasMany` with a `.first()` at the end, same key shape. */
 export type HasOneOptions<
   TRow extends Record<string, any>,
   TRelatedRow extends Record<string, any>,
@@ -66,7 +66,7 @@ export type HasOneOptions<
  * Without `withPivot`/`withTimestamps` the pivot is pure plumbing: the
  * relation compiles to a subquery, the returned rows are exactly the
  * related model's own, and no pivot column is readable. Request columns
- * to change that — they arrive under a `pivot` accessor on each related
+ * to change that. They arrive under a `pivot` accessor on each related
  * instance (see `withPivot`).
  */
 export interface BelongsToManyOptions<
@@ -85,7 +85,7 @@ export interface BelongsToManyOptions<
   relatedKey?: keyof TRelatedRow & string;
   /**
    * Pivot columns to read alongside the related rows, exposed as
-   * `tag.pivot.weight` on each returned instance — Laravel's
+   * `tag.pivot.weight` on each returned instance, Laravel's
    * `withPivot()`.
    *
    *   options: { pivotTable: "todo_tag", ..., withPivot: ["weight"] }
@@ -97,12 +97,12 @@ export interface BelongsToManyOptions<
    * behavioural difference for existing callers.
    */
   withPivot?: string[];
-  /** Adds `created_at`/`updated_at` to `withPivot` — Laravel's `withTimestamps()`. */
+  /** Adds `created_at`/`updated_at` to `withPivot`, Laravel's `withTimestamps()`. */
   withTimestamps?: boolean;
 }
 
 /**
- * A "has-many-through" relationship — reaches a distant related model via
+ * A "has-many-through" relationship, reaches a distant related model via
  * an intermediate model, e.g. `Country hasManyThrough Post through User`
  * (a country's posts, via its users). Two foreign-key hops, expressed as
  * a subquery rather than a JOIN so the returned rows stay exactly the
@@ -134,7 +134,7 @@ export interface HasManyThroughOptions<
   secondLocalKey?: keyof TThroughRow & string;
 }
 
-/** `hasOneThrough` is `hasManyThrough` with a `.first()` at the end — same option shape. */
+/** `hasOneThrough` is `hasManyThrough` with a `.first()` at the end, same option shape. */
 export type HasOneThroughOptions<
   TRow extends Record<string, any>,
   TThroughRow extends Record<string, any>,
@@ -142,14 +142,14 @@ export type HasOneThroughOptions<
 > = HasManyThroughOptions<TRow, TThroughRow, TRelatedRow>;
 
 /**
- * A polymorphic "child points at one of several parents" relationship —
+ * A polymorphic "child points at one of several parents" relationship,
  * the inverse side (`morphTo`). This model's table carries an explicit
  * `{morphType}`/`{morphId}` column pair (named explicitly here, NOT
- * guessed `{name}_type`/`{name}_id` the way Eloquent does — matching this
+ * guessed `{name}_type`/`{name}_id` the way Eloquent does, matching this
  * framework's no-key-guessing stance for every other relation).
  *
  * `types` maps each discriminant value stored in `morphType` to a thunk
- * returning the model it selects — so `morphTo()`'s resolved type is a
+ * returning the model it selects, so `morphTo()`'s resolved type is a
  * proper TS union of the mapped models rather than `any` (something TS
  * expresses far better than PHP's duck-typed `morphTo`, whose return is
  * always `Model`).
@@ -162,7 +162,7 @@ export type HasOneThroughOptions<
  *
  * `types` is **optional**: omitted, the discriminant is resolved through
  * the global morph map (`Relation.getMorphedModel()`) at runtime. But the
- * two are not interchangeable — the global map is a *runtime* mechanism
+ * two are not interchangeable. The global map is a *runtime* mechanism
  * registered from arbitrary strings, so omitting `types` degrades the
  * static type to `Model`. Declare `types` when you want the union;
  * rely on the map when you want central configuration. Declaring both is
@@ -178,8 +178,8 @@ export interface MorphToOptions<
   morphId: keyof TRow & string;
   /**
    * Discriminant value -> related-model thunk; the `morphType` column's
-   * value selects which one. Optional — falls back to the global morph
-   * map — but declaring it is what produces a precise instance union
+   * value selects which one. Optional, falls back to the global morph
+   * map, but declaring it is what produces a precise instance union
    * instead of a bare `Model`. Consulted before the map.
    */
   types?: TTypes;
@@ -188,7 +188,7 @@ export interface MorphToOptions<
 }
 
 /**
- * A polymorphic "parent owns children" relationship — the owning side
+ * A polymorphic "parent owns children" relationship, the owning side
  * (`morphMany`/`morphOne`). The foreign key + type discriminant live on
  * the **related** model's table; this model matches related rows whose
  * `{morphType}` column equals a fixed `type` value and whose `{morphId}`
@@ -201,7 +201,7 @@ export interface MorphToOptions<
  *   }
  *
  * `type` is **optional**, defaulting to the declaring model's
- * `morphAlias()` — so the discriminant is owned by the model it names
+ * `morphAlias()`, so the discriminant is owned by the model it names
  * rather than restated at every declaration that points at it. Supply it
  * explicitly to store something else; explicit always wins.
  */
@@ -214,7 +214,7 @@ export interface MorphManyOptions<
   /** Column on the RELATED table pointing back at this row's key. */
   morphId: keyof TRelatedRow & string;
   /**
-   * This model's discriminant value — related rows must have
+   * This model's discriminant value, related rows must have
    * `{morphType} = type`. Defaults to the declaring model's
    * `morphAlias()` (morph map -> `morphName` -> `table`).
    */
@@ -223,14 +223,14 @@ export interface MorphManyOptions<
   localKey?: keyof TRow & string;
 }
 
-/** `morphOne` is `morphMany` with a `.first()` at the end — same option shape. */
+/** `morphOne` is `morphMany` with a `.first()` at the end, same option shape. */
 export type MorphOneOptions<
   TRow extends Record<string, any>,
   TRelatedRow extends Record<string, any>,
 > = MorphManyOptions<TRow, TRelatedRow>;
 
 /**
- * A polymorphic many-to-many — the **morphed** side. This model is one of
+ * A polymorphic many-to-many, the **morphed** side. This model is one of
  * several types sharing one pivot table, and the pivot carries a
  * discriminant naming which:
  *
@@ -248,7 +248,7 @@ export type MorphOneOptions<
  *
  * `type` names **this** (the declaring) model, since this is the side the
  * pivot discriminates. That is the opposite of `MorphedByManyOptions`,
- * where it names the related model — the single easiest thing to get
+ * where it names the related model, the single easiest thing to get
  * wrong here. Laravel hides the difference behind an internal `$inverse`
  * flag; it's surfaced in the defaulting rules instead.
  */
@@ -270,14 +270,14 @@ export interface MorphToManyOptions<
   localKey?: keyof TRow & string;
   /** Column on the RELATED table `relatedPivotKey` points at. Defaults to the related model's `primaryKeyColumn`. */
   relatedKey?: keyof TRelatedRow & string;
-  /** Pivot columns to read back, exposed as `related.pivot.x` — see `BelongsToManyOptions.withPivot`. */
+  /** Pivot columns to read back, exposed as `related.pivot.x`. See `BelongsToManyOptions.withPivot`. */
   withPivot?: string[];
   /** Adds `created_at`/`updated_at` to `withPivot`. */
   withTimestamps?: boolean;
 }
 
 /**
- * A polymorphic many-to-many — the **inverse** side. The mirror of
+ * A polymorphic many-to-many, the **inverse** side. The mirror of
  * `morphToMany`: this model is the one the pivot points at *without* a
  * discriminant, and the related models are the morphed types.
  *
@@ -293,7 +293,7 @@ export interface MorphToManyOptions<
  *   --   select taggable_id from taggables
  *   --   where tag_id = ? and taggable_type = 'post')
  *
- * **`type` names the RELATED model here**, not this one — the pivot
+ * **`type` names the RELATED model here**, not this one, the pivot
  * discriminates the other side. It therefore defaults to the *related*
  * model's `morphAlias()`. Compare `MorphToManyOptions`, where the same
  * key names the declaring model.
@@ -316,7 +316,7 @@ export interface MorphedByManyOptions<
   localKey?: keyof TRow & string;
   /** Column on the RELATED table `morphId` points at. Defaults to the related model's `primaryKeyColumn`. */
   relatedKey?: keyof TRelatedRow & string;
-  /** Pivot columns to read back, exposed as `related.pivot.x` — see `BelongsToManyOptions.withPivot`. */
+  /** Pivot columns to read back, exposed as `related.pivot.x`. See `BelongsToManyOptions.withPivot`. */
   withPivot?: string[];
   /** Adds `created_at`/`updated_at` to `withPivot`. */
   withTimestamps?: boolean;
@@ -326,7 +326,7 @@ export interface MorphedByManyOptions<
  * The minimal shape `RelationDefinition.related()` needs to return for
  * `RelatedRowOf<Def>` to recover a related model's row type without
  * `relations.ts` importing `Model` (which would create a circular
- * import — `model.ts` imports from `relations.ts` for the option types
+ * import, `model.ts` imports from `relations.ts` for the option types
  * above). Every real `Model` subclass satisfies this structurally via
  * its own `declare static Row: SomeTable;` marker.
  */
@@ -335,7 +335,7 @@ export type ModelLike = (abstract new (...args: any[]) => any) & {
 };
 
 /**
- * A named, **batchable** relation declaration — what `static relations`
+ * A named, **batchable** relation declaration, what `static relations`
  * on a `Model` maps a name to, and what `EloquentBuilder.with(name)`
  * looks up to eager-load it. Distinct from the per-row `belongsTo`/
  * `hasMany`/`hasOne`/`belongsToMany` static methods (`Todo.user(row)`,
@@ -363,13 +363,13 @@ export type ModelLike = (abstract new (...args: any[]) => any) & {
  *   }
  *
  *   const posts = await Post.query().with("author", "images", "hashtags").get();
- *   posts.first()!.author   // UserTable | undefined — fully typed, inferred from `() => User`
+ *   posts.first()!.author   // UserTable | undefined, fully typed, inferred from `() => User`
  *   posts.first()!.images   // PostImageTable[]
  *   posts.first()!.hashtags // HashtagTable[]
  *
  * Dot paths nest to any depth (`with("author.team")`), and the object
- * form constrains what loads (`with({ images: (q) => q.where(...) })`) —
- * see `RelationPath` and `EloquentBuilder.with()`. The batching cost is
+ * form constrains what loads (`with({ images: (q) => q.where(...) })`).
+ * See `RelationPath` and `EloquentBuilder.with()`. The batching cost is
  * one query per relation **node**, independent of row count.
  */
 /** The related model's row type when it declares one, else a permissive bag. */
@@ -419,7 +419,7 @@ export type RelationDefinition<
       related: () => TRelatedModel;
       options: MorphedByManyOptions<TRow, RowOfLike<TRelatedModel>>;
     }
-  // The one member with NO `related` thunk — a morphTo points at several
+  // The one member with NO `related` thunk, a morphTo points at several
   // models, chosen at runtime by the discriminant, so there is no single
   // class to name here. Its targets live in `options.types` (optional;
   // see `MorphToOptions`) or the global morph map. Any code reaching for
@@ -437,7 +437,7 @@ export type RelationDefinition<
       options: HasOneThroughOptions<TRow, Record<string, any>, RowOfLike<TRelatedModel>>;
     };
 
-/** A model's full set of named, `with()`-batchable relations — see `RelationDefinition`'s docstring. */
+/** A model's full set of named, `with()`-batchable relations. See `RelationDefinition`'s docstring. */
 export type RelationDefinitions = Record<string, RelationDefinition>;
 
 /**
@@ -446,7 +446,7 @@ export type RelationDefinitions = Record<string, RelationDefinition>;
  * Derived from the constructor's INSTANCE type (as `RelatedInstanceOf`
  * below does), not from a `Row` static. The model redesign replaced
  * `declare static Row: PostTable` with the `Model<A>()` factory, so the
- * static no longer exists — reading `M["Row"]` off it yielded
+ * static no longer exists, reading `M["Row"]` off it yielded
  * `Record<string, any> | undefined`, which collapsed the constraint on
  * `whereHas()`'s constraint callback to `never` and made
  * `whereHas("tags", (q) => q.where("name", …))` uncallable.
@@ -459,7 +459,7 @@ export type RelatedRowOf<Def> = Def extends { related: () => infer M }
 
 /**
  * Extracts the related model's INSTANCE type from a single
- * `RelationDefinition` — what a loaded relation value actually holds, a
+ * `RelationDefinition`, what a loaded relation value actually holds, a
  * live model instance rather than a bare row. A type-only local so
  * `relations.ts` needn't import `model.ts` (whose `RelatedInstanceOf`
  * this mirrors).
@@ -467,8 +467,8 @@ export type RelatedRowOf<Def> = Def extends { related: () => infer M }
  * Reads the phantom `__brand` first and the `related` thunk only as a
  * fallback, because the two carry the related type with different
  * fidelity. A helper definition (`belongsTo(() => User, …)`) declares its
- * thunk as `() => ModelLike` — an `abstract new (...args: any[]) => any`
- * — so inferring the instance off it yields `any`, not `User`. The brand
+ * thunk as `() => ModelLike`, an `abstract new (...args: any[]) => any`,
+ * so inferring the instance off it yields `any`, not `User`. The brand
  * is where the helper's `R` survives. A hand-written definition has no
  * brand but does name its class concretely, so the thunk is exact there.
  * Preferring the brand makes both spellings resolve to the same instance
@@ -487,7 +487,7 @@ type RelatedInstanceOfThunk<Def> = Def extends { related: () => infer M }
 
 /**
  * The related model's instance type for a `morphTo` definition, recovered
- * from its `types` thunk-record as a union — so a relation declaring
+ * from its `types` thunk-record as a union, so a relation declaring
  * `types: { post: () => Post, video: () => Video }` reads back as
  * `Post | Video`, a discriminated union Laravel's `morphTo` (always
  * `Model`) cannot express.
@@ -499,7 +499,7 @@ type RelatedInstanceOfThunk<Def> = Def extends { related: () => infer M }
  * map is for typing. See `MorphToOptions`.
  *
  * `Model` is referenced structurally (via `ModelLike`'s owner) rather
- * than imported, keeping `relations.ts` free of a `model.ts` import — see
+ * than imported, keeping `relations.ts` free of a `model.ts` import. See
  * `ModelLike`'s docstring for why that matters.
  */
 export type MorphTargetOf<Def, TFallback = unknown> = Def extends { options: { types: infer T } }
@@ -511,7 +511,7 @@ export type MorphTargetOf<Def, TFallback = unknown> = Def extends { options: { t
   : TFallback;
 
 /**
- * What a loaded relation value holds, for a single `RelationDefinition` —
+ * What a loaded relation value holds, for a single `RelationDefinition`,
  * the single source of truth for the to-one/to-many split.
  *
  * `EagerLoadResult` here and `LoadedRelations` in `model.ts` both
@@ -529,20 +529,20 @@ export type RelationValueOf<Def, TMorphFallback = unknown> = Def extends { type:
     : Collection<RelatedInstanceOf<Def>>;
 
 /**
- * The names in a relation map whose relation is a `morphTo` — what the
+ * The names in a relation map whose relation is a `morphTo`, what the
  * morph-aware query methods (`whereMorphedTo()`, `whereHasMorph()`, ...)
  * narrow their `name` argument to.
  *
  * Makes `whereMorphedTo("author", user)` a compile error when `author` is
  * an ordinary `belongsTo`, rather than a runtime throw. The inverse of
- * how `whereHas()` rejects a `morphTo` — that one can only throw, since
+ * how `whereHas()` rejects a `morphTo`. That one can only throw, since
  * excluding a single member from an otherwise-permissive key union would
  * make the common case unusable.
  *
- * This bites at every entry point: `Model.query()` supplies the real
+ * This applies at every entry point: `Model.query()` supplies the real
  * relation map (`BuilderOf<M>` threads `RelationsOf<M>` through), and a
- * custom builder subclass names it directly. It degrades to `never` —
- * i.e. no accepted name — for a builder with no declared relations,
+ * custom builder subclass names it directly. It degrades to `never`,
+ * i.e. no accepted name, for a builder with no declared relations,
  * which is the honest answer for a model that declared none.
  */
 export type MorphToKeys<TRelations extends RelationDefinitions> = {
@@ -556,20 +556,20 @@ export type MorphToKeys<TRelations extends RelationDefinitions> = {
  * attaches (`eager-loading.ts` sets a single instance, `undefined`, or a
  * `Collection`) and the value-side `LoadedRelations` accessors
  * (`model.ts`), so `Post.query().with("comments").get()` and
- * `post.comments` agree on type — both are `RelationValueOf` now.
+ * `post.comments` agree on type. Both are `RelationValueOf` now.
  */
 export type EagerLoadResult<TRelations extends RelationDefinitions, K extends keyof TRelations> = {
   [P in K]: RelationValueOf<TRelations[P]>;
 };
 
 /**
- * The related model's declared relation map, for one `RelationDefinition`
- * — the step that lets a dot path walk from one model to the next.
+ * The related model's declared relation map, for one `RelationDefinition`.
+ * The step that lets a dot path walk from one model to the next.
  *
  * A local mirror of `model.ts`'s `RelationsOf<RelatedClassOf<Def>>`,
  * inlined here to keep `relations.ts` free of a `model.ts` import (see
  * `ModelLike`). Resolves to `never` for a relation whose target declares
- * nothing — which is what stops a path from continuing past a leaf.
+ * nothing. Which is what stops a path from continuing past a leaf.
  *
  * Takes the related instance from `RelatedInstanceOf` (brand first, thunk
  * as fallback) and reads its declared relationships back off the
@@ -580,7 +580,7 @@ export type EagerLoadResult<TRelations extends RelationDefinitions, K extends ke
  *
  * A `morphTo` stops the walk outright. Its brand names a *union* of
  * targets, and descending into a union would accept any relation name the
- * targets happen to share — which the loader then rejects at runtime,
+ * targets happen to share, which the loader then rejects at runtime,
  * since it resolves a morph node's children per discriminant rather than
  * by path. `morphWith()` is how those are nested.
  */
@@ -600,7 +600,7 @@ type RelatedInstanceOfBrand<Def> = Def extends { __brand?: { related: infer R } 
 /**
  * The `Relationships<A>` map of a related model, reached from its
  * instance type via the `HasAttributes<A>` phantom. `never` when the
- * target isn't a marker-driven model or declares no relations — which is
+ * target isn't a marker-driven model or declares no relations. Which is
  * what stops a dot path at a leaf.
  */
 type RelationshipsOfInstance<I> = [I] extends [never]
@@ -621,7 +621,7 @@ type RelationshipsOfInstance<I> = [I] extends [never]
 type PrevDepth = [never, 0, 1, 2, 3, 4, 5];
 
 /**
- * The maximum dot-path depth `with()` type-checks — five segments
+ * The maximum dot-path depth `with()` type-checks, five segments
  * (`"a.b.c.d.e"`).
  *
  * A **compile-time budget**, not a runtime limit: the loader recurses to
@@ -631,8 +631,8 @@ type PrevDepth = [never, 0, 1, 2, 3, 4, 5];
  * self-referential (`Post.replies.replies…`), so without a floor it never
  * terminates.
  *
- * Five was measured. Against a pathological graph — ten models, each
- * declaring a relation to all ten, i.e. 100,000 expressible paths —
+ * Five was measured. Against a pathological graph, ten models, each
+ * declaring a relation to all ten, i.e. 100,000 expressible paths,
  * `tsc --extendedDiagnostics` checked in 1.11s against a 0.86s baseline
  * of the same models with the path type unused: 0.25s and ~5,300 extra
  * type instantiations for the whole union. A realistic graph is far
@@ -642,7 +642,7 @@ type PrevDepth = [never, 0, 1, 2, 3, 4, 5];
 export type MaxRelationPathDepth = 5;
 
 /**
- * Every dot path `with()` accepts for a relation map — each declared name,
+ * Every dot path `with()` accepts for a relation map, each declared name,
  * plus each name joined to a valid path on its related model, to
  * `MaxRelationPathDepth` segments.
  *
@@ -650,9 +650,9 @@ export type MaxRelationPathDepth = 5;
  *   // "author" | "author.team" | "comments.author.team" | "replies.replies" | ...
  *
  * Bottoms out on three conditions, all of which matter: the depth counter
- * hitting zero, a related model declaring no relations (`never` — nothing
+ * hitting zero, a related model declaring no relations (`never`, nothing
  * to append), and a `morphTo`, which `RelatedRelationsOf` stops on
- * explicitly — nest those with `morphWith()` instead.
+ * explicitly, nest those with `morphWith()` instead.
  */
 export type RelationPath<R extends RelationDefinitions, D extends number = MaxRelationPathDepth> = [
   R,
@@ -664,7 +664,7 @@ export type RelationPath<R extends RelationDefinitions, D extends number = MaxRe
         [K in keyof R & string]: K | `${K}.${RelationPath<RelatedRelationsOf<R[K]>, PrevDepth[D]>}`;
       }[keyof R & string];
 
-/** The first segment of a dot path — `"author"` for `"author.team"`. */
+/** The first segment of a dot path, `"author"` for `"author.team"`. */
 type PathHead<P extends string> = P extends `${infer H}.${string}` ? H : P;
 
 /** The remainder of a dot path below head `H`, or `never` if `P` is just `H`. */
@@ -672,7 +672,7 @@ type PathRest<P extends string, H extends string> = P extends `${H}.${infer Rest
 
 /**
  * Merges a nested result shape `C` into a relation value `V`, preserving
- * whether the relation is to-one or to-many — so `with("comments.author")`
+ * whether the relation is to-one or to-many, so `with("comments.author")`
  * types `post.comments` as `Collection<Comment & { author: … }>` rather
  * than losing the `Collection` wrapper or the element type.
  */
@@ -685,7 +685,7 @@ type MergeNested<V, C> = [C] extends [never]
       : V & C;
 
 /**
- * The shape `with(...paths)` merges onto `TRow` — `EagerLoadResult`'s
+ * The shape `with(...paths)` merges onto `TRow`, `EagerLoadResult`'s
  * dot-path-aware replacement.
  *
  * Groups the requested paths by their first segment, so sibling paths
@@ -704,7 +704,7 @@ export type NestedEagerLoadResult<R extends RelationDefinitions, K extends strin
 };
 
 /**
- * A thunk returning the related model **class** — `() => User`. Kept
+ * A thunk returning the related model **class**, `() => User`. Kept
  * structural (a constructor whose instances are `R`) so `relations.ts`
  * needn't import `Model`.
  */
@@ -721,7 +721,7 @@ export type RelationHelperDefinition<K extends RelationKind, R> = K extends "mor
   ? {
       readonly type: "morphTo";
       readonly options: MorphToOptions<any, Record<string, () => ModelLike>>;
-      /** Phantom — never present at runtime. */
+      /** Phantom, never present at runtime. */
       readonly __brand?: { kind: K; related: R };
     }
   : {
@@ -731,11 +731,11 @@ export type RelationHelperDefinition<K extends RelationKind, R> = K extends "mor
       // definition is assignable to `RelationDefinition` (and the whole
       // `relationships` map to `RelationDefinitions`).
       readonly options: OptionsForKind<K>;
-      /** Phantom — never present at runtime. */
+      /** Phantom, never present at runtime. */
       readonly __brand?: { kind: K; related: R };
     };
 
-/** The option interface for a non-morphTo relation kind — matches `RelationDefinition`'s member. */
+/** The option interface for a non-morphTo relation kind, matches `RelationDefinition`'s member. */
 type OptionsForKind<K extends RelationKind> = K extends "belongsTo"
   ? BelongsToOptions<any, any>
   : K extends "hasOne"
@@ -768,7 +768,7 @@ function define<K extends RelationKind, R>(
     : ({ type, related, options } as RelationHelperDefinition<K, R>);
 }
 
-/** Many-to-one — the FK lives on this model's table. */
+/** Many-to-one. The FK lives on this model's table. */
 export function belongsTo<R>(
   related: RelatedThunk<R>,
   options: { foreignKey: string; ownerKey?: string },
@@ -776,7 +776,7 @@ export function belongsTo<R>(
   return define("belongsTo", related, options);
 }
 
-/** One-to-one — the FK lives on the related table. */
+/** One-to-one. The FK lives on the related table. */
 export function hasOne<R>(
   related: RelatedThunk<R>,
   options: { foreignKey: string; localKey?: string },
@@ -784,7 +784,7 @@ export function hasOne<R>(
   return define("hasOne", related, options);
 }
 
-/** One-to-many — the FK lives on the related table. */
+/** One-to-many. The FK lives on the related table. */
 export function hasMany<R>(
   related: RelatedThunk<R>,
   options: { foreignKey: string; localKey?: string },
@@ -836,7 +836,7 @@ export function hasManyThrough<R>(
   return define("hasManyThrough", related, options);
 }
 
-/** Polymorphic inverse — resolves the parent by a discriminant column. */
+/** Polymorphic inverse, resolves the parent by a discriminant column. */
 export function morphTo<R = unknown>(options: {
   morphType: string;
   morphId: string;
@@ -908,7 +908,7 @@ type DefinitionForMarker<V> =
  * The shape a model's `static relationships` map must have, derived from
  * the relation markers in its attributes interface `A`. Each key must be
  * a declared relation name and its definition's kind + related type must
- * match the marker — this is what makes a wrong `foreignKey`'s *related
+ * match the marker. This is what makes a wrong `foreignKey`'s *related
  * class* a compile error (via the helper's `R`) and a missing/extra
  * relation key a compile error.
  */

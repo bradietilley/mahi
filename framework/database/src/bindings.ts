@@ -6,7 +6,7 @@ import type { Dialect } from "./schema/dialect.js";
 
 /**
  * A value a caller may hand to a `where()`, a `whereIn()` list, a raw
- * binding, or a write payload — the *author-facing* counterpart to
+ * binding, or a write payload, the *author-facing* counterpart to
  * `SqlBinding` (which is the narrower set a driver will actually bind).
  *
  * The distinction matters: `SqlBinding` is a contract with `pg` /
@@ -19,7 +19,7 @@ import type { Dialect } from "./schema/dialect.js";
  *
  * That spelling has two problems beyond the noise. It puts the UTC
  * decision on the caller (get it wrong and you write local wall-clock
- * into a UTC column — see `normalizeBinding()`), and it produces an
+ * into a UTC column. See `normalizeBinding()`), and it produces an
  * ISO `Z` string that MySQL rejects outright for a `DATETIME` column.
  * Both are decisions the layer that knows the dialect should be making,
  * so `Bindable` lets the caller pass the value and `normalizeBinding()`
@@ -44,7 +44,7 @@ function hasKey(value: unknown): value is { getKey(): SqlBinding } {
 
 /**
  * One value on its way to a driver, converted into a shape that driver
- * can bind — the single place object-to-scalar serialisation happens,
+ * can bind, the single place object-to-scalar serialisation happens,
  * so no call site has to.
  *
  * The conversions:
@@ -55,7 +55,7 @@ function hasKey(value: unknown): value is { getKey(): SqlBinding } {
  *   `DateTime.toISOString()` renders in *the instance's own zone*, so a
  *   `DateTime.now()` created in Perth stringifies as
  *   `...T14:30:00.000+08:00`. Postgres `timestamptz` understands that,
- *   but `timestamp`, MySQL and SQLite do not — they store the local
+ *   but `timestamp`, MySQL and SQLite do not. They store the local
  *   wall clock as though it were UTC, silently shifting the value by
  *   the offset. Converting here means `DateTime.now()` and
  *   `DateTime.now("UTC")` bind identically, which is the only defensible

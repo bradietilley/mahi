@@ -11,7 +11,7 @@ import type { RedisConnection } from "../redis-connection.js";
  * `RedisQueueDriver` writes `queues:<name>`, `queues:<name>:reserved`,
  * `queues:<name>:delayed` and `queues:<name>:failed` on the *same*
  * connection, under the *same* `keyPrefix`. A cache `flush()` that
- * scanned the connection prefix alone would match all of them — so
+ * scanned the connection prefix alone would match all of them, so
  * `./artisan cache:clear` would delete every queued and every in-flight
  * job. Scoping cache keys under their own segment means the `flush()`
  * pattern (`<connection prefix>cache:*`) can never intersect
@@ -21,7 +21,7 @@ import type { RedisConnection } from "../redis-connection.js";
 export const DEFAULT_CACHE_PREFIX = "cache:";
 
 /**
- * A `CacheStore` backed by Redis — the multi-process-correct alternative
+ * A `CacheStore` backed by Redis, the multi-process-correct alternative
  * to `ArrayCacheStore` (dies with the process) and `FileCacheStore`
  * (correct, but only as correct as the filesystem it sits on). Because
  * `increment`/`add` map to Redis's genuinely atomic `INCRBY`/`SET NX`,
@@ -30,7 +30,7 @@ export const DEFAULT_CACHE_PREFIX = "cache:";
  *
  * Values are JSON-serialised on the way in and parsed on the way out, so
  * any JSON-representable value round-trips (matching `ArrayCacheStore`,
- * where `undefined` — never a stored value — is the "miss" sentinel).
+ * where `undefined`, never a stored value, is the "miss" sentinel).
  * `Date`/`Map`/`Set`/`BigInt` do NOT round-trip; see
  * `docs/cache/README.md`'s serialization table.
  *
@@ -41,7 +41,7 @@ export const DEFAULT_CACHE_PREFIX = "cache:";
  *
  *   - the **connection** prefix (`config/redis.ts`'s `keyPrefix`, e.g.
  *     `"mahi:"`) namespaces one *application* on a shared Redis, and is
- *     applied by ioredis itself to every command — which is why no method
+ *     applied by ioredis itself to every command. Which is why no method
  *     here ever mentions it, except `flush()` (see below);
  *   - the **store** prefix (`DEFAULT_CACHE_PREFIX`, overridable via
  *     `config/cache.ts`'s `stores.redis.prefix`) namespaces the *cache*
@@ -52,7 +52,7 @@ export const DEFAULT_CACHE_PREFIX = "cache:";
  * deletes with the connection prefix read off `client.options`, never a
  * separately-configured copy of it: a stale or empty copy would scan
  * `MATCH *` (every key in the logical DB, including the queue) and then
- * `DEL` each match with the connection prefix applied a second time —
+ * `DEL` each match with the connection prefix applied a second time,
  * matching everything and deleting nothing.
  */
 export class RedisCacheStore implements CacheStore {
@@ -110,13 +110,13 @@ export class RedisCacheStore implements CacheStore {
    * Deletes every key under this store's namespace, and nothing else.
    *
    * Deliberately NOT `FLUSHDB`, which would nuke every other app sharing
-   * the Redis instance/logical DB — and not a scan
+   * the Redis instance/logical DB, and not a scan
    * of the connection prefix either, which would take the queue with it
    * (see `DEFAULT_CACHE_PREFIX`). The pattern is
    * `<connection prefix><store prefix>*`, so `queues:*` is out of reach
    * by construction rather than by convention.
    *
-   * Iterates with `SCAN` (cursor-based, non-blocking — unlike `KEYS`,
+   * Iterates with `SCAN` (cursor-based, non-blocking, unlike `KEYS`,
    * which blocks the whole server for the length of the scan) and deletes
    * each batch with `UNLINK`, which frees the memory on a background
    * thread instead of stalling the server proportionally to how much
@@ -126,7 +126,7 @@ export class RedisCacheStore implements CacheStore {
    * hand: it is matched against the *stored* key, which already includes
    * ioredis's `keyPrefix`, and ioredis does not prefix the pattern for
    * you. The keys `SCAN` returns are likewise fully-qualified, so the
-   * connection prefix is stripped back off before `UNLINK` — otherwise
+   * connection prefix is stripped back off before `UNLINK`, otherwise
    * ioredis would apply it a second time and the delete would silently
    * match nothing. That double-prefix bug is exactly what made this
    * method a no-op on the shipped template config.
@@ -162,7 +162,7 @@ export class RedisCacheStore implements CacheStore {
   }
 
   /**
-   * Atomic via `SET key value NX EX ttl` — the single round-trip
+   * Atomic via `SET key value NX EX ttl`, the single round-trip
    * "set only if absent" primitive `Lock.acquire()` is built on, now
    * genuinely exclusive *across processes*. Returns `true` iff this call
    * set the key.
@@ -186,14 +186,14 @@ export class RedisCacheStore implements CacheStore {
 
   /**
    * Compare-and-delete in one server round-trip, via the canonical
-   * Redlock release script — the atomic path `Lock.release()` uses when a
+   * Redlock release script, the atomic path `Lock.release()` uses when a
    * store offers one.
    *
    * `Lock.release()`'s portable fallback is `get()` then `forget()`, and
    * on a shared store those are two round-trips with a window in between.
    * If the lock's TTL expires inside that window and another holder
    * acquires it, the first holder's `forget()` deletes a lock it no
-   * longer owns — two holders, which is the one thing a lock exists to
+   * longer owns, two holders, which is the one thing a lock exists to
    * prevent. `EVAL` closes the window: Redis runs the script to
    * completion without interleaving another client's commands.
    *

@@ -7,8 +7,8 @@
  * Carbon ships hundreds of translation files. A JavaScript package doing the
  * same faces a worse trade-off than a PHP one: every kilobyte is downloaded,
  * and "tree-shakeable locale data" is a promise that survives exactly until
- * someone writes `locale(userPreference)`. Meanwhile the host — every browser
- * and every Node build that isn't `small-icu` — already carries CLDR.
+ * someone writes `locale(userPreference)`. Meanwhile the host, every browser
+ * and every Node build that isn't `small-icu`, already carries CLDR.
  *
  * So this module ships **no strings**. Month names, weekday names, date
  * patterns, and relative-time phrasing all come from `Intl`, which means:
@@ -20,7 +20,7 @@
  * - the bundle does not grow.
  *
  * The one thing `Intl` genuinely cannot supply is ordinal *suffixes*
- * ("1st", "2nd"), which is why `registerOrdinal` exists — see `ordinal`.
+ * ("1st", "2nd"), which is why `registerOrdinal` exists. See `ordinal`.
  *
  * ## Locale vs. week start
  *
@@ -50,7 +50,7 @@ export type OrdinalRule = (value: number, category: Intl.LDMLPluralRule) => stri
  * laziness: ordinal *suffixes* are a minority feature across languages, the
  * ones that have them disagree about grammatical gender and agreement
  * (French writes "1er"/"1re"), and CLDR does not expose the suffixes
- * themselves — only the plural categories they attach to. Guessing would
+ * themselves, only the plural categories they attach to. Guessing would
  * produce confidently wrong text. Anything unregistered falls back to the
  * locale's plain numeral, which is what most languages use in dates anyway.
  */
@@ -108,8 +108,8 @@ export const Locale = {
   },
 
   /**
-   * Weekday names, indexed to match `DateTime.dayOfWeek` — index `0` is
-   * Sunday — regardless of where the locale starts its week.
+   * Weekday names, indexed to match `DateTime.dayOfWeek`, index `0` is
+   * Sunday, regardless of where the locale starts its week.
    */
   weekdayNames(style: NameStyle = "long", locale: LocaleIdentifier = getDefaultLocale()): string[] {
     const formatter = new Intl.DateTimeFormat(locale, { weekday: style, timeZone: "UTC" });

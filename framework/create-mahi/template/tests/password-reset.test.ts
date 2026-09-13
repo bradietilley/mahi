@@ -10,8 +10,8 @@ import { registerUser, resetRateLimits } from "./helpers/auth.js";
  * The password-reset endpoints, end to end.
  *
  * `fakeMail` swaps in a `RecordingMailManager`, so `testApp.mail` can
- * assert the email was sent and read the URL out of the mailable — which
- * is also how these tests get a valid token without reaching into the
+ * assert the email was sent and read the URL out of the mailable. Which
+ * is also how these tests get a valid token without depending on the
  * database (the stored value is an argon2 hash, so it cannot be read back).
  */
 describe("Password reset API", () => {
@@ -26,7 +26,7 @@ describe("Password reset API", () => {
   beforeEach(async () => {
     await resetRateLimits(testApp);
     testApp.mail?.reset();
-    // One live reset per email, keyed by address — clear the table so a
+    // One live reset per email, keyed by address, clear the table so a
     // previous test's row can't trip the per-mailbox throttle.
     await PasswordResetToken.query().delete();
   });
@@ -91,7 +91,7 @@ describe("Password reset API", () => {
       const user = await registerUser(testApp);
 
       const first = await client.postJson("/auth/forgot-password", { email: user.email });
-      // Clear the per-IP limiter so only the per-MAILBOX throttle can fire —
+      // Clear the per-IP limiter so only the per-MAILBOX throttle can fire,
       // otherwise this would pass for the wrong reason.
       await resetRateLimits(testApp);
       const second = await client.postJson("/auth/forgot-password", { email: user.email });

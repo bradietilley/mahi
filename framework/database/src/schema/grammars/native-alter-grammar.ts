@@ -10,7 +10,7 @@ import { compileColumnType } from "./column-types.js";
 
 /**
  * Shared compiler for engines that support real, in-place `ALTER TABLE`
- * (MySQL and PostgreSQL) — i.e. everything SQLite has to fake with a table
+ * (MySQL and PostgreSQL), i.e. everything SQLite has to fake with a table
  * rebuild. The two dialects differ only in a handful of spellings
  * (auto-increment, `MODIFY`/`ALTER COLUMN`, drop-index syntax), captured by
  * the `NativeAlterOptions` hooks; the create/alter/index/foreign-key
@@ -58,7 +58,7 @@ function normalizeDefault(value: unknown, dialect: Dialect): unknown {
  * SQLite is typeless. Postgres has neither: `postgresType()` compiles
  * an enum to a plain `varchar` (a native PG enum would mean owning a
  * `CREATE TYPE` and its migration lifecycle), which on its own accepts
- * *any* string — so a column declared `enum("status", ["draft",
+ * *any* string, so a column declared `enum("status", ["draft",
  * "live"])` silently allowed `"banana"`. The CHECK restores the
  * constraint the declaration promises.
  */

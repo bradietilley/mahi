@@ -20,7 +20,7 @@ beforeEach(() => {
   setPresenceResolver(undefined);
 });
 
-describe("Validator — presence and types", () => {
+describe("Validator: presence and types", () => {
   it("passes a required string", async () => {
     const validator = new Validator({ name: "Ada" }, {}, { name: rule().string().required() });
     expect(await validator.passes()).toBe(true);
@@ -89,7 +89,7 @@ describe("Validator — presence and types", () => {
   });
 });
 
-describe("Validator — constraints", () => {
+describe("Validator: constraints", () => {
   it("enforces min/max on strings", async () => {
     const rules = { title: rule().string().min(5).max(10) };
     expect(await new Validator({ title: "hey" }, {}, rules).passes()).toBe(false);
@@ -152,7 +152,7 @@ describe("Validator — constraints", () => {
   });
 });
 
-describe("Validator — nested data", () => {
+describe("Validator: nested data", () => {
   it("validates objectRule shapes and strips extra nested keys", async () => {
     const rules = {
       address: objectRule({
@@ -187,7 +187,7 @@ describe("Validator — nested data", () => {
   });
 });
 
-describe("Validator — files", () => {
+describe("Validator: files", () => {
   it("reads files from the files bag, not input", async () => {
     const file = new File(["hello"], "photo.png", { type: "image/png" });
     const rules = { avatar: fileRule().image().optional() };
@@ -222,7 +222,7 @@ describe("Validator — files", () => {
   });
 });
 
-describe("Validator — messages and attributes", () => {
+describe("Validator: messages and attributes", () => {
   it("interpolates :attribute and :min, humanizing the field key", async () => {
     const validator = new Validator({ post_id: "" }, {}, { post_id: rule().string().required() });
     await validator.passes();
@@ -260,7 +260,7 @@ describe("Validator — messages and attributes", () => {
   });
 });
 
-describe("Validator — custom rules and composition", () => {
+describe("Validator: custom rules and composition", () => {
   it("runs a ValidationRule pass()/fail()", async () => {
     class NoSpam extends ValidationRule {
       run(_attribute: string, value: unknown): this {
@@ -301,7 +301,7 @@ describe("Validator — custom rules and composition", () => {
   });
 });
 
-describe("Validator — exists / unique", () => {
+describe("Validator: exists / unique", () => {
   it("calls the presence resolver for exists and unique", async () => {
     const seen: string[] = [];
     setPresenceResolver({
@@ -467,7 +467,7 @@ describe("in()/notIn() reject non-scalars", () => {
     expect(await v.passes()).toBe(false);
   });
 
-  it("in() compares strictly — a string does not match a numeric list member", async () => {
+  it("in() compares strictly. A string does not match a numeric list member", async () => {
     // Bidirectional String() coercion would let "1" satisfy in([1]).
     const asString = new Validator({ n: "1" }, {}, { n: rule().in([1, 2, 3]) });
     expect(await asString.passes()).toBe(false);
@@ -476,12 +476,12 @@ describe("in()/notIn() reject non-scalars", () => {
     expect(await asNumber.passes()).toBe(true);
   });
 
-  it("in() compares strictly — a number does not match a string list member", async () => {
+  it("in() compares strictly. A number does not match a string list member", async () => {
     const v = new Validator({ n: 1 }, {}, { n: rule().in(["1", "2"]) });
     expect(await v.passes()).toBe(false);
   });
 
-  it("notIn() compares strictly — a string is not excluded by a numeric list member", async () => {
+  it("notIn() compares strictly. A string is not excluded by a numeric list member", async () => {
     // "1" is NOT in [1], so notIn([1]) must pass it.
     const v = new Validator({ n: "1" }, {}, { n: rule().notIn([1, 2]) });
     expect(await v.passes()).toBe(true);
@@ -1098,7 +1098,7 @@ describe("lowercase / uppercase", () => {
 
   it("passes a caseless string on both rules", async () => {
     // A string with no case cannot be the wrong case, so both rules accept
-    // it. Surprising enough to pin — a reader may expect uppercase() to
+    // it. Surprising enough to pin. A reader may expect uppercase() to
     // demand at least one letter.
     for (const caseless of ["123", "日本語", "😀", "-_-"]) {
       expect(
@@ -1154,7 +1154,7 @@ describe("lowercase / uppercase", () => {
     expect(await new Validator({ v: "ı" }, {}, { v: rule().string().lowercase() }).passes()).toBe(
       true,
     );
-    // ß uppercases to "SS" — a lowercase ß can never satisfy uppercase().
+    // ß uppercases to "SS". A lowercase ß can never satisfy uppercase().
     expect(await new Validator({ v: "ß" }, {}, { v: rule().string().uppercase() }).passes()).toBe(
       false,
     );
@@ -1171,7 +1171,7 @@ describe("lowercase / uppercase", () => {
 describe("enum", () => {
   // The shape TypeScript actually compiles a numeric enum to: both
   // directions in one object. Written out literally because that is the
-  // whole point of the test — `enum Priority { Low, High }` looks like it
+  // whole point of the test, `enum Priority { Low, High }` looks like it
   // has two members and has four entries.
   const NumericPriority = { Low: 0, High: 1, 0: "Low", 1: "High" } as const;
   const StringStatus = { Draft: "draft", Live: "live" } as const;
@@ -1196,7 +1196,7 @@ describe("enum", () => {
   it("rejects a numeric enum's reverse-mapping keys", async () => {
     // `Object.values({ Low: 0, High: 1, 0: "Low", 1: "High" })` is
     // `["Low", "High", 0, 1]`, so a naive membership check accepts the KEY
-    // "High" as a member — outside the declared `E[keyof E]` type, and a
+    // "High" as a member, outside the declared `E[keyof E]` type, and a
     // value the enum can never actually hold.
     const rules = { v: rule().enum(NumericPriority) };
 
@@ -1312,7 +1312,7 @@ describe("filled and present", () => {
 
   it("present() demands the key but allows it to be empty", async () => {
     // The mirror image of filled(), and the pair is easy to confuse.
-    // Note it is NOT combined with optional() here — see the next test.
+    // Note it is NOT combined with optional() here. See the next test.
     const rules = { v: rule().nullable().present() };
 
     expect(await new Validator({ v: "" }, {}, rules).passes()).toBe(true);
@@ -1322,7 +1322,7 @@ describe("filled and present", () => {
   it("optional() defeats present(), which reads like it should not", async () => {
     // A trap worth pinning. `optional()` skips every remaining step when
     // the key is missing, so `present()` never runs and the combination
-    // silently asserts nothing at all — it is a contradiction ("may be
+    // silently asserts nothing at all. It is a contradiction ("may be
     // absent" + "must be present") that fails open rather than erroring.
     expect(await new Validator({}, {}, { v: rule().optional().present() }).passes()).toBe(true);
 
@@ -1344,7 +1344,7 @@ describe("requiredWithout and unless", () => {
   });
 
   it("unless() applies its branch when the condition is false", async () => {
-    // The condition is evaluated once at BUILD time, against the rule —
+    // The condition is evaluated once at BUILD time, against the rule,
     // not per-request against the data. So this composes rules, it does
     // not branch on payload. (`requiredIf`/`prohibitedIf` are the
     // data-driven ones.)

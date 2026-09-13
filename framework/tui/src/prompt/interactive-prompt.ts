@@ -17,7 +17,7 @@ export type PromptState = "initial" | "active" | "error" | "submit" | "cancel";
 /**
  * Thrown by `InteractivePrompt.run()` in non-interactive mode
  * (`process.stdin`/`stdout` isn't a TTY, and no `Tui.interactive(true)`
- * override is set) when the default value fails validation — port of
+ * override is set) when the default value fails validation, port of
  * PHP's `NonInteractiveValidationException` behavior in `Interactivity::
  * default()`.
  */
@@ -29,7 +29,7 @@ export class NonInteractiveValidationError extends Error {
 }
 
 /**
- * Abstract base every interactive prompt (`ask`, `select`) extends —
+ * Abstract base every interactive prompt (`ask`, `select`) extends,
  * port of `Prompt.php`'s state machine + key loop + validation, minus
  * the PHP-only `stty`/`FormRevertedException`/theme-registry machinery
  * that has no use here (single hardcoded theme, no multi-step forms in
@@ -58,9 +58,9 @@ export abstract class InteractivePrompt<TValue> {
   protected abstract value(): TValue;
 
   /**
-   * Builds the "theme" frame for the current state — the box/content,
+   * Builds the "theme" frame for the current state, the box/content,
    * without the shared blank-line-spacing wrapper (that's applied once,
-   * uniformly, by this base class — see `wrapFrame()`).
+   * uniformly, by this base class. See `wrapFrame()`).
    */
   protected abstract renderFrame(): string;
 
@@ -70,7 +70,7 @@ export abstract class InteractivePrompt<TValue> {
 
   /**
    * Determines whether `value` counts as "empty" for the `required`
-   * check — overridable since `select`'s notion of "no value" (`null`)
+   * check, overridable since `select`'s notion of "no value" (`null`)
    * differs from `ask`'s (`""`).
    */
   protected isInvalidWhenRequired(value: TValue): boolean {

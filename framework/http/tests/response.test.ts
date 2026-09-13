@@ -175,7 +175,7 @@ describe("Response.file / FileResponse", () => {
       .contentType("text/plain")
       .toWeb();
     expect(web.headers.get("Content-Type")).toBe("text/plain");
-    // No Content-Length for a stream — length is unknown up front.
+    // No Content-Length for a stream. Length is unknown up front.
     expect(web.headers.get("Content-Length")).toBeNull();
     expect(await web.text()).toBe("abcdef");
   });

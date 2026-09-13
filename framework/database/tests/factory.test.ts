@@ -273,14 +273,14 @@ describe("Factory", () => {
 
 /**
  * A `definition()` is typed as the model shape, so a factory author
- * writes `published: true` and `meta: { … }` — and those must reach the
+ * writes `published: true` and `meta: { … }`, and those must reach the
  * database as `1` and `'{"a":1}'`.
  *
  * The build path used to go through `setRawAttributes()`, which skips
  * casts entirely, so both bound as a raw boolean/object: `create()` threw
  * on SQLite and MySQL and silently coerced on Postgres. It builds through
  * `forceFill()` now (casts applied, `fillable`/`guarded` deliberately
- * bypassed — a factory is trusted fixture code).
+ * bypassed. A factory is trusted fixture code).
  */
 describe("Factory applies the model's casts", () => {
   let app: Application;
@@ -367,7 +367,7 @@ describe("Factory applies the model's casts", () => {
   });
 
   it("still sets guarded columns (a factory bypasses fillable/guarded)", async () => {
-    // `forceFill` rather than `fill` — a factory must be able to set an
+    // `forceFill` rather than `fill`. A factory must be able to set an
     // `id` (or any guarded column) on a totally-guarded model.
     class Guarded extends Model<CastedAttributes>()({
       table: "casted",

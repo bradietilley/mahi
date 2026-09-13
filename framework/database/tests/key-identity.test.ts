@@ -7,7 +7,7 @@ describe("narrowKey", () => {
   });
 
   it("returns an unsafe bigint as a decimal string rather than losing precision", () => {
-    // Number(9007199254740993n) would be 9007199254740992 — a different row.
+    // Number(9007199254740993n) would be 9007199254740992, a different row.
     expect(narrowKey(9007199254740993n)).toBe("9007199254740993");
   });
 

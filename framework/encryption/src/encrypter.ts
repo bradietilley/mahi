@@ -3,14 +3,14 @@
  * for "store this securely, get the exact original value back later" use
  * cases (e.g. encrypting sensitive columns before storage).
  *
- * Uses AES-256-GCM (built into `node:crypto`, no new dependency) —
+ * Uses AES-256-GCM (built into `node:crypto`, no new dependency),
  * authenticated encryption, so tampering with the ciphertext is detected
  * on decrypt (throws) rather than silently producing garbage or, worse,
  * plausible-looking incorrect plaintext.
  *
  * Wire format is `base64url(version[1] || iv[12] || authTag[16] || ct)`,
  * minimum 29 bytes. The auth tag length is pinned on both cipher and
- * decipher (see `decrypt()` — this is security-critical),
+ * decipher (see `decrypt()`. This is security-critical),
  * and callers can optionally bind a ciphertext to a context via `aad`.
  *
  * Supports key rotation, Laravel-style: `encrypt()` always uses the
@@ -19,7 +19,7 @@
  * encrypted under an old `APP_KEY` stays decryptable after rotating to a
  * new one (as long as the old key is retained in `APP_PREVIOUS_KEYS`).
  * There's no automatic re-encryption under the new key on successful
- * decrypt with a previous key — same as Laravel — callers that want that
+ * decrypt with a previous key, same as Laravel, callers that want that
  * re-encrypt explicitly (decrypt, then encrypt again) as part of a
  * deliberate migration.
  */
@@ -71,8 +71,8 @@ function aadFor(aad: string | undefined): Buffer {
 }
 
 /**
- * Every failure mode — wrong key, wrong/missing aad, unknown version,
- * truncated payload, corruption, deliberate tampering — collapses into
+ * Every failure mode, wrong key, wrong/missing aad, unknown version,
+ * truncated payload, corruption, deliberate tampering, collapses into
  * this one message. That's deliberate: telling an attacker probing an
  * endpoint *which* of those they achieved turns the error into an oracle.
  */
@@ -99,7 +99,7 @@ export class Encrypter {
   }
 
   /**
-   * `aad` optionally binds the ciphertext to a context — decryption only
+   * `aad` optionally binds the ciphertext to a context, decryption only
    * succeeds when given the identical string. Use it to pin a value to
    * where it lives (`"users.ssn"`, `` `invoice:${id}` ``) so a ciphertext
    * copied to another column/row stops decrypting. It is authenticated,
@@ -121,7 +121,7 @@ export class Encrypter {
   }
 
   /**
-   * Tries `key` first, then each of `previousKeys` in order — the first
+   * Tries `key` first, then each of `previousKeys` in order, the first
    * key that decrypts (and passes GCM's authentication check) wins.
    * Throws only if every key fails.
    *

@@ -11,7 +11,7 @@ interface Entry {
 export interface ArrayCacheStoreOptions {
   /**
    * How often (seconds) to sweep expired entries out of memory. Defaults
-   * to 60. Pass `0` to disable the sweep entirely — appropriate for a
+   * to 60. Pass `0` to disable the sweep entirely, appropriate for a
    * short-lived process (a CLI command, a test) that will exit long
    * before anything accumulates.
    */
@@ -19,7 +19,7 @@ export interface ArrayCacheStoreOptions {
 }
 
 /**
- * In-memory `CacheStore` — dies with the process, good for tests/dev and
+ * In-memory `CacheStore`, dies with the process, good for tests/dev and
  * the framework's single-process default. No setup required, matching the
  * "correct, zero-infra default" pattern used elsewhere in this codebase
  * (`SyncQueueDriver`, `LocalBroadcastDriver`).
@@ -61,15 +61,15 @@ export class ArrayCacheStore implements CacheStore {
 
   /**
    * Reads and writes to `this.store` (a plain `Map`) synchronously, with
-   * no `await` between the check and the write — deliberately, so this
+   * no `await` between the check and the write, deliberately, so this
    * method is atomic across concurrent callers. `Map` operations
    * themselves are synchronous, and JavaScript's single-threaded,
    * run-to-completion semantics mean a synchronous block can't be
-   * interrupted by another `async` caller's continuation — the moment
+   * interrupted by another `async` caller's continuation, the moment
    * either method `await`s, its whole synchronous prefix has already
    * committed. Splitting the read and write across an `await` (e.g. `if
    * (await this.has(key)) ...; await this.put(key, ...)`) would NOT be
-   * atomic — two concurrent callers could both observe "key absent"
+   * atomic, two concurrent callers could both observe "key absent"
    * before either has written, exactly the bug `Lock.acquire()` depends
    * on this method not having.
    *
@@ -82,7 +82,7 @@ export class ArrayCacheStore implements CacheStore {
     const existing = this.liveEntry(key);
     const current = numericValue("ArrayCacheStore", key, existing?.value);
     const next = current + amount;
-    // Preserve the existing entry's expiry rather than resetting it —
+    // Preserve the existing entry's expiry rather than resetting it,
     // matches Laravel's increment() semantics (the TTL was already seeded
     // by a prior `add()` call; incrementing shouldn't extend it).
     this.store.set(key, { value: next, expiresAt: existing?.expiresAt });
@@ -90,7 +90,7 @@ export class ArrayCacheStore implements CacheStore {
     return next;
   }
 
-  /** See `increment()`'s docstring — synchronous check-then-write, no `await` in between, for atomicity. */
+  /** See `increment()`'s docstring, synchronous check-then-write, no `await` in between, for atomicity. */
   async add<T>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
     if (this.liveEntry(key) !== undefined) {
       return false;
@@ -105,7 +105,7 @@ export class ArrayCacheStore implements CacheStore {
   }
 
   /**
-   * Compare-and-delete, synchronously — no `await` between the read and
+   * Compare-and-delete, synchronously, no `await` between the read and
    * the delete, so it is atomic for the same reason `add()` is. Only
    * meaningful within this process, which is all this store spans.
    */
@@ -122,12 +122,12 @@ export class ArrayCacheStore implements CacheStore {
   /**
    * Drops every entry whose TTL has elapsed. Returns how many it removed.
    *
-   * Expiry is otherwise evaluated lazily, on read — which is enough for a
+   * Expiry is otherwise evaluated lazily, on read. Which is enough for a
    * key space that is read back, and a leak for one that isn't.
-   * `RateLimiter` is the case that bites: `throttle:<name>:<ip>` and its
+   * `RateLimiter` is the clearest example: `throttle:<name>:<ip>` and its
    * `:timer` sibling are written for every distinct client and, once the
    * window passes, never read again. In a long-running server that is two
-   * permanent `Map` entries per IP ever seen — an unbounded leak whose
+   * permanent `Map` entries per IP ever seen, an unbounded leak whose
    * rate is set by your traffic's client diversity. The periodic sweep
    * (see the constructor) calls this; it is public so a test or an app
    * can force one.
@@ -148,7 +148,7 @@ export class ArrayCacheStore implements CacheStore {
 
   /**
    * How many entries are resident, **including ones that have expired
-   * but not yet been reclaimed** — which is the number that matters when
+   * but not yet been reclaimed**. Which is the number that matters when
    * the question is "is this store leaking?", and the reason it isn't
    * filtered. `prune()` is what makes it drop.
    */
@@ -159,7 +159,7 @@ export class ArrayCacheStore implements CacheStore {
   /**
    * Stops the sweep timer. Called by `CacheManager.disconnectAll()` at
    * shutdown via the `Connectable` teardown half, so a terminated
-   * application leaves no timer behind — which matters most in tests,
+   * application leaves no timer behind, which matters most in tests,
    * where many `Application`s are built and torn down in one process.
    *
    * The timer is `unref()`ed anyway, so it can never be the reason a
@@ -178,7 +178,7 @@ export class ArrayCacheStore implements CacheStore {
     this.sweeper = setInterval(() => this.prune(), intervalSeconds * 1000);
     // Without `unref()` this timer alone would keep Node's event loop
     // alive, so every `./artisan` command would hang after doing its
-    // work — the exact failure the Redis provider's conditional connect
+    // work, the exact failure the Redis provider's conditional connect
     // exists to avoid. An unref'd timer still fires while the process has
     // other reasons to live, which is precisely when a sweep is wanted.
     this.sweeper.unref?.();

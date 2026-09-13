@@ -140,7 +140,7 @@ describe("Blueprint alter-mode", () => {
 
   /**
    * The rebuild must not lose the data it is rebuilding around, nor the
-   * indexes and constraints that were already there — the failure mode of a
+   * indexes and constraints that were already there, the failure mode of a
    * copy-and-rename is silent and total.
    */
   it("preserves rows and existing indexes when adding a foreign key", async () => {
@@ -220,7 +220,7 @@ describe("dropping an indexed column", () => {
 
     // The mirror-image down(): drop the index, drop the column. Written in
     // the order a person would write it, which compileAlter() does not
-    // preserve — so this is really a test of the order it imposes.
+    // preserve, so this is really a test of the order it imposes.
     await schema.table("jobs", (table: Blueprint) => {
       table.dropIndex(["queue", "available_at"]);
       table.dropColumn("queue");
@@ -234,7 +234,7 @@ describe("dropping an indexed column", () => {
   });
 
   it("drops an index and column named in either call order", async () => {
-    // Same operations, opposite call order — must behave identically,
+    // Same operations, opposite call order, must behave identically,
     // since compileAlter() sorts them itself.
     const { schema } = fresh();
 

@@ -77,8 +77,8 @@ describe("MaintenanceMode", () => {
 
     expect(await readFile(maintenanceFilePath(), "utf8")).toBe('{"message":"brb"}');
 
-    // A completely separate instance — standing in for the server
-    // process — sees it.
+    // A completely separate instance, standing in for the server
+    // process, sees it.
     const otherProcess = new MaintenanceMode(buildApp());
     expect(await otherProcess.active()).toBe(true);
   });
@@ -178,7 +178,7 @@ describe("maintenance middleware (via HttpKernel)", () => {
     const kernel = kernelFor(app);
 
     // Merely skipping the 503 is not enough: the request would fall
-    // through to routing, match nothing and 404 — the documented bypass
+    // through to routing, match nothing and 404. The documented bypass
     // would never reach the app, and its only effect would be writing the
     // secret into every access log in front of it.
     const res = await kernel.raw().request("/letmein");

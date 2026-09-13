@@ -63,7 +63,7 @@ describe("ScheduleListCommand", () => {
 
     const output = fake.strippedOutput();
     // The whole point: the hour shown is the one in the expression, in the
-    // zone it was written for — not the server's rendering of that instant.
+    // zone it was written for, not the server's rendering of that instant.
     expect(output).toMatch(/\d{4}-\d{2}-\d{2} 09:00 Asia\/Tokyo/);
     fake.restore();
   });

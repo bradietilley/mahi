@@ -148,7 +148,7 @@ describe("fakeMail", () => {
   });
 
   it("records a half-built mailable that render() would reject", async () => {
-    // A fake proves intent: no body, no global mail.from — render() would
+    // A fake proves intent: no body, no global mail.from, render() would
     // throw a MailException, but the recorder must still accept it.
     class BareMailable extends Mailable {
       override build(): void {
@@ -238,7 +238,7 @@ describe("fakeProcess", () => {
     try {
       expect(Process.isFaked()).toBe(true);
 
-      // An unmatched command is satisfied rather than spawned — the test
+      // An unmatched command is satisfied rather than spawned. The test
       // would otherwise shell out for real.
       const result = await Process.run("git rev-parse HEAD");
       expect(result.exitCode).toBe(0);

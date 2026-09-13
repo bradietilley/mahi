@@ -1,5 +1,5 @@
 /**
- * Plan §27 — the executable form of the compatibility matrix.
+ * Plan §27, the executable form of the compatibility matrix.
  *
  * Two kinds of assertion live here, and the distinction is the point:
  *

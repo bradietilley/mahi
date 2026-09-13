@@ -3,7 +3,7 @@ import { MailMessage } from "@mahiframework/mail";
 /**
  * The email-verification email.
  *
- * Yours to edit, like `ResetPasswordMail` — scaffolded into your app, not
+ * Yours to edit, like `ResetPasswordMail`, scaffolded into your app, not
  * shipped by the framework. Set `AUTH_SEND_VERIFY_EMAIL=false` to stop
  * sending it and deliver the link yourself.
  */

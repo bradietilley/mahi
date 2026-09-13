@@ -132,7 +132,7 @@ describe("FakeQueueDriver", () => {
   });
 
   /**
-   * Asserting by job CLASS rather than by its registered name string —
+   * Asserting by job CLASS rather than by its registered name string,
    * the form that survives a rename and turns a typo into a compile
    * error instead of a silently-passing assertNotPushed().
    */

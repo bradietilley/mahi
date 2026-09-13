@@ -10,7 +10,7 @@ import { rememberViaLock } from "../src/cache-store-helpers.js";
 /**
  * See the note in `stores/file-cache-store.test.ts`: a 50ms TTL leaves the
  * preceding `remember()` and `get()` racing disk I/O, and under a loaded
- * run they lose — expiring the value before the first assertion reads it.
+ * run they lose, expiring the value before the first assertion reads it.
  */
 const TTL_SECONDS = 1;
 
@@ -20,7 +20,7 @@ function sleepPastTtl(): Promise<void> {
 
 /**
  * `remember()`/`rememberViaLock()`/`lock()` are implemented once in
- * `cache-store-helpers.ts` and delegated to by every `CacheStore` — so
+ * `cache-store-helpers.ts` and delegated to by every `CacheStore`, so
  * this suite runs the same behavioral tests against both built-in
  * stores rather than duplicating them per-store.
  */
@@ -168,7 +168,7 @@ describe.each<{
       expect(results.every((r) => r === "computed")).toBe(true);
     });
 
-    it("does not block forever on a crashed lock holder — it falls back to computing", async () => {
+    it("does not block forever on a crashed lock holder. It falls back to computing", async () => {
       // Simulate a holder that acquired the lock and never released it (a
       // crash), by taking the lock directly and leaving it. A waiter must
       // NOT hang until the auto-release TTL; it waits a bounded time, then
@@ -194,7 +194,7 @@ describe.each<{
 
       expect(value).toBe("fallback");
       expect(calls).toBe(1);
-      // Well under the 30s TTL — we fell back rather than blocking on it.
+      // Well under the 30s TTL. We fell back rather than blocking on it.
       expect(Date.now() - started).toBeLessThan(1_000);
     });
   });

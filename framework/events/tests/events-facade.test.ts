@@ -187,7 +187,7 @@ describe("Events facade", () => {
       });
 
       // A second Application replaces the current app(); the facade must
-      // register against — and dispatch through — the new dispatcher.
+      // register against, and dispatch through, the new dispatcher.
       await bootedApp();
       Events.listen(UserRegistered, (event) => {
         second.push(event.email);

@@ -12,7 +12,7 @@ type InstanceOfModel<M> = M extends abstract new (...args: any) => infer I ? I :
 type ModelShape<M> = Partial<InstanceOfModel<M>> & Record<string, any>;
 
 /**
- * A `state()` argument — either a partial-attribute object merged
+ * A `state()` argument, either a partial-attribute object merged
  * directly over whatever's been built so far, or a resolver receiving
  * those attributes and returning the partial to merge. Mirrors Laravel's
  * `Factory::state()` closure signature (`fn (array $attributes) =>
@@ -20,20 +20,20 @@ type ModelShape<M> = Partial<InstanceOfModel<M>> & Record<string, any>;
  */
 export type FactoryState<T> = Partial<T> | ((attributes: T) => Partial<T>);
 
-/** An `afterMaking()`/`afterCreating()` callback — may be sync or async. */
+/** An `afterMaking()`/`afterCreating()` callback, may be sync or async. */
 export type FactoryCallback<T> = (row: T) => void | Promise<void>;
 
 /**
- * Base class for generating realistic fake model instances on demand —
+ * Base class for generating realistic fake model instances on demand,
  * the thing tests actually want most (`TodoFactory.make()` / `.create()`
  * with sensible random-but-valid defaults, optionally overridden per
- * test). Not a database seeder replacement — `Seeder` stays the
+ * test). Not a database seeder replacement. `Seeder` stays the
  * `db:seed`-driven, fixed "populate my dev database" mechanism; `Factory`
  * is the test/ad-hoc "give me N valid rows" mechanism. Seeders can (and
  * often should) use factories internally
  * (`await new TodoFactory().times(20).create()` inside a `Seeder.run()`).
  *
- * Bound to a `Model` subclass (not a raw Kysely handle) — matches
+ * Bound to a `Model` subclass (not a raw Kysely handle), matches
  * `Model` itself being static/self-resolving now, so a `Factory` needs
  * no constructor arguments at all:
  *
@@ -50,7 +50,7 @@ export type FactoryCallback<T> = (row: T) => void | Promise<void>;
  *
  * `create()`/`make()` always return an array (`ModelShape<M>[]`, length ==
  * `times()`, default 1); `createOne()`/`makeOne()` always return a single
- * row and ignore any `times()` call — reach for those when you know you
+ * row and ignore any `times()` call, use those when you know you
  * only want one row and don't want an array to unwrap. `make()`/
  * `makeOne()` build in-memory rows only, no DB write; `create()`/
  * `createOne()` build then insert (`times(n).create()` is one batch
@@ -77,9 +77,9 @@ export type FactoryCallback<T> = (row: T) => void | Promise<void>;
  * ## Lifecycle callbacks
  *
  * `afterMaking()` runs against every row right after it's built (before
- * any DB write — fires for `make()`/`makeOne()` too, not just
+ * any DB write, fires for `make()`/`makeOne()` too, not just
  * `create()`/`createOne()`); `afterCreating()` runs right after a row is
- * inserted. Both may be sync or return a `Promise`, and both stack —
+ * inserted. Both may be sync or return a `Promise`, and both stack,
  * register more than once to add more callbacks rather than replacing
  * the previous one:
  *
@@ -89,7 +89,7 @@ export type FactoryCallback<T> = (row: T) => void | Promise<void>;
  *     .createOne();
  *
  * Deliberately does NOT bundle `@faker-js/faker` or any fake-data
- * generation library — `definition()` is just a plain function returning
+ * generation library. `definition()` is just a plain function returning
  * a row; apps wanting realistic fake names/emails/etc. add
  * `@faker-js/faker` themselves and call it from their own `definition()`.
  *
@@ -97,7 +97,7 @@ export type FactoryCallback<T> = (row: T) => void | Promise<void>;
  *
  * `create()`/`createOne()` (and `times(n).create()`) route through the
  * same `timestamps`/`incrementing`/lifecycle-event behavior as
- * `Model.create()` — see `Model`'s own docstring. `createQuietly()`/
+ * `Model.create()`. See `Model`'s own docstring. `createQuietly()`/
  * `createOneQuietly()` are the `Model.withoutEvents()`-wrapped
  * equivalents, for seeding/tests that want rows inserted without firing
  * observers/listeners/`dispatchesEvents`:
@@ -120,7 +120,7 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
     return this;
   }
 
-  /** Layers a partial-attribute override (or resolver) on top of definition() — see the class docstring's "States" section. */
+  /** Layers a partial-attribute override (or resolver) on top of definition(). See the class docstring's "States" section. */
   state(state: FactoryState<ModelShape<M>>): this {
     this.states.push(
       typeof state === "function"
@@ -131,14 +131,14 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
     return this;
   }
 
-  /** Registers a callback run against every instance right after it's built, before any DB write — see the class docstring's "Lifecycle callbacks" section. */
+  /** Registers a callback run against every instance right after it's built, before any DB write. See the class docstring's "Lifecycle callbacks" section. */
   afterMaking(callback: FactoryCallback<InstanceType<M>>): this {
     this.afterMakingCallbacks.push(callback);
 
     return this;
   }
 
-  /** Registers a callback run against every instance right after create()/createOne() inserts it — see the class docstring's "Lifecycle callbacks" section. */
+  /** Registers a callback run against every instance right after create()/createOne() inserts it. See the class docstring's "Lifecycle callbacks" section. */
   afterCreating(callback: FactoryCallback<InstanceType<M>>): this {
     this.afterCreatingCallbacks.push(callback);
 
@@ -161,7 +161,7 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
    * afterMaking callbacks.
    *
    * Attributes go in through `forceFill()`, so each column's cast runs on
-   * the way in — a `definition()` is typed as the **model** shape
+   * the way in, a `definition()` is typed as the **model** shape
    * (`ModelShape<M>` is `Partial<InstanceOfModel<M>>`), so `active: true`
    * and `meta: { a: 1 }` are what a factory author naturally writes, and
    * both must reach the database as `1` and `'{"a":1}'`.
@@ -170,8 +170,8 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
    * so those values were bound as a raw boolean and a raw object:
    * `create()` threw on SQLite and MySQL, while Postgres silently
    * coerced them. `forceFill()` is the right primitive rather than
-   * `fill()` because a factory deliberately ignores `fillable`/`guarded`
-   * — it is trusted test-fixture code, and a guarded `id` still needs
+   * `fill()` because a factory deliberately ignores `fillable`/`guarded`.
+   * It is trusted test-fixture code, and a guarded `id` still needs
    * setting.
    */
   private async buildOne(overrides?: Partial<ModelShape<M>>): Promise<InstanceType<M>> {
@@ -187,7 +187,7 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
     return typed;
   }
 
-  /** Build in-memory instance(s) — no DB write. Always an array (length == times(), default 1); use makeOne() for a single instance. */
+  /** Build in-memory instance(s). No DB write. Always an array (length == times(), default 1); use makeOne() for a single instance. */
   async make(overrides?: Partial<ModelShape<M>>): Promise<InstanceType<M>[]> {
     return Promise.all(Array.from({ length: this.count }, () => this.buildOne(overrides)));
   }
@@ -221,36 +221,36 @@ export abstract class Factory<M extends AnyModelClass = AnyModelClass> {
 
   /**
    * Like `create()`, but with `Model` lifecycle events suppressed for
-   * every inserted row (`this.model.withoutEvents(...)` — see
+   * every inserted row (`this.model.withoutEvents(...)`. See
    * `Model.withoutEvents()`'s docstring). Rows still get
    * `timestamps`/`incrementing` treatment exactly as `create()` does;
    * only event dispatch (observers, `on()` listeners, `EventDispatcher`)
-   * is skipped. `afterMaking`/`afterCreating` callbacks still run — those
+   * is skipped. `afterMaking`/`afterCreating` callbacks still run. Those
    * are `Factory`'s own hooks, not `Model` lifecycle events.
    */
   async createQuietly(overrides?: Partial<ModelShape<M>>): Promise<InstanceType<M>[]> {
     return this.model.withoutEvents(() => this.create(overrides));
   }
 
-  /** Like `createOne()`, but with `Model` lifecycle events suppressed — see `createQuietly()`. */
+  /** Like `createOne()`, but with `Model` lifecycle events suppressed. See `createQuietly()`. */
   async createOneQuietly(overrides?: Partial<ModelShape<M>>): Promise<InstanceType<M>> {
     return this.model.withoutEvents(() => this.createOne(overrides));
   }
 
   /**
    * Stamps `timestamps` columns (unless the caller's `definition()`/
-   * `state()`/overrides already supplied them — same "explicit values
+   * `state()`/overrides already supplied them, same "explicit values
    * win" rule as `Model.create()`), fires `saving`/`creating` for every
    * row, inserts, fires `created`/`saved`, then runs `afterCreating`
-   * callbacks — matching `Model.create()`'s event/timestamp behavior so
+   * callbacks, matching `Model.create()`'s event/timestamp behavior so
    * factory-created rows aren't a special case apps have to remember
    * about.
    *
    * Batch-inserts in one statement when `model.incrementing` is false
-   * (the common `Factory` case — most `definition()`s assign a
+   * (the common `Factory` case, most `definition()`s assign a
    * client-generated id, e.g. `randomUUID()`), preserving `times(n).
    * create()`'s "one batch insert, not `n` round trips" guarantee. When
-   * `model.incrementing` is true, inserts row-by-row instead — Kysely's
+   * `model.incrementing` is true, inserts row-by-row instead, Kysely's
    * `InsertResult.insertId` only reports the LAST row's generated id for
    * a multi-row `VALUES (...), (...)` insert, so there's no way to read
    * back every row's generated primary key from a single batched insert;

@@ -10,7 +10,7 @@
  * values have to survive alongside it.
  *
  * The init is the same `RequestInit & Record<string, unknown>` that
- * `withFetchOptions()` accepts and `send()` actually passes — carrying the
+ * `withFetchOptions()` accepts and `send()` actually passes, carrying the
  * index signature is the whole point of the parameter, so a transport that
  * reads `init.dispatcher` typechecks without a cast.
  */

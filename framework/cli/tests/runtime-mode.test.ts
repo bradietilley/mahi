@@ -34,7 +34,7 @@ describe("resolveRuntimeMode", () => {
 
   /**
    * The override is what makes a packaged-but-not-compiled install (a `bin`
-   * script over bundled JS) able to declare itself — there is nothing about
+   * script over bundled JS) able to declare itself. There is nothing about
    * its argv that distinguishes it from a checkout.
    */
   it("lets MAHI_MODE override detection in both directions", () => {

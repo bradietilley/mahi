@@ -1,12 +1,12 @@
 /**
- * Post-save change tracking — `getChanges()`/`wasChanged()`/
+ * Post-save change tracking, `getChanges()`/`wasChanged()`/
  * `wasRecentlyCreated`, the cast-aware `getOriginal()`/`getRawOriginal()`
  * split, `originalIsEquivalent()`, and `discardChanges()`.
  *
  * The pre-save half (`getDirty()`/`isDirty()`) is covered by
  * `model-instances.test.ts`; this file pins the window that opens where
  * that one closes. The distinction matters because `save()` calls
- * `syncOriginal()`, which destroys the evidence of what it just wrote —
+ * `syncOriginal()`, which destroys the evidence of what it just wrote,
  * an `updated` observer that wants to react to one specific transition
  * (`order.wasChanged("status")`) has no other way to know.
  */
@@ -98,7 +98,7 @@ function postAttributes(overrides: PostOverrides = {}): PostAttributes {
  *
  * The clock is advanced by a second afterwards: `updated_at` stamping is
  * millisecond-resolution, and an in-memory SQLite test completes a
- * create-then-save well inside one — leaving the "new" timestamp equal to
+ * create-then-save well inside one, leaving the "new" timestamp equal to
  * the old one, which is correctly reported as *not* changed and would make
  * every `updated_at` assertion below depend on how fast the machine is.
  */
@@ -207,7 +207,7 @@ describe("Model change tracking", () => {
     it("is set through markPersisted(), the seam Factory's batched insert uses", () => {
       // Factory writes its rows itself rather than going through `save()`,
       // so `markPersisted()` has to land the instance in the same state
-      // `save()`'s insert branch does — otherwise a factory-made model
+      // `save()`'s insert branch does, otherwise a factory-made model
       // would report itself as never created.
       const post = new Post({ id: "9", title: "T", body: "B", status: "draft" });
       post.markPersisted();
@@ -248,7 +248,7 @@ describe("Model change tracking", () => {
       expect(post.wasChanged()).toBe(false);
     });
 
-    it("returns a copy — mutating it cannot corrupt the instance's record", async () => {
+    it("returns a copy, mutating it cannot corrupt the instance's record", async () => {
       const post = await seedPost();
       post.title = "Changed";
       await post.save();
@@ -263,7 +263,7 @@ describe("Model change tracking", () => {
       const post = await seedPost();
       post.title = "Changed";
       await post.save();
-      await post.save(); // nothing dirty — returns early, no UPDATE
+      await post.save(); // nothing dirty: returns early, no UPDATE
 
       expect(post.wasChanged("title")).toBe(true);
     });
@@ -332,7 +332,7 @@ describe("Model change tracking", () => {
       expect(seen).toEqual(["updating:dirty=true:changed=false", "updated:changed=true"]);
     });
 
-    it("lets an updated hook read the value that was written over — the acceptance case", async () => {
+    it("lets an updated hook read the value that was written over, the acceptance case", async () => {
       const transitions: string[] = [];
       Post.on("updated", (p) => {
         const post = p as unknown as Post;
@@ -401,7 +401,7 @@ describe("Model change tracking", () => {
       expect(post.status).toBe("published");
     });
 
-    it("returns whole snapshots — cast and raw", async () => {
+    it("returns whole snapshots, cast and raw", async () => {
       const post = await seedPost({ published: 1 });
 
       expect(post.getOriginal().published).toBe(true);
@@ -504,7 +504,7 @@ describe("Model change tracking", () => {
       // type cannot give a property a wider write type than its read type.
       // `create()`/`update()` take the lenient `WritableAttributes` shape;
       // only direct property assignment has this gap.
-      // @ts-expect-error see above — DB-typed write, model-typed property
+      // @ts-expect-error see above. DB-typed write, model-typed property
       post.price = 10;
 
       expect(post.isDirty("price")).toBe(false);

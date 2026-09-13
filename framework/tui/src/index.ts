@@ -1,9 +1,9 @@
 /**
- * `@mahiframework/tui` — a from-scratch TypeScript/Node port of
+ * `@mahiframework/tui`, a from-scratch TypeScript/Node port of
  * `laravel/prompts`, scoped to `note`/`error`/`warning`/`info`/
  * `success`/`intro`/`outro`, `ask`, `select`, `progress`, `spinner`,
  * and `table`, exposed through the static `Tui` facade. No dependency
- * on `@mahiframework/core` or any other framework package — usable
+ * on `@mahiframework/core` or any other framework package, usable
  * standalone, and talks directly to `process.stdin`/`process.stdout`.
  *
  * ```ts
@@ -16,7 +16,7 @@
  *
  * Known limitation: display-width measurement (used for box/table
  * alignment and text truncation) uses a hand-rolled, minimal East
- * Asian Width table rather than a full Unicode width database — common
+ * Asian Width table rather than a full Unicode width database, common
  * CJK text and emoji are measured correctly, but uncommon wide
  * characters outside the covered ranges may be measured as width 1
  * instead of 2, throwing box/table alignment off by a column or two.
@@ -33,9 +33,9 @@ export { ProgressBar } from "./progress.js";
 export type { TaskResult } from "./task.js";
 
 /**
- * Raw ANSI color wrappers (`colors.red("text")`, etc.) — exported for
+ * Raw ANSI color wrappers (`colors.red("text")`, etc.), exported for
  * consumers that want to color their own table cells/strings (e.g.
- * `route:list` coloring HTTP methods) without reaching into
+ * `route:list` coloring HTTP methods) without depending on
  * `@mahiframework/tui`'s internal `src/ansi/colors.ts` module path.
  */
 export * as colors from "./ansi/colors.js";
@@ -49,7 +49,7 @@ export * as colors from "./ansi/colors.js";
 export { colorsEnabled, setColorOverride } from "./context.js";
 
 /**
- * Whether prompts will actually prompt — the same check `ask`/`select`/
+ * Whether prompts will actually prompt, the same check `ask`/`select`/
  * `confirm` make before running interactively, honouring the
  * `Tui.interactive()` override that `Tui.fake()` sets.
  *
@@ -58,7 +58,7 @@ export { colorsEnabled, setColorOverride } from "./context.js";
  * to make *before* choosing to prompt at all: an app that offers a picker on a
  * terminal and an error message otherwise has to branch on this, and the
  * obvious hand-rolled `process.stdin.isTTY && process.stdout.isTTY` silently
- * ignores the override — so the interactive branch becomes unreachable from
+ * ignores the override, so the interactive branch becomes unreachable from
  * every test, which is the half that most needs covering.
  */
 export { isInteractive } from "./context.js";

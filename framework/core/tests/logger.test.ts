@@ -18,7 +18,7 @@ describe("formatLogLine", () => {
     expect(formatLogLine("info", "hello")).toMatch(new RegExp(`^${TIMESTAMP} INFO: hello$`));
   });
 
-  it("renders env.LEVEL when a source is given — Laravel's production.DEBUG style", () => {
+  it("renders env.LEVEL when a source is given, Laravel's production.DEBUG style", () => {
     expect(formatLogLine("debug", "hello", undefined, makeSource())).toMatch(
       new RegExp(`^${TIMESTAMP} production\\.DEBUG: hello$`),
     );
@@ -33,7 +33,7 @@ describe("formatLogLine", () => {
     );
   });
 
-  it("appends global context after per-call context — Laravel's %context% %extra% order", () => {
+  it("appends global context after per-call context, Laravel's %context% %extra% order", () => {
     const source = makeSource();
     source.context.add("deploy", "abc123");
 
@@ -51,7 +51,7 @@ describe("formatLogLine", () => {
     );
   });
 
-  it("omits both JSON objects entirely when empty — ignoreEmptyContextAndExtra", () => {
+  it("omits both JSON objects entirely when empty, ignoreEmptyContextAndExtra", () => {
     expect(formatLogLine("info", "msg", {}, makeSource())).toMatch(/production\.INFO: msg$/);
   });
 
@@ -79,7 +79,7 @@ describe("formatLogLine context serialization (safe)", () => {
     expect(line).toContain('"message":"inner"');
   });
 
-  it("does not throw on a circular context — renders [Circular] instead", () => {
+  it("does not throw on a circular context, renders [Circular] instead", () => {
     const circular: Record<string, unknown> = { a: 1 };
     circular["self"] = circular;
     expect(() => formatLogLine("info", "msg", circular)).not.toThrow();

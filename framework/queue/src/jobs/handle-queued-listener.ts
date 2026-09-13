@@ -5,7 +5,7 @@ import { Job } from "../job.js";
 /**
  * Built-in job that rehydrates a `listenQueued()` registration and runs
  * the original listener. Dispatched by the handler `QueueServiceProvider`
- * installs on `EventDispatcher` — not intended to be dispatched by
+ * installs on `EventDispatcher`, not intended to be dispatched by
  * application code directly.
  *
  * The `QueuedListenerPayload` (a plain serializable `{ id, data }` object)

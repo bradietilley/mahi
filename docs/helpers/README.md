@@ -4,7 +4,7 @@
 and array manipulation, an ordered-map `Collection`, locale-aware number
 formatting, type-checked dot-notation access into nested data, and a
 handful of Laravel's global helpers. Three small standalone packages sit
-alongside it — `@mahiframework/pipeline`, `@mahiframework/process`, `@mahiframework/tui` — each
+alongside it, `@mahiframework/pipeline`, `@mahiframework/process`, `@mahiframework/tui`, each
 usable without the framework.
 
 ```ts
@@ -18,14 +18,14 @@ data_get(config, "database.connections.sqlite"); // typed, compile-checked
 ```
 
 Nothing here touches the container, the config repository, or the
-application. These are pure functions and value objects — import them
+application. These are pure functions and value objects, import them
 anywhere, including inside a `config/*.ts` file that runs before
 `bootstrap()`.
 
 ## `Str`
 
 A frozen object of pure string functions. No `Stringable` wrapper, no
-fluent chain — Laravel's `Str::of()` exists because PHP has no method
+fluent chain, Laravel's `Str::of()` exists because PHP has no method
 chaining on scalars, which isn't a problem TypeScript has.
 
 ### Case conversion
@@ -44,7 +44,7 @@ function splitWords(value: string): string[] {
 
 That's why the conversions **round-trip**. Every converter first
 decomposes its input into the same lowercase word list, then reassembles
-it — so the input spelling is irrelevant:
+it, so the input spelling is irrelevant:
 
 ```ts
 Str.camel("foo-bar");     // "fooBar"
@@ -63,7 +63,7 @@ Str.studly("foo_bar");    // "FooBar"
 
 The word-boundary regex only fires on a **lowercase-or-digit followed by
 an uppercase**. So `"HTTPResponse"` splits as one word `"httpresponse"`,
-not `"http response"` — consecutive capitals are not a boundary. If you
+not `"http response"`, consecutive capitals are not a boundary. If you
 need acronym-aware splitting, do it yourself before calling.
 
 | Method | Signature | Result |
@@ -73,7 +73,7 @@ need acronym-aware splitting, do it yourself before calling.
 | `kebab` | `(value)` | `foo-bar-baz` |
 | `studly` | `(value)` | `FooBarBaz` |
 
-`Str.kebab()` is what the `make:*` generators use to derive filenames —
+`Str.kebab()` is what the `make:*` generators use to derive filenames.
 `make:job SendWelcomeEmail` writes `send-welcome-email.job.ts`. See
 [Console](../console/).
 
@@ -94,7 +94,7 @@ Str.slug("Hello World", "_");    // "hello_world"
 
 **This is ASCII-only by construction.** The `[^a-z0-9]+` replacement means
 a Cyrillic or CJK title slugs to the empty string. That's the honest
-outcome — transliterating scripts the framework has no table for would
+outcome, transliterating scripts the framework has no table for would
 produce confidently wrong output. If you need non-Latin slugs, transliterate
 before calling, or key on an ID instead.
 
@@ -118,7 +118,7 @@ Str.words("one two three four", 2);   // "one two..."
 Str.words("one two", 5);              // "one two"
 ```
 
-Note `limit()`'s length budget excludes the suffix — `limit(s, 5)` can
+Note `limit()`'s length budget excludes the suffix. `limit(s, 5)` can
 return an 8-character string.
 
 ### Predicates
@@ -130,7 +130,7 @@ endsWith(haystack: string, needles: string | readonly string[]): boolean
 ```
 
 All three accept one needle or several, and are **`some()`**, not
-`every()` — any match wins.
+`every()`, any match wins.
 
 ```ts
 Str.contains("hello world", "world");             // true
@@ -149,7 +149,7 @@ isUlid(value: string): boolean   // 26 Crockford-base32 chars, first char 0–7
 isJson(value: string): boolean   // JSON.parse succeeds; "" is false
 ```
 
-`isJson("")` is `false` — an empty string is short-circuited before
+`isJson("")` is `false`. An empty string is short-circuited before
 `JSON.parse` ever runs, because `JSON.parse("")` throws anyway and
 returning `false` for whitespace is what callers mean.
 
@@ -180,7 +180,7 @@ Str.before("app/http/controllers/foo.ts", "/");      // "app"
 Str.beforeLast("app/http/controllers/foo.ts", "/");  // "app/http/controllers"
 ```
 
-`between()` is **first `from`, last `to`** — matching Laravel's
+`between()` is **first `from`, last `to`**, matching Laravel's
 `Str::between`. It is greedy on the right:
 
 ```ts
@@ -232,7 +232,7 @@ cryptographically random but has ~4 bits of entropy per character, not
 ~6. For a token where density matters, generate bytes and base64url them
 yourself; for a filename suffix or a test fixture, this is fine.
 
-`Str.ulid()` is lexicographically sortable by generation time — the first
+`Str.ulid()` is lexicographically sortable by generation time, the first
 10 characters are `Date.now()` in Crockford base32, the remaining 16 are
 80 random bits. Two ULIDs generated in the same millisecond do **not**
 have a defined relative order (there is no monotonic counter). For
@@ -240,7 +240,7 @@ guaranteed-ordered IDs, see [`@mahiframework/snowflake`](../models/).
 
 `Str.uuid7()` is the UUID-shaped equivalent: a 48-bit millisecond
 timestamp followed by 74 random bits, so ids sort in creation order while
-staying valid UUIDs. Prefer it to `uuid()` for a primary key — a v4
+staying valid UUIDs. Prefer it to `uuid()` for a primary key, a v4
 scatters inserts across the index at random, fragmenting it and dirtying a
 fresh page per write, whereas a v7 appends and keeps the hot leaf in
 cache. It also makes `order by id` a usable proxy for `order by
@@ -252,7 +252,7 @@ created_at` without a second index.
 > space. Use `uuid()` there.
 
 Like ULIDs, two v7s minted in the same millisecond have no defined
-relative order — ordering comes from the timestamp, uniqueness from the
+relative order. Ordering comes from the timestamp, uniqueness from the
 random bits. `orderedUuid()` is an alias, named after what you want rather
 than which RFC version currently provides it.
 
@@ -280,7 +280,7 @@ Arr.wrap(["admin", "owner"]); // ["admin", "owner"]
 Arr.wrap(null);               // []
 ```
 
-`flatten()` is **one level only** — it's `Array.prototype.flat()` with the
+`flatten()` is **one level only**, it's `Array.prototype.flat()` with the
 default depth of 1. For arbitrary depth use `collect(x).flatten()`, which
 takes a depth argument and defaults to `Infinity`.
 
@@ -322,7 +322,7 @@ hasAny<T>(target: T, keys: Paths<T> | readonly Paths<T>[]): boolean
 pull<T, P>(target: T, key: P, fallback?): PathValue<T, P>
 ```
 
-`hasAny()` is `data_has`'s `some()` counterpart — `data_has` requires
+`hasAny()` is `data_has`'s `some()` counterpart, `data_has` requires
 **all** the given paths, `hasAny` requires **one**.
 
 `pull()` reads and removes in one call. It mutates `target`:
@@ -349,7 +349,7 @@ return fallback === undefined ? undefined : value(fallback);
 ```
 
 Two consequences worth knowing. First, with a predicate they are `O(n)`
-even when the match is at index 0 — the whole array is scanned and an
+even when the match is at index 0. The whole array is scanned and an
 intermediate array is allocated. For a hot loop use
 `array.find(predicate)`. Second, `fallback` goes through the `value()`
 helper, so a function is **called**, not returned:
@@ -361,7 +361,7 @@ Arr.first([], null, "none");                  // "none"
 ```
 
 Pass `null` (not `undefined`) as the predicate when you want a fallback
-without filtering — `undefined` would be fine too, but `null` reads as
+without filtering. `undefined` would be fine too, but `null` reads as
 deliberate.
 
 ### List and shape tests
@@ -425,7 +425,7 @@ Empty containers are **preserved as leaves** rather than vanishing:
 Arr.dot({ a: {}, b: [] });   // { "a": {}, "b": [] }
 ```
 
-Without that rule `dot()`/`undot()` would not round-trip — an empty object
+Without that rule `dot()`/`undot()` would not round-trip. An empty object
 would flatten to nothing and come back missing.
 
 `undot()` is the inverse. It builds the structure with `data_set` and then
@@ -448,7 +448,7 @@ whereNotNull<T>(array): T[]
 query(obj: DataObject): string
 ```
 
-`divide()` splits an object into parallel keys/values arrays —
+`divide()` splits an object into parallel keys/values arrays,
 `Object.keys` and `Object.values` in one call, correctly typed.
 
 `crossJoin()` produces every combination, seeded with `[[]]` so a
@@ -467,7 +467,7 @@ const [active, inactive] = Arr.partition(users, (u) => u.active);
 ```
 
 `sole()` asserts exactly one match, throwing `ItemNotFoundError` for zero
-and `MultipleItemsFoundError` for two or more — the same two errors
+and `MultipleItemsFoundError` for two or more, the same two errors
 `Collection.sole()` uses.
 
 ```ts
@@ -500,7 +500,7 @@ import { Collection, collect } from "@mahiframework/core";
 ```
 
 A near 1:1 port of Laravel's `Illuminate\Support\Collection`, and the
-return type of every model query that yields more than one row — see
+return type of every model query that yields more than one row. See
 [Models](../models/).
 
 ### It is an ordered `Map`, not an array
@@ -531,8 +531,8 @@ byEmail.get("ada@example.com");                   // User | undefined
 byEmail.filter((u) => u.active).count();          // still a Collection
 ```
 
-If `keyBy()` returned a native `Map` — the obvious TypeScript translation
-— the chain would stop dead there, and so would `groupBy`, `countBy`,
+If `keyBy()` returned a native `Map`, the obvious TypeScript translation,
+the chain would stop dead there, and so would `groupBy`, `countBy`,
 `mapWithKeys`, `pluck(value, key)`, `flip`, and `combine`. All of them
 return keyed `Collection`s instead.
 
@@ -547,7 +547,7 @@ The constructor is **private**. Build one through a static:
 | Static | Signature | Notes |
 |---|---|---|
 | `make` | `(items: readonly V[])` | Keys `0..n-1` |
-| `make` | `(items: Iterable<[K, V]>)` | Preserves keys — a `Map`, `.entries()`, or another `Collection` |
+| `make` | `(items: Iterable<[K, V]>)` | Preserves keys, a `Map`, `.entries()`, or another `Collection` |
 | `empty` | `<V>()` | Zero items, `nextIndex = 0` |
 | `wrap` | `(Collection \| V[] \| V)` | Scalars become a one-item collection |
 | `unwrap` | `(Collection \| V[])` | The plain array back out |
@@ -592,8 +592,8 @@ plain value).
 | `pull` | the removed value |
 | `getOrPut` | the existing or newly-stored value |
 
-Everything else — `map`, `filter`, `reject`, `where*`, `sort*`, `unique`,
-`merge`, `slice`, `take`, `chunk`, `values`, `keys`, `only`, `except` — is
+Everything else: `map`, `filter`, `reject`, `where*`, `sort*`, `unique`,
+`merge`, `slice`, `take`, `chunk`, `values`, `keys`, `only`, `except`, is
 non-destructive.
 
 The trap this creates:
@@ -606,7 +606,7 @@ items.push(4);     // MUTATES items, and returns it
 ```
 
 `sort()` returning a new instance while `push()` mutates looks
-inconsistent, and it is — but it's the same inconsistency Laravel has, and
+inconsistent, and it is, but it's the same inconsistency Laravel has, and
 diverging would silently break every ported snippet. When in doubt,
 assign the result: `const sorted = items.sort()` is correct either way.
 
@@ -631,7 +631,7 @@ byEmail.push(newUser);
 ```
 
 Use `put(key, value)` on a keyed collection. `prepend(value, key?)` works
-on both — with a key it inserts that one entry at the front and leaves
+on both, with a key it inserts that one entry at the front and leaves
 every other key alone; without one it renumbers from 0 like `unshift`.
 
 ### `all()` and `toArray()` discard keys
@@ -687,7 +687,7 @@ collection.get("missing", () => expensiveDefault());
 `mapInto(ctor)`, `eachSpread`, `reduce`, `reduceInto`, `reduceSpread`.
 
 Every callback receives `(item, key)`. `map()` always returns a
-**list-shaped** `Collection<U, number>` — it renumbers. Use
+**list-shaped** `Collection<U, number>`. It renumbers. Use
 `mapWithKeys()` to derive keys, or `mapValues()` to keep the ones you
 have:
 
@@ -698,13 +698,13 @@ keyed.mapValues((n) => n * 2);                          // same keys, new values
 keyed.map((n) => n * 2);                                // keys become 0, 1, 2...
 ```
 
-`mapValues()` is the one to reach for on a keyed collection: `map()`
+`mapValues()` is the one to use on a keyed collection: `map()`
 discards exactly the thing that made it keyed, and
 `mapWithKeys((v, k) => [k, f(v)])` restates the key only to say
 "unchanged".
 
 > **Building a keyed collection needs a `Map`.** `Collection.make()` takes
-> an array, another Collection, or an *iterable of entries* — and
+> an array, another Collection, or an *iterable of entries*, and
 > `Object.entries()` returns an **array**, so it matches the array
 > overload and gives you a list of `[key, value]` pairs:
 >
@@ -713,7 +713,7 @@ discards exactly the thing that made it keyed, and
 > Collection.make(new Map(Object.entries({ a: 1 })));  // Collection<number, string>
 > ```
 >
-> `collect()` cannot produce a keyed collection at all — its return type
+> `collect()` cannot produce a keyed collection at all. Its return type
 > is always `Collection<V, number>`.
 
 **Filtering.** `filter(callback?)` (no callback drops falsy values),
@@ -723,7 +723,7 @@ discards exactly the thing that made it keyed, and
 
 Supported `where` operators: `=`, `==`, `===`, `!=`, `<>`, `!==`, `<`,
 `>`, `<=`, `>=`. The three equality spellings are all strict `===` and the
-three inequality spellings are all `!==` — PHP's loose `==` has no place
+three inequality spellings are all `!==`, PHP's loose `==` has no place
 here, so the pairs are collapsed rather than faked.
 
 ```ts
@@ -736,7 +736,7 @@ collect(mixed).whereInstanceOf(Post);   // narrows to Collection<Post, K>
 `sole`, `hasSole`, `hasMany`, `contains`, `some` (alias), `doesntContain`,
 `every`, `search`, `before`, `after`, `ensure`.
 
-`search()` returns the **key**, or `false` when absent — so always compare
+`search()` returns the **key**, or `false` when absent, so always compare
 with `=== false`, never a truthiness check (key `0` is falsy):
 
 ```ts
@@ -767,7 +767,7 @@ All take an optional selector. `avg`/`min`/`max`/`median` skip
 all-null) collection; `sum` returns `0`. `mode()` returns a **sorted
 array** of the most-frequent values, since ties are real.
 
-`Collection.percentage()` returns a number from 0 to 100 — the share of
+`Collection.percentage()` returns a number from 0 to 100, the share of
 items passing the predicate:
 
 ```ts
@@ -790,17 +790,17 @@ returns a `Collection` of `Collection`s.
 `reverse`, `shuffle`, `random(count?)`.
 
 All preserve keys. The default comparator subtracts numbers and otherwise
-compares `String(a)` against `String(b)` — so mixed-type sorting is
+compares `String(a)` against `String(b)`, so mixed-type sorting is
 stringly, and `[10, 9]` sorts numerically as long as both are numbers.
 
 `random()` with no argument returns one item (or `undefined` when empty);
 with a count it returns a `Collection` sampled without replacement.
 
-**Uniqueness.** `unique(selector?)` — keeps the **first** occurrence and
+**Uniqueness.** `unique(selector?)`, keeps the **first** occurrence and
 preserves its key.
 
 **Merging and set operations.** `merge` (later wins), `mergeRecursive`,
-`union` (**existing keys win** — the opposite bias from `merge`),
+`union` (**existing keys win**, the opposite bias from `merge`),
 `replace`/`replaceRecursive` (aliases of merge), `concat` (appends
 values, discarding source keys), `multiply(n)`, `diff`, `diffUsing`,
 `intersect`, `intersectUsing`, `crossJoin`, `combine`, `flip`, `zip`,
@@ -880,7 +880,7 @@ try {
 `ArrayAccess` offsets (use `get`/`put`/`has`/`forget`), `Macroable`,
 `lazy()`/`LazyCollection`, `toBase()`, `collapseWithKeys()`, `dot`/`undot`
 (they're on `Arr`), the `*Assoc`/`*Keys`/`intersectByKeys` set-op
-variants, and `HigherOrderCollectionProxy` — the `__call`-forwarding magic
+variants, and `HigherOrderCollectionProxy`, the `__call`-forwarding magic
 that no type checker can follow, rejected for the same reason dynamic
 facades are.
 
@@ -920,7 +920,7 @@ interface NumberFormatOptions {
 }
 ```
 
-`precision` wins when both are given — `maxPrecision` is only consulted
+`precision` wins when both are given. `maxPrecision` is only consulted
 when `precision` is `undefined`. `precision: 2` on `1.5` gives `"1.50"`;
 `maxPrecision: 2` gives `"1.5"`.
 
@@ -989,7 +989,7 @@ Number.abbreviate(1_500_000, 1);  // "1.5M"
 Number.abbreviate(-2500);         // "-3K"
 ```
 
-The labels say `KB`/`MB` while dividing by 1024 — the same choice most
+The labels say `KB`/`MB` while dividing by 1024, the same choice most
 operating systems make and the one users expect from a file browser. It is
 technically `KiB`.
 
@@ -1007,7 +1007,7 @@ Number.fileSize(900);    // "900 B"
 than throwing. `abbreviate` handles negatives properly, extracting the
 sign before scaling.
 
-`clamp(value, min, max)` is `Math.min(max, Math.max(min, value))` — no
+`clamp(value, min, max)` is `Math.min(max, Math.max(min, value))`, no
 validation that `min <= max`, so an inverted range returns `min`.
 
 ## Dot-notation access
@@ -1036,7 +1036,7 @@ data_get(user, "adress.country");    // ❌ compile error — typo caught
 
 The camelCase spellings (`dataGet`, `dataSet`, `dataFill`, `dataHas`,
 `dataForget`) still exist and still work, but are `@deprecated` aliases.
-Prefer the snake_case names — they match Laravel and they're what the rest
+Prefer the snake_case names. They match Laravel and they're what the rest
 of the framework uses.
 
 ### The type machinery
@@ -1058,7 +1058,7 @@ deeper than that isn't offered.
 **Index signatures open the gate.** `Paths<Record<string, unknown>>` is
 plain `string`, and `PathValue<Record<string, unknown>, anything>` is
 `unknown`. That's exactly why `app.config.get("database.default")` compiles
-against an untyped config shape — there's nothing to check against, so
+against an untyped config shape. There's nothing to check against, so
 nothing is rejected.
 
 **`PathAssigned` differs from `PathValue` at wildcards.** Reading
@@ -1097,8 +1097,8 @@ function isPlainObject(value: DataValue): value is DataObject {
 }
 ```
 
-An object whose prototype is anything else — a `Date`, a `Map`, a `Set`, a
-model instance, any class instance — is a **leaf**. `data_get` will return
+An object whose prototype is anything else, a `Date`, a `Map`, a `Set`, a
+model instance, any class instance, is a **leaf**. `data_get` will return
 it, but will not walk into it:
 
 ```ts
@@ -1107,7 +1107,7 @@ data_get({ at: new Date() }, "at.getTime");    // ❌ compile error; Date is a P
 data_get({ user: userModel }, "user.email");   // does not traverse the model
 ```
 
-This is deliberate. Reaching into class internals by string path is how
+This is deliberate. Accessing class internals by string path is how
 you end up depending on private state, and there is no reflection here to
 make it safe. Call the object's own accessors instead.
 
@@ -1124,7 +1124,7 @@ data_get(target, ["a", "b"])                    // tuple form, also checked
 ```
 
 `fallback` is returned for a **runtime**-missing key. A path that doesn't
-exist on `T` is a compile error regardless — for keys that may genuinely
+exist on `T` is a compile error regardless, for keys that may genuinely
 be absent, make the property optional on the type and pass a fallback:
 
 ```ts
@@ -1136,7 +1136,7 @@ Passing `null`/`undefined`/`""` as the key returns the target unchanged,
 which makes `data_get` safe to call with a dynamic path that might be
 empty.
 
-### `data_set` mutates — and you should still use the return value
+### `data_set` mutates: and you should still use the return value
 
 ```ts
 data_set(target, path, value, overwrite = true): T
@@ -1154,7 +1154,7 @@ const root: Accessible = isAccessible(target)
 
 JavaScript has no PHP-style pass-by-reference for a primitive or a class
 instance, so the only way to receive that fresh structure is the return
-value. **Always write `target = data_set(target, ...)`** — it's a no-op in
+value. **Always write `target = data_set(target, ...)`**. It's a no-op in
 the common case and correct in the uncommon one:
 
 ```ts
@@ -1202,7 +1202,7 @@ data_forget(target, [pathA, pathB]): T
 ```
 
 Mutates and returns `target`. Deleting an **array element splices it**,
-shifting later indices down — it does not leave a hole:
+shifting later indices down. It does not leave a hole:
 
 ```ts
 const data = { items: ["a", "b", "c"] };
@@ -1252,7 +1252,7 @@ count of zero are both answers.
 
 The `Blankable` type covers every runtime branch the function has:
 `string | number | boolean | bigint | object | null | undefined`. `symbol`
-is deliberately excluded — passing one is a type error rather than a
+is deliberately excluded, passing one is a type error rather than a
 silent `false`.
 
 ### `value`
@@ -1265,7 +1265,7 @@ value<T, A, B>(val: (a: A, b: B) => T, a: A, b: B): T
 
 Resolve a value-or-thunk. If it's a function, call it (with any extra
 arguments); otherwise return it as-is. This is what makes "default may be
-lazy" work throughout the framework — `Arr.first`'s fallback,
+lazy" work throughout the framework, `Arr.first`'s fallback,
 `Collection.get`'s default:
 
 ```ts
@@ -1372,11 +1372,11 @@ await retry(
 );
 ```
 
-`error` is typed `unknown`, because a `catch` clause is `unknown` — a
+`error` is typed `unknown`, because a `catch` clause is `unknown`. A
 callback may throw anything, not only an `Error`.
 
 **`sleepMs` as a function** computes the delay from the attempt number and
-the error that caused it — which is how a caller honours a server's
+the error that caused it. Which is how a caller honours a server's
 `Retry-After` header:
 
 ```ts
@@ -1432,7 +1432,7 @@ Values thrown that aren't `Error`s are wrapped in one, since `throw`
 accepts anything. `concurrency` defaults to unlimited; `1` is strictly
 sequential; below `1` throws a `RangeError`.
 
-This is the general form of Laravel's `Http::pool()` — pooling has nothing
+This is the general form of Laravel's `Http::pool()`. Pooling has nothing
 to do with HTTP, and queue batches and storage uploads want the same
 thing. [`Http.pool()`](../http-client/#concurrent-requests) is a typed
 wrapper over it.
@@ -1491,8 +1491,8 @@ The corollary: the app must be **started from its own root directory**.
 `./artisan` handles this (it `cd`s to its own directory first), and
 `bin/server.js` should be run the same way. See [Deployment](../deployment/).
 
-An app that *cannot* satisfy that — a CLI installed on `PATH`, or a
-compiled binary run from anywhere — calls `setBasePath(root)` as the first
+An app that *cannot* satisfy that, a CLI installed on `PATH`, or a
+compiled binary run from anywhere, calls `setBasePath(root)` as the first
 statement of its `bootstrap()` instead, and the other three helpers follow
 it. See [Configuration → setBasePath()](../configuration/README.md#setbasepath--for-apps-that-arent-run-from-their-own-directory).
 
@@ -1504,7 +1504,7 @@ import { Pipeline, Hub } from "@mahiframework/pipeline";
 
 Send a value through an ordered list of pipes, each of which may transform
 it, short-circuit, or post-process on the way back out. This is the
-mechanism `@mahiframework/http` builds its middleware stack on — see
+mechanism `@mahiframework/http` builds its middleware stack on. See
 [Routing](../routing/).
 
 ### `Pipeline`
@@ -1522,7 +1522,7 @@ const result = await new Pipeline<Request, Response>()
 | `through(pipes)` | Replaces the pipe stack wholesale, in run order. |
 | `pipe(pipe)` | Appends one pipe to the end. |
 | `run(destination)` | Runs it. Returns the destination's (or a short-circuiting pipe's) result. |
-| `thenReturn()` | Runs with an identity destination — for transform-only pipelines. |
+| `thenReturn()` | Runs with an identity destination, for transform-only pipelines. |
 
 Calling `run()` without `send()` throws
 `"Pipeline.send() must be called before run()."`.
@@ -1592,7 +1592,7 @@ import { Process, makeProcessResult, ProcessFailedError } from "@mahiframework/p
 
 A wrapper over `node:child_process` for running external commands, with a
 `fake()`/`assertRan()` pair for tests. No `execa` dependency, no
-dependency on `@mahiframework/core` — it's usable standalone.
+dependency on `@mahiframework/core`. It's usable standalone.
 
 ```ts
 const result = await Process.run(["git", "rev-parse", "HEAD"]);
@@ -1613,13 +1613,13 @@ This is the single most important thing about the API:
 | `"git log \| head -5"` | `spawn(cmd, { shell: true })` | **Yes** |
 
 **Use the array form by default.** With no shell, arguments are passed to
-the process directly — there is no word splitting, no glob expansion, no
+the process directly. There is no word splitting, no glob expansion, no
 `;`/`&&`/`$()` interpretation, and therefore no shell injection. A user
 value that happens to contain `; rm -rf /` is one argument containing that
 text.
 
 The string form exists for the cases where you genuinely want shell
-features — pipes, redirects, globs:
+features, pipes, redirects, globs:
 
 ```ts
 await Process.run(["pg_dump", "--no-owner", databaseName]);       // safe
@@ -1636,7 +1636,7 @@ await Process.run(`pg_dump ${userSupplied}`);                     // ⚠️ inje
 | `env` | `Record<string, string>` | **Merged on top of** `process.env`, not a replacement. |
 | `input` | `string` | Written to stdin, which is then closed. |
 
-stdin is closed either way — a child waiting on input won't hang forever
+stdin is closed either way, a child waiting on input won't hang forever
 just because you didn't pass any.
 
 ### `run()` never rejects
@@ -1668,8 +1668,8 @@ const { stdout } = (await Process.run(["git", "rev-parse", "HEAD"])).throw();
 ### Exit code 1 is overloaded
 
 Node reports "killed by a signal" and "never started" both as a `null`
-exit code, so this package collapses them — along with a real exit
-status 1 — into `exitCode: 1`:
+exit code, so this package collapses them, along with a real exit
+status 1, into `exitCode: 1`:
 
 ```ts
 child.on("exit", (code) => {
@@ -1684,7 +1684,7 @@ Three distinct outcomes therefore look identical:
 - the process never started (`ENOENT`)
 
 There is no more specific POSIX convention worth inventing. If you need to
-tell them apart, inspect `stderr` — a spawn failure carries the Node error
+tell them apart, inspect `stderr`, a spawn failure carries the Node error
 message, and a timeout leaves whatever the child had written so far.
 
 ### `ProcessResult`
@@ -1701,7 +1701,7 @@ interface ProcessResult {
 }
 ```
 
-`makeProcessResult(command, exitCode, stdout, stderr)` builds one — you'll
+`makeProcessResult(command, exitCode, stdout, stderr)` builds one. You'll
 need it to define fake handlers.
 
 Output is buffered entirely in memory as a string. There is no streaming
@@ -1743,7 +1743,7 @@ it("records the deployed commit", async () => {
 ```
 
 A handler is either a fixed `ProcessResult` or a function of the actual
-command string, sync or async — the function form is how you vary the
+command string, sync or async. The function form is how you vary the
 response per invocation.
 
 **An unmatched command under `fake()` resolves successfully with empty
@@ -1772,8 +1772,8 @@ Expected a process matching "git push *" to have run. Ran: git status, git add .
 import { Tui } from "@mahiframework/tui";
 ```
 
-A from-scratch port of `laravel/prompts` — notes, prompts, tables,
-spinners, and progress bars — exposed through one static class. It talks
+A from-scratch port of `laravel/prompts`, notes, prompts, tables,
+spinners, and progress bars, exposed through one static class. It talks
 directly to `process.stdin`/`process.stdout` and depends on nothing else
 in the framework.
 
@@ -1804,8 +1804,8 @@ their TTY code path under a non-TTY test runner. It returns a handle with
 [Testing](../testing/#faking-the-terminal).
 
 Console commands get these through the `Command` base class rather than
-importing `Tui` directly. The full treatment — writing commands, output
-styling, the `make:*` generators — is in [Console](../console/).
+importing `Tui` directly. The full treatment, writing commands, output
+styling, the `make:*` generators, is in [Console](../console/).
 
 ## Gotchas
 
@@ -1837,7 +1837,7 @@ collection serialises as a JSON array, not an object.
 **`push`/`pop`/`shift`/`unshift`/`add` don't exist on keyed collections.**
 That's a compile error by design. Use `put(key, value)`.
 
-**`Collection.search()` returns `false`, not `-1`, when absent** — and key
+**`Collection.search()` returns `false`, not `-1`, when absent**, and key
 `0` is falsy. Compare with `=== false`.
 
 **`data_has` ignores wildcards.** It matches `*` as a literal key. Use
@@ -1847,7 +1847,7 @@ That's a compile error by design. Use `put(key, value)`.
 array.** Always use the return value.
 
 **`data_get` does not traverse `Date`s, `Map`s, `Set`s, or class
-instances.** They're leaves — returned whole, never walked into.
+instances.** They're leaves, returned whole, never walked into.
 
 **`blank(0)` and `blank(false)` are `false`.** That's the point of the
 helper; `if (!x)` is what you use when you *do* want truthiness.
@@ -1873,9 +1873,9 @@ own root.
 
 ## Related
 
-- [Models](../models/) — query results are `Collection`s
-- [Configuration](../configuration/) — `data_get`-style access via `app.config.get()`
-- [Routing](../routing/) — middleware is a `Pipeline`
-- [Console](../console/) — the `Command` base class and `Tui` in practice
-- [Testing](../testing/) — `Process.fake()`, `Tui.fake()`, and the rest of the fakes
-- [Dates & times](../datetime/) — `DateTime`, `Duration`, `Interval`, `Period`
+- [Models](../models/): query results are `Collection`s
+- [Configuration](../configuration/): `data_get`-style access via `app.config.get()`
+- [Routing](../routing/): middleware is a `Pipeline`
+- [Console](../console/): the `Command` base class and `Tui` in practice
+- [Testing](../testing/): `Process.fake()`, `Tui.fake()`, and the rest of the fakes
+- [Dates & times](../datetime/): `DateTime`, `Duration`, `Interval`, `Period`

@@ -97,7 +97,7 @@ describe("stub response coercions", () => {
 
   it("treats a lone non-numeric `status` as a JSON body, not a spec", async () => {
     // `{ status: "active" }` has only a spec-shaped key, but a string is
-    // never an HTTP status — so it is a JSON body, not `status: NaN`.
+    // never an HTTP status, so it is a JSON body, not `status: NaN`.
     Http.fake({ "*": { status: "active" } });
     const response = await Http.get("https://x.test/");
     expect(response.status).toBe(200);
@@ -137,7 +137,7 @@ describe("stub response coercions", () => {
 
 describe("wildcard matching", () => {
   const cases: Array<[pattern: string, url: string, expected: boolean]> = [
-    // The implicit leading `*` — Laravel's Str::start($url, '*').
+    // The implicit leading `*`, Laravel's Str::start($url, '*').
     ["github.com/*", "https://api.github.com/repos", true],
     ["github.com/*", "https://gitlab.com/repos", false],
     ["*", "https://anything.test/", true],
@@ -270,8 +270,8 @@ describe("stray requests", () => {
 
   it("allow-list patterns have no implicit leading wildcard", async () => {
     Http.fake({ "github.com/*": { ok: true } });
-    // Unlike a stub pattern, this does NOT match https://api.example.com/x
-    // — an explicit escape from the guard is spelled out in full.
+    // Unlike a stub pattern, this does NOT match https://api.example.com/x,
+    // an explicit escape from the guard is spelled out in full.
     Http.allowStrayRequests(["api.example.com/*"]);
 
     await expect(Http.get("https://api.example.com/x")).rejects.toThrow(StrayRequestError);

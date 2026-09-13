@@ -7,14 +7,14 @@ import { getActiveTransaction } from "../transaction-context.js";
 /**
  * Compiles Laravel-shaped `Blueprint` callbacks into Kysely schema
  * statements for one connection. The `Schema` facade is the static
- * proxy over this class — see `schema-facade.ts`.
+ * proxy over this class. See `schema-facade.ts`.
  *
  * `dialect` selects the grammar (SQLite/MySQL/Postgres) used to spell the
  * DDL; it defaults to `"sqlite"` so existing call sites that construct a
  * `SchemaBuilder` from a bare Kysely instance keep working.
  *
  * The connection is resolved at **statement** time, not construction
- * time, and joins an enclosing `transaction()` on it — the same rule
+ * time, and joins an enclosing `transaction()` on it, the same rule
  * `QueryBuilder` follows. That's what lets the migrator wrap a migration
  * in a transaction and have the `Schema.create(...)` calls inside it
  * actually participate: the migration reaches the builder through the
@@ -28,7 +28,7 @@ export class SchemaBuilder {
     private dialect: Dialect = "sqlite",
   ) {}
 
-  /** The connection this statement runs on — the active transaction on it, if any. */
+  /** The connection this statement runs on, the active transaction on it, if any. */
   private get db(): Kysely<any> {
     return getActiveTransaction(this.connection) ?? this.connection;
   }

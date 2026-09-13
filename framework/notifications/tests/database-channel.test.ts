@@ -14,7 +14,7 @@ import { Notification } from "../src/notification.js";
 import type { NotificationRoutable } from "../src/notifiable.js";
 
 /**
- * The plain-adapter notifiable the guide documents — implements
+ * The plain-adapter notifiable the guide documents, implements
  * `NotificationRoutable` without extending `Model`, so it has no
  * `morphAlias()` and falls back to its static `table`.
  */
@@ -161,7 +161,7 @@ describe("DatabaseChannel", () => {
       const { channel, kysely } = await buildChannel();
 
       // A live Model is Proxy-wrapped and its `get` trap binds
-      // `constructor`, stripping the statics — so reading
+      // `constructor`, stripping the statics, so reading
       // `instance.constructor.table` yields undefined. The class must be
       // read off the prototype.
       await channel.send(UserModel.hydrate({ id: "u1" }) as any, new FollowNotification("actor-9"));

@@ -11,7 +11,7 @@ import type { WildcardListener } from "./event-dispatcher.js";
  * heterogeneous array covering many unrelated events, so there is no
  * single `E` to infer; a per-pair generic would need existential types
  * TypeScript doesn't have. The consequence is that a closure in a pair
- * gets `AbstractEvent`, not the narrowed event — use a `ListenerClass`
+ * gets `AbstractEvent`, not the narrowed event, use a `ListenerClass`
  * (which declares its own `Listener<E>`) when you want the typed payload
  * from the hook, or register the closure via `Events.listen()` /
  * `dispatcher.listen()`, where inference does work.
@@ -29,13 +29,13 @@ declare module "@mahiframework/core" {
      *
      * An event-name wildcard pattern is accepted in place of the event
      * class (`["model.posts.*", AuditModelWrites]`), and a closure in
-     * place of the listener class — so the hook now covers everything
+     * place of the listener class, so the hook now covers everything
      * `listen()` does, and a provider only needs to drop to a manual
      * `boot()` for `listenQueued()`.
      *
      * The pairs are `readonly`: the collector only iterates them, and
      * requiring mutable tuples would reject the natural way to write the
-     * hook — `return [[TodoCreated, LogTodo]] as const` — since a `const`
+     * hook, `return [[TodoCreated, LogTodo]] as const`, since a `const`
      * assertion produces readonly tuples.
      */
     listeners?(): ReadonlyArray<ListenerRegistration>;

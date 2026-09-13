@@ -9,7 +9,7 @@ export default defineConfig({
      * The `multi-process` suite spawns real child processes that perform
      * 200 lock-acquire/release cycles against the same file. Idle that is
      * ~150ms, but under a full 27-package run it competes for disk with
-     * everything else — and 5s is also exactly `LOCK_TIMEOUT_MS`, so the
+     * everything else, and 5s is also exactly `LOCK_TIMEOUT_MS`, so the
      * test deadline and the lock deadline were racing each other. Raising
      * the test timeout leaves the lock timeout as the thing that fails,
      * which is the one that actually means something.

@@ -6,7 +6,7 @@ export class ResetPasswordRequest extends Request {
     return {
       email: rule().string().email().required(),
       token: rule().string().required().min(1),
-      // Same minimum as registration — a reset must not be a way to set a
+      // Same minimum as registration. A reset must not be a way to set a
       // weaker password than signup would have allowed.
       password: rule().string().required().min(8),
     } as const;

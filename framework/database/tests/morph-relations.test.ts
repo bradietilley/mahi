@@ -78,8 +78,8 @@ class Video extends Model<VideoAttributes>()({
 }
 
 /**
- * The same three models with every discriminant omitted — `type` on the
- * owning side, `types` on the inverse — so they resolve through
+ * The same three models with every discriminant omitted, `type` on the
+ * owning side, `types` on the inverse, so they resolve through
  * `morphAlias()` and the global morph map instead. Declared separately
  * from the explicit models above so both forms stay covered.
  */
@@ -88,7 +88,7 @@ class MappedComment extends Model<CommentAttributes>()({
   primaryKey: "id",
   timestamps: false,
 }) {
-  /** No `types` — resolves through the global morph map alone. */
+  /** No `types`, resolves through the global morph map alone. */
   commentable() {
     return this.morphTo({ morphType: "commentable_type", morphId: "commentable_id" });
   }
@@ -105,7 +105,7 @@ class MappedPost extends Model<MappedPostAttributes>()({
   primaryKey: "id",
   timestamps: false,
 }) {
-  /** No `type` — defaults to this model's `morphAlias()`. */
+  /** No `type`, defaults to this model's `morphAlias()`. */
   commentsRelation() {
     return this.morphMany(MappedComment as unknown as typeof BaseModel, {
       morphType: "commentable_type",
@@ -165,7 +165,7 @@ interface GlobalCommentAttributes {
   commentable: MorphTo<BaseModel>;
 }
 
-/** The same declaration with no local `types` — resolves through the global map. */
+/** The same declaration with no local `types`, resolves through the global map. */
 class GlobalComment extends Model<GlobalCommentAttributes>()({
   table: "comments",
   primaryKey: "id",
@@ -178,7 +178,7 @@ class GlobalComment extends Model<GlobalCommentAttributes>()({
 
 describe("Polymorphic relations", () => {
   let app: Application;
-  /** Every SELECT executed since the last `resetQueryLog()` — see `countQueries()`. */
+  /** Every SELECT executed since the last `resetQueryLog()`. See `countQueries()`. */
   let selectLog: string[] = [];
 
   /**
@@ -371,7 +371,7 @@ describe("Polymorphic relations", () => {
 
       it("falls back to morphName when the model is unmapped", async () => {
         // No morph map registered; MappedPost has no morphName either, so
-        // it falls all the way to `table` — which is "posts", not "post",
+        // it falls all the way to `table`. Which is "posts", not "post",
         // and therefore matches nothing in the seeded data.
         const post = await MappedPost.findOrFail("p1");
         expect((await post.commentsRelation().get()).isEmpty()).toBe(true);
@@ -384,7 +384,7 @@ describe("Polymorphic relations", () => {
 
       it("lets an explicit type override the default", async () => {
         // Post declares `type: "post"` explicitly while a map would say
-        // otherwise — explicit wins.
+        // otherwise, explicit wins.
         Relation.morphMap({ post: () => Video, video: () => Post });
         const post = await Post.findOrFail("p1");
 

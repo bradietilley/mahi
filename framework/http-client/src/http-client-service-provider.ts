@@ -14,7 +14,7 @@ export { HTTP_CLIENT_TOKEN };
  *
  * Entirely optional: `@mahiframework/http-client` works standalone with no
  * container, on a module-level default factory. This provider only exists
- * for what genuinely needs configuring — named clients, global middleware,
+ * for what genuinely needs configuring, named clients, global middleware,
  * and event dispatch.
  *
  *   // config/http-client.ts
@@ -39,7 +39,7 @@ export class HttpClientServiceProvider extends ServiceProvider {
    * module-level factory the static `Http` uses.
    *
    * Deferred to `boot()` because `@mahiframework/events` may register after this
-   * provider — `register()` must not assume ordering. The `has()` guard
+   * provider. `register()` must not assume ordering. The `has()` guard
    * means a missing dispatcher silently skips events rather than failing,
    * so `@mahiframework/events` stays an optional peer.
    */

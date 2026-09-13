@@ -10,7 +10,7 @@ import { uniqueModeOf } from "./job.js";
 import { decodeJob, type JobState } from "./job-serialization.js";
 
 /**
- * Dispatch-time uniqueness for jobs — Laravel's `ShouldBeUnique` /
+ * Dispatch-time uniqueness for jobs, Laravel's `ShouldBeUnique` /
  * `ShouldBeUniqueUntilProcessing`, built on `@mahiframework/cache` locks.
  *
  * A job opts in with a `static unique` marker (see `Job.uniqueId`/
@@ -22,7 +22,7 @@ import { decodeJob, type JobState } from "./job-serialization.js";
  * worker starts processing it (`untilProcessing`).
  *
  * The lock is acquired in the dispatching process and released in
- * whichever worker later runs the job — a cross-process handoff — so
+ * whichever worker later runs the job, a cross-process handoff, so
  * release goes through `Lock.forceRelease()` (owner-less, keyed) rather
  * than the owner-checked `release()`. The worker reconstructs the exact
  * same key from the job's class name and `uniqueId()`, so nothing about
@@ -37,7 +37,7 @@ export const DEFAULT_UNIQUE_FOR_SECONDS = 3600;
 /**
  * The cache lock key for a unique job: `mahi:unique:<registryName>:<id>`,
  * where `id` is the job's `uniqueId()` (or `""` for class-wide
- * uniqueness). The registry name — not `constructor.name` — is used so the
+ * uniqueness). The registry name, not `constructor.name`, is used so the
  * key survives minification and matches on both the dispatch and worker
  * sides.
  */
@@ -53,7 +53,7 @@ export function uniqueLockKey(registryName: string, job: Job): string {
  * manager's default store.
  *
  * Returns `undefined` when no cache is available at all (the `@mahiframework/cache`
- * manager isn't bound and the job named no explicit store) — the caller
+ * manager isn't bound and the job named no explicit store). The caller
  * treats that as "uniqueness cannot be enforced", allowing the dispatch to
  * proceed rather than throwing, so a queue-only app without a configured
  * cache does not hard-fail on a unique job.
@@ -78,12 +78,12 @@ export function resolveUniqueStore(app: Application, job: Job): CacheStore | und
  * Acquire the uniqueness lock for a job about to be dispatched.
  *
  * Returns `true` when the lock was acquired (or uniqueness does not apply,
- * or cannot be enforced) — i.e. "go ahead and push". Returns `false` when
+ * or cannot be enforced), i.e. "go ahead and push". Returns `false` when
  * the lock is already held, meaning an identical job is already queued (or
  * running) and this dispatch should be dropped.
  *
  * A non-unique job returns `true` without touching the cache. A unique job
- * whose store cannot be resolved also returns `true` (fail open — better a
+ * whose store cannot be resolved also returns `true` (fail open, better a
  * possible duplicate than a dispatch that throws because the cache is
  * unconfigured), after logging a warning.
  */
@@ -114,7 +114,7 @@ export async function acquireUniqueLock(
     key: uniqueLockKey(registryName, job),
     automaticReleaseAfterSeconds: ttl,
     // Try once: uniqueness is a non-blocking "is one already queued?"
-    // check, never a wait — waiting would stall the dispatcher.
+    // check, never a wait. Waiting would stall the dispatcher.
     maximumWaitForSeconds: 0,
   });
 
@@ -133,22 +133,22 @@ export async function acquireUniqueLock(
 
 /**
  * Acquire the uniqueness lock for an already-**serialized** job about to
- * be pushed — the chain-advance path, where the worker has a
+ * be pushed, the chain-advance path, where the worker has a
  * `{ jobClass, state }` pair rather than a live instance.
  *
  * Uniqueness applies to each link of a chain independently (matching
  * Laravel), but only the *head* of a chain goes through
  * `QueueManager.dispatch()`; every tail link is pushed straight onto the
  * driver by the worker as its predecessor succeeds. Without this, a
- * `ShouldBeUnique` job enqueued as a tail link skipped its lock entirely
- * — so a chain could enqueue a duplicate of a job that was already
+ * `ShouldBeUnique` job enqueued as a tail link skipped its lock entirely,
+ * so a chain could enqueue a duplicate of a job that was already
  * queued, which is the exact thing the marker exists to prevent.
  *
  * Returns `true` when the push should proceed. Rebuilding the instance is
  * necessary because the lock key depends on `uniqueId()` (and the store
  * on `uniqueVia()`), both of which are methods on the class. A rebuild
- * that throws — most often a referenced model deleted while the chain was
- * mid-flight — returns `true` rather than propagating: the push then
+ * that throws, most often a referenced model deleted while the chain was
+ * mid-flight, returns `true` rather than propagating: the push then
  * proceeds and the *worker* deals with the missing model on its own
  * established path (skip or fail per `deleteWhenMissingModels`), instead
  * of the chain silently stalling here with no record anywhere.
@@ -180,7 +180,7 @@ export async function acquireUniqueLockForState(
  * Release a job's uniqueness lock, by reconstructing the same key the
  * dispatcher locked and force-releasing it (owner-less, since the releasing
  * process is not the one that acquired it). Best-effort: never throws, so a
- * cache blip cannot fail an otherwise-successful job — a stale lock will
+ * cache blip cannot fail an otherwise-successful job. A stale lock will
  * expire via `uniqueFor` regardless.
  *
  * A no-op for a non-unique job, or when no store can be resolved.

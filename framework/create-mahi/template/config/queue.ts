@@ -10,7 +10,7 @@ export function queueConfig(env: Env): QueueConfig {
         queue: "default",
         // Seconds before a reserved job is presumed abandoned and handed
         // to another worker. This is what makes a killed worker's job run
-        // again instead of being stranded — but it MUST be longer than
+        // again instead of being stranded, but it MUST be longer than
         // the longest a job can legitimately take (including its own
         // `timeout()`), or a still-running job gets a second worker.
         retryAfter: 90,
@@ -20,7 +20,7 @@ export function queueConfig(env: Env): QueueConfig {
         // per dispatch with `Bus.dispatch(job, { afterCommit: false })`.
         afterCommit: true,
       },
-      // Redis-backed queue (requires @mahiframework/redis) — worth it for
+      // Redis-backed queue (requires @mahiframework/redis), worth it for
       // throughput and for cross-process locks (`WithoutOverlapping`,
       // `RateLimited`), which the array/file cache stores cannot provide.
       redis: { queue: "default", retryAfter: 90 },

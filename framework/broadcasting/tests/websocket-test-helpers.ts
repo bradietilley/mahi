@@ -18,7 +18,7 @@ export interface TestServer {
  * mounted and injected. A real server (rather than Hono's in-process
  * `app.request()`) is unavoidable here: the websocket handshake happens at
  * the Node `upgrade` event, below the `fetch` interface Hono's test
- * request helper exercises — an in-process test would never touch the
+ * request helper exercises. An in-process test would never touch the
  * code path this driver exists to implement.
  */
 export async function startTestServer(
@@ -69,8 +69,8 @@ export class TestSocket {
   /**
    * Note the ordering: the `TestSocket` (and with it the `message`
    * listener) is constructed BEFORE awaiting `open`, not after. An
-   * endpoint that sends a frame from its own `onOpen` — a scrollback
-   * replay, a greeting — delivers it the moment the handshake completes,
+   * endpoint that sends a frame from its own `onOpen`, a scrollback
+   * replay, a greeting, delivers it the moment the handshake completes,
    * which is the same tick the `open` event fires. Attaching the listener
    * after that await drops the frame, and drops it *intermittently*: it
    * only loses the race under load, so it passes alone and fails in a
@@ -130,14 +130,14 @@ export class TestSocket {
   }
 
   /**
-   * The next frame as raw text, unparsed — for an endpoint that is not
+   * The next frame as raw text, unparsed, for an endpoint that is not
    * the broadcast socket and owes it no JSON.
    */
   nextRawFrame(timeoutMs = 1000): Promise<string> {
     return this.nextFrame(timeoutMs);
   }
 
-  /** Assert nothing arrives within the window — for "must NOT receive" cases. */
+  /** Assert nothing arrives within the window, for "must NOT receive" cases. */
   async expectNoMessage(windowMs = 100): Promise<void> {
     const frame = await this.nextFrame(windowMs).catch(() => null);
 

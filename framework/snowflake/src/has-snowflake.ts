@@ -5,7 +5,7 @@ import { SNOWFLAKE_TOKEN } from "./tokens.js";
 
 /**
  * A `KeyStrategy` that assigns a Snowflake ID on create when the primary
- * key is missing — the redesign replacement for the old `HasSnowflake`
+ * key is missing, the redesign replacement for the old `HasSnowflake`
  * `Model.use()` extension. Pass it as a model's `keyType`:
  *
  *   interface WidgetAttributes { id: string; name: string; }
@@ -20,7 +20,7 @@ import { SNOWFLAKE_TOKEN } from "./tokens.js";
  *   row.id; // "9348975348573485734"
  *
  * The key is a 19-digit string, so the column must be a `text` (or
- * `bigint`-as-text) primary key — never an auto-increment integer. An
+ * `bigint`-as-text) primary key, never an auto-increment integer. An
  * explicit `id` on the insert payload always wins. The per-model sequence
  * group is the model's class name (`context.modelName`), matching the old
  * `newUniqueId()`'s `this.name`.

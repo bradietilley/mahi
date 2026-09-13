@@ -16,14 +16,14 @@ import type { Lock, LockOptions } from "./locking/lock.js";
  *
  * `store()`/`remember()`/`rememberViaLock()` come from the `CacheManager`
  * itself; the plain operations (`get`/`put`/`forget`/`has`/`flush`/
- * `increment`/`add`/`lock`) are forwarded to the DEFAULT store — the
- * common case — matching how Laravel's `Cache` facade proxies to the
+ * `increment`/`add`/`lock`) are forwarded to the DEFAULT store, the
+ * common case, matching how Laravel's `Cache` facade proxies to the
  * default repository. For a non-default store, go through `Cache.store
  * (name)` (a `CacheStore`) and call the same methods on it.
  *
  * Prefer constructor-injecting `CacheManager` (via `CACHE_TOKEN`) where
  * that's practical (e.g. inside a `ServiceProvider`/`Command` that already
- * receives `app`) — reach for this only where threading
+ * receives `app`), use this only where threading
  * `app`/`CacheManager` through is genuinely inconvenient, same guidance as
  * `app()` itself.
  */

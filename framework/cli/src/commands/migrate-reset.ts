@@ -5,13 +5,13 @@ import { Command } from "../command.js";
 import { collectMigrationSources } from "./migration-directories.js";
 
 /**
- * `migrate:reset` — roll back every migration, newest batch first.
+ * `migrate:reset`, roll back every migration, newest batch first.
  *
  * The difference from `migrate:fresh` is which mechanism does the
  * emptying, and it matters: `reset` runs each migration's `down()`, while
  * `fresh` drops the tables outright and never calls one. So `reset`
- * exercises your `down()` methods — which is the point, since a `down()`
- * nobody runs is a `down()` nobody knows is broken — and correspondingly
+ * exercises your `down()` methods, which is the point, since a `down()`
+ * nobody runs is a `down()` nobody knows is broken, and correspondingly
  * fails on a migration whose `down()` is missing or wrong, where `fresh`
  * would not.
  */
@@ -30,7 +30,7 @@ export class MigrateResetCommand extends Command {
 
   async handle(options: { pretend?: boolean; force?: boolean } = {}): Promise<void> {
     // Destructive: empties the whole schema. `--pretend` changes nothing,
-    // so it skips the guard — same rule as migrate:rollback.
+    // so it skips the guard, same rule as migrate:rollback.
     if (!options.pretend && !(await this.confirmToProceed(options))) {
       return;
     }

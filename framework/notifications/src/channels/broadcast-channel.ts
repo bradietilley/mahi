@@ -9,7 +9,7 @@ import { NotificationBroadcast } from "../notification-broadcast.js";
  * `NotificationBroadcast` event carrying the notification's `toBroadcast()`
  * payload, and lets `@mahiframework/broadcasting`'s `afterDispatch()` hook
  * pick it up (because `NotificationBroadcast` structurally implements
- * `ShouldBroadcast`). No new broadcasting plumbing lives here — if
+ * `ShouldBroadcast`). No new broadcasting plumbing lives here, if
  * broadcasting isn't installed, the event dispatches harmlessly with no
  * listeners.
  *

@@ -160,8 +160,8 @@ describe("EmailVerificationBroker", () => {
 
     it("rejects a link whose address changed after it was issued", async () => {
       // The hole the email hash exists to close: request a link, change the
-      // account's address, then click. The signature is still valid — the
-      // URL was legitimately signed — so only the hash catches it.
+      // account's address, then click. The signature is still valid, the
+      // URL was legitimately signed, so only the hash catches it.
       const result = await broker.sendVerificationLink("alice", { signer });
       const url = (result as { url: string }).url;
 

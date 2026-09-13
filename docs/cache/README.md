@@ -13,7 +13,7 @@ const cached = await Cache.get<Post[]>("feed:427185966743560456");
 const feed = await Cache.remember("feed:global", () => buildGlobalFeed(), 60);
 ```
 
-Two stores ship in the box — `array` (in-process `Map`) and `file` (JSON
+Two stores ship in the box, `array` (in-process `Map`) and `file` (JSON
 on disk). `@mahiframework/redis` adds a third. All three implement the same
 nine-method interface, so nothing above the store layer changes when you
 switch.
@@ -51,8 +51,8 @@ await Cache.put("app:settings", settings);          // no expiry
 await Cache.remember("app:settings", load);         // ttlSeconds defaults to null = no expiry
 ```
 
-**There is no `decrement()`.** Pass a negative amount to `increment()` —
-which is exactly what `RateLimiter.decrement()` does internally
+**There is no `decrement()`.** Pass a negative amount to `increment()`.
+Which is exactly what `RateLimiter.decrement()` does internally
 (`this.increment(key, decaySeconds, amount * -1)`).
 
 ```ts
@@ -60,13 +60,13 @@ await Cache.increment("stock:sku-1", -1);
 ```
 
 **There is no `many()` / `putMany()` / `pull()` / `forgetMany()`.** Batch
-reads and read-and-delete are not modelled. Loop, or reach for the
-underlying client through a driver you own.
+reads and read-and-delete are not modelled. Loop, or use the underlying
+client through a driver you own.
 
 **There are no cache tags.** Tag invalidation requires either a
 tag-index-per-key scheme (correctness problems on every non-Redis store)
 or `SCAN`-based prefix deletion (Redis-specific). Namespace your keys
-instead — `feed:user:{id}` — and delete by writing the keys you know.
+instead, `feed:user:{id}`, and delete by writing the keys you know.
 
 ### TTL is always seconds, always absolute, always lazy
 
@@ -84,23 +84,23 @@ this.store.set(key, {
 });
 ```
 
-Expiry is evaluated **lazily on read** — a `get()`/`has()` that finds an
+Expiry is evaluated **lazily on read**, a `get()`/`has()` that finds an
 entry past its `expiresAt` deletes it and reports a miss. So an entry
-written and never read again occupies memory (or an inode) until something
+written and never read again holds memory (or an inode) until something
 touches that key.
 
-That is fine for a key space you read back, and a leak for one you don't.
-The case that bites is `RateLimiter`: it writes `throttle:<name>:<ip>`
-and a `:timer` sibling for every distinct client, and never looks at
-either again once the window passes. In a long-running server that is two
-dead entries per IP you have ever served.
+For keys you read back, that is fine. For keys you never read again, it
+is a leak. `RateLimiter` is the clearest example: it writes
+`throttle:<name>:<ip>` and a `:timer` sibling for every distinct client,
+and never reads either again once the window passes. A long-running
+server accumulates two dead entries for every IP it has served.
 
 Both built-in stores therefore also expire **eagerly**:
 
 | Store | Eager expiry |
 |---|---|
 | `ArrayCacheStore` | Sweeps itself every `sweepIntervalSeconds` (default 60, `0` to disable). The timer is `unref()`ed, so it can never keep a process alive. |
-| `FileCacheStore` | `prune()`, on demand — a full directory walk, so its cost belongs to a scheduled task rather than an unlucky request. |
+| `FileCacheStore` | `prune()`, on demand, a full directory walk, so its cost belongs to a scheduled task rather than an unlucky request. |
 | `RedisCacheStore` | Redis does it, both lazily and on its own background cycle. No `prune()`. |
 
 ```ts
@@ -108,8 +108,8 @@ schedule.command("cache:prune").hourly();
 ```
 
 `./artisan cache:prune` calls `prune()` on the default store (or
-`--store <name>`), and reports rather than fails on a store that has none
-— so a scheduled task doesn't break the day `cache.default` changes.
+`--store <name>`), and reports rather than fails on a store that has none,
+so a scheduled task doesn't break the day `cache.default` changes.
 
 ### `increment()` preserves the existing expiry
 
@@ -126,12 +126,12 @@ this.store.set(key, { value: next, expiresAt: existing?.expiresAt });
 
 The entry's `expiresAt` is carried forward untouched. Incrementing a
 counter does **not** extend its window. If it did, a rate limit of "5 per
-minute" would become "5 per minute of silence" — every hit would push the
+minute" would become "5 per minute of silence". Every hit would push the
 reset a further minute out, and a client hitting steadily would be locked
 out forever. `RedisCacheStore.increment()` gets the same semantics for
 free, because Redis `INCRBY` preserves a key's TTL.
 
-A counter incremented into existence (no prior entry) has **no** expiry —
+A counter incremented into existence (no prior entry) has **no** expiry.
 `existing?.expiresAt` is `undefined`. That's why `RateLimiter.increment()`
 seeds the key with `add(key, 0, decaySeconds)` first: `add()` sets the
 TTL, `increment()` then counts within it.
@@ -158,8 +158,8 @@ const second = await Cache.add("import:lock", "running", 300);  // false
 
 "Set only if absent (or expired)". This is the primitive `Lock.acquire()`
 is built on and the primitive `RateLimiter` uses to seed a window's timer
-exactly once. It is a *store-level* atomicity contract, not a convenience
-— see [Store atomicity](#store-atomicity) for what implementations must
+exactly once. It is a *store-level* atomicity contract, not a convenience.
+See [Store atomicity](#store-atomicity) for what implementations must
 guarantee.
 
 ### `remember()` and `rememberViaLock()`
@@ -170,7 +170,7 @@ remember(key, callback, ttlSeconds = null)
 
 Get-or-compute-and-store. Returns the cached value when present; otherwise
 runs `callback`, stores the result, returns it. `ttlSeconds` defaults to
-`null` — **no expiry**. Pass a number for a bounded lifetime.
+`null`, **no expiry**. Pass a number for a bounded lifetime.
 
 The miss check is `value !== undefined`. A cached `null`, `0`, `""` or
 `false` is a **hit**; only `undefined` is a miss. That means a callback
@@ -193,30 +193,30 @@ Same contract, but the compute-and-store step runs inside a `Lock` on the
 same key, so a cache-miss stampede only runs `callback()` once. The exact
 sequence:
 
-1. `get(key)` — return it if present. No lock is taken on the happy path.
+1. `get(key)`: return it if present. No lock is taken on the happy path.
 2. Acquire `Lock({ key, automaticReleaseAfterSeconds: 30 })`. Waiters
-   block **indefinitely** — `maximumWaitForSeconds` is not set, so the
+   block **indefinitely**. `maximumWaitForSeconds` is not set, so the
    default is `Infinity`.
-3. Re-check `get(key)` while holding the lock — the winner has probably
+3. Re-check `get(key)` while holding the lock. The winner has probably
    populated it by now, and every waiter returns that value without
    computing.
 4. Otherwise compute, `put()`, release.
 
 Use it when the callback is expensive or side-effecting enough that
-running it N times concurrently is a real problem. The costs are one extra
+running it N times concurrently is worth avoiding. The costs are one extra
 `add()` + `get()` + `forget()` round-trip per miss, and the fact that
 waiters block with no timeout. On a store whose `add()` is only atomic
 in-process (array, file), the deduplication is only within one process;
 on Redis it's genuinely global.
 
-Laravel has no first-class equivalent — the closest is pairing
+Laravel has no first-class equivalent. The closest is pairing
 `Cache::lock()` with `remember()` by hand.
 
 ## Store guarantees
 
 Read this table before picking `cache.default`. Everything above the store
-layer is identical across the three; everything that can actually hurt you
-is in here.
+layer is identical across the three; the differences that matter are all
+in here.
 
 | | `array` | `file` | `redis` |
 |---|---|---|---|
@@ -234,7 +234,7 @@ is in here.
 
 Two caveats on the file store's "yes"es. They rest on `rename()` and
 `open(…, "wx")` being atomic, which is true of a **local** filesystem and
-historically not of NFS — over a network filesystem, use Redis. And
+historically not of NFS, over a network filesystem, use Redis. And
 "across processes" means across processes *on one host*: several machines
 sharing a mount is the same NFS problem.
 
@@ -260,7 +260,7 @@ const user = await Cache.get<{ lastSeen: Date }>("user");
 user.lastSeen.getTime();   // fine on `array`, TypeError on `file`/`redis`
 ```
 
-The type parameter on `get<T>()` is an assertion, not a check — nothing
+The type parameter on `get<T>()` is an assertion, not a check, nothing
 validates that what came back matches `T`. There is no tagged serializer
 (a `superjson`-style envelope) because it would make every stored value
 non-interoperable with anything else reading that Redis. **Cache
@@ -286,8 +286,8 @@ export function cacheConfig(): CacheConfig {
 }
 ```
 
-Correct for a single process and for tests. Wrong the instant you run two.
-See [Redis](../redis/) for what breaks and why.
+This suits a single process and tests, but not a multi-process
+deployment. See [Redis](../redis/) for what breaks and why.
 
 One option, and you will rarely set it:
 
@@ -312,24 +312,16 @@ async add<T>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
 }
 ```
 
-JavaScript is single-threaded with run-to-completion
-semantics: a synchronous block cannot be interrupted by another `async`
-caller's continuation. The moment a function `await`s, its entire
-synchronous prefix has already committed.
+This is what makes the operation atomic. JavaScript runs a single thread
+to completion, so a synchronous block cannot be interrupted by another
+`async` caller's continuation. Once a function `await`s, everything
+before the `await` has already committed.
 
-The naive-looking alternative is **not** atomic:
-
-```ts
-// BROKEN — do not implement add() this way
-if (await this.has(key)) return false;
-await this.put(key, value, ttlSeconds);
-return true;
-```
-
-Two concurrent callers can both observe "key absent" at the `await`
-boundary before either has written, and both return `true`. That is
-exactly the bug `Lock.acquire()` depends on not existing — two holders of
-a mutual-exclusion lock.
+The `await` placement is therefore part of the contract. Checking the key
+with `await this.has(key)` before writing would let two concurrent
+callers both see the key as absent and both return `true`, and
+`Lock.acquire()` relies on that never happening, since it would mean two
+holders of a mutual-exclusion lock.
 
 The guarantee is scoped to **one Node process**. Two processes each with
 their own `ArrayCacheStore` share nothing at all.
@@ -337,7 +329,7 @@ their own `ArrayCacheStore` share nothing at all.
 ### `FileCacheStore`
 
 **One file per key** under a directory. Durable across restarts, and safe
-for several processes on one host to share — which is the combination it
+for several processes on one host to share. Which is the combination it
 exists for: a web server plus `queue:work` plus a `schedule:run` cron, no
 Redis.
 
@@ -345,8 +337,7 @@ Redis.
 { default: "file", stores: { file: { path: "storage/cache" } } }
 ```
 
-**`path` is a directory, not a file.** It was `storage/cache.json` before
-this store was one file per key; an app still pointing at a file gets an
+**`path` is a directory, not a file.** Pointing it at a file gets an
 error saying so rather than a bare `ENOTDIR`.
 
 ```
@@ -364,13 +355,13 @@ process has to remember to drop:
 - **`rename()` is atomic.** Every write goes to a temp file in the same
   directory, then renames over the target. A reader sees the whole old
   entry or the whole new one; a crash mid-write leaves the old one intact.
-- **`open(path, "wx")` is atomic create-if-absent** — which is exactly
+- **`open(path, "wx")` is atomic create-if-absent**: which is exactly
   `add()`'s contract, in one syscall, genuinely exclusive across
   processes.
 - **An `O_EXCL` lock file** for the two operations that are unavoidably
   read-modify-write: `increment()`, and the `add()` case where a key
   exists but has expired. Held for microseconds, and reclaimed by the next
-  caller if it is older than `STALE_LOCK_MS` (5s) — so a process killed
+  caller if it is older than `STALE_LOCK_MS` (5s), so a process killed
   while holding one cannot wedge a key permanently.
 
 **Reads never write.** `get()`/`has()` read one file; the only write on the
@@ -382,14 +373,14 @@ did not have, both of which were real:
 - **No lost updates.** That version serialized through an *in-process*
   promise chain, so two processes each did an unsynchronised
   read-modify-write of the whole file and the last writer won. Rate limits
-  undercounted, and `add()` returned `true` in two processes at once — so
+  undercounted, and `add()` returned `true` in two processes at once, so
   `Lock`, `WithoutOverlapping` and `rememberViaLock()` guarded nothing.
 - **A corrupt file costs one key, not the cache.** A plain `writeFile()`
   of a single file meant a crash mid-write left truncated JSON, and every
   subsequent read of *every* key threw.
 
 `prune()` (or `./artisan cache:prune`) deletes entries whose TTL has
-elapsed, plus any `.tmp`/`.lock` scratch file older than 5 seconds — the
+elapsed, plus any `.tmp`/`.lock` scratch file older than 5 seconds, the
 leftovers of a process killed mid-write. Schedule it if you write far more
 keys than you read back.
 
@@ -401,14 +392,14 @@ for you.
 
 Lives in `@mahiframework/redis`. `increment` maps to `INCRBY`, `add` to
 `SET key value NX EX ttl`, and `releaseLock` to a compare-and-delete Lua
-script — all genuinely atomic *across processes*, so every `Lock` and
-`RateLimiter` built on it becomes multi-process correct for free. Its
+script, all genuinely atomic *across processes*, so every `Lock` and
+`RateLimiter` built on it is multi-process correct without extra work. Its
 keys live under a `cache:` namespace inside the connection's `keyPrefix`,
 which is what stops `flush()` reaching the queue. See [Redis](../redis/).
 
 ## `CacheManager` and the `Cache` facade
 
-`CacheManager extends Manager<CacheStore>` — the same synchronous,
+`CacheManager extends Manager<CacheStore>`, the same synchronous,
 lazily-resolving, per-name-cached driver resolver as `DatabaseManager`.
 
 | Method | Returns | Notes |
@@ -423,8 +414,8 @@ The manager's `remember`/`rememberViaLock` take `storeName` as a **fourth**
 argument, after `ttlSeconds`, so the first three arguments match
 `CacheStore.remember()` exactly.
 
-`CacheServiceProvider` registers `array` and `file` via `extend()` — the
-same mechanism a plugin uses — plus the `RateLimiter` singleton at
+`CacheServiceProvider` registers `array` and `file` via `extend()`, the
+same mechanism a plugin uses, plus the `RateLimiter` singleton at
 `RATE_LIMITER_TOKEN`, bound to the app's **default** store. Neither
 built-in store implements `Connectable`, so there is no `boot()`.
 
@@ -434,7 +425,7 @@ built-in store implements `Connectable`, so there is no `boot()`.
 class Cache extends Facade<CacheManager>(() => CACHE_TOKEN)
 ```
 
-Two groups of statics, and the split matters:
+Two groups of statics:
 
 | Forwarded to the **default store** | Forwarded to the **manager** |
 |---|---|
@@ -446,14 +437,10 @@ await Cache.store("redis").put("key", value); // a specific store
 await Cache.remember("key", load, 300, "redis");
 ```
 
-There is no `Cache.put(..., store)` overload. For a non-default store, go
-through `Cache.store(name)` — which returns a plain `CacheStore` with the
-identical methods.
-
 Prefer injecting `CacheManager` via `CACHE_TOKEN` where you already have
 `app` (inside a `ServiceProvider`, a `Command`, a controller that received
 it). The facade is for call sites where threading it through is genuinely
-inconvenient — same guidance as `app()` itself.
+inconvenient, same guidance as `app()` itself.
 
 ## Locks
 
@@ -491,8 +478,8 @@ await lock.get(() => rebuildFeed());
 | `automaticReleaseAfterSeconds` | `number` | *(required)* | Seconds before the lock self-releases. |
 | `maximumWaitForSeconds` | `number` | `Infinity` | Seconds `acquire()` retries before throwing. |
 | `retryEvery` | `number` | `250` | **Milliseconds** between retries. |
-| `automaticReleaseAfter` | `number` | — | `@deprecated` millisecond spelling. Ignored when the seconds field is set. |
-| `maximumWaitFor` | `number` | — | `@deprecated` millisecond spelling. Ignored when the seconds field is set. |
+| `automaticReleaseAfter` | `number` |: | `@deprecated` millisecond spelling. Ignored when the seconds field is set. |
+| `maximumWaitFor` | `number` |: | `@deprecated` millisecond spelling. Ignored when the seconds field is set. |
 
 **`automaticReleaseAfterSeconds` is required.** Omitting both it and the
 deprecated millisecond alias throws from the constructor:
@@ -503,14 +490,14 @@ Lock requires an automatic-release TTL: pass `automaticReleaseAfterSeconds` (sec
 
 There is no default, because there is no safe default. The TTL is the only
 thing standing between a crashed holder and a permanently stuck lock, and
-its correct value is "somewhat longer than the work takes" — which the
+its correct value is "somewhat longer than the work takes", which the
 framework cannot know.
 
 **`retryEvery` is in milliseconds while everything else is in seconds.**
 It's the retry loop's own unit and never touches a store TTL. Read the
 signature.
 
-**`maximumWaitForSeconds: 0` means try once and throw immediately** — the
+**`maximumWaitForSeconds: 0` means try once and throw immediately**, the
 non-blocking acquire. That's what `WithoutOverlapping` job middleware uses,
 so a worker slot is never tied up waiting.
 
@@ -526,7 +513,7 @@ get<T>(callback: () => T | Promise<T>): Promise<T>
 waiting `block()` pair as in Laravel. One method, which always waits up to
 `maximumWaitForSeconds` (default: forever) and always throws
 `LockTimeoutError` on timeout rather than returning `false`. Safe to call
-again after a timeout — it retries from scratch.
+again after a timeout. It retries from scratch.
 
 **`release()` is owner-checked, atomically.**
 
@@ -547,14 +534,14 @@ async release(): Promise<void> {
 
 Each `Lock` instance carries a `randomUUID()` owner token written as the
 lock entry's value. If the lock expired and someone else re-acquired it,
-`release()` is a safe no-op — it will not delete a lock this instance no
+`release()` is a safe no-op. It will not delete a lock this instance no
 longer owns. You never manage the owner string yourself.
 
 The two branches are not equivalent, and the reason is the whole point of
 `CacheStore.releaseLock()`. The fallback is a `get()` and a `forget()`:
 two round-trips with a window in between. On a shared store the lock's TTL
 can expire *inside* that window, a second holder can acquire it, and the
-`forget()` then deletes **their** lock — two live holders of a
+`forget()` then deletes **their** lock. Two live holders of a
 mutual-exclusion lock, which is the single failure a lock exists to
 prevent. All three built-in stores implement `releaseLock()` (Redis via a
 compare-and-delete Lua script, the file store under its entry lock, the
@@ -562,13 +549,13 @@ array store synchronously), so the fallback only ever runs for a
 third-party store that predates the method.
 
 **`automaticReleaseAfterSeconds` is floored at 1 second.** `Math.ceil(0)`
-is `0`, which stores read as "no expiry" — so a lock configured with a
+is `0`, which stores read as "no expiry", so a lock configured with a
 zero TTL would have had no recovery path at all, and a
 `WithoutOverlapping({ expireAfterSeconds: 0 })` job would have wedged its
-job class forever. Redis rejects `EX 0` outright, so one second — the
-shortest lifetime it can express — is the floor everywhere.
+job class forever. Redis rejects `EX 0` outright, so one second, the
+shortest lifetime it can express, is the floor everywhere.
 
-**`get(callback)`** acquires, runs, and releases in a `finally` — so a
+**`get(callback)`** acquires, runs, and releases in a `finally`, so a
 throwing callback still frees the lock. Returns the callback's value.
 
 **There is no `block()` and no `forceRelease()`.** `acquire()` covers the
@@ -591,9 +578,9 @@ Exactly as exclusive as the underlying store's `add()`:
 
 | Store | Exclusive within one process | Exclusive across processes |
 |---|---|---|
-| `ArrayCacheStore` | Yes — synchronous `Map` check-then-set | No — nothing is shared |
-| `FileCacheStore` | Yes | **Yes**, on one host — `open(…, "wx")` is an atomic create |
-| `RedisCacheStore` | Yes | **Yes**, anywhere — `SET NX` is server-side atomic |
+| `ArrayCacheStore` | Yes, synchronous `Map` check-then-set | No, nothing is shared |
+| `FileCacheStore` | Yes | **Yes**, on one host. `open(…, "wx")` is an atomic create |
+| `RedisCacheStore` | Yes | **Yes**, anywhere. `SET NX` is server-side atomic |
 
 A `WithoutOverlapping` job middleware backed by the **array** store guards
 nothing at all once you run two workers. The file store fixes that for
@@ -625,8 +612,8 @@ class Limit {
 | `Limit.perDay` | `(maxAttempts, decayDays = 1)` | `86400 * decayDays` |
 | `Limit.none` | `()` | An `Unlimited` |
 
-**`perMinutes()` takes its arguments in the opposite order** — decay first,
-then max — matching Laravel's `Limit::perMinutes()`. `Limit.perMinute(5,
+**`perMinutes()` takes its arguments in the opposite order**, decay first,
+then max, matching Laravel's `Limit::perMinutes()`. `Limit.perMinute(5,
 2)` and `Limit.perMinutes(2, 5)` are the same limit. Every other static
 puts `maxAttempts` first. This is the one place to double-check.
 
@@ -634,14 +621,14 @@ Fluent modifiers:
 
 | Method | Effect |
 |---|---|
-| `by(key)` | Scope the limit to a signature — a user id, an IP, an API key. |
+| `by(key)` | Scope the limit to a signature, a user id, an IP, an API key. |
 | `after(callback)` | Only record a hit when `callback(result)` is truthy. |
 | `response(callback)` | Build a custom response when exceeded, instead of the default 429. |
 | `fallbackKey()` | A key derived from this limit's own attributes. |
 
 `after()` is what "only count failed logins" is made of. In HTTP,
 `throttle()` calls it with the `Response` **after** the handler runs, and
-only hits the counter when it returns true — a successful login costs
+only hits the counter when it returns true, a successful login costs
 nothing against the limit.
 
 `fallbackKey()` returns `` `${key ? key + ":" : ""}attempts:${maxAttempts}:decay:${decaySeconds}` ``.
@@ -656,7 +643,7 @@ class GlobalLimit extends Limit   // constructor(maxAttempts, decaySeconds = 60)
 class Unlimited extends GlobalLimit // constructor() — maxAttempts = Number.MAX_SAFE_INTEGER
 ```
 
-`GlobalLimit` is a limit with no per-key split — every caller shares one
+`GlobalLimit` is a limit with no per-key split, every caller shares one
 counter ("this endpoint may be called 1000 times/minute in total").
 
 `Unlimited` is a marker. Consumers check `instanceof Unlimited` and skip
@@ -743,7 +730,7 @@ return false;
 ```
 
 At-or-over the limit **and** the timer still live means blocked. At the
-limit with a dead timer means the window rolled over — reset the counter
+limit with a dead timer means the window rolled over, reset the counter
 and allow. This is why `resetAttempts()` (counter only) and `clear()`
 (both) are separate methods: clearing only the counter is precisely what
 window rollover needs.
@@ -755,8 +742,8 @@ const availableAt = (await this.cache.get<number>(`${key}:timer`)) ?? 0;
 return Math.max(0, availableAt - this.currentTime());
 ```
 
-It returns `0` for a key that was never hit, which is correct ("available
-now") but indistinguishable from "the window just ended". It's what
+It returns `0` for a key with no recorded attempts, which is correct
+("available now") but indistinguishable from "the window just ended". It's what
 `throttle()` puts in the `Retry-After` header and what `RateLimited` job
 middleware uses as its release delay.
 
@@ -780,7 +767,7 @@ if (result === false) { /* rate limited — the import did not run */ }
 ```
 
 `attempt()` returns `false` when limited, otherwise the callback's return
-value — or `true` if the callback returned `undefined`/`null`, so a
+value, or `true` if the callback returned `undefined`/`null`, so a
 void-returning callback can still signal "it ran".
 
 #### Named limiters
@@ -818,7 +805,7 @@ limiter.for("api", (request: Request) => [
 
 `limiter(name)` returns a resolver that runs the callback, normalises the
 result to an array, and rewrites any **duplicated** `.key` to that limit's
-`fallbackKey()` — so two `Limit.perMinute()` calls with no explicit
+`fallbackKey()`, so two `Limit.perMinute()` calls with no explicit
 `.by()` don't silently share one counter. Limits with distinct keys are
 left untouched.
 
@@ -834,7 +821,7 @@ HTTP limits can't collide with a manually-managed limiter key.
 
 ## Testing
 
-`ArrayCacheStore` is already the test-friendly one — no infrastructure, no
+`ArrayCacheStore` is already the test-friendly one, no infrastructure, no
 cleanup beyond a fresh instance per test, and it's what a generated app's
 `cache.default` points at. There is no cache fake because there doesn't
 need to be one.
@@ -859,7 +846,7 @@ re-runs on every call.
 immortal counter.
 
 **`Cache.flush()` hits the default store only.** So does
-`Cache.get`/`put`/`forget`. Non-default stores are untouched — which is
+`Cache.get`/`put`/`forget`. Non-default stores are untouched. Which is
 also why `./artisan cache:clear` on the default `array` store clears that
 CLI process's own empty `Map` and reports success. Pass `--store`.
 
@@ -872,7 +859,7 @@ removed when read, or by `prune()` / `./artisan cache:prune`. `flush()`
 deletes everything.
 
 **Cache JSON-shaped values.** A `Date` comes back a string and a `Map`
-comes back `{}` on `file`/`redis`, but survive intact on `array` — so a
+comes back `{}` on `file`/`redis`, but survive intact on `array`, so a
 bug here only shows up after you switch `CACHE_STORE`. See
 [Serialization](#serialization-differs-by-store-and-it-is-not-abstracted-away).
 
@@ -887,10 +874,10 @@ worst case.
 
 ## Related
 
-- [Queues](../queues/) — `RateLimited`, `WithoutOverlapping` and
+- [Queues](../queues/): `RateLimited`, `WithoutOverlapping` and
   `ThrottlesExceptions` job middleware are all built on this package
-- [Redis](../redis/) — the multi-process store, and why the built-ins
+- [Redis](../redis/): the multi-process store, and why the built-ins
   aren't
-- [Configuration](../configuration/) — `config/cache.ts`
-- [Providers](../providers/) — registering a custom store via `extend()`
-- [Routing](../routing/) — `throttle()` middleware
+- [Configuration](../configuration/): `config/cache.ts`
+- [Providers](../providers/): registering a custom store via `extend()`
+- [Routing](../routing/): `throttle()` middleware

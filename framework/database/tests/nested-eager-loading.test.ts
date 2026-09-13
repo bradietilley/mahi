@@ -122,7 +122,7 @@ class Post extends Model<PostAttributes>()({
   };
 }
 
-/** A `morphTo` pointing at two models with DIFFERENT relations — what `morphWith` exists for. */
+/** A `morphTo` pointing at two models with DIFFERENT relations, what `morphWith` exists for. */
 class Note extends Model<NoteAttributes>()({
   table: "notes",
   primaryKey: "id",
@@ -230,7 +230,7 @@ describe("Nested eager loading", () => {
     await Author.create({ id: "a2", team_id: "t2", name: "Bo" });
     await Author.create({ id: "a3", team_id: null, name: "Cy" });
 
-    // p1/p2 share author a1 — the case that makes de-duplication in
+    // p1/p2 share author a1. The case that makes de-duplication in
     // `collectRelated` observable.
     await Post.create({ id: "p1", author_id: "a1", parent_id: null, title: "First" });
     await Post.create({ id: "p2", author_id: "a1", parent_id: null, title: "Second" });
@@ -314,7 +314,7 @@ describe("Nested eager loading", () => {
       const posts = await Post.query().where("id", "p4").with("author.team").get();
       const p4 = posts.first()!;
 
-      // a3 has a null team_id — the path stops there rather than throwing.
+      // a3 has a null team_id, the path stops there rather than throwing.
       expect((p4 as any).author.name).toBe("Cy");
       expect((p4 as any).author.team).toBeUndefined();
     });
@@ -512,8 +512,8 @@ describe("Nested eager loading", () => {
     });
 
     it("leaves limit() working on an unconstrained builder", async () => {
-      // The guard is installed per constrained eager-load builder only —
-      // it must not leak onto ordinary queries.
+      // The guard is installed per constrained eager-load builder only.
+      // It must not leak onto ordinary queries.
       const posts = await Post.query().limit(2).get();
       expect(posts.count()).toBe(2);
     });
@@ -659,7 +659,7 @@ describe("Nested eager loading", () => {
       // the path is deliberately asserted past the type here.
       const notes = await Note.query()
         .where("notable_type", "post")
-        // @ts-expect-error a dot path cannot continue through a morphTo — use morphWith()
+        // @ts-expect-error a dot path cannot continue through a morphTo, use morphWith()
         .with("notable.comments")
         .get();
 

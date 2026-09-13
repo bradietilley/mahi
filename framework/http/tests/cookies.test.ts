@@ -119,7 +119,7 @@ describe("expiredCookie", () => {
 
 describe("withCookies", () => {
   it("appends without collapsing multiple Set-Cookie headers", () => {
-    // `Headers.set()` — and copying a Headers bag entry by entry — joins
+    // `Headers.set()`, and copying a Headers bag entry by entry, joins
     // them into one value no browser will parse.
     const response = withCookies(HttpResponse.json({}).toWeb(), ["a=1", "b=2"]);
     expect(response.headers.getSetCookie()).toEqual(["a=1", "b=2"]);
@@ -140,7 +140,7 @@ describe("withCookies", () => {
 
 describe("cookies through the framework boundary", () => {
   // Mahi handlers return platform `Response` objects, and Hono only
-  // merges its own queued headers into responses it built itself — so
+  // merges its own queued headers into responses it built itself, so
   // cookies must survive that boundary explicitly.
 
   function mount(register: (router: Router) => void, pipes: HttpPipe[] = []): Hono {
@@ -205,7 +205,7 @@ describe("cookies through the framework boundary", () => {
   });
 
   it("emits a cookie ONCE even with global middleware wrapping the route", async () => {
-    // The boundary runs once per pipeline frame — the route handler, then
+    // The boundary runs once per pipeline frame, the route handler, then
     // every enclosing global middleware on the way back out. Reading the
     // queue non-destructively made each frame re-emit it, so a real
     // browser login received two identical Set-Cookie headers. Caught by

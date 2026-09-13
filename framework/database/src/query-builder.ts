@@ -10,7 +10,7 @@ export type WhereOperator = "=" | "!=" | ">" | ">=" | "<" | "<=" | "like" | "is"
 
 /**
  * The set of value types this framework's drivers accept as a SQL
- * parameter binding — what a `?` placeholder in a compiled query is
+ * parameter binding, what a `?` placeholder in a compiled query is
  * actually filled with, and therefore what `getBindings()` reports.
  *
  * This is the type at the *bottom* of the value pipeline, after
@@ -18,15 +18,15 @@ export type WhereOperator = "=" | "!=" | ">" | ">=" | "<" | "<=" | "like" | "is"
  * `whereRaw()` binding and a write payload all accept the wider
  * `Bindable` (see `bindings.ts`), which additionally admits `DateTime`,
  * `Date`, `bigint` and model instances. `normalizeBinding()` reduces
- * those to this set during compilation, so everything below that point
- * — Kysely, `pg`/`mysql2`/`better-sqlite3` — only ever sees a value it
+ * those to this set during compilation, so everything below that point,
+ * Kysely, `pg`/`mysql2`/`better-sqlite3`, only ever sees a value it
  * can bind.
  */
 export type SqlBinding = string | number | boolean | null;
 
 /**
  * The trailing arguments of a `where(column, ...)`-shaped method once the
- * leading column/callback has been resolved — either `[operator, value]`
+ * leading column/callback has been resolved, either `[operator, value]`
  * (`where("price", ">", 5)`) or just `[value]` (`where("price", 5)`,
  * implicitly `"="`), matching Laravel's own two-or-three-argument
  * `where()` convention.
@@ -38,7 +38,7 @@ export type WhereArgs<
 
 /**
  * The trailing arguments of a `whereDate()`/`whereDay()`/`whereMonth()`/
- * `whereYear()`/`whereTime()`-shaped method — either `[operator, value]`
+ * `whereYear()`/`whereTime()`-shaped method, either `[operator, value]`
  * or just `[value]` (implicitly `"="`), parameterized over each method's
  * own accepted value type `V` (`string | Date` for `whereDate`/
  * `whereTime`, `string | number | Date` for `whereDay`/`whereMonth`/
@@ -46,18 +46,18 @@ export type WhereArgs<
  */
 export type DateWhereArgs<V> = [operator: WhereOperator, value: V] | [value: V];
 
-/** The trailing arguments of `whereJsonLength()`/`orWhereJsonLength()` — either `[operator, value]` or just `[value]` (implicitly `"="`). */
+/** The trailing arguments of `whereJsonLength()`/`orWhereJsonLength()`, either `[operator, value]` or just `[value]` (implicitly `"="`). */
 export type JsonLengthArgs = [operator: WhereOperator, value: number] | [value: number];
 
 /**
  * A callback used anywhere Laravel accepts a `Closure` in place of a
- * value list or scalar (`whereIn`, `whereExists`, ...) — receives a
+ * value list or scalar (`whereIn`, `whereExists`, ...), receives a
  * fresh, unbound `QueryBuilder` (this framework's `Query\Builder`
  * equivalent, matching Laravel's `forSubQuery()`) to mutate directly:
  *
  *   builder.whereIn("id", (q) => q.table("post_hashtag").select("post_id").where("hashtag_id", tagId));
  *
- * No Kysely syntax is ever exposed here — `table()` replaces Kysely's
+ * No Kysely syntax is ever exposed here, `table()` replaces Kysely's
  * `selectFrom()`, `select()` replaces column projection, and every
  * other `QueryBuilder` method (`where()`, `whereColumn()`, ...) works
  * exactly as it does on a top-level query. The callback's return value
@@ -69,17 +69,17 @@ export type SubqueryFactory = (query: QueryBuilder<Record<string, any>>) => void
 
 /**
  * Everything `whereIn()`/`whereExists()` (and friends) accept in place of
- * a value list — a `SubqueryFactory` closure, an already-built
+ * a value list, a `SubqueryFactory` closure, an already-built
  * `QueryBuilder` (e.g. `Related.query().toBase()`), or a raw `Expression`
- * (`Expression.raw(...)`, this framework's `DB::raw()` port — see
- * `expression.ts`) — matching Laravel's own `whereIn($column, $values)`
+ * (`Expression.raw(...)`, this framework's `DB::raw()` port, see
+ * `expression.ts`), matching Laravel's own `whereIn($column, $values)`
  * accepting a `Closure|Builder|Expression`.
  */
 export type Subquery = SubqueryFactory | QueryBuilder<any> | Expression;
 
 /**
  * Compiles a `Subquery` value into the Kysely expression `eb(...)`/
- * `eb.exists(...)` compile against — the one place this file still
+ * `eb.exists(...)` compile against, the one place this file still
  * touches Kysely internals to bridge a `QueryBuilder`/`Expression` into
  * a Kysely-compiled subquery.
  *
@@ -87,7 +87,7 @@ export type Subquery = SubqueryFactory | QueryBuilder<any> | Expression;
  * `SelectQueryBuilder`, which Kysely parenthesizes correctly wherever
  * it's used as an `IN`/`EXISTS` operand. A raw `Expression`, though, is
  * just an unparenthesized SQL fragment the user wrote by hand (`select
- * ...` with no wrapping) — explicitly wrapped in `(...)` here so it's
+ * ...` with no wrapping), explicitly wrapped in `(...)` here so it's
  * valid in both positions, matching what `QueryBuilder`'s own compiled
  * subqueries already produce.
  */
@@ -150,7 +150,7 @@ interface ColumnWhereNode {
   operator: WhereOperator;
   second: string;
   /**
-   * `second` names a column in the ENCLOSING query, not this one — set
+   * `second` names a column in the ENCLOSING query, not this one, set
    * by the correlated-existence builders in `EloquentBuilder`.
    *
    * `alias()` rewrites `{table}.col` to `{alias}.col` so a subquery's
@@ -158,7 +158,7 @@ interface ColumnWhereNode {
    * touch the outer reference, and normally can't: the two sides name
    * different tables. In a SELF-referential relation they name the same
    * one, so the outer half would be rewritten to the subquery's alias
-   * and the predicate would compare the subquery's row to itself —
+   * and the predicate would compare the subquery's row to itself,
    * `whereHas("replies")` matching everything or nothing rather than
    * correlating. The flag is the only thing that distinguishes them.
    */
@@ -187,11 +187,11 @@ interface GroupWhereNode {
 }
 
 /**
- * `whereDate`/`whereDay`/`whereMonth`/`whereYear`/`whereTime` — the
+ * `whereDate`/`whereDay`/`whereMonth`/`whereYear`/`whereTime`, the
  * component extracted from a date/time column. Each engine spells the
  * extraction differently (`strftime()`, `year()`, `extract()`), so the
  * node stores only which component was asked for and the active
- * `QueryGrammar` turns it into SQL — see `query/grammar.ts`.
+ * `QueryGrammar` turns it into SQL. See `query/grammar.ts`.
  */
 type DatePart = "date" | "day" | "month" | "year" | "time";
 
@@ -204,7 +204,7 @@ interface DatePartWhereNode {
   value: string;
 }
 
-/** `whereJsonContains`/`whereJsonContainsKey`/`whereJsonLength` — see the class docstring's "JSON where helpers" section. */
+/** `whereJsonContains`/`whereJsonContainsKey`/`whereJsonLength`. See the class docstring's "JSON where helpers" section. */
 interface JsonContainsWhereNode {
   type: "jsonContains";
   connector: Connector;
@@ -254,12 +254,12 @@ interface RawOrderClause {
   bindings: Bindable[];
 }
 
-/** `inRandomOrder()` — the function differs per engine, so the node records only the intent. */
+/** `inRandomOrder()`, the function differs per engine, so the node records only the intent. */
 interface RandomOrderClause {
   kind: "random";
 }
 
-/** A `selectRaw()` projection — a hand-written SQL fragment with `?` bindings. */
+/** A `selectRaw()` projection, a hand-written SQL fragment with `?` bindings. */
 interface RawSelectEntry {
   kind: "raw";
   sqlText: string;
@@ -268,7 +268,7 @@ interface RawSelectEntry {
 
 /**
  * A `(select count(*) from ...) as alias` projection built from another
- * `QueryBuilder` — what `EloquentBuilder.withCount()` adds.
+ * `QueryBuilder`, what `EloquentBuilder.withCount()` adds.
  *
  * Held as the builder itself rather than pre-compiled SQL so it is
  * embedded as a real Kysely subquery at execution time. Compiling it to
@@ -287,7 +287,7 @@ type SelectEntry = RawSelectEntry | CountSelectEntry;
 
 type OrderEntry = OrderClause | RawOrderClause | RandomOrderClause;
 
-/** A `HAVING` clause — either a basic `column operator value` or a raw SQL fragment. See `QueryBuilder.having()`/`havingRaw()`. */
+/** A `HAVING` clause, either a basic `column operator value` or a raw SQL fragment. See `QueryBuilder.having()`/`havingRaw()`. */
 interface BasicHavingNode {
   kind: "basic";
   connector: Connector;
@@ -312,7 +312,7 @@ type JoinType = "inner" | "left" | "cross";
  * One condition inside a join's `ON` clause. `kind: "value"` compares a
  * column against a bound value (`on("taggables.taggable_type", "post")`),
  * `kind: "ref"` compares two columns (`onRef("taggables.tag_id", "=",
- * "tags.id")`) — the same split `where()`/`whereColumn()` already make on
+ * "tags.id")`), the same split `where()`/`whereColumn()` already make on
  * the where side, carried into the join.
  */
 interface JoinOnNode {
@@ -331,7 +331,7 @@ interface JoinNode {
 }
 
 /**
- * The `ON`-clause accumulator handed to `join(table, callback)` — mirrors
+ * The `ON`-clause accumulator handed to `join(table, callback)`, mirrors
  * the where-tree design (each node carries its own `and`/`or` connector,
  * compiled into one Kysely expression at execution time) so a multi-
  * condition join reads the same way a grouped `where()` does:
@@ -346,14 +346,14 @@ interface JoinNode {
  * Deliberately narrower than Laravel's `JoinClause` (which is a full
  * `Query\Builder` and accepts every `where*()` method): `on`/`orOn` cover
  * value comparisons, `onRef`/`orOnRef` cover column comparisons, and
- * anything beyond that belongs in the outer `where()` — a join predicate
+ * anything beyond that belongs in the outer `where()`, a join predicate
  * complex enough to need `whereIn`/`whereExists` is a filter, not a join.
  */
 export class JoinClause {
-  /** @internal — read by `QueryBuilder.applyJoins()`. */
+  /** @internal, read by `QueryBuilder.applyJoins()`. */
   readonly ons: JoinOnNode[] = [];
 
-  /** `ON first = value` — a bound value comparison. Two-argument form implies `"="`. */
+  /** `ON first = value`, a bound value comparison. Two-argument form implies `"="`. */
   on(first: string, operator: WhereOperator, value: Bindable): this;
   on(first: string, value: Bindable): this;
   on(first: string, ...args: [WhereOperator, Bindable] | [Bindable]): this {
@@ -367,7 +367,7 @@ export class JoinClause {
     return this.push("or", "value", first, args);
   }
 
-  /** `ON first = second` where both sides are **columns** — the ordinary join predicate. */
+  /** `ON first = second` where both sides are **columns**, the ordinary join predicate. */
   onRef(first: string, operator: WhereOperator, second: string): this {
     this.ons.push({ connector: "and", kind: "ref", first, operator, second });
 
@@ -395,7 +395,7 @@ export class JoinClause {
 }
 
 /**
- * Compiles one `ON` node into a Kysely expression — the join-side twin
+ * Compiles one `ON` node into a Kysely expression, the join-side twin
  * of `compileNode()`.
  *
  * `normalize` is passed in rather than resolved here because this is a
@@ -430,7 +430,7 @@ function compileJoinOns(
   return result;
 }
 
-/** A `UNION`/`UNION ALL` operand — see `QueryBuilder.union()`. */
+/** A `UNION`/`UNION ALL` operand. See `QueryBuilder.union()`. */
 interface UnionNode {
   subquery: Subquery;
   all: boolean;
@@ -438,7 +438,7 @@ interface UnionNode {
 
 /**
  * Splits a Laravel-style `"json_col->nested->path"` column reference
- * into the base column and its path segments — mirrors Laravel's own
+ * into the base column and its path segments, mirrors Laravel's own
  * `CompilesJsonPaths::wrapJsonFieldAndPath()`, simplified (no bracket/
  * array-index segment support, which none of this framework's JSON
  * where helpers need yet).
@@ -460,7 +460,7 @@ function splitJsonColumn(column: string): JsonColumn {
  *
  * The zone is the whole point. These predicates compare against a
  * calendar field the *database* extracts from a stored value, and the
- * framework only ever stores UTC — so `whereDate("created_at",
+ * framework only ever stores UTC, so `whereDate("created_at",
  * DateTime.now())` from a machine in Perth must compare against the UTC
  * date, not the local one. Without the conversion, every query run
  * between midnight and 08:00 local would silently ask for the wrong day.
@@ -553,14 +553,14 @@ function splitRawSqlPlaceholders(sqlText: string): { fragments: string[]; placeh
     if (char === "?") {
       const next = sqlText[i + 1];
 
-      // `??` — the caller's explicit escape for a literal `?`.
+      // `??`, the caller's explicit escape for a literal `?`.
       if (next === "?") {
         current += "?";
         i++;
         continue;
       }
 
-      // Postgres JSON operators `?|` and `?&` — an operator, not a bind.
+      // Postgres JSON operators `?|` and `?&`, an operator, not a bind.
       if (next === "|" || next === "&") {
         current += char + next;
         i++;
@@ -587,7 +587,7 @@ function splitRawSqlPlaceholders(sqlText: string): { fragments: string[]; placeh
  * through Kysely's `sql` template tag so each binding is still sent as a
  * real parameter, never string-interpolated.
  *
- * See `splitRawSqlPlaceholders()` for which `?`s count as placeholders —
+ * See `splitRawSqlPlaceholders()` for which `?`s count as placeholders,
  * ones inside string/identifier quotes, `??` escapes and Postgres'
  * `?|`/`?&` JSON operators are not bind sites.
  */
@@ -604,21 +604,21 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
 }
 
 /**
- * Low-level, table-scoped query builder — mirrors Laravel's
+ * Low-level, table-scoped query builder, mirrors Laravel's
  * `Illuminate\Database\Query\Builder`: no `Model` awareness at all, just
  * a table name + a lazily-resolved connection + accumulated where/order/
  * limit/offset state, executed on demand.
  *
  * Connection resolution is deferred to execution time (`get()`/`first()`/
  * `count()`/`insert()`/`update()`/`delete()`), not bound eagerly at
- * construction — `resolveConnection` is called fresh on every execution,
+ * construction. `resolveConnection` is called fresh on every execution,
  * so a builder constructed inside a `transaction()` callback (via
  * `EloquentBuilder`/`Model`, whose `resolveConnection` checks the active
  * transaction context) picks up the transactional connection even though
  * the builder object itself was created before execution.
  *
  * Each chainable method **mutates `this` and returns `this`** (not a new
- * cloned instance) — matches Laravel's Builder ergonomics
+ * cloned instance), matches Laravel's Builder ergonomics
  * (`$query->where(...)` mutates `$query`), simpler than an immutable/
  * clone-per-call design, and consistent with `EloquentBuilder` wrapping
  * this class the same way.
@@ -626,9 +626,9 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  * ## Where clauses
  *
  * Every `where*()` method pushes a node onto an internal tree (not a
- * flat list) — each node carries its own `and`/`or` connector (Laravel's
+ * flat list), each node carries its own `and`/`or` connector (Laravel's
  * `$boolean`) and, for `where(callback)`/`orWhere(callback)`, a nested
- * child list — compiled recursively into a single Kysely expression via
+ * child list, compiled recursively into a single Kysely expression via
  * `eb.and()`/`eb.or()`/`eb.not()` at execution time. This is what makes
  * grouped conditions possible:
  *
@@ -638,7 +638,7 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  *   // WHERE active = 1 AND (role = 'admin' OR role = 'owner')
  *
  * `whereIn()`'s second argument accepts either a plain value array or a
- * `Subquery` (a callback, a `QueryBuilder`, or an `Expression`) —
+ * `Subquery` (a callback, a `QueryBuilder`, or an `Expression`),
  * matching real Laravel's `whereIn($column, $values)` overload (a
  * `Closure`/`Builder`/`Expression` compiles to a correlated subquery
  * instead of a value list). There is deliberately no separate
@@ -648,7 +648,7 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  *
  * `join()`/`leftJoin()`/`crossJoin()` widen the builder's row type rather
  * than fighting it: a join mixes columns from two tables, so the return
- * type is `QueryBuilder<TRow & TJoined>` — exactly what `selectRaw<TExtra>()`
+ * type is `QueryBuilder<TRow & TJoined>`, exactly what `selectRaw<TExtra>()`
  * already does for a raw aliased column. `leftJoin()` widens with
  * `Partial<TJoined>` instead, since an unmatched left row nulls every
  * joined column.
@@ -661,7 +661,7 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  *     .get();
  *
  * `union()`/`unionAll()` append another query's rows to this one's. Both
- * sides must project a matching column set — this builder can't check
+ * sides must project a matching column set. This builder can't check
  * that (it has no schema), so it's the caller's responsibility, same as
  * Laravel.
  *
@@ -669,7 +669,7 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  *
  * No vector/full-text search operators, no
  * `whereRowValues`/`whereAll`/`whereAny`/`whereNone`, no `dynamicWhere()`
- * (magic `whereName()` methods — against this codebase's "no magic"
+ * (magic `whereName()` methods, against this codebase's "no magic"
  * stance). `groupBy()`/`having()`/`havingRaw()` ARE supported (paired
  * with an aggregate `selectRaw()`); `countBy()` stays as single-call
  * sugar for the common "count per group" case.
@@ -682,9 +682,9 @@ function buildRawSqlExpression(sqlText: string, bindings: readonly unknown[]): a
  *
  * The builder itself is dialect-agnostic: it accumulates a tree of
  * nodes and lets Kysely spell the standard SQL. The handful of
- * constructs the engines genuinely disagree on — date-component
+ * constructs the engines genuinely disagree on, date-component
  * extraction, JSON containment/length, random ordering, upsert conflict
- * clauses, row locks — are delegated to a `QueryGrammar` resolved from
+ * clauses, row locks, are delegated to a `QueryGrammar` resolved from
  * the connection at execution time (see `query/grammar.ts`), so the
  * same builder chain compiles correctly against SQLite, MySQL and
  * Postgres.
@@ -703,7 +703,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   private selectColumns?: string[];
   private joins: JoinNode[] = [];
   private unions: UnionNode[] = [];
-  /** Set by `alias()` — kept apart from `tableName` so `qualify()` can rewrite real-table-qualified columns. */
+  /** Set by `alias()`, kept apart from `tableName` so `qualify()` can rewrite real-table-qualified columns. */
   private tableAlias?: string;
 
   constructor(
@@ -713,7 +713,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * The `QueryGrammar` for whichever engine this builder's connection
-   * talks to — the dialect-specific spellings of date extraction, JSON
+   * talks to, the dialect-specific spellings of date extraction, JSON
    * predicates, random ordering, upserts and row locks.
    *
    * Resolved fresh from the connection on every call rather than cached
@@ -727,7 +727,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * One bound value converted to a shape the driver accepts — a
+   * One bound value converted to a shape the driver accepts, a
    * `DateTime`/`Date` to UTC text, a `bigint` to a key, a model instance
    * to its key. See `normalizeBinding()` for why each conversion exists.
    *
@@ -781,13 +781,13 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * Rebinds this builder to a different table. `DB.table(name)` is the
    * front door for *starting* a query (Laravel's `DB::table()`); this
    * method is for retargeting an existing builder, so a nested subquery
-   * callback (`whereIn()`/`whereExists()`'s `Subquery` overload — see the
+   * callback (`whereIn()`/`whereExists()`'s `Subquery` overload. See the
    * class docstring) can point at a different table than the outer query
    * without ever touching Kysely's `selectFrom()` directly:
    *
    *   builder.whereIn("id", (q) => q.table("post_hashtag").select("post_id").where("hashtag_id", tagId));
    *
-   * Returns `QueryBuilder<Record<string, any>>` rather than `this` —
+   * Returns `QueryBuilder<Record<string, any>>` rather than `this`,
    * switching tables invalidates the original `TRow` typing (the new
    * table's columns aren't `TRow`'s), so `where()`/`select()` etc. widen
    * to accept arbitrary column names after a `table()` call, matching
@@ -800,7 +800,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Aliases this builder's table (`"posts as parent"`) — Laravel's
+   * Aliases this builder's table (`"posts as parent"`), Laravel's
    * `from($table, $as)`. Kysely's `selectFrom()` already accepts the
    * `"table as alias"` form, so `table("posts as parent")` works too;
    * this exists so the intent is explicit at call sites that *depend* on
@@ -815,14 +815,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * Clauses already accumulated that qualify a column with the **real
    * table name** are rewritten to the alias when they compile (see
    * `qualify()`). Aliasing is normally applied to an already-built
-   * builder — `whereHas()` takes the related model's scoped `query()`
-   * and *then* aliases it — so without that rewrite a global scope like
+   * builder, `whereHas()` takes the related model's scoped `query()`
+   * and *then* aliases it, so without that rewrite a global scope like
    * `SoftDeletes`, which must qualify its column to survive joins, would
    * emit `"posts"."deleted_at"` against a query whose only table is now
    * `posts__sub`. Bare (unqualified) columns are untouched: they resolve
    * against whatever the query's single table is, alias or not.
    *
-   * `TRow` is unchanged — an alias renames the table, not its columns.
+   * `TRow` is unchanged, an alias renames the table, not its columns.
    */
   alias(name: string): this {
     this.tableAlias = name;
@@ -830,7 +830,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** The table this builder selects from, including any `alias()` suffix — used by correlation builders that need to qualify columns. */
+  /** The table this builder selects from, including any `alias()` suffix, used by correlation builders that need to qualify columns. */
   getTable(): string {
     return this.tableAlias === undefined
       ? this.tableName
@@ -839,7 +839,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * Rewrites a `{real table}.column` reference to `{alias}.column` on an
-   * aliased builder — see `alias()`. A no-op with no alias set, and on
+   * aliased builder. See `alias()`. A no-op with no alias set, and on
    * any column qualified by some *other* table (a joined one, or the
    * outer query in a correlated predicate), which must keep pointing
    * where it points.
@@ -855,8 +855,8 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Adds an `INNER JOIN`, widening the row type to `TRow & TJoined` —
-   * see the class docstring's "Joins and unions" section. Pass `TJoined`
+   * Adds an `INNER JOIN`, widening the row type to `TRow & TJoined`.
+   * See the class docstring's "Joins and unions" section. Pass `TJoined`
    * explicitly to describe the columns the join projects; it is NOT
    * inferred (this builder has no schema to read).
    *
@@ -868,7 +868,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * `table` may be aliased (`"posts as parent"`), which is what makes a
    * self-join expressible.
    *
-   * A join does not project the joined table's columns on its own —
+   * A join does not project the joined table's columns on its own,
    * `selectAll()` on a joined query returns every column from every
    * table, with duplicate names colliding. Pair a join with an explicit
    * `select("posts.*", "users.name as author_name")` whenever the two
@@ -893,7 +893,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * Adds a `LEFT JOIN`, widening the row type to `TRow &
-   * Partial<TJoined>` — the joined columns are `undefined` on any row
+   * Partial<TJoined>`: the joined columns are `undefined` on any row
    * with no match, which `Partial` is the honest type for.
    */
   leftJoin<TJoined extends Record<string, any> = Record<string, any>>(
@@ -913,7 +913,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this.pushJoin("left", table, firstOrOn, second) as QueryBuilder<TRow & Partial<TJoined>>;
   }
 
-  /** Adds a `CROSS JOIN` — no `ON` clause, every row paired with every row. */
+  /** Adds a `CROSS JOIN`, no `ON` clause, every row paired with every row. */
   crossJoin<TJoined extends Record<string, any> = Record<string, any>>(
     table: string,
   ): QueryBuilder<TRow & TJoined> {
@@ -942,7 +942,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Appends another query's rows to this one's, deduplicated —
+   * Appends another query's rows to this one's, deduplicated,
    * Laravel's `union()`. Accepts the same `Subquery` shapes
    * `whereIn()`/`whereExists()` do (a callback, a built `QueryBuilder`,
    * or a raw `Expression`).
@@ -952,7 +952,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    *     .union((q) => q.table("drafts").where("author_id", userId))
    *     .get();
    *
-   * Both sides must project the same column set in the same order — this
+   * Both sides must project the same column set in the same order. This
    * builder has no schema to verify that with, so a mismatch surfaces as
    * a database error, same as Laravel. `TRow` is unchanged: a union
    * appends rows, never columns.
@@ -967,7 +967,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** `union()` keeping duplicate rows — Laravel's `unionAll()`. */
+  /** `union()` keeping duplicate rows, Laravel's `unionAll()`. */
   unionAll(subquery: Subquery): this {
     this.unions.push({ subquery, all: true });
 
@@ -1052,7 +1052,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** Exposes the accumulated where tree — used by `EloquentBuilder` to merge nested-builder state into a parent. */
+  /** Exposes the accumulated where tree, used by `EloquentBuilder` to merge nested-builder state into a parent. */
   getWheres(): WhereNode[] {
     return this.wheres;
   }
@@ -1142,7 +1142,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * `whereColumn()` where `second` belongs to the ENCLOSING query — the
+   * `whereColumn()` where `second` belongs to the ENCLOSING query, the
    * correlation predicate of an `EXISTS`/`IN` subquery.
    *
    * Framework-internal: `EloquentBuilder`'s existence builders use it so
@@ -1188,7 +1188,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** Escape hatch for a raw SQL fragment as a where condition — anything not covered by the typed methods above. */
+  /** Escape hatch for a raw SQL fragment as a where condition, anything not covered by the typed methods above. */
   whereRaw(sqlText: string, bindings: Bindable[] = []): this {
     this.wheres.push({ type: "raw", connector: "and", sqlText, bindings });
 
@@ -1210,7 +1210,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     const [operator, rawValue] = args.length === 2 ? args : (["=", args[0]] as const);
     // Formatted eagerly rather than at compile time (as `where()`'s
     // values are), because a date part is compared as an already-extracted
-    // calendar *field* — `"03"`, `"2024"` — not as a timestamp, so there
+    // calendar *field*, `"03"`, `"2024"`, not as a timestamp, so there
     // is nothing for the dialect to spell differently.
     const value =
       rawValue instanceof DateTime
@@ -1343,10 +1343,10 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * `column` may reference a nested path with `->` (e.g. `"meta->tags"`),
-   * matching Laravel's JSON-column dot-path convention — see
+   * matching Laravel's JSON-column dot-path convention. See
    * `splitJsonColumn()`. Compiles to whichever containment construct the
    * connection's engine provides (`json_each()` on SQLite,
-   * `json_contains()` on MySQL, `@>` on Postgres) — see
+   * `json_contains()` on MySQL, `@>` on Postgres). See
    * `query/grammar.ts`.
    */
   whereJsonContains(column: keyof TRow & string, value: Bindable): this {
@@ -1433,21 +1433,21 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this.orderBy(column, "desc");
   }
 
-  /** Orders by `column` descending — defaults to `"created_at"`, matching Laravel's `latest()`. */
+  /** Orders by `column` descending, defaults to `"created_at"`, matching Laravel's `latest()`. */
   latest<K extends keyof TRow & string>(
     column: K | "created_at" = "created_at" as K | "created_at",
   ): this {
     return this.orderBy(column as K, "desc");
   }
 
-  /** Orders by `column` ascending — defaults to `"created_at"`, matching Laravel's `oldest()`. */
+  /** Orders by `column` ascending, defaults to `"created_at"`, matching Laravel's `oldest()`. */
   oldest<K extends keyof TRow & string>(
     column: K | "created_at" = "created_at" as K | "created_at",
   ): this {
     return this.orderBy(column as K, "asc");
   }
 
-  /** Appends a raw `ORDER BY` fragment — escape hatch for expressions `orderBy()` can't express. */
+  /** Appends a raw `ORDER BY` fragment, escape hatch for expressions `orderBy()` can't express. */
   orderByRaw(sqlText: string, bindings: Bindable[] = []): this {
     this.orders.push({ kind: "raw", sqlText, bindings });
 
@@ -1455,7 +1455,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Shuffles the result rows — matches Laravel's `inRandomOrder()`.
+   * Shuffles the result rows, matches Laravel's `inRandomOrder()`.
    * Compiles to the engine's own random function (`RANDOM()` on
    * SQLite/Postgres, `RAND()` on MySQL), resolved at execution time
    * through the active `QueryGrammar`.
@@ -1468,7 +1468,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * Clears every accumulated `orderBy()`/`orderByRaw()` entry, optionally
-   * replacing it with a single new `orderBy(column, direction)` — matches
+   * replacing it with a single new `orderBy(column, direction)`, matches
    * Laravel's `reorder()`.
    */
   reorder<K extends keyof TRow & string>(column?: K, direction: "asc" | "desc" = "asc"): this {
@@ -1492,7 +1492,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Adds one or more `GROUP BY` columns — Laravel's `groupBy(...)`.
+   * Adds one or more `GROUP BY` columns, Laravel's `groupBy(...)`.
    * Accumulates across calls (`groupBy("a").groupBy("b")` groups by both).
    * Pair with an aggregate `selectRaw()` and/or `having()` to build
    * grouped-aggregate queries beyond what `countBy()` covers.
@@ -1509,7 +1509,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** Appends a raw `GROUP BY` fragment — escape hatch for grouped expressions `groupBy()` can't express. */
+  /** Appends a raw `GROUP BY` fragment, escape hatch for grouped expressions `groupBy()` can't express. */
   groupByRaw(sqlText: string, bindings: Bindable[] = []): this {
     this.rawGroups.push({ sqlText, bindings });
 
@@ -1546,7 +1546,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** Appends a raw `HAVING` fragment — escape hatch, same `?`-binding convention as `whereRaw()`. */
+  /** Appends a raw `HAVING` fragment, escape hatch, same `?`-binding convention as `whereRaw()`. */
   havingRaw(sqlText: string, bindings: Bindable[] = []): this {
     this.havings.push({ kind: "raw", connector: "and", sqlText, bindings });
 
@@ -1560,14 +1560,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Appends a raw, aliased SQL expression to the row's column set —
+   * Appends a raw, aliased SQL expression to the row's column set,
    * e.g. a correlated-subquery aggregate (`comments_count`) or a `CASE`
    * expression no typed method here covers. The SQL **must** alias its
    * result (`... AS column_name`); this builder has no separate "alias"
    * argument, matching Kysely's own `sql`-tag-select convention.
    *
-   * Explicit generic argument `TExtra` describes the shape the SQL adds
-   * — widens the builder's row type to `TRow & TExtra` from this call
+   * Explicit generic argument `TExtra` describes the shape the SQL adds,
+   * widens the builder's row type to `TRow & TExtra` from this call
    * onward, so `.get()`/`.first()` return rows typed with the extra
    * column(s) included:
    *
@@ -1576,14 +1576,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    *       "(select count(*) from comments where comments.post_id = posts.id) as comments_count",
    *     )
    *     .get();
-   *   posts.first()!.comments_count  // number — typed, not `any`
+   *   posts.first()!.comments_count  // number, typed, not `any`
    *   posts.first()!.title           // still typed from PostTable
    *
    * This is the one place `TRow` is deliberately widened rather than
-   * narrowed by a `where`-style filter — matches Laravel's
+   * narrowed by a `where`-style filter, matches Laravel's
    * `selectRaw()`, minus the JOIN this could otherwise require (the SQL
    * itself is a correlated subquery, so the result row shape stays
-   * exactly "one row per this table's row" — no join-caused duplication
+   * exactly "one row per this table's row", no join-caused duplication
    * or ambiguous column names).
    *
    * Like `whereRaw()`, `?` placeholders in `sqlText` are matched
@@ -1600,7 +1600,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Projects `(select count(*) from <subquery>) as alias` — the
+   * Projects `(select count(*) from <subquery>) as alias`, the
    * correlated-count column behind `EloquentBuilder.withCount()`.
    *
    * Takes the subquery as a live `QueryBuilder` rather than compiled
@@ -1615,13 +1615,13 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Restricts the column set the compiled `SELECT` projects — Laravel's
+   * Restricts the column set the compiled `SELECT` projects, Laravel's
    * `select()`, replacing (not appending to) any previous `select()`
    * call, same as Laravel. Omitted entirely, this builder defaults to
    * `select *` (`selectAll()`), same as a bare `DB::table(...)`.
    *
    * The primary reason to call this directly is building a subquery for
-   * `whereIn()`'s `Subquery` overload — a single-column projection is
+   * `whereIn()`'s `Subquery` overload. A single-column projection is
    * what makes the compiled SQL valid as an `IN (...)` operand:
    *
    *   builder.whereIn("id", (q) => q.table("post_hashtag").select("post_id").where("hashtag_id", tagId));
@@ -1629,7 +1629,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * The other is disambiguating a `join()`, where `*` would return
    * colliding duplicate column names. Wildcards are accepted alongside
    * named columns (`select("posts.*", "users.name as author_name")`),
-   * matching Laravel — see `startSelect()` for how the two are split
+   * matching Laravel. See `startSelect()` for how the two are split
    * apart for Kysely.
    */
   select(...columns: string[]): this {
@@ -1662,13 +1662,13 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * Locks the matching rows for the duration of the surrounding
-   * transaction — `SELECT ... FOR UPDATE` (exclusive) or `FOR SHARE`
+   * transaction, `SELECT ... FOR UPDATE` (exclusive) or `FOR SHARE`
    * (shared), the standard read-modify-write guard against two
    * concurrent transactions both reading a balance/stock level before
    * either writes it back.
    *
    * `true` (the default) is `FOR UPDATE`, `false` is `FOR SHARE`, and a
-   * string is emitted verbatim as the trailing clause — the escape
+   * string is emitted verbatim as the trailing clause, the escape
    * hatch for engine-specific modifiers this builder doesn't model
    * (`lock("for update nowait")`, `lock("for update skip locked")`),
    * matching Laravel's `lock($value)`.
@@ -1679,8 +1679,8 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * **A documented no-op on SQLite**, which has no row-level locking at
    * all (one writer per database file) and rejects the clause as a
    * syntax error. The intent is still recorded, so the same code runs
-   * unchanged against SQLite in tests and MySQL/Postgres in production
-   * — but on SQLite it provides no isolation beyond what the
+   * unchanged against SQLite in tests and MySQL/Postgres in production,
+   * but on SQLite it provides no isolation beyond what the
    * single-writer file already gives. Matches Laravel's own
    * `SQLiteGrammar::compileLock()`, which returns an empty string
    * unconditionally.
@@ -1691,12 +1691,12 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this;
   }
 
-  /** `lock(true)` — `SELECT ... FOR UPDATE`. Matches Laravel's `lockForUpdate()`. See `lock()`'s docstring re: SQLite. */
+  /** `lock(true)`, `SELECT ... FOR UPDATE`. Matches Laravel's `lockForUpdate()`. See `lock()`'s docstring re: SQLite. */
   lockForUpdate(): this {
     return this.lock(true);
   }
 
-  /** `lock(false)` — `SELECT ... FOR SHARE`. Matches Laravel's `sharedLock()`. See `lock()`'s docstring re: SQLite. */
+  /** `lock(false)`, `SELECT ... FOR SHARE`. Matches Laravel's `sharedLock()`. See `lock()`'s docstring re: SQLite. */
   sharedLock(): this {
     return this.lock(false);
   }
@@ -1711,8 +1711,8 @@ export class QueryBuilder<TRow extends Record<string, any>> {
       case "in": {
         // An empty value list has no valid SQL form: `in ()` is a syntax
         // error on MySQL and Postgres (SQLite happens to tolerate it).
-        // Laravel compiles the constant instead — `whereIn` with nothing
-        // to match matches nothing, `whereNotIn` matches everything —
+        // Laravel compiles the constant instead, `whereIn` with nothing
+        // to match matches nothing, `whereNotIn` matches everything,
         // which is also the only reading that keeps a filter built from
         // a user-supplied list from 500ing when that list is empty.
         if (Array.isArray(node.values) && node.values.length === 0) {
@@ -1811,7 +1811,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Applies every accumulated `join()`/`leftJoin()`/`crossJoin()` —
+   * Applies every accumulated `join()`/`leftJoin()`/`crossJoin()`,
    * called immediately after `startSelect()` and **before**
    * `applyWheres()` everywhere a SELECT is built, so a where clause may
    * reference a joined table's columns.
@@ -1836,7 +1836,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return result;
   }
 
-  /** Applies every accumulated `union()`/`unionAll()` operand — called last, after ordering/limit, matching SQL's own clause order. */
+  /** Applies every accumulated `union()`/`unionAll()` operand, called last, after ordering/limit, matching SQL's own clause order. */
   private applyUnions(qb: SelectQueryBuilder<any, any, any>): SelectQueryBuilder<any, any, any> {
     let result = qb;
 
@@ -1939,7 +1939,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * The bare `FROM {table} {joins}` clause every SELECT-shaped query
-   * starts from, with no projection applied yet — split out from
+   * starts from, with no projection applied yet, split out from
    * `startSelect()` because Kysely requires joins to be declared
    * **before** column projection (`selectFrom(t).innerJoin(...).select(...)`),
    * and because the aggregate terminals (`count()`/`exists()`/`min()`/...)
@@ -1962,7 +1962,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   /**
    * Starts a fresh `SELECT` against this builder's table (joins applied),
    * projecting either the explicit `select()` column list (if set) or
-   * every column (`selectAll()`, Laravel's default `select *`) — shared
+   * every column (`selectAll()`, Laravel's default `select *`), shared
    * by `buildSelect()`/`first()`/`chunk()`/`lazy()` so all of them honor
    * an explicit `select()` call the same way.
    */
@@ -1977,7 +1977,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     // named columns and `selectAll()` for `*`/`table.*` wildcards (which
     // it rejects as a `select()` argument). Laravel takes both through
     // one `select()`, so the split happens here rather than at call
-    // sites — `select("posts.*", "users.name as author")` is the normal
+    // sites. `select("posts.*", "users.name as author")` is the normal
     // idiom on a joined query and has to work.
     const wildcards: string[] = [];
     const named: string[] = [];
@@ -2031,7 +2031,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    *
    * Skipped entirely on SQLite, where there is no row-level lock to
    * take and Kysely emits `for update` into SQL the engine then fails
-   * to parse — see `lock()`'s docstring.
+   * to parse. See `lock()`'s docstring.
    *
    * A string `lock("for update nowait")` is passed through verbatim as
    * a raw clause, matching Laravel's `lock($value)` escape hatch for
@@ -2060,8 +2060,8 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * This builder as a scalar `COUNT(*)` subquery — `(select count(*)
-   * from {table} where {this builder's wheres})` — returned as a Kysely
+   * This builder as a scalar `COUNT(*)` subquery, `(select count(*)
+   * from {table} where {this builder's wheres})`, returned as a Kysely
    * expression ready to be aliased into an outer query's projection.
    *
    * Ignores `orderBy()`/`limit()`/`offset()` (same as `count()`), and
@@ -2069,7 +2069,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * correlated existence/count subquery only ever needs the row count.
    *
    * Used by `EloquentBuilder.withCount()` (through `selectCount()`) to
-   * add a `{relation}_count` column — the accumulated `where()`
+   * add a `{relation}_count` column, the accumulated `where()`
    * conditions carry the relation's correlation (`related.fk =
    * parent.local`) plus any `whereHas`-style constraining callback the
    * caller applied.
@@ -2082,7 +2082,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * specifically so the outer query embeds it as a subquery Kysely
    * compiles itself. Handing back a SQL string forced the caller to
    * re-parse it through `selectRaw()`'s `?`-splitting, which is wrong on
-   * any engine that numbers its placeholders — on Postgres the compiled
+   * any engine that numbers its placeholders, on Postgres the compiled
    * fragment contains `$1` and no `?` at all, so the bindings could not
    * be reattached.
    */
@@ -2101,7 +2101,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    *
    * Compiles with `LIMIT 1` (unless a smaller/equal explicit `limit()`
    * is already set), which Kysely's `executeTakeFirst()` does NOT add on
-   * its own — it is `const [row] = await execute()`, so without this the
+   * its own. It is `const [row] = await execute()`, so without this the
    * database materialises and ships the *entire* result set to discard
    * all but the first row. `find()`, `findOrFail()`, `firstOrCreate()`,
    * `refresh()` and every `belongsTo().first()` all route through here.
@@ -2123,7 +2123,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     qb = this.applyHavings(qb);
     qb = this.applyUnions(qb);
     qb = this.applyOrders(qb);
-    // Always exactly one row — Laravel's `take(1)`. An earlier `limit()`
+    // Always exactly one row, Laravel's `take(1)`. An earlier `limit()`
     // doesn't narrow this: `first()` means "the first row", and the old
     // `Math.min(limit, 1)` only ever differed for `limit(0)`, where it made
     // `first()` silently return nothing.
@@ -2138,7 +2138,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * True when this query's row count can't be obtained by swapping the
-   * projection for `count(*)` — because the clauses that decide *how
+   * projection for `count(*)`, because the clauses that decide *how
    * many rows come back* live above the `WHERE`.
    *
    * `groupBy` collapses rows into groups (a bare `count(*)` would return
@@ -2147,7 +2147,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * deduplicates the projection; a `union` appends another query's rows
    * entirely. In every case the honest count is "how many rows does the
    * finished query produce", which needs the finished query as a
-   * subquery — Laravel's `getCountForPagination()` makes the same split.
+   * subquery, Laravel's `getCountForPagination()` makes the same split.
    */
   private needsCountSubquery(): boolean {
     return (
@@ -2160,14 +2160,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Counts rows matching this builder's accumulated `where()` conditions
-   * — deliberately ignores `orderBy()`/`limit()`/`offset()`, so
+   * Counts rows matching this builder's accumulated `where()` conditions,
+   * deliberately ignores `orderBy()`/`limit()`/`offset()`, so
    * pagination's "total across all pages" is correct even though the
    * same builder chain also has a page-sized `limit`/`offset` applied
    * (mirrors Laravel's `Builder::getCountForPagination()`).
    *
    * `groupBy`/`having`/`distinct`/`union` queries are counted by wrapping
-   * the whole query as a subquery (`select count(*) from (…)`) — see
+   * the whole query as a subquery (`select count(*) from (…)`). See
    * `needsCountSubquery()`.
    */
   async count(): Promise<number> {
@@ -2183,7 +2183,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * `select count(*) from ({this query}) as aggregate` — the count for a
+   * `select count(*) from ({this query}) as aggregate`, the count for a
    * grouped/distinct/having/union query.
    *
    * Built through a `clone()` with the ordering and paging stripped: an
@@ -2250,7 +2250,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * `GROUP BY column` + `COUNT(*)` over this builder's accumulated
-   * `where()` conditions, returned as a `column value -> count` map —
+   * `where()` conditions, returned as a `column value -> count` map,
    * the in-builder replacement for hand-rolling a raw Kysely
    * `groupBy()`/`countAll()` query (Eloquent has no single-call
    * equivalent either; this is this framework's own addition, used for
@@ -2267,14 +2267,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Processes matching rows in offset-based pages of `size` — Laravel's
+   * Processes matching rows in offset-based pages of `size`, Laravel's
    * `chunk()`. Runs one `SELECT ... LIMIT size OFFSET n` per page until a
    * short page is returned, calling `callback` with each page's rows.
    * Return `false` from `callback` to stop early (matching Laravel).
    *
    * Honors this builder's own `where`/`orderBy` (an explicit `orderBy` is
    * strongly recommended for stable paging); ignores any pre-set
-   * `limit`/`offset` (this method manages them). Immune to nothing —
+   * `limit`/`offset` (this method manages them). Immune to nothing,
    * unlike `chunkById()`, offset paging can skip/repeat rows if the
    * underlying data is mutated mid-iteration; for that use `each()` over
    * a stable ordering or fetch ids up front.
@@ -2313,7 +2313,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * Calls `callback` once per matching row, fetched in offset-based pages
-   * of `size` behind the scenes — Laravel's `each()`. Return `false` from
+   * of `size` behind the scenes, Laravel's `each()`. Return `false` from
    * `callback` to stop early. Built on `chunk()`.
    */
   async each(
@@ -2336,7 +2336,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
 
   /**
    * An async generator yielding matching rows one at a time, fetched in
-   * offset-based pages of `size` — Laravel's `lazy()`, adapted to Node's
+   * offset-based pages of `size`, Laravel's `lazy()`, adapted to Node's
    * `for await` (a more natural fit than PHP's `Generator`).
    *
    *   for await (const row of Model.query().orderBy("id").toBase().lazy()) {
@@ -2367,7 +2367,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Alias for `lazy()` — Laravel's `Query\Builder::cursor()`. On this
+   * Alias for `lazy()`, Laravel's `Query\Builder::cursor()`. On this
    * driver it pages rather than doing true single-row PDO streaming
    * (better-sqlite3 has no incremental cursor API through Kysely), but
    * exposes the same `for await` interface so call sites are portable if
@@ -2380,7 +2380,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   /**
    * The table name the write terminals (`insert`/`update`/`delete`/
    * `upsert`/`increment`) target. `alias()` and `join()` are SELECT-only
-   * here — SQLite supports neither an aliased `UPDATE` target nor
+   * here, SQLite supports neither an aliased `UPDATE` target nor
    * `UPDATE ... JOIN`, so rather than silently dropping them (emitting a
    * statement that quietly writes the wrong rows) this throws.
    */
@@ -2402,14 +2402,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Inserts a row and returns the values passed in — **not** the stored
+   * Inserts a row and returns the values passed in, **not** the stored
    * row, so a DB-generated key or column default is not reflected back.
    * `Model.create()` is the path that reads a generated primary key (see
    * `insertAndReadGeneratedId()`).
    *
    * Takes `Partial<TRow>`, not `TRow`: requiring every column would make a
    * column with a database default (`created_at`, a `DEFAULT 0` flag) or a
-   * generated key impossible to omit — the very columns this method
+   * generated key impossible to omit, the very columns this method
    * documents as not being read back. `Model.create()` is `Partial` for
    * the same reason.
    */
@@ -2456,8 +2456,8 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    *
    * Every `attributes` predicate is added to a **clone**, never to
    * `this`. This method reads and then writes, so the naive form pushes
-   * the same where-group onto the builder twice and — because this
-   * builder mutates in place (see the class docstring) — leaves both
+   * the same where-group onto the builder twice and, because this
+   * builder mutates in place (see the class docstring), leaves both
    * behind permanently, poisoning every later use of the same chain.
    */
   async updateOrInsert(attributes: Partial<TRow>, values: Partial<TRow> = {}): Promise<boolean> {
@@ -2488,14 +2488,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    * columns instead (defaults to every column in `values` when
    * omitted). Matches Laravel's `Query\Builder::upsert()`.
    *
-   * The conflict clause itself is dialect-specific — `ON CONFLICT
+   * The conflict clause itself is dialect-specific, `ON CONFLICT
    * (cols) DO UPDATE ... excluded.col` on SQLite/Postgres, `ON
-   * DUPLICATE KEY UPDATE ... VALUES(col)` on MySQL — so it is delegated
+   * DUPLICATE KEY UPDATE ... VALUES(col)` on MySQL, so it is delegated
    * to the active `QueryGrammar`. One consequence worth knowing:
    * MySQL's form has no conflict-target list, so **any** unique index
    * on the table triggers the update there, not only `uniqueBy`.
    */
-  // `Partial<TRow>[]` for the same reason as `insert()` — see its docstring.
+  // `Partial<TRow>[]` for the same reason as `insert()`. See its docstring.
   async upsert(
     values: Partial<TRow>[],
     uniqueBy: (keyof TRow & string) | (keyof TRow & string)[],
@@ -2575,7 +2575,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Escape hatch — the underlying Kysely SELECT builder, with this
+   * Escape hatch, the underlying Kysely SELECT builder, with this
    * builder's `where`/`orderBy`/`limit`/`offset`/`distinct` already
    * applied, for anything not covered above (joins, column projection,
    * vector/full-text/JSON operators).
@@ -2584,15 +2584,15 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return this.buildSelect();
   }
 
-  /** The compiled SELECT SQL for this builder's current state, with `?` placeholders in place of bound values — matches Laravel's `toSql()`. */
+  /** The compiled SELECT SQL for this builder's current state, with `?` placeholders in place of bound values, matches Laravel's `toSql()`. */
   toSql(): string {
     return this.buildSelect().compile().sql;
   }
 
   /**
    * The compiled SELECT SQL with every bound value substituted directly
-   * into the string (for logging/debugging only — never execute this
-   * string against a real connection) — matches Laravel's `toRawSql()`.
+   * into the string (for logging/debugging only, never execute this
+   * string against a real connection), matches Laravel's `toRawSql()`.
    */
   toRawSql(): string {
     const compiled = this.buildSelect().compile();
@@ -2605,14 +2605,14 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     });
   }
 
-  /** The positional bound values for this builder's current SELECT state, in the same order as `toSql()`'s `?` placeholders — matches Laravel's `getBindings()`. */
+  /** The positional bound values for this builder's current SELECT state, in the same order as `toSql()`'s `?` placeholders, matches Laravel's `getBindings()`. */
   getBindings(): readonly SqlBinding[] {
     return this.buildSelect().compile().parameters as readonly SqlBinding[];
   }
 
   /**
    * Returns a new `QueryBuilder` with the same accumulated `where`/
-   * `order`/`limit`/`offset`/`distinct`/`lock` state — mutating the
+   * `order`/`limit`/`offset`/`distinct`/`lock` state, mutating the
    * clone (or the original) afterwards does not affect the other.
    * Matches Laravel's `clone()`; unlike Laravel, this builder otherwise
    * mutates `this` on every chained call (see the class docstring), so
@@ -2644,7 +2644,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
   }
 
   /**
-   * Conditionally apply a callback — Laravel's `Conditionable::when()`.
+   * Conditionally apply a callback, Laravel's `Conditionable::when()`.
    * A function `value` is invoked with `this` to produce the condition.
    * The callback's return is used when it isn't `null`/`undefined`;
    * otherwise `this` is returned so a void callback still chains.
@@ -2652,7 +2652,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
    */
   // The closure-condition overload is declared FIRST. Overloads resolve in
   // order, and the value overload's `TValue extends (...) => _R ? never :
-  // TValue` guard resolves to `never` for a function argument — which
+  // TValue` guard resolves to `never` for a function argument, which
   // still *matches*, binding `TValue` to `never` and leaving the callback
   // parameter an implicit `any`. Putting the closure form first means
   // `when((q) => ..., (q) => ...)` infers `q` properly.
@@ -2674,7 +2674,7 @@ export class QueryBuilder<TRow extends Record<string, any>> {
     return applyWhen(this, value, callback, defaultCb, false);
   }
 
-  // Closure-condition overload first — see the note on `when()`.
+  // Closure-condition overload first. See the note on `when()`.
   unless<TValue, TReturn = this>(
     value: (builder: this) => TValue,
     callback: (builder: this, value: TValue) => TReturn | void,

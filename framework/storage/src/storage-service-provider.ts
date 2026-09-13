@@ -9,10 +9,10 @@ export { STORAGE_TOKEN };
 /**
  * Registers the `StorageManager` singleton and a `LocalStorageDriver`
  * factory for every configured disk whose `driver` is `"local"` (or
- * omitted — local is the default). Same `extend()` mechanism a plugin
+ * omitted. Local is the default). Same `extend()` mechanism a plugin
  * would use to add e.g. an "s3" disk later; those disks are skipped
  * here so the plugin's own `extend(name, ...)` can own them. No
- * `boot()` needed — `LocalStorageDriver` has no async warm-up
+ * `boot()` needed. `LocalStorageDriver` has no async warm-up
  * (`mkdir`/`writeFile` happen lazily per-call, same "sync driver
  * construction, lazy I/O" philosophy already established for
  * `DatabaseManager`/`CacheManager`).

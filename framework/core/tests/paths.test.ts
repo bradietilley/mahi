@@ -92,7 +92,7 @@ describe("paths", () => {
     });
 
     /**
-     * The derived helpers take no part in this — they already delegate to
+     * The derived helpers take no part in this. They already delegate to
      * `base_path()`. Asserted anyway because it is the entire point: an
      * app sets one root and its database, storage and logs all relocate
      * with it.

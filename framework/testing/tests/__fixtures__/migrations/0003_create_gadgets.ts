@@ -6,7 +6,7 @@ const migration: Migration = {
     await Schema.create("gadgets", (table: Blueprint) => {
       table.string("id").primary();
       table.string("name");
-      // Deliberately NOT named `deleted_at` — the assertions must read the
+      // Deliberately NOT named `deleted_at`. The assertions must read the
       // column off the model rather than assuming the conventional name.
       table.timestamp("archived_at").nullable();
     });

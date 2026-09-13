@@ -13,7 +13,7 @@ declare module "@mahiframework/core" {
      * Contribute global HTTP pipes, run ahead of route dispatch for every
      * request via `@mahiframework/pipeline`'s `Pipeline` (see
      * `middleware/pipeline-middleware.ts`). Collected by HttpKernel in
-     * provider registration order — a provider earlier in `config/app.ts`'s
+     * provider registration order, a provider earlier in `config/app.ts`'s
      * `providers[]` runs its pipes before a later provider's.
      */
     middleware?(): HttpPipe[];

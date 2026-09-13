@@ -31,7 +31,7 @@ export class CacheManager extends Manager<CacheStore> {
 
   /**
    * Replace the resolved store for a name (default if omitted), bypassing
-   * the configured factory and any cached instance — the cache analogue
+   * the configured factory and any cached instance, the cache analogue
    * of `QueueManager.swap()`. The test-only primitive behind
    * `createTestApplication({ fakeCache: true })`, which points the default
    * store at a fresh in-memory `ArrayCacheStore`; production code
@@ -46,7 +46,7 @@ export class CacheManager extends Manager<CacheStore> {
   }
 
   /**
-   * Get-or-compute-and-store on the named (or default) store — delegates
+   * Get-or-compute-and-store on the named (or default) store, delegates
    * to `CacheStore.remember()` after resolving which store to use.
    * Argument order matches `CacheStore.remember()`'s
    * `(key, callback, ttlSeconds)` exactly; `storeName` is the one extra
@@ -61,7 +61,7 @@ export class CacheManager extends Manager<CacheStore> {
     return this.store(storeName).remember(key, callback, ttlSeconds);
   }
 
-  /** Like `remember()`, but stampede-safe — see `CacheStore.rememberViaLock()`. */
+  /** Like `remember()`, but stampede-safe. See `CacheStore.rememberViaLock()`. */
   async rememberViaLock<T>(
     key: string,
     callback: () => T | Promise<T>,

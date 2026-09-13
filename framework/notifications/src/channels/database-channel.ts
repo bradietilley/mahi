@@ -12,8 +12,8 @@ import type { NotificationRoutable } from "../notifiable.js";
  * `table`), so a notifiable that IS a model needs nothing extra and
  * agrees with whatever a `morphMany`/`morphTo` on the same table would
  * write. `table` remains accepted for the plain-adapter notifiables the
- * guide documents — classes that implement `NotificationRoutable` without
- * extending `Model` — which have no `morphAlias()` to call.
+ * guide documents, classes that implement `NotificationRoutable` without
+ * extending `Model`, which have no `morphAlias()` to call.
  */
 interface NotifiableClass {
   morphAlias?: () => string;
@@ -25,7 +25,7 @@ interface NotifiableClass {
  * `instance.constructor`.
  *
  * A live `Model` is `Proxy`-wrapped and its `get` trap binds every
- * function-valued property it returns — including `constructor` — and a
+ * function-valued property it returns, including `constructor`, and a
  * bound function carries none of the original's statics. So
  * `instance.constructor.table` reads `undefined` for a real model, which
  * is exactly the trap `ModelRegistry.nameFor()` and `loadMany()` document.
@@ -41,14 +41,14 @@ function notifiableClassOf(notifiable: NotificationRoutable): NotifiableClass {
  * later (an in-app "notification bell").
  *
  * The table carries an explicit `notifiable_type` + `notifiable_id` pair,
- * written by a manual insert here rather than through a relation — the
+ * written by a manual insert here rather than through a relation. The
  * row is created before anything would read it back as one, and the
  * insert needs no relation machinery.
  *
  * `notifiable_type` comes from the notifiable class's `morphAlias()`
  * (`@mahiframework/database`'s morph-map → `morphName` → `table` chain), so a
  * notifiable that's a real `Model` writes the same discriminant a
- * `morphMany`/`morphTo` against the same table would — which is what
+ * `morphMany`/`morphTo` against the same table would. Which is what
  * makes `Notification`'s own `notifiable` relation resolve. Plain adapter
  * classes that implement `NotificationRoutable` without extending `Model`
  * fall back to their static `table`.
@@ -86,7 +86,7 @@ export class DatabaseChannel implements NotificationChannel {
   }
 
   /**
-   * The discriminant to store for this notifiable — `morphAlias()` when
+   * The discriminant to store for this notifiable, `morphAlias()` when
    * the class has one (every `Model` does), else its static `table`.
    *
    * Note `morphAlias()` can itself throw `ClassMorphViolationError` under

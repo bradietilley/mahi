@@ -1,11 +1,11 @@
 /**
- * The parsed shape of an eager-load request — the state behind
+ * The parsed shape of an eager-load request, the state behind
  * `EloquentBuilder.with()` and `Model.load()`.
  *
  * ## Why a tree
  *
  * A flat queue of local relation names (`eagerLoad: string[]`) makes
- * three things impossible: a dot path (`with("author.team")` — no place
+ * three things impossible: a dot path (`with("author.team")`, no place
  * to hang the second segment), a constraining closure (no per-name
  * payload), and `morphWith` (no per-discriminant payload). All three are
  * properties of a *node*, not of a flat list, so the request is a tree
@@ -13,13 +13,13 @@
  *
  * The query-count contract: one batched query per relation **node** in
  * the tree. A three-level path is three queries no matter how many rows
- * are involved — never N+1. (`morphTo` is the documented exception at
+ * are involved, never N+1. (`morphTo` is the documented exception at
  * O(distinct types).)
  */
 
 /** A single relation in a parsed eager-load request. */
 export interface EagerLoadNode {
-  /** The local relation name — one dot-path segment, never a path itself. */
+  /** The local relation name, one dot-path segment, never a path itself. */
   name: string;
 
   /**
@@ -59,7 +59,7 @@ function emptyNode(name: string): EagerLoadNode {
  * Merge semantics follow Laravel's `parseWithRelations`: a path implies
  * every prefix of itself, and repeated prefixes reuse the same node
  * rather than duplicating it. So `with("author.team")` then
- * `with("author.posts")` yields ONE `author` node with two children —
+ * `with("author.posts")` yields ONE `author` node with two children,
  * hence one `author` query, not two. A later constraint on an existing
  * node replaces that node's constraint (last call wins) rather than
  * silently dropping it.
@@ -177,7 +177,7 @@ export class MorphToSpec {
    *     video: (q) => q.where("visibility", "public"),
    *   })
    *
-   * Types absent from the map are left unconstrained — this filters what
+   * Types absent from the map are left unconstrained. This filters what
    * a resolved parent must look like, it does not restrict which types
    * are resolvable.
    */
@@ -188,7 +188,7 @@ export class MorphToSpec {
   }
 
   /**
-   * Declares nested relations to eager-load per morph type — Laravel's
+   * Declares nested relations to eager-load per morph type, Laravel's
    * `morphWith()`.
    *
    *   Comment.query().with({
@@ -200,10 +200,10 @@ export class MorphToSpec {
    *
    * `with("commentable.author")` can't express this: the segment after
    * the dot has to name a relation on ONE related model, and a morphTo
-   * has several. Keying by discriminant is what makes it well-defined —
+   * has several. Keying by discriminant is what makes it well-defined.
    * `Post` has `tags`, `Video` needn't.
    *
-   * A type absent from the map loads no children (not an error — a mixed
+   * A type absent from the map loads no children (not an error, a mixed
    * page routinely contains types you have nothing extra to load for).
    * Costs no extra queries beyond the children themselves, since a
    * `morphTo` already resolves one query per distinct type.

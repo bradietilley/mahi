@@ -12,7 +12,7 @@ import type { SequenceResolver } from "./sequence-resolver.js";
  * entries older than one second.
  *
  * The stored sequence is incremented then returned, so the first ID in a
- * given microsecond gets sequence `1` (not `0`) — matching PHP, so a
+ * given microsecond gets sequence `1` (not `0`), matching PHP, so a
  * shared sequence file is interoperable across languages.
  */
 export class FileSequenceResolver implements SequenceResolver {
@@ -72,7 +72,7 @@ export class FileSequenceResolver implements SequenceResolver {
             continue;
           }
         } catch {
-          // Lock vanished between EEXIST and stat — retry immediately.
+          // Lock vanished between EEXIST and stat, retry immediately.
           continue;
         }
 
@@ -87,7 +87,7 @@ export class FileSequenceResolver implements SequenceResolver {
     try {
       unlinkSync(lockPath);
     } catch {
-      // Lock file already gone — another process recovered, or we never acquired it.
+      // Lock file already gone, another process recovered, or we never acquired it.
     }
   }
 

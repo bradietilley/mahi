@@ -3,7 +3,7 @@ import { Tui, colors } from "@mahiframework/tui";
 import { Command } from "../command.js";
 
 /**
- * `db:table <table>` — column detail for one table (name, type,
+ * `db:table <table>`, column detail for one table (name, type,
  * nullability, auto-increment), mirroring Laravel's `TableCommand`.
  * Backed by Kysely's `introspection.getTables()`, same as `db:show`.
  */

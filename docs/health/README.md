@@ -49,7 +49,7 @@ the two halves of the standard orchestrator split:
 
 **Do not collapse these into one endpoint.** If `/up` started doing real
 I/O, a Redis blip would fail the *liveness* probe and Kubernetes would
-restart every pod in the deployment — converting a recoverable dependency
+restart every pod in the deployment, converting a recoverable dependency
 outage into a full outage, plus a thundering-herd reconnect against the
 dependency that was already struggling. The blast radius of a wrong
 readiness answer is "this instance stops receiving traffic"; the blast
@@ -64,7 +64,7 @@ the app down would put traffic straight back onto it.
 
 ## Writing a check
 
-A check is a plain object — a name and a function. There is no base class
+A check is a plain object, a name and a function. There is no base class
 to extend and no file-per-check convention.
 
 ```ts
@@ -78,7 +78,7 @@ const stripe: HealthCheck = {
 
 | Field | |
 |---|---|
-| `name` | Result-object key within the group. Lowercase and stable — it goes in the JSON. |
+| `name` | Result-object key within the group. Lowercase and stable. It goes in the JSON. |
 | `group` | Result-object group. Defaults to `"app"`. |
 | `timeoutSeconds` | Per-check deadline. Defaults to `health.timeoutSeconds` (5). |
 | `run(app)` | The probe. Receives the `Application`. |
@@ -129,16 +129,16 @@ when its package isn't installed, so an app without `@mahiframework/storage` rep
 | `filesystem` | Writes a unique file to the default disk under `health-check/`, reads it back, compares, deletes it. |
 
 The cache and filesystem checks are deliberately **round trips, not
-writes.** A `put` that succeeds against a store whose reads are broken — a
+writes.** A `put` that succeeds against a store whose reads are broken, a
 full disk, a replica accepting writes it discards, a filesystem that went
-read-only after the mount was cached — reports healthy. Reading back a
+read-only after the mount was cached, reports healthy. Reading back a
 value only this invocation could have written is the only assertion that
 catches it.
 
 The database check uses `select 1` rather than introspecting tables: it is
 portable across sqlite/MySQL/Postgres, touches no application table, and
 cannot be affected by schema state. It checks the **default connection
-only** — checking every configured connection means a probe whose cost
+only**, checking every configured connection means a probe whose cost
 scales with your config file and which fails on a deliberately-offline
 analytics replica. Register a second check if you need a second connection
 probed.
@@ -193,7 +193,7 @@ getaddrinfo ENOTFOUND prod-redis.internal
 SQLITE_CANTOPEN: unable to open database file /srv/app/storage/prod.sqlite
 ```
 
-`/health` is by definition reachable from whatever probes it — often a load
+`/health` is by definition reachable from whatever probes it, often a load
 balancer, sometimes the internet, and always before anyone remembers to put
 an ACL on it. So in production every failure message is replaced with
 `"Check failed"` unless the request carries `X-Health-Secret` matching the
@@ -204,7 +204,7 @@ curl -H "X-Health-Secret: $HEALTH_SECRET" https://example.com/health
 ```
 
 Which checks exist and which failed stays visible; only the message goes.
-Redaction never applies outside production, and never on the CLI — that
+Redaction never applies outside production, and never on the CLI. That
 runs inside the trust boundary, and an operator who has SSH'd into the box
 needs the real message.
 
@@ -230,7 +230,7 @@ write it into every access log.
   4 checks, 1 failed (124ms)
 ```
 
-Exits `1` if any check failed, `0` otherwise — so it works as a deployment
+Exits `1` if any check failed, `0` otherwise, so it works as a deployment
 gate or a smoke test:
 
 ```sh
@@ -265,8 +265,8 @@ export function healthConfig(): HealthConfig {
 ### Why checks run sequentially
 
 Parallel is the tempting default and it is wrong for a probe. Every check
-is I/O against a dependency that is *already suspected of being unwell* —
-that is why it is being probed. Firing all of them at once, once per probe
+is I/O against a dependency that is *already suspected of being unwell*.
+That is why it is being probed. Firing all of them at once, once per probe
 interval, from every instance, is a synchronised burst of connection
 attempts at exactly the moment the dependency can least absorb it. A health
 check that amplifies the outage it was installed to detect is a well-known
@@ -282,7 +282,7 @@ and found it too slow.
 Every check races a deadline, and a check that exceeds it reports
 `Timed out after 5s` rather than hanging. Without this, one check on a TCP
 connection with no socket timeout would hang the request until the load
-balancer's own timeout fired — at which point the balancer has learned
+balancer's own timeout fired, at which point the balancer has learned
 nothing, and the app is holding one open request per probe interval,
 forever.
 
@@ -305,7 +305,7 @@ or probes will overlap.
 
 ## See also
 
-- [Providers](../providers/) — the `checks()` hook alongside the others
-- [Routing](../routing/) — both probe endpoints
-- [Console](../console/) — `./artisan health`
-- [Deployment](../deployment/) — probes in a real deployment
+- [Providers](../providers/): the `checks()` hook alongside the others
+- [Routing](../routing/): both probe endpoints
+- [Console](../console/): `./artisan health`
+- [Deployment](../deployment/): probes in a real deployment

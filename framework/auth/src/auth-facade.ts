@@ -23,7 +23,7 @@ import { AUTH_TOKEN } from "./tokens.js";
  *   await Auth.runAs(user, async () => { ... });
  */
 export class Auth extends Facade<AuthManager>(() => AUTH_TOKEN) {
-  /** The authenticated user. Throws for guests — use `userOrNull()` if that's expected. */
+  /** The authenticated user. Throws for guests, use `userOrNull()` if that's expected. */
   static user<TUser = unknown>(): TUser {
     return this.instance().user<TUser>();
   }
@@ -58,7 +58,7 @@ export class Auth extends Facade<AuthManager>(() => AUTH_TOKEN) {
   }
 
   /**
-   * A guard that can establish sessions, typed as such — the supported
+   * A guard that can establish sessions, typed as such, the supported
    * replacement for `Auth.guard("session") as unknown as SessionGuard`,
    * a cast that compiles even when the guard has no `login()`.
    */
@@ -95,12 +95,12 @@ export class Auth extends Facade<AuthManager>(() => AUTH_TOKEN) {
     return this.instance().logout(request, guardName);
   }
 
-  /** The password-reset broker — `sendResetLink()` / `reset()`. */
+  /** The password-reset broker, `sendResetLink()` / `reset()`. */
   static passwordBroker(): PasswordBroker {
     return this.instance().passwordBroker();
   }
 
-  /** The email-verification broker — `sendVerificationLink()` / `verify()`. */
+  /** The email-verification broker, `sendVerificationLink()` / `verify()`. */
   static verificationBroker(): EmailVerificationBroker {
     return this.instance().verificationBroker();
   }

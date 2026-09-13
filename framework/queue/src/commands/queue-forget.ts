@@ -5,7 +5,7 @@ import { QUEUE_TOKEN } from "../tokens.js";
 import { supportsFailedJobs } from "../failed-job-repository.js";
 
 /**
- * `queue:forget <id>` — delete a single failed job by id without retrying
+ * `queue:forget <id>`, delete a single failed job by id without retrying
  * it. Mirrors Laravel's `queue:forget`.
  */
 export class QueueForgetCommand extends Command {

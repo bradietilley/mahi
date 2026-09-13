@@ -4,16 +4,16 @@ export { stripAnsi };
 
 /**
  * Ranges of Unicode codepoints considered "wide" (occupy two terminal
- * columns) under East Asian Width (`W`/`F` categories) — CJK
+ * columns) under East Asian Width (`W`/`F` categories), CJK
  * ideographs/punctuation, Hangul syllables, fullwidth forms, common
  * emoji blocks. This is a minimal, hand-rolled table (not the full
- * Unicode East-Asian-Width database PHP's `mb_strwidth()` uses) —
+ * Unicode East-Asian-Width database PHP's `mb_strwidth()` uses),
  * covers the common cases (CJK text, most emoji) but isn't exhaustive.
  *
  * KNOWN LIMITATION: uncommon wide characters outside these ranges will
  * be measured as width 1 instead of 2, which can throw off box/table
  * alignment by a column or two. The tradeoff is deliberate (no new runtime
- * dependency vs. a small `string-width`-style package) — revisit if this
+ * dependency vs. a small `string-width`-style package), revisit if this
  * causes real bugs.
  */
 const WIDE_RANGES: Array<[number, number]> = [
@@ -34,7 +34,7 @@ const WIDE_RANGES: Array<[number, number]> = [
 ];
 
 /**
- * Combining marks (zero display width) — a minimal set covering common
+ * Combining marks (zero display width). A minimal set covering common
  * combining diacriticals; not the full Unicode combining-class table.
  */
 function isCombiningMark(codepoint: number): boolean {
@@ -81,7 +81,7 @@ export function displayWidth(text: string): number {
 /**
  * Truncates `text` to fit within `width` display columns, appending an
  * ellipsis (`…`) when truncation occurs. ANSI-aware only in that it
- * measures via `displayWidth` — does not attempt to preserve/re-close
+ * measures via `displayWidth`, does not attempt to preserve/re-close
  * SGR codes mid-truncation (renderers using this apply color after
  * truncating, not before).
  */

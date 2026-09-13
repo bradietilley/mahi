@@ -9,8 +9,8 @@ export const DEFAULT_GROUP = "app";
 export const DEFAULT_TIMEOUT_SECONDS = 5;
 
 /**
- * The one place checks live and the one place they run. Both frontends —
- * `GET /health` and `./artisan health` — are thin shells over
+ * The one place checks live and the one place they run. Both frontends,
+ * `GET /health` and `./artisan health`, are thin shells over
  * `run()`, so they cannot drift from each other.
  */
 export class HealthRegistry {
@@ -47,7 +47,7 @@ export class HealthRegistry {
   }
 
   /**
-   * Run every check and build the report. **Never throws** — a check that
+   * Run every check and build the report. **Never throws**, a check that
    * blows up produces a failure string in its own slot and nothing else is
    * affected. A probe endpoint that 500s because one check author threw a
    * non-`Error` reports "the app is broken" when the truth is "the check
@@ -59,7 +59,7 @@ export class HealthRegistry {
 
     // `pooled()` rather than a `for` loop so `concurrency` is a config
     // value and not a rewrite. It also surfaces a rejection as an Error
-    // *value* rather than rejecting the pool — though `runOne()` already
+    // *value* rather than rejecting the pool, though `runOne()` already
     // guarantees it never rejects, so that is a second belt.
     const outcomes = await pooled(
       checks.map((check) => () => this.runOne(check)),
@@ -120,7 +120,7 @@ function keyFor(check: HealthCheck): string {
 /**
  * Race `work` against a deadline. Without this, one check on a TCP
  * connection with no socket timeout hangs the request until the load
- * balancer's own timeout fires — at which point the balancer has learned
+ * balancer's own timeout fires, at which point the balancer has learned
  * nothing and the app is holding an open request per probe interval,
  * forever.
  *
@@ -138,7 +138,7 @@ export async function withTimeout<T>(work: () => Promise<T>, seconds: number): P
     timer = setTimeout(() => resolve(`Timed out after ${seconds}s`), seconds * 1000);
     // Deliberately NOT `unref()`ed. An unref'd deadline lets the process
     // exit before it fires, which in the hung-check case means
-    // `./artisan health` exits silently having printed nothing — the
+    // `./artisan health` exits silently having printed nothing, the
     // exact scenario this timer exists to turn into a reported failure.
     // `clearTimeout` in the `finally` below is what prevents the leak.
   });

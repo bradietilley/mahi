@@ -3,7 +3,7 @@ import type { Env } from "./env.js";
 
 /**
  * Snowflake ID generator. Opt in per model with `keyType: snowflake()`
- * in the model's config (see `src/models/user.model.ts`) — this config
+ * in the model's config (see `src/models/user.model.ts`). This config
  * only takes effect once `SnowflakeServiceProvider` is registered (see
  * `config/app.ts`). The epoch and bit signature must not change after
  * IDs exist in the database.

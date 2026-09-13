@@ -40,7 +40,7 @@ describe("DatabaseServiceProvider.shutdown()", () => {
 
   /**
    * A named connection nothing ever touched must not be *constructed*
-   * here purely to be torn down — for MySQL/Postgres that means building
+   * here purely to be torn down, for MySQL/Postgres that means building
    * a pool during shutdown, opening connections in order to close them.
    */
   it("does not construct a connection that was never used", async () => {
@@ -79,7 +79,7 @@ describe("DatabaseServiceProvider.shutdown()", () => {
 
   /**
    * Shutdown can run after a boot that threw before this provider's own
-   * `boot()` — `make()`ing the manager there would build the thing we are
+   * `boot()`, `make()`ing the manager there would build the thing we are
    * trying not to leave open.
    */
   it("is a no-op when the database token was never resolved", async () => {

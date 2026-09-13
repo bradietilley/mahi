@@ -10,7 +10,7 @@ npm run dev              # http://127.0.0.1:8000, restarts on file changes
 ```
 
 `npm run dev` runs the server under `tsx watch`, so edits restart it
-automatically — the usual development loop. `./artisan serve` is the plain
+automatically, the usual development loop. `./artisan serve` is the plain
 one-shot equivalent.
 
 Other useful commands:
@@ -46,7 +46,7 @@ storage/      Logs, file uploads, cache/lock files (gitignored)
 tests/        Vitest suites
 ```
 
-Start in `src/providers/app.provider.ts` — every hook the framework
+Start in `src/providers/app.provider.ts`, every hook the framework
 collects is documented there.
 
 ## Documentation

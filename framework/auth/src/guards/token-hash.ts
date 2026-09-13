@@ -6,7 +6,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
  * or a performance shortcut taken at the cost of security:
  *
  * argon2 is intentionally slow (~50-100ms) to make brute-forcing
- * HUMAN-CHOSEN passwords infeasible — passwords occupy a tiny, heavily
+ * HUMAN-CHOSEN passwords infeasible, passwords occupy a tiny, heavily
  * biased corner of the keyspace, so the only defense is making each guess
  * expensive. A personal access token is 32 bytes of `randomBytes`: there
  * is no low-entropy space to brute-force, so the slowness buys nothing
@@ -26,7 +26,7 @@ export function hashToken(secret: string): string {
  * Constant-time comparison of a presented secret against a stored digest.
  *
  * `timingSafeEqual` rather than `===` is the security-critical detail
- * here — the same class of bug `Signer.verify()` guards against, and just
+ * here, the same class of bug `Signer.verify()` guards against, and just
  * as easy to "simplify" back into a vulnerability during review.
  */
 export function verifyTokenHash(secret: string, storedDigest: string): boolean {
@@ -51,7 +51,7 @@ export function verifyTokenHash(secret: string, storedDigest: string): boolean {
  *
  * The id prefix exists for lookup. The stored column is a digest, so it
  * can't be looked up by equality; without an id, verifying a token would
- * mean loading every token row and comparing each — O(n) work per
+ * mean loading every token row and comparing each, O(n) work per
  * request, trivially DoS-able. The id turns it into one indexed
  * primary-key lookup plus exactly one digest comparison.
  */

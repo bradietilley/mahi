@@ -75,7 +75,7 @@ describe("PasswordBroker", () => {
 
     it("survives two concurrent requests for the same email", async () => {
       // The old delete-then-insert pair let both requests delete and then
-      // both insert, and the second insert violated the primary key — a
+      // both insert, and the second insert violated the primary key, a
       // 500 on a password-reset form, reachable by double-clicking.
       const unthrottled = new PasswordBroker<UserTable>(provider, hasher, { throttleSeconds: 0 });
 
@@ -171,7 +171,7 @@ describe("PasswordBroker", () => {
 
     it("hashes on the no-token path so timing doesn't leak pending resets", async () => {
       // Otherwise "no pending reset" returns instantly while "wrong
-      // token" pays for an argon2 verify (~50-100ms at 64 MiB) — a
+      // token" pays for an argon2 verify (~50-100ms at 64 MiB), a
       // timing oracle, and an unthrottled way to make the server burn
       // CPU.
       const spy = vi.spyOn(hasher, "make");
@@ -185,7 +185,7 @@ describe("PasswordBroker", () => {
     describe("revocation", () => {
       // Password reset is the account-RECOVERY path: the thing a user
       // does because they believe they're compromised. Leaving the
-      // attacker's session and API tokens alive defeats the exercise —
+      // attacker's session and API tokens alive defeats the exercise,
       // and a "remember me" session runs to ~400 days.
       it("destroys every session and token for the user", async () => {
         const destroyForUser = vi.fn(async () => {});

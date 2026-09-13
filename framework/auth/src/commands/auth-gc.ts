@@ -6,13 +6,13 @@ import { Auth } from "../auth-facade.js";
  * tokens.
  *
  * Every one of those stores enforces expiry on read, so a stale row is
- * never *honoured* — but nothing deletes them either, so the tables grow
+ * never *honoured*, but nothing deletes them either, so the tables grow
  * unboundedly without this. Kept as one `auth:gc` command (rather than a
  * per-store family) to match the "gc" naming already established.
  * Schedule it; it's a cleanup job, not a correctness guarantee.
  *
  * Every guard that can collect garbage is swept, discovered by
- * capability rather than by hardcoded name — an app naming its guards
+ * capability rather than by hardcoded name, an app naming its guards
  * `web`/`api` (Laravel's convention) has no guard called "session" at
  * all.
  */

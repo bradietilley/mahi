@@ -2,7 +2,7 @@ import { Seeder } from "@mahiframework/database";
 import { User } from "../../src/models/user.model.js";
 
 /**
- * The app's default `db:seed` entrypoint — populates a fresh database
+ * The app's default `db:seed` entrypoint, populates a fresh database
  * with a handful of users via `UserFactory`, so `migrate:fresh --seed`
  * (or a bare `db:seed`) leaves something to look at. Registered in
  * `AppServiceProvider.seeders()`.

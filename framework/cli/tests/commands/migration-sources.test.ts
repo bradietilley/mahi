@@ -15,7 +15,7 @@ function migration(name: string): RegisteredMigration {
 
 /**
  * `toEqual` compares the `migration` object's `up`/`down` by reference,
- * and every `migration()` call above builds fresh closures — so entries
+ * and every `migration()` call above builds fresh closures, so entries
  * are compared by the only part that is actually meaningful here: the
  * name (for registered entries) or the path itself (for directories).
  */
@@ -79,7 +79,7 @@ describe("collectMigrationSources", () => {
   /**
    * The compiled-binary path: an app with a static registry never wants
    * its `migrationsPath` collected as well, because that directory does
-   * not exist inside the bundle and would silently contribute nothing —
+   * not exist inside the bundle and would silently contribute nothing,
    * or, worse, exist beside the binary and contribute something stale.
    */
   it("uses database.migrationSources instead of the path when the app sets one", async () => {

@@ -2,7 +2,7 @@
 // Removes compiled outputs in a package's `dist/` that no longer have a
 // source file under `src/`. `tsc -b` only ever adds or overwrites outputs;
 // when a source file is deleted or renamed its stale `.js`/`.d.ts` stays
-// behind — still importable, still shipped by `files: ["dist"]`, and still
+// behind, still importable, still shipped by `files: ["dist"]`, and still
 // referencing whatever the code looked like at the time. Run after every
 // build (the package `build` script does) so a tarball only ever contains
 // what the current sources produce.
@@ -35,7 +35,7 @@ function hasSource(relPath) {
     const base = relPath.slice(0, -suffix.length);
     return sourceExts.some((ext) => existsSync(join(srcDir, base + ext)));
   }
-  // Unknown output kind (asset copied by some other step) — leave it alone.
+  // Unknown output kind (asset copied by some other step), leave it alone.
   return true;
 }
 

@@ -24,12 +24,12 @@ function matchesPath(path: string, pattern: string): boolean {
 /**
  * How this request is presenting the bypass secret, if at all.
  *
- * - `header` — `X-Maintenance-Secret`, for a machine (curl, a probe, CI).
- * - `path`   — `/<secret>/...`, for a human pasting the URL Laravel's
+ * - `header`, `X-Maintenance-Secret`, for a machine (curl, a probe, CI).
+ * - `path`, `/<secret>/...`, for a human pasting the URL Laravel's
  *              `down --secret` prints. Answered with a redirect that
  *              SETS the cookie, so every subsequent request works
  *              normally.
- * - `cookie` — a bypass already granted.
+ * - `cookie`, a bypass already granted.
  */
 type BypassKind = "header" | "path" | "cookie" | undefined;
 
@@ -84,7 +84,7 @@ function cookieValue(request: Request, name: string): string | undefined {
 
 /**
  * Global pipe that short-circuits every request with a 503 (plus
- * `Retry-After`) while the application is down for maintenance — except
+ * `Retry-After`) while the application is down for maintenance, except
  * requests matching a configured `except` path (e.g. the liveness check)
  * or carrying the bypass secret. Installed automatically by `HttpKernel`
  * ahead of provider middleware, so no app wiring is required.
@@ -111,7 +111,7 @@ export function maintenanceMiddleware(
 
     // The `/<secret>` URL is a one-time exchange, not a way to browse.
     // Merely skipping the 503 would let the request fall through to
-    // routing, match nothing, and 404 — the documented bypass would never
+    // routing, match nothing, and 404. The documented bypass would never
     // reach the application, and its only lasting effect would be writing
     // the secret into the access log of every proxy in front of it. Trade
     // it for a cookie and redirect to the root, which is what makes the
@@ -133,7 +133,7 @@ export function maintenanceMiddleware(
  *
  * `HttpOnly` because nothing in a browser needs to read it, `SameSite=Lax`
  * so it survives a pasted link, and `Secure` whenever the request itself
- * was — the value IS the secret, so it must not be sent in clear once
+ * was. The value IS the secret, so it must not be sent in clear once
  * TLS is available.
  */
 function grantBypass(secret: string, secure: boolean): HttpResponseType {

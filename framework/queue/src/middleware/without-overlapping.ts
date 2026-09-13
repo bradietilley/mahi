@@ -17,7 +17,7 @@ export interface WithoutOverlappingOptions {
    *
    * Default `5`, **not** `0`: a zero delay means the blocked job is
    * popped, finds the lock still held, and is released again
-   * immediately — a hot loop that burns a worker slot and a database
+   * immediately, a hot loop that burns a worker slot and a database
    * write per iteration for the entire duration of the first job's
    * run. The release still counts an attempt either way, so the loop
    * is now bounded by `maxAttempts` too (see `QueueWorkCommand`), but
@@ -28,7 +28,7 @@ export interface WithoutOverlappingOptions {
   /** Lock auto-release TTL (seconds) guarding against a crashed holder. Default `60`. */
   expireAfterSeconds?: number;
   /**
-   * The cache store backing the lock — a live `CacheStore`, or a store
+   * The cache store backing the lock. A live `CacheStore`, or a store
    * name resolved from the cache manager, or omitted to use the cache
    * manager's default store (resolved from the container via `CACHE_TOKEN`
    * at run time). Passing a live store keeps `@mahiframework/cache` an optional
@@ -40,7 +40,7 @@ export interface WithoutOverlappingOptions {
    * `WithoutOverlapping::shared()`). By default the lock key is prefixed
    * with the job's registered class name, so two different job classes
    * using the same key (e.g. `"invoice:1"`) do NOT block each other. Set
-   * this to lock purely on the key, ignoring the class — for coordinating
+   * this to lock purely on the key, ignoring the class, for coordinating
    * distinct job classes that touch the same resource.
    */
   shared?: boolean;
@@ -48,13 +48,13 @@ export interface WithoutOverlappingOptions {
 
 /**
  * Job middleware ensuring no two jobs sharing the same lock key run
- * concurrently — wraps `@mahiframework/cache`'s `Lock` (backed by a
+ * concurrently, wraps `@mahiframework/cache`'s `Lock` (backed by a
  * `CacheStore`'s atomic `add()`). While one instance holds the lock, other
  * instances are either **released** back onto the queue to retry later
  * (the default) or silently dropped, matching Laravel's
  * `WithoutOverlapping` `releaseAfter`/`dontRelease` semantics.
  *
- * This is run-time exclusivity — it stops two instances *running* at once.
+ * This is run-time exclusivity. It stops two instances *running* at once.
  * It does NOT prevent duplicate *dispatch*; for that, mark the job class
  * `static unique` (see `ShouldBeUnique`).
  *
@@ -95,7 +95,7 @@ export class WithoutOverlapping implements JobMiddleware {
 
   /**
    * Build a `WithoutOverlapping` that resolves its store from the
-   * container's default cache (`CACHE_TOKEN`) at run time — sugar for
+   * container's default cache (`CACHE_TOKEN`) at run time, sugar for
    * `new WithoutOverlapping(undefined, key, options)`, so a job need not
    * thread a `CacheStore` through itself.
    */
@@ -143,7 +143,7 @@ export class WithoutOverlapping implements JobMiddleware {
     const store = this.resolveStore(passable);
 
     // Non-blocking acquire: try once. If the lock is held, either release
-    // for a later retry or drop, per configuration — never sit and wait,
+    // for a later retry or drop, per configuration. Never sit and wait,
     // which would tie up the worker slot.
     const lock = store.lock({
       key: this.lockKey(passable),
@@ -157,7 +157,7 @@ export class WithoutOverlapping implements JobMiddleware {
       acquired = true;
     } catch (error) {
       // ONLY a timeout means "someone else holds it". A bare `catch {}`
-      // here also swallowed the store being unreachable — Redis down
+      // here also swallowed the store being unreachable, Redis down
       // looked exactly like contention, so every job on every worker
       // quietly released itself forever while the actual problem went
       // unreported. Anything that isn't a lock timeout is a real error
@@ -187,7 +187,7 @@ export class WithoutOverlapping implements JobMiddleware {
   /**
    * The lock key: `overlap:<jobName>:<key>` by default, so two unrelated
    * job classes using the same `key` don't share a lock; `overlap:<key>`
-   * when `shared` — Laravel's cross-class behaviour.
+   * when `shared`, Laravel's cross-class behaviour.
    *
    * The class part is the job's REGISTERED name, not `constructor.name`:
    * under a production bundle a minifier renames classes, so two different
@@ -228,7 +228,7 @@ export class WithoutOverlapping implements JobMiddleware {
   /**
    * Resolve the `CacheStore` to lock on: a live store passed in as-is; a
    * store name or omitted store resolved from the container's cache
-   * manager (`CACHE_TOKEN`) — the default store when no name was given.
+   * manager (`CACHE_TOKEN`), the default store when no name was given.
    */
   private resolveStore(passable: JobMiddlewarePassable): CacheStore {
     if (this.store && typeof this.store !== "string") {

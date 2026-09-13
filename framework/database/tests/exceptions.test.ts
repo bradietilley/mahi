@@ -9,7 +9,7 @@ import {
 } from "../src/exceptions.js";
 
 /**
- * The classification logic is pure — it inspects a raw driver error's
+ * The classification logic is pure. It inspects a raw driver error's
  * message/code and picks the matching exception class. These cases use the
  * shapes each real driver produces (sqlite messages, mysql `errno`/`code`,
  * postgres SQLSTATE `code`) so the mapping is verified without a live DB.
@@ -73,7 +73,7 @@ describe("translateDatabaseError", () => {
     expect(translated.sql).toBe("SELECT 1");
   });
 
-  it("is idempotent — already-translated errors pass through unchanged", () => {
+  it("is idempotent, already-translated errors pass through unchanged", () => {
     const first = translateDatabaseError("sqlite", new Error("UNIQUE constraint failed: t.c"));
     const second = translateDatabaseError("sqlite", first);
     expect(second).toBe(first);

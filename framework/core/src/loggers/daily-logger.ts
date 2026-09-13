@@ -8,7 +8,7 @@ const DATE_SUFFIX_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 function formatDate(date: Date): string {
   // UTC, deliberately: line timestamps in `formatLogLine` are UTC
   // (`DateTime.now("UTC")`), so the file the lines land in must roll over
-  // on the same clock — otherwise, on a machine offset from UTC, lines
+  // on the same clock, otherwise, on a machine offset from UTC, lines
   // written in the hours around local midnight get a UTC date that
   // disagrees with the local-date filename and end up in the "wrong"
   // day's file.
@@ -32,13 +32,13 @@ function withDateSuffix(path: string, date: Date): string {
 }
 
 /**
- * Rotates to a new `{base}-{Y-m-d}{ext}` file each day — Laravel's "daily"
+ * Rotates to a new `{base}-{Y-m-d}{ext}` file each day, Laravel's "daily"
  * driver equivalent (`Monolog\Handler\RotatingFileHandler`). The
  * configured `path` (e.g. `storage_path('logs/mahi.log')`) is just the
  * template used to derive each day's actual filename; nothing is ever
  * written to that exact path.
  *
- * Rotation is driven by the current date at write time (not a timer) —
+ * Rotation is driven by the current date at write time (not a timer),
  * matches `RotatingFileHandler`'s "just compute today's filename" model,
  * so it works correctly across process restarts with no persisted state.
  * Pruning of files older than `maxFiles` days (if configured) only runs
@@ -78,7 +78,7 @@ export class DailyLogger extends AbstractLogger {
     if (resolvedPath !== this.lastResolvedPath) {
       this.lastResolvedPath = resolvedPath;
 
-      // `maxFiles` unset OR <= 0 means "unlimited" — never prune. Guarding
+      // `maxFiles` unset OR <= 0 means "unlimited", never prune. Guarding
       // `<= 0` is not pedantry: `slice(0)` returns the *entire* array, so
       // `maxFiles: 0` would delete every dated file including the one just
       // written. Monolog/Laravel treat `days => 0` as "keep everything".
@@ -120,7 +120,7 @@ export class DailyLogger extends AbstractLogger {
       try {
         unlinkSync(join(dir, file));
       } catch {
-        // Best-effort — a file removed concurrently (or already gone) isn't an error here.
+        // Best-effort, a file removed concurrently (or already gone) isn't an error here.
       }
     }
   }

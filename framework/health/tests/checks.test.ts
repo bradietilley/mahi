@@ -10,7 +10,7 @@ import { LocalStorageDriver, StorageManager } from "@mahiframework/storage";
 import { cacheCheck, databaseCheck, filesystemCheck } from "../src/checks/index.js";
 
 /**
- * Each check runs against the REAL backing implementation — a real
+ * Each check runs against the REAL backing implementation, a real
  * `ArrayCacheStore`, a real sqlite `DatabaseManager`, a real
  * `LocalStorageDriver` over a temp dir. The checks talk to those managers
  * through structural types (see `checks/contracts.ts`), so these tests are

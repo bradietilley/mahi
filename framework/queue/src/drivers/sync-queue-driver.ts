@@ -10,12 +10,12 @@ import { uniqueModeOf } from "../job.js";
 import { acquireUniqueLockForState, releaseUniqueLock } from "../unique-jobs.js";
 
 /**
- * Runs jobs immediately, inline, no persistence — the queue equivalent of
+ * Runs jobs immediately, inline, no persistence, the queue equivalent of
  * `ArrayCacheStore`: correct, zero infra, ideal default for dev/tests.
  * Matches Laravel's own `sync` driver semantics exactly: "dispatch" and
  * "execute" are the same call, so `push()` completes only once the job's
  * `handle()` has finished running (or thrown). There is no separate
- * `pop()`/worker loop involved at all — `pop()` always returns `undefined`,
+ * `pop()`/worker loop involved at all, `pop()` always returns `undefined`,
  * since nothing is ever queued for later.
  */
 export class SyncQueueDriver implements QueueDriver {
@@ -26,19 +26,19 @@ export class SyncQueueDriver implements QueueDriver {
 
   async push(jobClass: string, state: JobState, options: PushOptions = {}): Promise<void> {
     const JobClass = this.registry.resolve(jobClass);
-    // Rebuild the live job from its serialized state — the same round-trip
+    // Rebuild the live job from its serialized state, the same round-trip
     // the durable worker performs (models rehydrated), so a job behaves
     // identically under `sync` as under `database`, and any `Model` fields
     // are freshly loaded rather than the stale dispatch-time instances. A
     // model whose class opted into `deleteWhenMissingModels` and no longer
-    // exists throws `SkipJobMissingModelError` — swallow it so the job is
+    // exists throws `SkipJobMissingModelError`, swallow it so the job is
     // treated as completed (skipped), matching the durable worker.
     let job;
     try {
       job = await decodeJob(this.app, JobClass, state);
     } catch (error) {
       if (error instanceof SkipJobMissingModelError) {
-        // The referenced model is gone — treat as completed and free the
+        // The referenced model is gone, treat as completed and free the
         // uniqueness lock so a fresh instance can be queued.
         await this.releaseUnique(jobClass, JobClass, state, "untilFinished");
 
@@ -57,13 +57,13 @@ export class SyncQueueDriver implements QueueDriver {
     }
 
     // Run through the job's middleware (if any), exactly as the durable
-    // worker does — so `RateLimited`/`WithoutOverlapping` behave the same
+    // worker does, so `RateLimited`/`WithoutOverlapping` behave the same
     // under `sync`. A middleware-triggered `ReleaseJobError` surfaces to
     // the caller here, since sync has no queue to release back onto.
     try {
       await runJobThroughMiddleware(this.app, job);
     } catch (error) {
-      // A throwing sync job is terminal (no retries here) — release the
+      // A throwing sync job is terminal (no retries here), release the
       // `untilFinished` lock so the failure doesn't block re-dispatch.
       if (mode === "untilFinished") {
         await releaseUniqueLock(this.app, jobClass, job);
@@ -72,7 +72,7 @@ export class SyncQueueDriver implements QueueDriver {
       throw error;
     }
 
-    // Success — free the `untilFinished` lock now the job has finished.
+    // Success, free the `untilFinished` lock now the job has finished.
     if (mode === "untilFinished") {
       await releaseUniqueLock(this.app, jobClass, job);
     }
@@ -81,7 +81,7 @@ export class SyncQueueDriver implements QueueDriver {
     // once the current one succeeds, carrying the remainder forward.
     //
     // Each link takes its own uniqueness lock, as it would have if it had
-    // been dispatched directly — only the head of a chain goes through
+    // been dispatched directly, only the head of a chain goes through
     // `QueueManager.dispatch()`. A held lock drops the link (and the rest
     // of the chain riding on it), matching the durable worker.
     if (options.chain && options.chain.length > 0) {
@@ -107,7 +107,7 @@ export class SyncQueueDriver implements QueueDriver {
    * Release a unique job's lock when the live instance couldn't be built
    * (a missing model). Rebuilds a bare prototype instance purely so
    * `releaseUniqueLock` can read `uniqueId()`/`uniqueVia()`/`uniqueFor()`
-   * and `static unique` off it — the same key the dispatcher locked.
+   * and `static unique` off it, the same key the dispatcher locked.
    */
   private async releaseUnique(
     jobClass: string,
@@ -126,7 +126,7 @@ export class SyncQueueDriver implements QueueDriver {
 
   /**
    * Runs the job once the enclosing transaction commits, or immediately
-   * outside one — so `{ afterCommit: true }` means the same thing under
+   * outside one, so `{ afterCommit: true }` means the same thing under
    * `sync` as under a durable driver, and a job dispatched in a
    * transaction that rolls back never runs here either.
    *
@@ -153,11 +153,11 @@ export class SyncQueueDriver implements QueueDriver {
   }
 
   async delete(): Promise<void> {
-    // No-op — see release().
+    // No-op. See release().
   }
 
   async fail(): Promise<void> {
-    // No-op — a throwing sync job surfaces its error directly to the
+    // No-op, a throwing sync job surfaces its error directly to the
     // caller of push(); there is no failed_jobs table for this driver.
   }
 }

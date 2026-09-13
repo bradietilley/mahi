@@ -6,7 +6,7 @@ import { Job } from "../job.js";
  * Built-in job that delivers a message rendered at dispatch time.
  *
  * Dispatched by the handler `QueueServiceProvider` installs on
- * `MailManager` when `@mahiframework/mail` is registered — not intended to be
+ * `MailManager` when `@mahiframework/mail` is registered, not intended to be
  * dispatched by application code directly; call `Mail.queue()` instead.
  *
  * The `RenderedMail` is carried as a constructor field, so it rides
@@ -17,7 +17,7 @@ import { Job } from "../job.js";
  * rejected at `Mail.queue()` rather than mangled here.)
  *
  * Note the job holds a fully-formed message, which means the `jobs` row
- * contains the message BODY in plaintext — and `failed_jobs` keeps it
+ * contains the message BODY in plaintext, and `failed_jobs` keeps it
  * indefinitely. See `MailManager.queue()` on why a message carrying a
  * credential must not be queued this way.
  */

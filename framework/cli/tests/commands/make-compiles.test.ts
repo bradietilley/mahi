@@ -30,8 +30,8 @@ import { MakeProviderCommand } from "../../src/commands/make-provider.js";
  *
  * It scaffolds a small app tree, writes a tsconfig whose `paths` map
  * `@mahiframework/*` to each package's built `dist`, and runs `tsc --noEmit`. It
- * therefore requires the workspace to be built first — which the monorepo's
- * `test` task depends on — and is skipped (not failed) if a required `dist`
+ * therefore requires the workspace to be built first, which the monorepo's
+ * `test` task depends on, and is skipped (not failed) if a required `dist`
  * is missing, so a bare `vitest` in one package without a full build does
  * not report a spurious failure.
  */

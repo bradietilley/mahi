@@ -1,6 +1,6 @@
 # @mahiframework/notifications
 
-Notifications — multi-channel notifications for Mahi.
+Notifications, multi-channel notifications for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

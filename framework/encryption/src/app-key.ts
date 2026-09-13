@@ -5,8 +5,8 @@
  *
  * Deriving separate keys per purpose (via distinct `info` context strings)
  * means a compromise of one derived key (e.g. leaked ciphertext key)
- * doesn't also expose the other (e.g. signing key) — real defense-in-depth
- * — without requiring the operator to manage more than one secret
+ * doesn't also expose the other (e.g. signing key), real defense-in-depth,
+ * without requiring the operator to manage more than one secret
  * (`APP_KEY` remains the single value that needs generating/rotating/
  * backing up).
  */
@@ -40,7 +40,7 @@ export function parseAppKey(raw: string | undefined): Buffer {
 /**
  * Derives a purpose-scoped 32-byte subkey from the master `APP_KEY` via
  * HKDF-SHA256. `context` distinguishes independent derived keys from the
- * same master key (e.g. `"encryption"` vs `"signing"`) — no salt is used
+ * same master key (e.g. `"encryption"` vs `"signing"`). No salt is used
  * since the master key itself is already a high-entropy secret.
  */
 export function deriveKey(masterKey: Buffer, context: string): Buffer {
@@ -50,19 +50,19 @@ export function deriveKey(masterKey: Buffer, context: string): Buffer {
 }
 
 /**
- * Parses `APP_PREVIOUS_KEYS` — a comma-separated list of previously-active
+ * Parses `APP_PREVIOUS_KEYS`, a comma-separated list of previously-active
  * `APP_KEY` values (each optionally `base64:`-prefixed, same format as
- * `APP_KEY` itself) — into an array of 32-byte master key Buffers.
+ * `APP_KEY` itself), into an array of 32-byte master key Buffers.
  *
  * Unlike `parseAppKey()`, an unset/empty value is not an error: it just
- * means no previous keys are configured (the common case — most apps
+ * means no previous keys are configured (the common case, most apps
  * never rotate). Individual malformed entries (wrong decoded length) do
  * throw, on the theory that a typo'd previous key should fail loudly at
  * boot rather than silently making some old ciphertexts undecryptable.
  *
  * Used together with `key:generate --force`, which rotates `APP_KEY` but
  * (matching Laravel) does **not** automatically populate
- * `APP_PREVIOUS_KEYS` — moving the outgoing key there is a deliberate
+ * `APP_PREVIOUS_KEYS`, moving the outgoing key there is a deliberate
  * manual step, so an operator can choose how many previous keys to retain
  * (or none, if old data is being re-encrypted / discarded anyway) rather
  * than having the list grow unbounded automatically.

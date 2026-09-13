@@ -18,14 +18,14 @@ import { normalizeBinding } from "../bindings.js";
  * This is the one true chokepoint: every builder `.execute()`, every
  * `sql\`...\`.execute()`, every schema statement and every transaction
  * funnels through a `DatabaseConnection.executeQuery`, so decorating that
- * catches them all — regardless of whether the caller used `Model`,
+ * catches them all, regardless of whether the caller used `Model`,
  * `QueryBuilder`, `DB`, `Schema`, or a raw Kysely instance. The wrapper is
  * transparent: it only rethrows, so success paths and result shapes are
  * untouched.
  *
  * Being that chokepoint also makes this the right place to record which
  * engine the connection talks to (`registerDialect()`), so the query
- * layer can recover the dialect from a bare `Kysely` instance — see
+ * layer can recover the dialect from a bare `Kysely` instance. See
  * `dialect-registry.ts` for why that's needed and why the adapter is the
  * key.
  */
@@ -71,15 +71,15 @@ function wrapDriver(driver: Driver, dialect: Dialect): Driver {
  * **Booleans, SQLite only.** better-sqlite3 refuses a JS `boolean`
  * outright ("can only bind numbers, strings, bigints, buffers, and
  * null"), because SQLite has no boolean type. Every layer above happily
- * produces one — a `BooleanCast` column, `where("published", true)`
- * straight from a route's query string, a `Blueprint` default — so
+ * produces one, a `BooleanCast` column, `where("published", true)`
+ * straight from a route's query string, a `Blueprint` default, so
  * coercing here, at the one place every statement passes through, is
  * the only fix that covers all of them at once. `true`/`false` become
  * SQLite's own `1`/`0`, which is what the column already stores. MySQL
  * and Postgres bind booleans natively (Postgres has a real `boolean`
  * type; mysql2 maps them to `1`/`0` itself), so they are left alone.
  *
- * **Object bindings, every dialect** — `normalizeBinding()`, which
+ * **Object bindings, every dialect**, `normalizeBinding()`, which
  * turns a `DateTime`/`Date` into UTC text, a `bigint` into a key, and a
  * model instance into its own key.
  *
@@ -89,7 +89,7 @@ function wrapDriver(driver: Driver, dialect: Dialect): Driver {
  * that never touch the builder and would otherwise have no answer at
  * all: a raw ``sql`...` `` template, a migration, and the pivot writes
  * in `relationship-writes.ts` that go straight to Kysely. Being the one
- * true chokepoint is the whole point of this file — a binding rule
+ * true chokepoint is the whole point of this file, a binding rule
  * enforced anywhere else is a rule something can route around.
  */
 function normalizeParameters(dialect: Dialect, query: CompiledQuery): CompiledQuery {

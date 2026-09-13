@@ -86,7 +86,7 @@ async function main(): Promise<void> {
 
   // A run that dies mid-scaffold otherwise leaves a half-written tree
   // behind, which then trips the "directory not empty" guard on the retry.
-  // Only a target this run CREATED is safe to remove on failure — never a
+  // Only a target this run CREATED is safe to remove on failure, never a
   // pre-existing directory a user pointed `--force` at.
   const targetExisted = await pathExists(target);
   let scaffolded = false;
@@ -110,7 +110,7 @@ async function main(): Promise<void> {
     }
 
     // Both of these shell out to `./artisan`, which needs `tsx` and the
-    // framework packages present — so they're only possible post-install.
+    // framework packages present, so they're only possible post-install.
     if (installed) {
       await Tui.task("Generating application key", () => artisan(target, ["key:generate"]));
     } else {
@@ -130,7 +130,7 @@ async function main(): Promise<void> {
     // Roll back a directory this run created, so the failure leaves the
     // filesystem as it found it and a corrected retry isn't blocked by
     // "directory not empty". A `--force` into an existing directory is left
-    // untouched — we can't know which files were the user's.
+    // untouched. We can't know which files were the user's.
     if (scaffolded && !targetExisted) {
       await rm(target, { recursive: true, force: true }).catch(() => {});
     }

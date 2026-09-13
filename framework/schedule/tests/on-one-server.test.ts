@@ -8,7 +8,7 @@ import { ScheduledTask } from "../src/scheduled-task.js";
 import { runDueTasks } from "../src/run-due-tasks.js";
 
 /**
- * `onOneServer()` — running a task once per tick across several hosts,
+ * `onOneServer()`, running a task once per tick across several hosts,
  * rather than once per host.
  *
  * Simulated with two independent `Application`s pointed at one lock
@@ -64,7 +64,7 @@ describe("onOneServer()", () => {
     expect(runs).toHaveLength(1);
   });
 
-  it("runs on both hosts without it — the behaviour being fixed", async () => {
+  it("runs on both hosts without it, the behaviour being fixed", async () => {
     // The control. Without onOneServer() a per-host scheduler runs the
     // task per host, which is correct for most tasks and catastrophic for
     // a billing job.
@@ -80,7 +80,7 @@ describe("onOneServer()", () => {
 
   it("does not block the next tick", async () => {
     // The lock is deliberately never released, so it must be scoped to
-    // the minute — otherwise the first run would win forever and the task
+    // the minute, otherwise the first run would win forever and the task
     // would never run again until the expiry elapsed.
     const runs: string[] = [];
     const a = countingSchedule(runs, "a", (t) => t.onOneServer());
@@ -129,8 +129,8 @@ describe("onOneServer()", () => {
   });
 
   it("combines with withoutOverlapping(), which uses a separate key", async () => {
-    // They solve different problems — one host per tick, versus not
-    // overlapping itself over time — so a task may want both, and their
+    // They solve different problems, one host per tick, versus not
+    // overlapping itself over time, so a task may want both, and their
     // locks must not collide.
     const task = new ScheduledTask(() => {}).name("t").onOneServer().withoutOverlapping();
 

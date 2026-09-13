@@ -50,7 +50,7 @@ export class HttpError extends Error {
   }
 
   /**
-   * 401 — the request lacks valid credentials. Distinct from
+   * 401, the request lacks valid credentials. Distinct from
    * `forbidden()` (403), which means "we know who you are, and you may
    * not do this". Authenticating differently could resolve a 401; it
    * will never resolve a 403.
@@ -64,7 +64,7 @@ export class HttpError extends Error {
   }
 
   /**
-   * 405 — the path exists but not for this method. `Allow` is
+   * 405. The path exists but not for this method. `Allow` is
    * **mandatory** on a 405 (RFC 9110 §15.5.6) and is the only way the
    * client learns what it should have sent, so it is a required
    * parameter rather than an optional extra.
@@ -73,13 +73,13 @@ export class HttpError extends Error {
     return new HttpError(405, message).withHeaders({ Allow: allow.join(", ") });
   }
 
-  /** 413 — the request body exceeded the configured limit. */
+  /** 413, the request body exceeded the configured limit. */
   static payloadTooLarge(message = "Payload Too Large"): HttpError {
     return new HttpError(413, message);
   }
 
   /**
-   * 429 — rate limited. `retryAfterSeconds` sets `Retry-After`; omit it
+   * 429, rate limited. `retryAfterSeconds` sets `Retry-After`; omit it
    * only when the caller genuinely cannot say when to retry.
    */
   static tooManyRequests(message = "Too Many Requests", retryAfterSeconds?: number): HttpError {

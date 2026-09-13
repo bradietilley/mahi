@@ -15,7 +15,7 @@ import type { Dialect } from "../src/schema/dialect.js";
  * cross-dialect integration suite proves the SQL is *accepted*; these
  * prove it is *shaped right*, and run everywhere.
  *
- * The MySQL/Postgres connections below are never connected — a
+ * The MySQL/Postgres connections below are never connected, a
  * `Kysely` instance compiles queries without touching its pool, which
  * is exactly what `toSql()` exercises.
  */
@@ -99,7 +99,7 @@ describe("query grammar", () => {
 
   it("emits row locks only where the engine has them", () => {
     // SQLite has no row-level locking and rejects the clause outright,
-    // so the intent is recorded but never compiled — see `lock()`.
+    // so the intent is recorded but never compiled. See `lock()`.
     expect(query("sqlite").lockForUpdate().toSql()).not.toContain("for update");
     expect(query("mysql").lockForUpdate().toSql()).toContain("for update");
     expect(query("postgres").lockForUpdate().toSql()).toContain("for update");
@@ -153,7 +153,7 @@ describe("timestamp formatting", () => {
   });
 
   it("writes MySQL's space-separated form, which is the only one it accepts", () => {
-    // Strict mode rejects the trailing `Z` outright — this is what made
+    // Strict mode rejects the trailing `Z` outright. This is what made
     // `migrate` unable to record a migration on MySQL.
     expect(formatTimestamp("mysql", at)).toBe("2026-09-02 07:31:37.499");
   });
@@ -189,7 +189,7 @@ describe("timestamp formatting", () => {
     });
 
     it("leaves anything that isn't an unambiguous instant alone", () => {
-      // A bare date, a time, and ordinary text must pass through — this
+      // A bare date, a time, and ordinary text must pass through. This
       // runs over declared datetime columns, but rewriting a value that
       // merely looks date-ish would corrupt it.
       expect(toDriverTimestamp("mysql", "2026-09-02")).toBe("2026-09-02");

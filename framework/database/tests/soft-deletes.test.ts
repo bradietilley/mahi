@@ -84,7 +84,7 @@ describe("SoftDeletes", () => {
     expect(await Widget.find("1")).toMatchObject({ name: "Sprocket" });
   });
 
-  it("forceDelete() actually removes the row — withTrashed() no longer finds it", async () => {
+  it("forceDelete() actually removes the row, withTrashed() no longer finds it", async () => {
     await Widget.delete("1");
     await (await Widget.withTrashed().where("id", "1").first())!.forceDelete();
 
@@ -142,7 +142,7 @@ describe("SoftDeletes", () => {
       const affected = await Widget.query().where("name", "Sprocket").delete();
       expect(affected).toBe(1);
 
-      // The row is still there, just trashed — the whole point of the
+      // The row is still there, just trashed, the whole point of the
       // model declaring soft deletes.
       const trashed = await Widget.withTrashed().where("id", "1").first();
       expect(trashed).toBeTruthy();

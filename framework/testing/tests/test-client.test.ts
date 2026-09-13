@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { TestClient } from "../src/test-client.js";
 
 /**
- * `TestClient` only needs a `request()`-shaped function — proved here
+ * `TestClient` only needs a `request()`-shaped function, proved here
  * against a trivial in-memory Hono app, no real `Application` required.
  */
 function makeClient(): TestClient {

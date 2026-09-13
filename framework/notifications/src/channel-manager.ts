@@ -5,12 +5,12 @@ import type { NotificationRoutable } from "./notifiable.js";
 
 /**
  * Resolves named notification channels and fans a single `Notification`
- * out across every channel its `via()` returns — the notifications
+ * out across every channel its `via()` returns, the notifications
  * analogue of `MailManager`/`CacheManager`/`QueueManager`.
  *
  * Built-in channels (`mail`/`database`/`broadcast`) are registered via
  * `extend()` by `NotificationsServiceProvider`, exactly the way a plugin
- * would register an additional channel — there is no `via()`-names-an-
+ * would register an additional channel. There is no `via()`-names-an-
  * arbitrary-class dynamic-driver magic (Laravel's
  * `ChannelManager::createDriver()` falls back to `class_exists($driver)`;
  * this doesn't). A `via()` entry naming an unregistered channel throws the
@@ -24,7 +24,7 @@ export class ChannelManager extends Manager<NotificationChannel> {
   /**
    * Deliver `notification` to `notifiable` over every channel its `via()`
    * lists, sequentially. Each channel resolves lazily on first use and is
-   * cached thereafter. Errors propagate to the caller — a caller that
+   * cached thereafter. Errors propagate to the caller. A caller that
    * wants best-effort delivery across channels wraps its own dispatch (or
    * queues per-channel).
    *
@@ -43,7 +43,7 @@ export class ChannelManager extends Manager<NotificationChannel> {
     await this.deliver(notifiable, notification);
   }
 
-  /** Fan `notification` out across its `via()` channels — the actual delivery. */
+  /** Fan `notification` out across its `via()` channels, the actual delivery. */
   private async deliver(
     notifiable: NotificationRoutable,
     notification: Notification,

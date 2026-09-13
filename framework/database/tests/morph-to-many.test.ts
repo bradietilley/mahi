@@ -32,7 +32,7 @@ interface VideoAttributes {
 }
 
 /**
- * One `taggables` pivot shared by posts and videos — the canonical
+ * One `taggables` pivot shared by posts and videos, the canonical
  * polymorphic many-to-many. `Post.tags`/`Video.tags` read it as
  * `morphToMany`; `Tag.posts`/`Tag.videos` read the SAME pivot back as
  * `morphedByMany`.
@@ -97,7 +97,7 @@ class Post extends Model<PostAttributes>()({
       type: "post",
       withTimestamps: true,
     }),
-    /** No explicit `type` — defaults to this model's morphAlias(). */
+    /** No explicit `type`, defaults to this model's morphAlias(). */
     defaultedTags: morphToMany(() => Tag, {
       pivotTable: "taggables",
       morphType: "taggable_type",
@@ -195,7 +195,7 @@ describe("Polymorphic many-to-many", () => {
     await Video.create({ id: "v1", url: "http://example.com/v1" });
 
     // p1 -> release(5), news(1);  p2 -> release(9);  v1 -> release(2)
-    // Note v1 and p1 BOTH link tag t-rel — the discriminant is the only
+    // Note v1 and p1 BOTH link tag t-rel. The discriminant is the only
     // thing separating them.
     await kysely
       .insertInto("taggables")
@@ -286,7 +286,7 @@ describe("Polymorphic many-to-many", () => {
     });
 
     it("defaults the discriminant to the declaring model's morphAlias()", async () => {
-      // Unmapped, Post.morphAlias() is "posts" (the table) — which no
+      // Unmapped, Post.morphAlias() is "posts" (the table), which no
       // pivot row stores, so nothing matches.
       const post = await Post.findOrFail("p1");
       expect((await (post as any).relations.defaultedTags().get()).isEmpty()).toBe(true);
@@ -307,7 +307,7 @@ describe("Polymorphic many-to-many", () => {
     });
 
     it("filters by the RELATED model's discriminant", async () => {
-      // The same tag, same pivot — only `type` differs between these two.
+      // The same tag, same pivot, only `type` differs between these two.
       const tag = await Tag.findOrFail("t-rel");
 
       expect((await (tag as any).relations.posts().get()).count()).toBe(2);
@@ -344,7 +344,7 @@ describe("Polymorphic many-to-many", () => {
       const post = await Post.findOrFail("p1");
       const tag = (await (post as any).relations.tagsWithPivot().get()).first()!;
 
-      // The pivot is readable, but is not a column of `tags` — so it must
+      // The pivot is readable, but is not a column of `tags`, so it must
       // not appear in the row object or be dirty-trackable.
       expect(tag.pivot.weight).toBeDefined();
       expect(Object.keys(tag.toObject())).toEqual(["id", "name"]);
@@ -406,7 +406,7 @@ describe("Polymorphic many-to-many", () => {
 
     it("does not shadow the related model's own timestamp columns", async () => {
       // `tags` has no created_at, so this only proves the prefix keeps
-      // the two namespaces apart — but that's exactly the collision the
+      // the two namespaces apart, but that's exactly the collision the
       // pivot__ prefix exists to prevent.
       const post = await Post.findOrFail("p1");
       const tag = (await (post as any).relations.tagsWithTimestamps().get()).first()!;

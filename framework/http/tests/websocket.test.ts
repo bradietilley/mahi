@@ -14,7 +14,7 @@ import type { Router } from "../src/router.js";
  * of its own alongside a framework one (a PTY bridge next to the
  * broadcast socket, say) needs a way to get one. Building a second
  * `createNodeWebSocket()` looks like the obvious answer, compiles, and
- * then **crashes the process on the first connection** — see
+ * then **crashes the process on the first connection**. See
  * `WebSocketSupport`. The kernel owns a single helper instead, and the
  * case worth guarding is "two routes, one helper, both work".
  */
@@ -100,7 +100,7 @@ describe("HttpKernel websocket support", () => {
 
     const port = await serve(app);
 
-    // Both, and in either order — the failure this guards against took the
+    // Both, and in either order, the failure this guards against took the
     // whole process down on whichever connected first.
     expect(await exchange(port, "/first")).toEqual(["first"]);
     expect(await exchange(port, "/second")).toEqual(["second"]);

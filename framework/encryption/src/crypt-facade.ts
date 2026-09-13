@@ -13,12 +13,12 @@ import { ENCRYPTER_TOKEN } from "./encryption-service-provider.js";
  *
  * Prefer constructor-injecting `Encrypter` (via `ENCRYPTER_TOKEN`) where
  * that's practical (e.g. inside a `ServiceProvider`/`Command` that
- * already receives `app`) — reach for this only at call sites where
+ * already receives `app`), use this only at call sites where
  * threading `app`/`Encrypter` through is genuinely inconvenient, same
  * guidance as `app()` itself.
  */
 export class Crypt extends Facade<Encrypter>(() => ENCRYPTER_TOKEN) {
-  /** `aad` binds the ciphertext to a context — see `Encrypter.encrypt()`. */
+  /** `aad` binds the ciphertext to a context. See `Encrypter.encrypt()`. */
   static encrypt(value: string, aad?: string): string {
     return this.instance().encrypt(value, aad);
   }

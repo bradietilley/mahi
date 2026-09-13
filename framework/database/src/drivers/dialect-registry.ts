@@ -4,7 +4,7 @@ import type { Dialect } from "../schema/dialect.js";
 /**
  * Which engine a given `Kysely` instance talks to.
  *
- * The query layer needs this constantly — `FOR UPDATE` is a syntax error
+ * The query layer needs this constantly. `FOR UPDATE` is a syntax error
  * on SQLite, `strftime()` doesn't exist on MySQL, `"quoted"` identifiers
  * are string literals there, and `RETURNING` is the only way to read a
  * generated key on Postgres. But a `QueryBuilder` is handed a
@@ -19,14 +19,14 @@ import type { Dialect } from "../schema/dialect.js";
  * creates. That key is what makes this survive the case that matters:
  * `db.transaction()` produces a *new* `Transaction` object, so keying by
  * the `Kysely` instance itself would lose the dialect the moment any
- * query ran inside a transaction — and every model write does. The
+ * query ran inside a transaction, and every model write does. The
  * adapter, by contrast, is created once per dialect and shared by the
  * root instance and every `Transaction`/`withoutPlugins()` derivative
  * (verified against Kysely 0.29), so a lookup through it resolves in
  * all of them.
  *
  * A `WeakMap` rather than a `Map` so a discarded connection's entry is
- * collectable — tests build hundreds of throwaway in-memory SQLite
+ * collectable, tests build hundreds of throwaway in-memory SQLite
  * connections.
  *
  * Registration happens in `errorTranslatingDialect()`, which every
@@ -41,7 +41,7 @@ export function registerDialect(adapter: object, dialect: Dialect): void {
 }
 
 /**
- * The engine behind `db` — including when `db` is a `Transaction` rather
+ * The engine behind `db`, including when `db` is a `Transaction` rather
  * than the root connection.
  *
  * Falls back to `"sqlite"` for a `Kysely` this framework didn't build

@@ -3,10 +3,10 @@ import { Key } from "../terminal/key.js";
 import { displayWidth } from "../render/text-width.js";
 
 /**
- * The text-input engine behind `ask()` — port of `Concerns/
+ * The text-input engine behind `ask()`, port of `Concerns/
  * TypedValue.php`: owns `value`/`cursorPosition`, handles arrow-key/
  * Home/End/Backspace/Delete/word-delete/printable-char editing, and
- * exposes `renderWithCursor()` (the `addCursor()` port — inverse-video
+ * exposes `renderWithCursor()` (the `addCursor()` port, inverse-video
  * block cursor, left/right ellipsis when the value is wider than the
  * available box width).
  */
@@ -113,7 +113,7 @@ export class TypedValue {
   /**
    * Character offset of the word boundary immediately before the
    * cursor. Punctuation is treated as a word boundary (so
-   * "word.word" deletes in two steps) — a simplified port of PHP's
+   * "word.word" deletes in two steps), a simplified port of PHP's
    * `findWordStartBeforeCursor()` (skips the ICU `IntlBreakIterator`
    * refinement, which has no direct Node/JS equivalent without a new
    * dependency; the regex-based fallback PHP itself falls back to
@@ -141,7 +141,7 @@ export class TypedValue {
   /**
    * Renders the value with a virtual inverse-video block cursor,
    * truncating (with a dim ellipsis) on either side when the value is
-   * wider than `maxWidth` — port of `TypedValue::addCursor()`.
+   * wider than `maxWidth`, port of `TypedValue::addCursor()`.
    */
   renderWithCursor(maxWidth?: number): string {
     return addCursor(this.value, this.cursorPosition, maxWidth);
@@ -151,7 +151,7 @@ export class TypedValue {
 /**
  * Renders `value` with a virtual inverse-video block cursor at
  * `cursorPosition`, truncating (with a dim ellipsis) on either side
- * when wider than `maxWidth` — exported standalone so `ask.ts` can
+ * when wider than `maxWidth`, exported standalone so `ask.ts` can
  * render a placeholder with the cursor pinned to position 0 without
  * constructing a full `TypedValue` instance.
  */

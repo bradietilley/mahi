@@ -1,6 +1,6 @@
 # @mahiframework/http-client
 
-HTTP client — a fluent, retryable HTTP client with fakes for Mahi.
+HTTP client, a fluent, retryable HTTP client with fakes for Mahi.
 
 Part of the [Mahi](https://github.com/bradietilley/mahi) framework.
 

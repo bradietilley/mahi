@@ -56,7 +56,7 @@ are the connection and the named queue (`{ connection: "database", queue:
 "emails" }`). A job doesn't get to decide where it runs; the caller does.
 
 `afterCommit` is the one exception, and only because it's about the job's
-own data dependency — a job that reads rows written by the transaction
+own data dependency. A job that reads rows written by the transaction
 dispatching it should say so once on the class, not at every call site.
 
 **There is no `ShouldQueue` marker interface.** Extending `Job` *is* the
@@ -64,11 +64,11 @@ marker for "this is a queueable job".
 
 **Uniqueness has two levels, and they solve different problems:**
 
-- **Dispatch-time uniqueness** — a `static unique` marker on the class
+- **Dispatch-time uniqueness**: a `static unique` marker on the class
   (`ShouldBeUnique`) stops a *duplicate* being enqueued at all. A burst of
   100 dispatches of the same unique job enqueues one row. See
   [Unique jobs](#unique-jobs) below.
-- **Run-time exclusivity** — the `WithoutOverlapping` middleware stops two
+- **Run-time exclusivity**: the `WithoutOverlapping` middleware stops two
   *already-enqueued* instances from *running* at the same time. It does
   not prevent duplicate dispatch. See [`WithoutOverlapping`](#withoutoverlapping).
 
@@ -94,23 +94,23 @@ const dropped = await Bus.dispatch(new SyncInventory("ABC")); // false — dropp
 
 `Bus.dispatch()`/`QueueManager.dispatch()` acquire a cache lock keyed by
 `mahi:unique:<jobName>:<uniqueId>` before pushing. If it's already held,
-the dispatch is a **silent no-op** returning `false` — the duplicate is
+the dispatch is a **silent no-op** returning `false`. The duplicate is
 dropped, matching Laravel.
 
 | `static unique` | Lock acquired | Lock released |
 |---|---|---|
-| `"untilFinished"` | at dispatch | when the job **finishes** (deleted after success, failed after exhausting attempts) — a duplicate is dropped while one is queued OR running |
+| `"untilFinished"` | at dispatch | when the job **finishes** (deleted after success, failed after exhausting attempts). A duplicate is dropped while one is queued OR running |
 | `"untilProcessing"` | at dispatch | when a worker **starts** processing it (before `handle()`), so a new instance can be queued while one runs |
 
 Optional hooks (read state off `this`):
 
-- `uniqueId(): string` — distinguishes *which* unique job. Defaults to
+- `uniqueId(): string`: distinguishes *which* unique job. Defaults to
   `""` (class-wide: only one may be queued at a time).
-- `uniqueFor(): number` — the lock TTL in seconds (default: the
+- `uniqueFor(): number`: the lock TTL in seconds (default: the
   connection's `uniqueFor`, then `3600`). This is the **crash safety
   net**: a worker that dies mid-job lets the lock expire rather than
   wedging the job forever. Set it above the job's worst-case runtime.
-- `uniqueVia(): string | CacheStore` — which cache store backs the lock
+- `uniqueVia(): string | CacheStore`: which cache store backs the lock
   (default: the cache manager's default store).
 
 **Store caveat.** Uniqueness is only as strong as the store. The `array`
@@ -121,7 +121,7 @@ a logged warning) rather than throwing.
 
 The lock is acquired in the dispatching process and released in whichever
 worker later runs the job, so release goes through `Lock.forceRelease()`
-(owner-less, keyed) — the worker recomputes the same key from the job's
+(owner-less, keyed), the worker recomputes the same key from the job's
 class name and `uniqueId()`, so nothing about the lock is persisted in the
 payload.
 
@@ -134,14 +134,14 @@ Job.prototype.maxAttempts = 3;
 Not a field initializer. This is deliberate and it has a visible
 consequence.
 
-`encodeJob()` serializes a job with `{ ...job }` — **own enumerable
+`encodeJob()` serializes a job with `{ ...job }`, **own enumerable
 fields only**. A prototype property is not an own field, so the default
 `3` is never written into the payload. A rebuilt job inherits it from the
 prototype instead. The payload stays small, and a job
 enqueued before you changed the default picks up the new default on its
 next attempt rather than carrying the old one forever.
 
-Override it with a field initializer and the opposite happens — on
+Override it with a field initializer and the opposite happens, on
 purpose:
 
 ```ts
@@ -173,7 +173,7 @@ backoff(attempts: number): number {
 ```
 
 Overrides the worker's default linear backoff. See
-[The off-by-one in backoff](#the-off-by-one-in-backoff) — it matters.
+[The off-by-one in backoff](#the-off-by-one-in-backoff). It matters.
 
 ### `retryUntil()`
 
@@ -216,7 +216,7 @@ retry/fail path.
 termination, JavaScript cannot forcibly abort an in-flight `await`. The
 `handle()` promise **keeps running in the background** after the race
 rejects. A job that timed out may still complete its database writes,
-still send its email, still hold its lock — minutes later, in a worker
+still send its email, still hold its lock, minutes later, in a worker
 that has already moved on and possibly already retried it.
 
 Treat `timeout()` as a scheduling hint, not an isolation boundary. If a
@@ -253,8 +253,8 @@ export async function decodeJob(app, JobClass, state): Promise<Job> {
 }
 ```
 
-`Object.create` gives an object with the right prototype chain — so all
-the methods work, `instanceof` holds, prototype defaults apply — and
+`Object.create` gives an object with the right prototype chain, so all
+the methods work, `instanceof` holds, prototype defaults apply, and
 `Object.assign` puts the decoded fields back. Your constructor body is
 **never executed** on the worker.
 
@@ -263,17 +263,17 @@ Practical rules:
 - **Anything your constructor computes must be assigned to a field.**
   `this.slug = slugify(title)` survives. A local variable does not.
 - **Constructor side effects run exactly once, at dispatch.** That's the
-  point — a constructor that increments a counter or writes a row won't do
+  point, a constructor that increments a counter or writes a row won't do
   it again on each retry.
 - **Fields must be JSON-round-trippable**, with one exception: `Model`
   instances, which get special encoding (below). A `Date` field comes back
   as a string. A `Map` comes back as `{}`. A class instance that isn't a
   `Model` comes back as a plain object with the right keys and *no
-  prototype* — its methods are gone.
+  prototype*, its methods are gone.
 - **Getters and methods live on the prototype**, so they survive
   perfectly. Only own enumerable data fields are serialized.
 
-The `sync` driver performs the **same** round-trip — encode, then decode —
+The `sync` driver performs the **same** round-trip, encode, then decode,
 even though it never leaves the process. That is deliberate: a job that
 works under `sync` and breaks under `database` because of a
 non-serializable field would be the worst possible thing to discover in
@@ -305,7 +305,7 @@ Job [SomeJob] is not registered. Register it via a provider's jobs() hook
 so it can be dispatched and reconstructed by name.
 ```
 
-The name is what's persisted, not the class name — so it must be stable
+The name is what's persisted, not the class name, so it must be stable
 across deploys and survive minification. Treat the strings as append-only,
 like enum members: renaming one orphans every job already sitting in the
 queue under the old name (the worker will fail them immediately as an
@@ -345,7 +345,7 @@ export class WelcomePostAuthorJob extends Job {
 }
 ```
 
-`this.author` really is a `User`, freshly loaded — not a stale snapshot
+`this.author` really is a `User`, freshly loaded, not a stale snapshot
 from dispatch time. That freshness is the *reason* for the reference
 encoding, beyond payload size: a job that runs five minutes after dispatch
 should see the row as it is now.
@@ -404,7 +404,7 @@ value (has it been saved?).
 | `Collection` | → array, each item encoded |
 | `Array` | recursed |
 | Plain object (prototype is `Object.prototype` or `null`) | recursed |
-| Anything else — `DateTime`, a custom class, a `Map` | passed through untouched |
+| Anything else: `DateTime`, a custom class, a `Map` | passed through untouched |
 
 Other class instances are **not** deeply traversed. No surprising walks
 into arbitrary objects; the rule is predictable and you can reason about
@@ -446,7 +446,7 @@ If *any* referenced model is missing and that model has
 
 ### `QueueManager`
 
-`QueueManager extends Manager<QueueDriver>` — synchronous resolution,
+`QueueManager extends Manager<QueueDriver>`, synchronous resolution,
 per-name caching, same as every other manager.
 
 | Method | Purpose |
@@ -473,7 +473,7 @@ await Bus.dispatch(new SendDigestJob(user), { delaySeconds: 3600 });
 await Bus.dispatch(new HeavyReportJob(id), { connection: "database" });
 ```
 
-Two statics — `dispatch` and `chain` — proxying `QUEUE_TOKEN`. As with
+Two statics, `dispatch` and `chain`, proxying `QUEUE_TOKEN`. As with
 every facade in Mahi, prefer injecting `QueueManager` where you already
 have `app`.
 
@@ -515,7 +515,7 @@ its `chain`. The worker pops the first remaining link after a success,
 dispatches it carrying the remainder forward, and so on. An empty array is
 a no-op.
 
-A failed link **stops the chain** — the remaining links are never
+A failed link **stops the chain**. The remaining links are never
 dispatched. A *released* link doesn't stop it; the release re-queues the
 same job with its chain intact.
 
@@ -530,7 +530,7 @@ queue the worker is draining.
 Uniqueness still applies to **each link independently**, matching
 Laravel. A link whose class is `static unique` takes its lock as it is
 pushed, exactly as a direct dispatch would; if an identical job is
-already queued, that link is dropped — and so is the remainder of the
+already queued, that link is dropped, and so is the remainder of the
 chain, which travels on that push. This is the same "a duplicate is a
 silent no-op" contract `dispatch()` has, so the worker logs it rather
 than leaving a chain that just stops.
@@ -548,13 +548,13 @@ await DB.transaction(async () => {
 
 This is a race. The job carries `{ __model: "order", __id }`, and the
 worker rehydrates it by loading that row. But the transaction hasn't
-committed yet — so on MySQL/Postgres, where the job row goes in on a
+committed yet, so on MySQL/Postgres, where the job row goes in on a
 different pooled connection and commits immediately, a worker can pop the
 job and find no order. The job fails on a row that exists a millisecond
 later.
 
 `afterCommit` fixes it by holding the push until the outermost
-transaction commits — and skipping it entirely if the transaction rolls
+transaction commits, and skipping it entirely if the transaction rolls
 back:
 
 ```ts
@@ -575,11 +575,11 @@ dispatch out of a connection-wide default.
 Semantics that follow from being built on the transaction context:
 
 - **Nesting hoists.** A dispatch inside a nested `transaction()` waits for
-  the *outermost* commit — a released savepoint isn't durable on its own.
+  the *outermost* commit. A released savepoint isn't durable on its own.
 - **A rolled-back savepoint discards its dispatches**, while the enclosing
   transaction's are untouched.
 - **Exactly once.** Not once per nesting level.
-- **Outside a transaction it's a no-op** — the push happens immediately.
+- **Outside a transaction it's a no-op**: the push happens immediately.
 
 It works on every driver, including `sync` (the job runs after the
 commit, or never) and `fake` (which records the deferral, so
@@ -588,8 +588,8 @@ commit, or never) and `fake` (which records the deferral, so
 Without `afterCommit`, the push participates in the transaction directly:
 the `jobs` row is written on the transaction's own connection, so it
 commits or rolls back with everything else. That's still a race against
-workers — the row becomes visible at commit, which may be before the
-dispatching code has finished — just a much narrower one.
+workers. The row becomes visible at commit, which may be before the
+dispatching code has finished, just a much narrower one.
 
 ## Drivers
 
@@ -618,9 +618,9 @@ rehydration, the middleware pipeline, and chain advancement. Everything
 except persistence and retries.
 
 `pop()` always returns `undefined`. `release()`, `delete()` and `fail()`
-are no-ops — nothing was ever queued, so there's nothing to release, and
+are no-ops. Nothing was ever queued, so there's nothing to release, and
 there is no `failed_jobs` for this driver. **A throwing sync job throws at
-the dispatch site.** There is no retry, no backoff, no failed-jobs row —
+the dispatch site.** There is no retry, no backoff, no failed-jobs row.
 `maxAttempts` is meaningless here.
 
 A `ReleaseJobError` from middleware also surfaces to the caller, since
@@ -660,7 +660,7 @@ failed_jobs
   index (failed_at)
 ```
 
-Run `./artisan migrate` — `QueueServiceProvider` contributes both
+Run `./artisan migrate`, `QueueServiceProvider` contributes both
 migrations. They're unused if you never resolve the `database` connection.
 
 #### Eligibility and the visibility timeout
@@ -676,7 +676,7 @@ AND (reserved_at IS NULL OR reserved_at <= now - retryAfter)
 That last clause is the important one. `pop()` sets `reserved_at`; if the
 worker holding the job is killed (`SIGKILL`, OOM, a hardware fault),
 nothing ever clears it. Without a **visibility timeout** the job is
-stranded permanently: not queued, not failed, not in `queue:failed` — just
+stranded permanently: not queued, not failed, not in `queue:failed`, just
 gone. `retryAfter` (default 90s, configurable per connection) is how long
 a reservation is honoured before another worker may take it, and a
 reclaimed job comes back with `attempts` incremented, so a job that
@@ -695,7 +695,7 @@ second worker running it concurrently.
 How the reservation is taken depends on the dialect, because the right
 answer differs:
 
-**MySQL 8+ / Postgres** — one short transaction:
+**MySQL 8+ / Postgres**, one short transaction:
 
 ```sql
 SELECT * FROM jobs WHERE <eligible> ORDER BY available_at, id
@@ -706,7 +706,7 @@ UPDATE jobs SET reserved_at = now WHERE id = ?;
 `SKIP LOCKED` makes concurrent workers step over each other's locked rows
 instead of queueing behind them, so throughput scales with worker count.
 
-**SQLite** — read a small bounded batch, then win one with a conditional
+**SQLite**, read a small bounded batch, then win one with a conditional
 update:
 
 ```ts
@@ -726,20 +726,20 @@ worker reading and JSON-parsing the entire backlog on every poll.
 That index's column order is deliberate, and it is about correctness as
 much as speed. It has to satisfy `pop()`'s `ORDER BY available_at, id`,
 because on MySQL a `... ORDER BY ... FOR UPDATE SKIP LOCKED` that needs a
-**filesort locks every row it sorts** — so a second worker skips all of
+**filesort locks every row it sorts**, so a second worker skips all of
 them and gets nothing. Three workers polling a three-job queue would come
 back with one job between them. If you add your own index here, keep
 `available_at` ahead of anything else.
 
 Timestamps are written truncated to whole seconds. These columns are
-second-precision, and Postgres *rounds* rather than truncates — so a job
+second-precision, and Postgres *rounds* rather than truncates, so a job
 pushed with no delay was stored up to half a second in the *future* and
 `available_at <= now` was false. The queue looked permanently empty.
 
 #### Transactions
 
-Every statement resolves its connection at call time — `getActiveTransaction()
-?? root`, exactly like `Model` — so a job pushed inside `DB.transaction()`
+Every statement resolves its connection at call time, `getActiveTransaction()
+?? root`, exactly like `Model`, so a job pushed inside `DB.transaction()`
 commits or rolls back *with* that transaction on every engine. See
 [Dispatching inside a transaction](#dispatching-inside-a-transaction).
 
@@ -762,7 +762,7 @@ This driver also implements `FailedJobRepository`, which is what the
 
 Records every `push()` into an array and runs nothing. `QueueServiceProvider`
 registers it alongside `sync` and `database`, so it's always available as a
-connection name without any test-only wiring — point `queue.default` at
+connection name without any test-only wiring, point `queue.default` at
 `"fake"`, pass `{ connection: "fake" }`, or let
 `createTestApplication({ fakeQueue: true })` `swap()` it in.
 
@@ -799,13 +799,13 @@ interface PushedJob {
 | `assertPushedTimes(job, times, filter?)` | Exactly `times`. |
 | `assertPushedAfterCommit(job, filter?)` | Deferred until the transaction committed. |
 | `assertNothingPushed()` | Nothing at all. |
-| `reset()` | Discard recordings — for a `beforeEach()`. |
+| `reset()` | Discard recordings: for a `beforeEach()`. |
 
 The fake honours `afterCommit` for real: it defers the *recording* the
 same way a durable driver defers the push, so a test can assert that a
 rolled-back transaction pushed nothing.
 
-`job` is a `JobIdentifier` — either the registered name string or **the
+`job` is a `JobIdentifier`, either the registered name string or **the
 class itself**. Prefer the class: it matches the dispatch site, survives a
 rename, and a typo is a compile error rather than a silently-passing
 `assertNotPushed()`. The class form needs a `JobRegistry`, which
@@ -813,7 +813,7 @@ rename, and a typo is a compile error rather than a silently-passing
 connection both supply. A bare `new FakeQueueDriver()` throws a message
 saying so rather than quietly matching nothing.
 
-Note `assertPushedTimes` — "this ran once, not twice" is exactly the shape
+Note `assertPushedTimes`, "this ran once, not twice" is exactly the shape
 of a duplicate-dispatch bug, and it's the assertion `assertPushed()`
 cannot make.
 
@@ -835,8 +835,8 @@ runner-agnostic.
 | Needs a worker | no | yes | no | yes |
 
 ¹ The Redis driver has no database transaction to observe. Dispatch with
-`{ afterCommit: true }` still works — `QueueManager` falls back to an
-immediate push — but it does not defer. Use the `database` connection for
+`{ afterCommit: true }` still works, `QueueManager` falls back to an
+immediate push, but it does not defer. Use the `database` connection for
 jobs that must not be visible before their rows are committed.
 
 ### `redis`
@@ -857,7 +857,7 @@ gets pushed back onto the ready list with `attempts` incremented. That is
 the same crash recovery the database driver gets from its `reserved_at`
 predicate.
 
-Every mutation is a **single Lua script** — reserve, release, fail, retry.
+Every mutation is a **single Lua script**, reserve, release, fail, retry.
 The alternative (`LREM` then `LPUSH` from the client) loses the job
 outright if the worker dies between the two commands, which is exactly the
 failure this driver exists to survive. Scripts are loaded once and invoked
@@ -865,7 +865,7 @@ by `EVALSHA`, with a transparent reload on `NOSCRIPT`, so a poll costs 40
 bytes rather than a few kilobytes of script body.
 
 This driver implements `FailedJobRepository`, so `queue:failed`,
-`queue:retry`, `queue:forget` and `queue:flush` all work against it —
+`queue:retry`, `queue:forget` and `queue:flush` all work against it,
 storing the full stack trace, the chain and the originating queue, same
 as the database driver.
 
@@ -885,11 +885,11 @@ as the database driver.
 | `--sleep <seconds>` | `3` | How long to sleep when `pop()` returns nothing. |
 | `--once` | off | Process a single job (or wait once) and exit. For tests and scripts. |
 | `--tries <n>` | each job's `maxAttempts` | Override the attempt budget for every job. |
-| `--timeout <seconds>` | — | Soft timeout for jobs that define no `timeout()`. |
+| `--timeout <seconds>` |: | Soft timeout for jobs that define no `timeout()`. |
 | `--backoff <seconds>` | `attempts * 5` | Retry delay for jobs that define no `backoff()`. |
 | `--memory <mb>` | `128` | Stop once heap usage crosses this. |
-| `--max-jobs <n>` | — | Stop after this many jobs. |
-| `--max-time <seconds>` | — | Stop after this long. |
+| `--max-jobs <n>` |: | Stop after this many jobs. |
+| `--max-time <seconds>` |: | Stop after this long. |
 | `--stop-when-empty` | off | Stop as soon as the queue drains (batch/CI runs). |
 
 ### Stopping is normal
@@ -908,7 +908,7 @@ force-killed. On either signal the loop stops after the current job.
 ./artisan queue:restart
 ```
 
-Tells every running worker to stop after its current job — the deploy
+Tells every running worker to stop after its current job, the deploy
 step, since workers hold their job classes in memory from boot and would
 otherwise keep running the old code. It writes a timestamp to the cache;
 each worker compares it with its own start time. **It needs a cache store
@@ -920,7 +920,7 @@ store nothing else can see the signal.
 ```
 
 Deletes every pending job on a queue without running it. Destructive and
-irreversible — the jobs are gone, not failed.
+irreversible. The jobs are gone, not failed.
 
 **Guarded in production** by the same check the migration commands use: it
 prompts on a terminal (defaulting to *no*), and with no terminal it refuses
@@ -972,7 +972,7 @@ try {
 }
 ```
 
-No retry. There is nothing sensible to retry — the class won't exist next
+No retry. There is nothing sensible to retry. The class won't exist next
 minute either. Straight to `failed_jobs`. This is how jobs orphaned by a
 renamed registry key surface.
 
@@ -987,11 +987,11 @@ await this.failJob(driver, queued, undefined, error);   // anything else
 ```
 
 A `deleteWhenMissingModels` model that no longer exists means "this work
-no longer applies": the job is removed successfully — not failed, not
+no longer applies": the job is removed successfully, not failed, not
 retried, and `handle()` never runs.
 
-Any other decode error — including the default `ModelNotFoundError` for a
-row that was deleted while the job sat in the queue — **fails that job**
+Any other decode error, including the default `ModelNotFoundError` for a
+row that was deleted while the job sat in the queue, **fails that job**
 and the worker carries on. There is nothing to retry; the row will still
 be missing next time.
 
@@ -1029,7 +1029,7 @@ if (error instanceof ReleaseJobError) {
 }
 ```
 
-A release isn't a failure — the work isn't wrong, it just shouldn't run
+A release isn't a failure. The work isn't wrong, it just shouldn't run
 *now*. But `release()` bumps `attempts`, and a lock that is never free
 would otherwise release the job forever. Bounding it by the same attempt
 budget turns "spins indefinitely" into "fails, visibly, after N tries".
@@ -1045,7 +1045,7 @@ if (attemptsExhausted || retryDeadlinePassed(job)) {
 
 Order inside `failJob()`: `driver.fail()` (the row moves to
 `failed_jobs`), then `job.failed()`, then `JobFailed`. Your `failed()`
-hook runs *after* the job is already recorded as failed — it can't veto
+hook runs *after* the job is already recorded as failed. It can't veto
 that, and if it throws, that's logged rather than allowed to kill the
 worker.
 
@@ -1073,7 +1073,7 @@ attempt that just failed**, so they agree:
 | 3rd | `2` | `3` | `3 * 5` = **15s** |
 
 (The default previously used the raw pre-increment count, making the first
-retry immediate — which hammers a downstream that has just failed. It
+retry immediate, which hammers a downstream that has just failed. It
 doesn't any more.)
 
 `--backoff <seconds>` sets a flat fallback for jobs that define no
@@ -1088,7 +1088,7 @@ export class JobProcessing extends AbstractEvent {
 ```
 
 `JobProcessing`, `JobProcessed`, and `JobFailed` (which also carries
-`error`) are dispatched through [Events](../events/) — but only when
+`error`) are dispatched through [Events](../events/), but only when
 `EVENTS_TOKEN` is bound. The queue package works standalone; events are a
 soft dependency.
 
@@ -1111,7 +1111,7 @@ listeners(): Array<[EventClass, ListenerClass]> {
 }
 ```
 
-Note `connection` is `string | undefined` — it's whatever was passed to
+Note `connection` is `string | undefined`. It's whatever was passed to
 `--connection`, so it's `undefined` when the worker is draining the
 default.
 
@@ -1130,7 +1130,7 @@ interface JobMiddleware {
 ```
 
 With no middleware, `runJobThroughMiddleware()` is literally `await
-job.handle()` — zero overhead for the common case. The same function is
+job.handle()`, zero overhead for the common case. The same function is
 used by the worker **and** the sync driver, so middleware behaves
 identically under both.
 
@@ -1143,7 +1143,7 @@ throw new ReleaseJobError(delaySeconds);   // default 0
 ```
 
 The control-flow sentinel meaning "put this back on the queue, try again
-in `delaySeconds`" — as distinct from a real failure. The work isn't
+in `delaySeconds`", as distinct from a real failure. The work isn't
 wrong; it just shouldn't run *right now*. Handled at step 6 above, before
 any attempts logic.
 
@@ -1170,7 +1170,7 @@ entirely.
 
 **It fails open.** If no limiter is registered under that name, the
 middleware calls `next()` and the job runs unthrottled, matching Laravel.
-No error, no warning — a typo in the limiter name silently disables the
+No error, no warning, a typo in the limiter name silently disables the
 rate limit. Worth a test.
 
 The limiter callback receives the **job instance**, so you can scope
@@ -1206,24 +1206,24 @@ middleware(): JobMiddleware[] {
 
 The store can be a live `CacheStore`, a store *name*, or omitted
 (`WithoutOverlapping.for(key)`) to resolve the default cache store from the
-container (`CACHE_TOKEN`) at run time — so a job need not thread a store
+container (`CACHE_TOKEN`) at run time, so a job need not thread a store
 through itself.
 
 Fluent helpers mirror Laravel: `.releaseAfter(s)`, `.dontRelease()`,
 `.expireAfter(s)`, `.shared()`.
 
 Acquires a `Lock` on `overlap:<jobName>:{key}` with
-`maximumWaitForSeconds: 0` — a **non-blocking** try-once. Waiting would tie
+`maximumWaitForSeconds: 0`, a **non-blocking** try-once. Waiting would tie
 up the worker slot doing nothing.
 
 **The key is namespaced by the job class** by default, so two unrelated
 job classes using the same `key` (e.g. `"invoice:1"`) do NOT block each
 other. Call `.shared()` (or pass `shared: true`) to lock purely on the key
-across classes — Laravel's `WithoutOverlapping::shared()` — for
+across classes, Laravel's `WithoutOverlapping::shared()`, for
 coordinating distinct job classes that touch the same resource.
 
 `<jobName>` is the job's **registered** name, the same stable string
-unique jobs key on — not `constructor.name`, which a minifier is free to
+unique jobs key on, not `constructor.name`, which a minifier is free to
 collapse onto a shared identifier, silently merging two classes' locks.
 It falls back to `constructor.name` only when the registry cannot answer
 (no queue provider installed, or an unregistered class): a lock key is
@@ -1231,11 +1231,11 @@ not worth failing a job over.
 
 | `releaseAfterSeconds` | Behaviour when the lock is held |
 |---|---|
-| a number (default `5`) | `throw new ReleaseJobError(n)` — retry in `n` seconds. |
-| `false` | `return` — the job is **silently dropped**. Laravel's `dontRelease`. |
+| a number (default `5`) | `throw new ReleaseJobError(n)`: retry in `n` seconds. |
+| `false` | `return`: the job is **silently dropped**. Laravel's `dontRelease`. |
 
 The default is deliberately non-zero. A zero delay means the blocked job
-is popped, finds the lock still held, and is released again immediately —
+is popped, finds the lock still held, and is released again immediately,
 a hot loop burning a worker slot and a write per iteration for the whole
 duration of the first job's run. The release also counts an attempt, so
 the loop is bounded by `maxAttempts` regardless, but a sane delay is what
@@ -1243,7 +1243,7 @@ stops it being pathological in the first place.
 
 The lock is released in a `finally`, so a throwing job still frees it.
 `expireAfterSeconds` (default 60) is the auto-release safety net for a
-crashed holder — set it above your worst-case runtime, or a long job loses
+crashed holder, set it above your worst-case runtime, or a long job loses
 its lock mid-flight and a second copy starts.
 
 A store failure (Redis unreachable) **propagates** rather than being read
@@ -1252,7 +1252,7 @@ every job on every worker quietly release itself forever while the real
 fault went unreported.
 
 **The guarantee is only as strong as the store.** Backed by
-`ArrayCacheStore` this prevents overlap within one process only — two
+`ArrayCacheStore` this prevents overlap within one process only, two
 workers each get their own lock and both run. `FileCacheStore` covers
 every worker on one host; only Redis covers workers on several. See
 [Cache](../cache/#how-exclusive-is-a-lock-really).
@@ -1268,7 +1268,7 @@ new ThrottlesExceptions(limiter: RateLimiter, key: string, options?: {
 ```
 
 A circuit breaker. More than `maxExceptions` failures within
-`decayMinutes` and the circuit opens — subsequent runs are released
+`decayMinutes` and the circuit opens. Subsequent runs are released
 **without executing `handle()` at all** until the window elapses, sparing
 a failing downstream from being hammered by every retry.
 
@@ -1283,7 +1283,7 @@ middleware(): JobMiddleware[] {
 
 On the happy path the job runs normally. A thrown error is **counted and
 re-thrown**, so the worker's own attempts/backoff/failed-jobs handling
-still applies — the breaker only affects *future* runs once the threshold
+still applies, the breaker only affects *future* runs once the threshold
 is crossed. The counter key is `throttle-exceptions:{key}`.
 
 ## Failed jobs
@@ -1337,7 +1337,7 @@ Prints `No failed jobs.` when empty.
 
 Pushes each stored payload back onto the queue it failed on, with a
 **fresh id**, `attempts` reset to `0`, and **its chain restored**, then
-deletes the failed-jobs record — in one transaction, so a crash mid-retry
+deletes the failed-jobs record, in one transaction, so a crash mid-retry
 can't both requeue the job and keep the failed record. Reports
 `No failed job with id {id}.` for an unknown id and keeps going.
 
@@ -1358,7 +1358,7 @@ Bulk-deletes failed jobs, or only those older than `--hours`. Reports how
 many were removed. A non-numeric or negative `--hours` errors out rather
 than deleting everything.
 
-**Guarded in production**, like `queue:clear` — `failed_jobs` is the record
+**Guarded in production**, like `queue:clear`. `failed_jobs` is the record
 you read *after* an incident, so an unattended flush destroys evidence
 rather than just rows. `--hours` narrows the range but does not remove the
 need to confirm.
@@ -1392,7 +1392,7 @@ export function queueConfig(): QueueConfig {
 **`retryAfter` must exceed the longest a job can run**, including its own
 `timeout()`. Too low and a slow-but-healthy job gets a second worker
 running it concurrently; too high and a genuinely crashed worker's job
-waits that long to be retried. 90s suits most workloads — a queue of
+waits that long to be retried. 90s suits most workloads, a queue of
 long-running imports wants a higher value, and its own connection.
 
 `QueueServiceProvider` also registers `fake` regardless of config.
@@ -1418,7 +1418,7 @@ See [Events](../events/#queued-listeners).
 ./artisan queue:work --connection database --sleep 1 --max-time 3600
 ```
 
-Run it under systemd, a Docker restart policy, or PM2 — anything that
+Run it under systemd, a Docker restart policy, or PM2, anything that
 restarts the process when it exits. **The supervisor is not optional**:
 `--max-time`, `--max-jobs`, `--memory` and `queue:restart` all work by
 *exiting*, on the assumption something starts a replacement.
@@ -1435,7 +1435,7 @@ Deploy step:
 
 Workers hold their job classes in memory from boot, so without this they
 keep running the old code indefinitely. `queue:restart` needs a cache
-store the workers share — [Redis](../redis/) across hosts.
+store the workers share, [Redis](../redis/) across hosts.
 
 Scaling out means more worker processes, on as many hosts as you like:
 reserving is atomic on both durable drivers, and a worker that dies has
@@ -1453,7 +1453,7 @@ Redis does. See [Cache](../cache/#store-guarantees).
 **`maxAttempts` is not `tries`.** And its default lives on the prototype.
 
 **`timeout()` doesn't stop anything.** The `handle()` promise keeps running
-after the race rejects — JS cannot forcibly abort an in-flight `await`. So
+after the race rejects. JS cannot forcibly abort an in-flight `await`. So
 a timed-out job may still be doing work while its retry runs. **Keep
 `timeout()` well under `retryAfter`**, and make `handle()` idempotent.
 
@@ -1468,12 +1468,12 @@ dispatching works in dev and breaks in production.
 an unknown class. Append, don't rename.
 
 **A model field without `morphName` throws at dispatch**, not at run time.
-That's the good case — you find out at the call site.
+That's the good case. You find out at the call site.
 
 **`RateLimited` fails open** when the limiter name isn't registered.
 
 **Delivery is at-least-once.** A job whose worker stalls past `retryAfter`
-is reclaimed and runs again — concurrently with the original. Idempotent
+is reclaimed and runs again, concurrently with the original. Idempotent
 `handle()` is not optional advice.
 
 **`retryAfter` must exceed your slowest job.** Otherwise the recovery
@@ -1490,22 +1490,22 @@ signal is per-process, so nothing else ever sees it.
 guard across workers at all; `file` guards across workers on one host,
 `redis` across hosts.
 
-**`queue:clear` is irreversible.** The jobs are deleted, not failed —
+**`queue:clear` is irreversible.** The jobs are deleted, not failed,
 nothing records that they existed.
 
 **A production command refused for want of a terminal exits 1.** That is
 deliberate: a pipeline that forgot `--force` must fail rather than report
 success for work that never happened. An operator answering "no" at a real
-prompt exits 0 — that is a decision, not a fault.
+prompt exits 0. That is a decision, not a fault.
 
 ## Related
 
-- [Cache](../cache/) — the `RateLimiter` and `Lock` all three middleware build on
-- [Events](../events/) — queue lifecycle events, and queued listeners
-- [Mail](../mail/) — `Mail.queue()`, and why a credential must never be queued
-- [Models](../models/) — `morphName`, `deleteWhenMissingModels`
-- [Scheduling](../scheduling/) — `schedule.job(() => new SomeJob())`
-- [Redis](../redis/) — multi-process workers and cross-process locks
-- [Providers](../providers/) — the `jobs()` and `models()` hooks
-- [Testing](../testing/) — `createTestApplication({ fakeQueue: true })`
-- [Configuration](../configuration/) — `config/queue.ts`
+- [Cache](../cache/): the `RateLimiter` and `Lock` all three middleware build on
+- [Events](../events/): queue lifecycle events, and queued listeners
+- [Mail](../mail/): `Mail.queue()`, and why a credential must never be queued
+- [Models](../models/): `morphName`, `deleteWhenMissingModels`
+- [Scheduling](../scheduling/): `schedule.job(() => new SomeJob())`
+- [Redis](../redis/): multi-process workers and cross-process locks
+- [Providers](../providers/): the `jobs()` and `models()` hooks
+- [Testing](../testing/): `createTestApplication({ fakeQueue: true })`
+- [Configuration](../configuration/): `config/queue.ts`

@@ -26,7 +26,7 @@ const migration: Migration = {
       table.timestamp("reserved_at").nullable();
       table.timestamp("created_at");
       // Remaining chain links (JSON array of { jobClass, payload }) to
-      // dispatch after this job succeeds — NULL for an unchained job.
+      // dispatch after this job succeeds, NULL for an unchained job.
       table.text("chain_json").nullable();
     });
 

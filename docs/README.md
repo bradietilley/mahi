@@ -2,9 +2,9 @@
 
 A TypeScript application framework for building APIs and services on Node.js.
 
-Mahi takes the architecture that makes Laravel productive — service
+Mahi takes the architecture that makes Laravel productive, service
 providers with a two-stage lifecycle, a service container, driver-based
-managers, an expressive ORM, first-class queues and scheduling — and
+managers, an expressive ORM, first-class queues and scheduling, and
 rebuilds it for TypeScript, where the type system does work that PHP's
 runtime magic had to do at runtime.
 
@@ -56,7 +56,7 @@ Mahi returns a type.
 **No dynamic facade proxies.** Laravel's facades forward arbitrary method
 names at runtime, which no type checker can follow. Mahi's facades are
 hand-written classes with real static methods that each proxy exactly one
-token — so renaming an underlying method is a compile error, not a runtime
+token, so renaming an underlying method is a compile error, not a runtime
 surprise.
 
 **Synchronous driver resolution.** `manager.driver()` never returns a
@@ -74,60 +74,60 @@ framework to do something it didn't anticipate.
 
 ### Getting started
 
-- [Installation](./installation/) — creating and running a new application
-- [Configuration](./configuration/) — config files, environment variables
-- [Application lifecycle](./lifecycle/) — bootstrap, the two-stage boot
-- [Deployment](./deployment/) — running in production
+- [Installation](./installation/): creating and running a new application
+- [Configuration](./configuration/): config files, environment variables
+- [Application lifecycle](./lifecycle/): bootstrap, the two-stage boot
+- [Deployment](./deployment/): running in production
 
 ### Core concepts
 
-- [Service container](./container/) — binding and resolving services
-- [Service providers](./providers/) — the extension point for everything
-- [Helpers](./helpers/) — `Str`, `Arr`, `Collection`, `Number`, `data_get`
+- [Service container](./container/): binding and resolving services
+- [Service providers](./providers/): the extension point for everything
+- [Helpers](./helpers/): `Str`, `Arr`, `Collection`, `Number`, `data_get`
 
 ### The HTTP layer
 
-- [Routing](./routing/) — routes, groups, middleware, named routes, URLs
-- [Requests](./requests/) — input, files, form requests
-- [Validation](./validation/) — rules, custom messages, typed output
-- [Controllers](./controllers/) — single-action controllers
-- [Responses](./responses/) — JSON, files, redirects, API resources
+- [Routing](./routing/): routes, groups, middleware, named routes, URLs
+- [Requests](./requests/): input, files, form requests
+- [Validation](./validation/): rules, custom messages, typed output
+- [Controllers](./controllers/): single-action controllers
+- [Responses](./responses/): JSON, files, redirects, API resources
 
 ### Database
 
-- [Getting started](./database/) — connections, the query builder, transactions
-- [Models](./models/) — attributes, casts, events, serialization
-- [Relationships](./relationships/) — defining and eager-loading relations
-- [Queries](./queries/) — the fluent query builder in depth
-- [Migrations](./migrations/) — schema, seeders, factories
-- [Pagination](./pagination/) — length-aware, simple, and cursor paginators
+- [Getting started](./database/): connections, the query builder, transactions
+- [Models](./models/): attributes, casts, events, serialization
+- [Relationships](./relationships/): defining and eager-loading relations
+- [Queries](./queries/): the fluent query builder in depth
+- [Migrations](./migrations/): schema, seeders, factories
+- [Pagination](./pagination/): length-aware, simple, and cursor paginators
 
 ### Security
 
-- [Authentication](./authentication/) — guards, tokens, sessions, passwords
-- [Authorization](./authorization/) — gates, policies, abilities
-- [Encryption & hashing](./encryption/) — `Crypt`, `Hash`, signed URLs
+- [Authentication](./authentication/): guards, tokens, sessions, passwords
+- [Authorization](./authorization/): gates, policies, abilities
+- [Encryption & hashing](./encryption/): `Crypt`, `Hash`, signed URLs
 
 ### Infrastructure
 
-- [Cache](./cache/) — stores, locks, rate limiting
-- [Queues](./queues/) — jobs, workers, retries, chaining
-- [Scheduling](./scheduling/) — recurring tasks
-- [Events](./events/) — dispatching and listening
-- [Broadcasting](./broadcasting/) — websockets
-- [Storage](./storage/) — file disks
-- [Mail](./mail/) — mailables and transports
-- [Notifications](./notifications/) — multi-channel notifications
-- [Health checks](./health/) — readiness probes, `/health`, `./artisan health`
-- [Logging](./logging/) — channels and stacks
-- [Redis](./redis/) — the multi-process story
-- [HTTP client](./http-client/) — outbound requests, retries, fakes
+- [Cache](./cache/): stores, locks, rate limiting
+- [Queues](./queues/): jobs, workers, retries, chaining
+- [Scheduling](./scheduling/): recurring tasks
+- [Events](./events/): dispatching and listening
+- [Broadcasting](./broadcasting/): websockets
+- [Storage](./storage/): file disks
+- [Mail](./mail/): mailables and transports
+- [Notifications](./notifications/): multi-channel notifications
+- [Health checks](./health/): readiness probes, `/health`, `./artisan health`
+- [Logging](./logging/): channels and stacks
+- [Redis](./redis/): the multi-process story
+- [HTTP client](./http-client/): outbound requests, retries, fakes
 
 ### Tooling
 
-- [Console](./console/) — `artisan`, writing commands
-- [Testing](./testing/) — the test application, fakes, assertions
-- [Dates & times](./datetime/) — the `DateTime` API
+- [Console](./console/): `artisan`, writing commands
+- [Testing](./testing/): the test application, fakes, assertions
+- [Dates & times](./datetime/): the `DateTime` API
 
 ## Packages
 
@@ -156,10 +156,10 @@ Mahi is a set of packages, not a monolith. Install what you use.
 | `@mahiframework/testing` | Test application, HTTP client, database assertions |
 | `@mahiframework/datetime` | Immutable date/time library |
 | `@mahiframework/snowflake` | Distributed 63-bit IDs |
-| `@mahiframework/tui` | Terminal UI — prompts, tables, spinners, progress bars |
+| `@mahiframework/tui` | Terminal UI: prompts, tables, spinners, progress bars |
 | `@mahiframework/pipeline` | Send a value through a series of pipes |
 | `@mahiframework/process` | Run external commands |
-| `@mahiframework/http-client` | Outbound HTTP — fluent requests, retries, `Http.fake()` |
+| `@mahiframework/http-client` | Outbound HTTP: fluent requests, retries, `Http.fake()` |
 | `@mahiframework/facades` | The `Facade<T>` mixin |
 
 ## Requirements

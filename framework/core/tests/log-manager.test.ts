@@ -17,7 +17,7 @@ function buildManager(config: LogConfig): LogManager {
   const app = new Application();
   const manager = new LogManager(app, config);
 
-  // Register creators by *driver* name, mirroring LoggingServiceProvider —
+  // Register creators by *driver* name, mirroring LoggingServiceProvider,
   // each receives the resolving channel's own config.
   manager.extendDriver("console", () => new ConsoleLogger());
   manager.extendDriver("single", (cfg) => new FileLogger((cfg as { path: string }).path));
@@ -179,7 +179,7 @@ describe("LogManager", () => {
     it("channel() does not throw when the logging config itself is undefined", () => {
       // Pin the app root at the temp dir: the emergency fallback builds a
       // FileLogger at storage_path('logs/mahi.log'), which mkdir's its
-      // directory — keep that out of the repo's cwd.
+      // directory, keep that out of the repo's cwd.
       setBasePath(tmpDir);
       try {
         const app = new Application();

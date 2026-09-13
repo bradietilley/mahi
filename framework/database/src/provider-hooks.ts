@@ -10,7 +10,7 @@ declare module "@mahiframework/core" {
      * during `DatabaseServiceProvider` boot into the `ModelRegistry` (same
      * pattern as the queue package's `jobs()` hook), so a worker process can
      * rehydrate `{ __model, __id }` references even for models it never
-     * imported directly. A flat array of classes — the morph key comes from
+     * imported directly. A flat array of classes. The morph key comes from
      * each model's `morphName`, the lookup from its own `find()`, so no
      * per-model lambdas or key strings are needed.
      */
@@ -32,8 +32,8 @@ declare module "@mahiframework/core" {
 
     /**
      * Return this provider's migrations as explicit, statically-imported
-     * `{ name, migration }` entries — the bundle-safe form of
-     * `migrations()`, and the one to reach for when a provider's
+     * `{ name, migration }` entries, the bundle-safe form of
+     * `migrations()`, and the one to use when a provider's
      * migrations must survive `bun build --compile`/`esbuild`. Collected
      * by the same `migrate*` commands, and takes precedence over this
      * provider's `migrations()` if both are implemented.
@@ -42,8 +42,8 @@ declare module "@mahiframework/core" {
      *       return [{ name: "0001_create_jobs_table", migration: createJobsTable }];
      *     }
      *
-     * `name` is what lands in the `migrations` table and orders execution
-     * — keep it identical to the filename-without-extension the directory
+     * `name` is what lands in the `migrations` table and orders execution,
+     * keep it identical to the filename-without-extension the directory
      * form would have produced, or an app that already migrated via
      * `migrations()` will run them a second time.
      */

@@ -8,7 +8,7 @@ export interface ArrayLogEntry {
 }
 
 /**
- * Writes to an in-memory array instead of any real destination — Laravel's
+ * Writes to an in-memory array instead of any real destination, Laravel's
  * "array" driver equivalent, handy for asserting on logged output in tests
  * without touching the filesystem. Entries are kept in call order and
  * never pruned; dies with the process like `ArrayCacheStore`.

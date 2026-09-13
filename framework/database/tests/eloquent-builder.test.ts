@@ -31,7 +31,7 @@ class Post extends Model<PostAttributes>()({
   primaryKey: "id",
   timestamps: { createdAt: "created_at", updatedAt: null },
 }) {
-  /** The single builder override point — `Post.query()` returns `PostBuilder`. */
+  /** The single builder override point. `Post.query()` returns `PostBuilder`. */
   static query(): PostBuilder {
     this.bootIfNotBooted();
     const builder = new PostBuilder(this);
@@ -117,7 +117,7 @@ describe("EloquentBuilder", () => {
   });
 
   it("where(callback) builds a nested group using a fresh instance of the SAME custom builder subclass", async () => {
-    // Inside the callback, the nested builder is a PostBuilder too — its
+    // Inside the callback, the nested builder is a PostBuilder too. Its
     // own `published()`/`pinned()` scopes are callable, not just base
     // where()/orWhere().
     const rows = await Post.query()

@@ -225,7 +225,7 @@ describe("ORM correctness", () => {
 
       await Widget.create({ id: "1", name: "Taken", active: true });
 
-      // Collides on `name`, not on the `id` we matched by — the re-read
+      // Collides on `name`, not on the `id` we matched by, the re-read
       // finds nothing, so the original error must surface rather than
       // being swallowed.
       await expect(Widget.firstOrCreate({ id: "2" }, { name: "Taken" } as any)).rejects.toThrow(
@@ -241,7 +241,7 @@ describe("ORM correctness", () => {
 
     it("updateOrCreate()'s create path fires create events once, with no spurious update", async () => {
       // The recovery path applies `values` to whichever row won, which on
-      // the ordinary (uncontended) path is the one we just inserted — so
+      // the ordinary (uncontended) path is the one we just inserted, so
       // the follow-up `updateInstance()` must no-op rather than emitting a
       // second round of update events for a row nothing changed.
       const fired: string[] = [];

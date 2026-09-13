@@ -87,7 +87,7 @@ describe("ContainerBroadcastAuthorizer grants", () => {
 });
 
 /**
- * The provider passes a THUNK, not a signer — resolving the container's
+ * The provider passes a THUNK, not a signer, resolving the container's
  * signer eagerly builds the encrypter, which throws on a missing
  * `APP_KEY` and takes boot down with it (see the provider's docstring).
  * The tests above all pass a signer directly, which is the
@@ -114,7 +114,7 @@ describe("ContainerBroadcastAuthorizer lazy signer", () => {
     expect(auth.verifyGrant("private-orders.1", grant)).toEqual({ authorized: true });
     expect(auth.mintGrant("private-orders.2", 60_000)).toBeTypeOf("string");
 
-    // Memoized: three operations, one resolution — and one `.for()`
+    // Memoized: three operations, one resolution, and one `.for()`
     // scoping, so the purpose separation isn't re-derived per call.
     expect(resolve).toHaveBeenCalledTimes(1);
   });
@@ -136,7 +136,7 @@ describe("ContainerBroadcastAuthorizer lazy signer", () => {
 
     expect(auth.mintGrant("private-x", 1_000)).toBeNull();
     expect(auth.verifyGrant("private-x", "anything")).toBeNull();
-    // `null` is cached as "resolved to nothing" — a second miss must not
+    // `null` is cached as "resolved to nothing". A second miss must not
     // hit the container again.
     expect(resolve).toHaveBeenCalledTimes(1);
   });

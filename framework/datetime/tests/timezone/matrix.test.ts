@@ -1,7 +1,7 @@
 /**
- * Plan §26. Runs the same handful of behaviours across a spread of zones —
+ * Plan §26. Runs the same handful of behaviours across a spread of zones,
  * northern and southern DST, half-hour and three-quarter-hour offsets, both
- * signs, and a couple with no DST at all — so a regression in one zone family
+ * signs, and a couple with no DST at all, so a regression in one zone family
  * can't hide behind another.
  */
 

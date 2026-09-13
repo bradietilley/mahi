@@ -9,7 +9,7 @@ import { Cast } from "../src/casts.js";
 
 /**
  * `EloquentBuilder` casts the values it binds, in both the where and the
- * write direction — the model-shape-in / DB-shape-out contract the
+ * write direction, the model-shape-in / DB-shape-out contract the
  * instance accessors and the static `Model.update()` already had.
  *
  * The engine-visible half of this lives in
@@ -207,7 +207,7 @@ describe("EloquentBuilder casts its bindings", () => {
       expect(row.active).toBe(true);
     });
 
-    it("is idempotent — a value already in DB shape survives a second cast", async () => {
+    it("is idempotent, a value already in DB shape survives a second cast", async () => {
       // The static `Model.update()` casts before calling the builder,
       // which now casts again. `toDatabaseType` accepts `ModelType |
       // DbType` precisely so this is a no-op rather than, say,

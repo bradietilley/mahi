@@ -67,8 +67,8 @@ describe("listenHttpServer", () => {
 });
 
 /**
- * The peer address only exists over a real socket — `hono.request()`
- * dispatches in-process and has none — so these have to bind a server.
+ * The peer address only exists over a real socket, `hono.request()`
+ * dispatches in-process and has none, so these have to bind a server.
  */
 describe("client IP over a real socket", () => {
   let listening: ListeningServer | undefined;
@@ -110,7 +110,7 @@ describe("client IP over a real socket", () => {
       headers: { "x-forwarded-for": "9.9.9.9" },
     });
 
-    // Not "9.9.9.9", and — critically — not null. Returning undefined
+    // Not "9.9.9.9", and, critically, not null. Returning undefined
     // for a direct connection is what made every un-proxied client share
     // one `throttle:unknown:/path` bucket.
     expect((await res.json()) as { ip: string }).toMatchObject({ ip: "127.0.0.1" });
@@ -173,7 +173,7 @@ describe("bindWithRetries", () => {
 
 /**
  * `server.close()` alone stops accepting new connections and then waits
- * for the open ones to end — and an upgraded websocket never ends on its
+ * for the open ones to end, and an upgraded websocket never ends on its
  * own, so a server with a single connected client never finishes closing.
  * That is the "SIGTERM and the process hangs until it is SIGKILLed"
  * symptom, and these are the cases that reproduce it.
@@ -206,7 +206,7 @@ describe("ListeningServer.close()", () => {
     await listening.close({ drainTimeoutMs: 10_000 });
 
     const [code] = (await closed) as [number];
-    // 1001 "going away" — the server is shutting down, so the client
+    // 1001 "going away". The server is shutting down, so the client
     // should reconnect rather than conclude the conversation is over.
     expect(code).toBe(1001);
   });
@@ -232,7 +232,7 @@ describe("ListeningServer.close()", () => {
       Promise.all([listening.close({ drainTimeoutMs: 0 }), listening.close({ drainTimeoutMs: 0 })]),
     ).resolves.toBeDefined();
 
-    // A third, after both settled — a signal handler firing on a server
+    // A third, after both settled, a signal handler firing on a server
     // an entrypoint already closed.
     await expect(listening.close({ drainTimeoutMs: 0 })).resolves.toBeUndefined();
   });
@@ -250,7 +250,7 @@ describe("ListeningServer.close()", () => {
   /**
    * Removing the bind-time `reject` listener without replacing it left
    * the server with NO `error` listener, and Node treats an unhandled
-   * `error` event as a throw — so a post-bind socket error took the whole
+   * `error` event as a throw, so a post-bind socket error took the whole
    * process down.
    */
   it("keeps an error listener on the server after binding", async () => {

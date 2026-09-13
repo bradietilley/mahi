@@ -38,8 +38,8 @@ describe("HttpError", () => {
   });
 
   it("methodNotAllowed() requires and sets Allow", () => {
-    // `Allow` is mandatory on a 405 (RFC 9110 §15.5.6) — it is the only
-    // way the client learns what it should have sent — so it's a
+    // `Allow` is mandatory on a 405 (RFC 9110 §15.5.6) and is the only
+    // way the client learns what it should have sent, so it's a
     // required parameter rather than an optional extra.
     const error = HttpError.methodNotAllowed(["GET", "HEAD"]);
     expect(error.status).toBe(405);

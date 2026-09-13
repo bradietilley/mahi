@@ -21,8 +21,8 @@ function pad(n: number): string {
  *
  * A plain frozen object rather than a `const enum`: `const enum` is erased
  * by the compiler and therefore unusable under `isolatedModules` (which
- * this repo enables) and under any transpile-only toolchain — tsx, esbuild,
- * SWC — that compiles a file at a time.
+ * this repo enables) and under any transpile-only toolchain, tsx, esbuild,
+ * SWC, that compiles a file at a time.
  */
 const CronField = {
   Minute: 0,
@@ -47,11 +47,11 @@ export const DEFAULT_PING_TIMEOUT_MS = 5_000;
  * A single recurring task: a callback plus a cron expression describing
  * when it's due, built fluently. Matches Laravel's scheduler API shape
  * closely since it's a well-known, well-tested vocabulary for this exact
- * problem — see `docs/scheduling/README.md`.
+ * problem. See `docs/scheduling/README.md`.
  */
 export class ScheduledTask {
   // Held as individual fields so composable helpers like `daily().weekdays()`
-  // can splice one position without disturbing the others — mirrors
+  // can splice one position without disturbing the others, mirrors
   // Laravel's `spliceIntoPosition()`.
   private fields: [string, string, string, string, string] = ["*", "*", "*", "*", "*"];
   private description?: string;
@@ -64,12 +64,12 @@ export class ScheduledTask {
    */
   private overlapping = false;
   private overlapExpiresAfterMinutes = DEFAULT_OVERLAP_EXPIRY_MINUTES;
-  /** Whether `onOneServer()` was called — see that method. */
+  /** Whether `onOneServer()` was called. See that method. */
   private oneServer = false;
   private oneServerExpiresAfterMinutes = DEFAULT_OVERLAP_EXPIRY_MINUTES;
-  /** Whether this task runs concurrently with the rest of the tick — see `runInBackground()`. */
+  /** Whether this task runs concurrently with the rest of the tick. See `runInBackground()`. */
   private background = false;
-  /** Supplies a default name when none was set explicitly — see `withDefaultName()`. */
+  /** Supplies a default name when none was set explicitly. See `withDefaultName()`. */
   private defaultName?: () => string | undefined;
   /** Memoised `defaultName()` result, so the resolver runs at most once. */
   private resolvedDefaultName?: { value: string | undefined };
@@ -255,8 +255,8 @@ export class ScheduledTask {
    * shorthand, which is expanded here).
    *
    * The expression is fully parsed **now**, so an out-of-range value, an
-   * unknown name, or an inverted range throws at registration — naming the
-   * field and the offending text — rather than from inside `schedule:run`
+   * unknown name, or an inverted range throws at registration, naming the
+   * field and the offending text, rather than from inside `schedule:run`
    * where it once took every other due task down with it.
    */
   cron(expression: string): this {
@@ -373,7 +373,7 @@ export class ScheduledTask {
    * resolver is deferred and memoised rather than run eagerly for two
    * reasons: it constructs a job purely to read a class name, which is
    * wasted work when the caller names the task anyway, and doing it at
-   * registration would run application code during boot — where a factory
+   * registration would run application code during boot, where a factory
    * that touches the container or the database would turn "we couldn't
    * pick a nice default name" into "the app won't start".
    */
@@ -388,7 +388,7 @@ export class ScheduledTask {
    * running, by holding a lock named after the task for the duration.
    *
    * The lock key is the task's `name()`, resolved when the task actually
-   * runs rather than when this method is called — so ordering in the chain
+   * runs rather than when this method is called, so ordering in the chain
    * doesn't matter and `withoutOverlapping().name("x")` behaves the same as
    * `name("x").withoutOverlapping()`. A task with no name has no key that
    * could distinguish it from any other, so `Schedule` rejects it at
@@ -424,7 +424,7 @@ export class ScheduledTask {
    * job wants both: not two at once on one host, and not one per host.
    *
    * Needs a lock every host can see, which means a cache store shared
-   * between them — `CACHE_STORE=redis`. `runDueTasks()` refuses an
+   * between them, `CACHE_STORE=redis`. `runDueTasks()` refuses an
    * `ArrayCacheStore` (per-process, so no exclusion at all) and falls
    * back to lock files, which are only as global as the filesystem. On a
    * single host this is a no-op that costs one cache round trip.
@@ -434,7 +434,7 @@ export class ScheduledTask {
    * behind acquire it within the same minute and run the task again,
    * which is the exact thing being prevented. It instead expires on its
    * own after `expiresAfterMinutes` (default 1 hour), so the key must
-   * also identify the *tick*, not just the task — see
+   * also identify the *tick*, not just the task. See
    * `getOneServerKey()`.
    *
    * Like `withoutOverlapping()`, the name is the lock key, so a task
@@ -466,7 +466,7 @@ export class ScheduledTask {
    * lock correct rather than a permanent block: each due minute is a
    * fresh key, so tomorrow's run is unaffected by today's lock still
    * sitting in the store. Seconds are excluded so two hosts a few
-   * seconds apart compute the same key for the same tick — the whole
+   * seconds apart compute the same key for the same tick, the whole
    * point.
    */
   getOneServerKey(at: Date): string | undefined {
@@ -500,14 +500,14 @@ export class ScheduledTask {
    * the queue up.
    *
    * Due tasks otherwise run one after another in registration order, so a
-   * task that takes 90 seconds delays every task behind it by 90 seconds —
+   * task that takes 90 seconds delays every task behind it by 90 seconds,
    * and under `schedule:run` pushes the whole tick past the next cron
    * firing. Marking a task background starts it and moves on; the run
    * still waits for all of them before finishing, so nothing is orphaned
    * and the process doesn't exit mid-task.
    *
-   * Unlike Laravel's version this is not a child process — it's the same
-   * event loop — so it buys concurrency for I/O-bound work (HTTP calls,
+   * Unlike Laravel's version this is not a child process, it's the same
+   * event loop, so it buys concurrency for I/O-bound work (HTTP calls,
    * queries) and nothing at all for a CPU-bound loop, which will still
    * block everything. Genuinely long or heavy work belongs on a queue.
    */
@@ -531,7 +531,7 @@ export class ScheduledTask {
    * The task's name: the one set with `name()`, else whatever
    * `withDefaultName()`'s resolver produces, else `undefined`. Unlike
    * `getDescription()` there is no cron-expression fallback, because the
-   * callers that matter — overlap locking and `Schedule.validate()` — need
+   * callers that matter, overlap locking and `Schedule.validate()`, need
    * to know when a task genuinely has no identity of its own.
    */
   getName(): string | undefined {
@@ -609,13 +609,13 @@ export class ScheduledTask {
    *
    * Both of those matter: pings sit *between* the scheduler and the task's
    * work, so a monitoring endpoint that accepts a connection and then
-   * never answers would otherwise hang `pingBefore()` indefinitely and —
-   * since tasks in a tick share a process — stall every task behind it.
+   * never answers would otherwise hang `pingBefore()` indefinitely and,
+   * since tasks in a tick share a process, stall every task behind it.
    * `AbortSignal.timeout()` inside the client bounds the wait; running the
    * URLs together bounds the total at one timeout rather than one per URL.
    *
-   * A failure never fails the task — an unreachable monitoring webhook
-   * must not break the thing it monitors — but it IS logged at warning,
+   * A failure never fails the task, an unreachable monitoring webhook
+   * must not break the thing it monitors, but it IS logged at warning,
    * because a silently-dropped ping means a dead-man's-switch monitor
    * fires for a task that actually succeeded, and you want to be able to
    * tell those apart.
@@ -674,7 +674,7 @@ function parseTime(time: string): { hour: number; minute: number } {
  * Pass the task's `timeZone` to render in that zone. Without it the
  * output is server-local, which for a task scheduled with `timezone()` is
  * a different wall clock than the one its expression was written
- * against — `schedule:list` therefore always passes it, and appends the
+ * against, `schedule:list` therefore always passes it, and appends the
  * zone name so the column is unambiguous.
  */
 export function formatNextRun(date: Date | undefined, timeZone?: string): string {

@@ -12,13 +12,13 @@ export interface EnvelopeOptions {
 }
 
 /**
- * The "who / what subject" half of a message — everything except the body
+ * The "who / what subject" half of a message, everything except the body
  * and attachments. Two ways to produce one:
  *
  *   - Fluent: a `Mailable`'s `to()/cc()/subject()/...` setters accumulate
  *     into the instance the base `Mailable` holds.
  *   - Declarative: a `Mailable` overrides `envelope()` and returns
- *     `new Envelope({ subject, to, ... })` in one shot — mirroring
+ *     `new Envelope({ subject, to, ... })` in one shot, mirroring
  *     Laravel's modern `Envelope` value object.
  *
  * `Mailable.render()` reads the resulting `Envelope` and spreads it into a
@@ -35,7 +35,7 @@ export class Envelope {
   subject = "";
 
   /**
-   * Arbitrary string tags (e.g. `"welcome"`, `"password-reset"`) — passed
+   * Arbitrary string tags (e.g. `"welcome"`, `"password-reset"`), passed
    * through to transports that understand them for categorization/analytics
    * (SMTP maps them to `X-Tag` headers; log/array drivers just carry them).
    * Mirrors Laravel's `Envelope::$tags`.

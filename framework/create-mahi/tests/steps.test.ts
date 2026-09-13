@@ -33,7 +33,7 @@ describe("directoryIsUsable", () => {
     expect(await directoryIsUsable(tmp)).toBe(true);
   });
 
-  it("tolerates a lone .git — scaffolding into a fresh clone is normal", async () => {
+  it("tolerates a lone .git, scaffolding into a fresh clone is normal", async () => {
     await mkdir(path.join(tmp, ".git"));
     expect(await directoryIsUsable(tmp)).toBe(true);
   });
@@ -192,8 +192,8 @@ describe("createDatabaseFile", () => {
 
 /**
  * A developer setting up an app copies `.env.example` and fills it in. If a
- * key the app actually reads (`config/env.ts`) isn't listed there — even
- * commented out — it's invisible: the developer never learns it exists
+ * key the app actually reads (`config/env.ts`) isn't listed there, even
+ * commented out, it's invisible: the developer never learns it exists
  * until an `undefined` surfaces at runtime. This asserts every schema key
  * appears somewhere in `.env.example` (uncommented `KEY=` or a `# KEY=`
  * hint), so the example stays a superset of what the app understands.
@@ -227,7 +227,7 @@ describe(".env.example parity with config/env.ts", () => {
  * test: those install into the pnpm workspace, where an undeclared
  * `@mahiframework/*` still resolves by hoisting. A real `npm create mahi` gets
  * only the declared dependencies, so an undeclared import is a
- * `TS2307` on the user's very first `tsc -b` — which is exactly what
+ * `TS2307` on the user's very first `tsc -b`. Which is exactly what
  * happened to `@mahiframework/datetime`, pruned as unused by one commit and
  * re-imported by the next.
  *
@@ -247,7 +247,7 @@ describe("template dependency completeness", () => {
     for (const file of await sourceFiles(TEMPLATE_DIR)) {
       const source = await readFile(file, "utf-8");
 
-      // `from "@mahiframework/x"` and `import("@mahiframework/x")` — the two forms the
+      // `from "@mahiframework/x"` and `import("@mahiframework/x")`, the two forms the
       // template uses. Deliberately not matching prose in comments.
       for (const match of source.matchAll(
         /(?:from|import\()\s*["'](@mahiframework\/[a-z-]+)["']/g,

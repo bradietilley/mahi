@@ -10,7 +10,7 @@ export interface RedisConfig {
  * Resolves named `RedisConnection`s, synchronously, exactly like
  * `DatabaseManager`/`CacheManager`. One resolved connection is shared by
  * all three Redis-backed drivers (`RedisCacheStore`, `RedisQueueDriver`,
- * `RedisBroadcastDriver`) that point at the same connection name — a
+ * `RedisBroadcastDriver`) that point at the same connection name, a
  * single client design, three thin adapters. Each
  * connection is a `Connectable`; `RedisServiceProvider` connects the
  * default one in its `boot()` and disconnects every resolved connection on

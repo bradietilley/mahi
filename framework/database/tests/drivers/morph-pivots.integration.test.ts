@@ -6,7 +6,7 @@ import type { MorphToMany, MorphedByMany } from "../../src/markers.js";
 import type { Blueprint } from "../../src/schema/blueprint.js";
 
 /**
- * Polymorphic many-to-many writes on every engine — the last of X8's named
+ * Polymorphic many-to-many writes on every engine, the last of X8's named
  * gaps, together with `detach([])`.
  *
  * `morph-to-many.test.ts` covers the behaviour thoroughly but hardcodes
@@ -158,7 +158,7 @@ for (const engine of ENGINES) {
 
     it("keeps two owners' pivot rows apart when their keys collide", async () => {
       // The reason the discriminant exists. With `increments()` on separate
-      // tables, the first post and the first video both get id 1 — so a
+      // tables, the first post and the first video both get id 1, so a
       // query that forgets `taggable_type` returns the other's tags and
       // looks perfectly healthy.
       const { post, video, red, blue } = await seed();
@@ -185,7 +185,7 @@ for (const engine of ENGINES) {
 
       expect(removed).toBe(1);
       expect((await (post as any).relations.tags().get()).toArray()).toHaveLength(0);
-      // The video keeps its row — same tag, same key, different type.
+      // The video keeps its row, same tag, same key, different type.
       expect((await (video as any).relations.tags().get()).toArray()).toHaveLength(1);
     });
 
@@ -264,7 +264,7 @@ for (const engine of ENGINES) {
       it("removes nothing when given an empty array", async () => {
         // One early return in `deletePivotRows` separates "detach nothing"
         // from "detach everything". If it regressed, this silently wipes
-        // the pivot table — no error, no failing write, just missing rows
+        // the pivot table, no error, no failing write, just missing rows
         // discovered later.
         const { post, red, blue } = await seed();
 

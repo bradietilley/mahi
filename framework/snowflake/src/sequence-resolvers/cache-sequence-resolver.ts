@@ -12,14 +12,14 @@ import type { SequenceResolver } from "./sequence-resolver.js";
  * `increment()` really are, since those two calls *are* the whole
  * algorithm:
  *
- *   - `ArrayCacheStore` — atomic within one process only, so it shares
+ *   - `ArrayCacheStore`, atomic within one process only, so it shares
  *     nothing between processes. **Not** usable for multi-process
  *     sequencing; use `FileSequenceResolver` or a unique worker id per
  *     process.
- *   - `FileCacheStore` — atomic across processes **on one host**
+ *   - `FileCacheStore`, atomic across processes **on one host**
  *     (`O_EXCL` create, lock-file-guarded increment). Fine for several
  *     processes on one machine; not across machines, and not over NFS.
- *   - `RedisCacheStore` — atomic anywhere (`SET NX`, `INCRBY`). The right
+ *   - `RedisCacheStore`, atomic anywhere (`SET NX`, `INCRBY`). The right
  *     answer once more than one host shares a worker id.
  */
 export class CacheSequenceResolver implements SequenceResolver {
@@ -31,7 +31,7 @@ export class CacheSequenceResolver implements SequenceResolver {
   async sequence(currentTime: number): Promise<number> {
     const key = `${this.prefix}${currentTime}`;
 
-    // Seed at 0 so incrementing yields 1, 2, 3… — the documented
+    // Seed at 0 so incrementing yields 1, 2, 3…, the documented
     // "first caller gets 0, everyone else increments" contract. (The
     // PHP sibling seeds at 1 and returns 0, which skips sequence 1.)
     if (await this.store.add(key, 0, 10)) {

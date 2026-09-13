@@ -21,7 +21,7 @@ export interface ServeBinding {
   hostname: string;
   port: number;
   /**
-   * True when the port came from `--port` or `SERVER_PORT` — Laravel
+   * True when the port came from `--port` or `SERVER_PORT`, Laravel
    * then does not walk `--tries` alternate ports.
    */
   portWasExplicit: boolean;
@@ -31,7 +31,7 @@ const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_PORT = 8000;
 
 /**
- * Split `--host` into `[hostname, port?]` — IPv6 (`[::1]:8080`) first,
+ * Split `--host` into `[hostname, port?]`, IPv6 (`[::1]:8080`) first,
  * then a single `host:port` colon split.
  */
 export function getHostAndPort(host: string): [string, string | undefined] {

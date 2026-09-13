@@ -10,7 +10,7 @@ import {
  * `nextCronRun()` skips whole days and hours it can prove cannot match,
  * which is what keeps a once-a-year expression from costing half a million
  * iterations. Those skips are also the easiest thing in this package to
- * get subtly wrong — a jump one hour too far silently loses a run, and
+ * get subtly wrong, a jump one hour too far silently loses a run, and
  * nothing about the result looks unusual when it happens.
  *
  * So it is checked against a reference implementation that does the

@@ -46,7 +46,7 @@ const alicePost: PostRow = { id: "p1", user_id: "alice", published: false };
 const publishedPost: PostRow = { id: "p2", user_id: "bob", published: true };
 
 /**
- * A gate with no AUTH_TOKEN bound — every check sees a guest unless
+ * A gate with no AUTH_TOKEN bound, every check sees a guest unless
  * `forUser()` is used. Keeps these tests focused on resolution logic
  * rather than on auth wiring (which `can.test.ts` covers).
  */
@@ -111,7 +111,7 @@ describe("GateRegistry", () => {
       async (ability) => {
         // A plain property lookup finds these on Object.prototype, so
         // `allows("constructor", Post)` called the class constructor
-        // without `new` and threw a TypeError out of the gate — a 500
+        // without `new` and threw a TypeError out of the gate, a 500
         // from an authorization check, reachable by anyone who can
         // influence an ability name. A clean deny is the correct answer.
         await expect(gate.forUser(alice).allows(ability, Post, alicePost)).resolves.toBe(false);
@@ -120,7 +120,7 @@ describe("GateRegistry", () => {
 
     it("still dispatches to an ability inherited from a base policy", async () => {
       // The prototype walk must stop at Object.prototype, not at the
-      // policy's own prototype — a shared base policy is a normal thing
+      // policy's own prototype, a shared base policy is a normal thing
       // to have.
       class BasePolicy extends Policy<User, PostRow> {
         archive(): boolean {
@@ -163,7 +163,7 @@ describe("GateRegistry", () => {
       await gate.forUser(alice).allows("view", Post, alicePost);
       await gate.forUser(alice).allows("view", Post, alicePost);
 
-      // Same `this` both times — policies are stateless singletons.
+      // Same `this` both times. Policies are stateless singletons.
       expect(spy.mock.instances[0]).toBe(spy.mock.instances[1]);
       spy.mockRestore();
     });
@@ -288,8 +288,8 @@ describe("GateRegistry", () => {
     });
   });
 
-  describe("ambient user, resolved through AUTH_TOKEN", () => {
-    /** Stands in for @mahiframework/auth's AuthManager — resolved by string, never imported. */
+  describe("ambient user: resolved through AUTH_TOKEN", () => {
+    /** Stands in for @mahiframework/auth's AuthManager, resolved by string, never imported. */
     function gateWithUser(user: User | null): GateRegistry {
       const app = new Application();
       app.instance("auth", { userOrNull: () => user });
@@ -331,7 +331,7 @@ describe("GateRegistry", () => {
   describe("without @mahiframework/auth installed", () => {
     it("treats every request as a guest instead of throwing", async () => {
       // Authorization must be usable in an app that has no auth package
-      // bound at all — every check simply sees a guest.
+      // bound at all, every check simply sees a guest.
       await expect(gate.allows("view", Post, publishedPost)).resolves.toBe(true);
       await expect(gate.allows("update", Post, alicePost)).resolves.toBe(false);
     });

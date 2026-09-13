@@ -15,7 +15,7 @@ export const QUEUE_RESTART_KEY = "mahi:queue:restart";
  * A worker reads this after each job and compares it with its own start
  * time: a restart signalled *after* the worker started means the worker
  * is running stale code and should exit for its supervisor to replace.
- * That's the whole mechanism — deliberately a shared cache value rather
+ * That's the whole mechanism, deliberately a shared cache value rather
  * than a signal, because a deploy has no way to enumerate the PIDs of
  * workers spread across hosts, but every one of them can read one key.
  *
@@ -41,7 +41,7 @@ export async function restartSignalledAt(app: Application): Promise<number | und
 
     return Number.isFinite(at) ? at : undefined;
   } catch (error) {
-    // A cache outage must not stop a worker that is otherwise healthy —
+    // A cache outage must not stop a worker that is otherwise healthy,
     // the worst case of failing soft here is that a restart signal is
     // missed until the next poll.
     app.logger.error("queue: could not read the restart signal.", { error });

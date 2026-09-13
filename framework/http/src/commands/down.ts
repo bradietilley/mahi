@@ -12,7 +12,7 @@ interface DownOptions {
 }
 
 /**
- * Puts the application into maintenance mode — every request then gets a
+ * Puts the application into maintenance mode. Every request then gets a
  * 503 (plus `Retry-After` when `--retry` is given) until `maintenance:up`
  * runs, except paths passed via `--except` or requests carrying the
  * `--secret` bypass. Mirrors `php artisan down`, minus its

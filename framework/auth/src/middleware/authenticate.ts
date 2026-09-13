@@ -6,7 +6,7 @@ import type { AuthManager } from "../auth-manager.js";
 /**
  * Require an authenticated user, else 401.
  *
- * Per-route pipe, not a global provider pipe — auth is opt-in per route.
+ * Per-route pipe, not a global provider pipe. Auth is opt-in per route.
  * It populates the ambient auth scope that `AuthServiceProvider`'s global
  * pipe opens for every request.
  *
@@ -28,7 +28,7 @@ export function authenticate(guardName?: string): HttpPipe {
 }
 
 /**
- * Resolve the user if credentials are present, but never reject — for
+ * Resolve the user if credentials are present, but never reject, for
  * routes that serve guests and authenticated users differently.
  *
  * Pair with `Auth.userOrNull()`; `Auth.user()` still throws for guests,

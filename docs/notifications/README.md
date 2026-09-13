@@ -1,7 +1,7 @@
 # Notifications
 
 A notification is one message that may go out over several channels at
-once — an email *and* a row in a table *and* a websocket push — from a
+once, an email *and* a row in a table *and* a websocket push, from a
 single class.
 
 ```ts
@@ -57,7 +57,7 @@ class, and each channel checks `if (!notification.toX) return;` before
 calling it. The consequence is that "does this notification support the
 mail channel?" is a compile-time question your editor can answer, and a
 typo in `toMial` is a missing method rather than a silently skipped
-channel. There is no central registry of channel method names — a plugin
+channel. There is no central registry of channel method names, a plugin
 channel invents its own optional `toXxx()` by the same convention.
 
 ### `via()` receives the notifiable
@@ -72,7 +72,7 @@ via(notifiable: NotificationRoutable): string[] {
 }
 ```
 
-Channels can vary per recipient — email only the people who opted in,
+Channels can vary per recipient, email only the people who opted in,
 broadcast only to connected users. Laravel's `via()` gets the notifiable
 too; the difference here is that there is no
 `routeNotificationFor{Studly}` string-to-method reflection anywhere.
@@ -83,7 +83,7 @@ Routing is the notifiable's own explicit method.
 `id` is a stable identifier for this notification instance. `DatabaseChannel`
 uses it as the row's primary key, defaulting to a fresh `randomUUID()` at
 persist time when unset. Set it explicitly when you need a caller-chosen
-id — for example a time-sortable Snowflake, so the persisted rows page
+id, for example a time-sortable Snowflake, so the persisted rows page
 chronologically:
 
 ```ts
@@ -108,12 +108,12 @@ interface NotificationRoutable {
 }
 ```
 
-One method. That's the whole "notifiable" contract — the TypeScript
+One method. That's the whole "notifiable" contract, the TypeScript
 equivalent of Laravel's `Notifiable` trait, minus the magic.
 
 Laravel drives per-channel routing through
 `routeNotificationForMail()`, `routeNotificationForSlack()`,
-`routeNotificationForNexmo()` — a string-reflection lookup that builds a
+`routeNotificationForNexmo()`, a string-reflection lookup that builds a
 method name from a channel name at runtime. That pattern is rejected
 here. A notifiable implements **one** method with a plain `switch`, so
 "where does channel X deliver to?" is ordinary, greppable, type-checked
@@ -144,8 +144,8 @@ is free to skip delivery in that case.
 
 ### When the recipient isn't a model
 
-Sometimes there is no model instance to put `routeNotificationFor()` on —
-you hold only an id (from a foreign key, a job payload, a webhook), and
+Sometimes there is no model instance to put `routeNotificationFor()` on.
+You hold only an id (from a foreign key, a job payload, a webhook), and
 loading the row just to notify it would be a wasted query. A tiny adapter
 closes the gap:
 
@@ -172,7 +172,7 @@ await notify(new UserNotifiable(post.user_id), new LikeNotification(...));
 ```
 
 An adapter like this has no `morphAlias()`, so `DatabaseChannel` falls
-back to its static `table` for `notifiable_type` — see
+back to its static `table` for `notifiable_type`. See
 [below](#the-database-channel).
 
 A model can implement `NotificationRoutable` directly instead, which is
@@ -200,13 +200,13 @@ export class User extends Model<UserAttributes>()({
 ```
 
 Then `notifiable_type` comes from `morphAlias()` and agrees with every
-other polymorphic column pointing at that table — which is what lets a
+other polymorphic column pointing at that table. Which is what lets a
 `Notification` declare a real `morphTo` for `notifiable`.
 
 ## `AnonymousNotifiable`
 
 For notifying an address you hold directly, with no persisted recipient
-behind it — Laravel's `Notification::route(...)->notify(...)`.
+behind it, Laravel's `Notification::route(...)->notify(...)`.
 
 ```ts
 import { AnonymousNotifiable, notify } from "@mahiframework/notifications";
@@ -234,7 +234,7 @@ The database channel does not support anonymous notifiables.
 The database channel needs a persisted `notifiable_type` +
 `notifiable_id` pair, which an anonymous target by definition doesn't
 have. Rather than writing a row keyed to nothing (or silently skipping),
-it throws at the point of the mistake — when you route it — rather than
+it throws at the point of the mistake, when you route it, rather than
 later at send time.
 
 The facade offers a shorthand that constructs one for you:
@@ -285,7 +285,7 @@ try {
 }
 ```
 
-`getDefaultDriver()` returns `"mail"` unconditionally — there's no
+`getDefaultDriver()` returns `"mail"` unconditionally. There's no
 `notifications.default` config key. It only matters if something calls
 `driver()` with no name, which `send()` never does.
 
@@ -315,7 +315,7 @@ Takes the `Mailable` from `toMail()` and hands it to `MailManager.send()`.
 Requires `MAIL_TOKEN` to be bound.
 
 **The mailable owns its own recipients.** `routeNotificationFor("mail")`
-is *advisory* — nothing reads it automatically. A `toMail()` that wants
+is *advisory*. Nothing reads it automatically. A `toMail()` that wants
 the routed address reads it and calls `.to(...)` itself:
 
 ```ts
@@ -358,7 +358,7 @@ await this.db.connection().kysely.insertInto("notifications").values({
 Two things it reads off the notifiable:
 
 - **`notifiable_type`** from the notifiable class's
-  [`morphAlias()`](../relationships/#morph-maps) — the same morph map →
+  [`morphAlias()`](../relationships/#morph-maps), the same morph map →
   `morphName` → `table` chain every polymorphic relation uses, so the
   value agrees with what a `morphMany`/`morphTo` against that table would
   write. Plain adapter notifiables that aren't `Model` subclasses have no
@@ -368,15 +368,15 @@ Two things it reads off the notifiable:
 
 Note the class is read off the **prototype**, not `notifiable.constructor`.
 A live `Model` is `Proxy`-wrapped and its `get` trap binds every function
-it returns — including `constructor` — and a bound function carries none
+it returns, including `constructor`, and a bound function carries none
 of the original's statics. Reading `notifiable.constructor.table` on a
 real model yields `undefined`.
 
-`type` is the `Notification` subclass's own `constructor.name` —
+`type` is the `Notification` subclass's own `constructor.name`:
 `"InvoicePaid"`, `"LikeNotification"`. Note that this means **minification
 or a class rename changes the persisted `type` of future rows**, and old
 rows keep the old string. If you need a stable public discriminant, put
-one inside the JSON payload instead — a `data` column carrying
+one inside the JSON payload instead, a `data` column carrying
 `{ type: "like", ... }` with a `"like"` the framework never sees.
 
 `toDatabase()` is typed as returning `object`, not
@@ -401,7 +401,7 @@ export class LikeNotification extends Notification {
 }
 ```
 
-`DatabaseChannel` writes with a **raw Kysely insert**, not a model — the
+`DatabaseChannel` writes with a **raw Kysely insert**, not a model. The
 row is created before anything would read it back as a relation, and the
 insert needs no relation machinery. Read them back with an ordinary
 `where`:
@@ -453,7 +453,7 @@ It dispatches an event and stops. No websocket code lives in this
 package.
 
 `NotificationBroadcast` extends `AbstractEvent` and **structurally
-implements** `@mahiframework/broadcasting`'s `ShouldBroadcast` — it has
+implements** `@mahiframework/broadcasting`'s `ShouldBroadcast`. It has
 `broadcastChannel()`, `broadcastEventName()` and `broadcastPayload()`,
 without importing the interface. Broadcasting checks for that shape
 structurally, so implementing it is enough. That's what keeps
@@ -492,7 +492,7 @@ class NotificationBroadcast extends AbstractEvent {
 | Payload | `{ id, type, ...toBroadcast() }` |
 
 Requires `EVENTS_TOKEN` to be bound. The push to actual clients requires
-`@mahiframework/broadcasting` too — see [Broadcasting](../broadcasting/), and
+`@mahiframework/broadcasting` too. See [Broadcasting](../broadcasting/), and
 note its single-process limitation before relying on it.
 
 ## Channel registration and graceful degradation
@@ -520,11 +520,11 @@ this.app.singleton(NOTIFICATIONS_TOKEN, (app) => {
 
 | Channel | Required binding | Registered when |
 |---|---|---|
-| `database` | `DATABASE_TOKEN` | Always — the `notifications` table is this package's own hard dependency |
+| `database` | `DATABASE_TOKEN` | Always. The `notifications` table is this package's own hard dependency |
 | `mail` | `MAIL_TOKEN` | Only if `MailServiceProvider` is registered |
 | `broadcast` | `EVENTS_TOKEN` | Only if `EventsServiceProvider` is registered |
 
-**"Degrades" here means "throws a specific, obvious error"** — not "does
+**"Degrades" here means "throws a specific, obvious error"**, not "does
 nothing". If `MAIL_TOKEN` isn't bound, the `mail` channel is never
 `extend()`ed, and a `via()` returning `["mail"]` throws:
 
@@ -535,7 +535,7 @@ Driver "mail" is not registered on ChannelManager.
 That's the same message any unregistered driver produces anywhere in the
 framework, and it's deliberately noisy. The failure mode being avoided is
 a notification that silently doesn't send because a provider is missing
-from `config/app.ts` — a bug that surfaces as a support ticket six weeks
+from `config/app.ts`, a bug that surfaces as a support ticket six weeks
 later, not as an exception.
 
 The `if (app.has(...))` guards buy you the ability to *install less*: an
@@ -548,9 +548,9 @@ misconfigured `via()`.
 The channel factories resolve their tokens at `register()` time, so in
 `config/app.ts` this provider must come **after**:
 
-- `DatabaseServiceProvider` — always
-- `MailServiceProvider` — if the `mail` channel is used
-- `EventsServiceProvider` — if the `broadcast` channel is used
+- `DatabaseServiceProvider`: always
+- `MailServiceProvider`: if the `mail` channel is used
+- `EventsServiceProvider`: if the `broadcast` channel is used
 
 ```ts
 export const providers: ServiceProviderClass[] = [
@@ -598,11 +598,11 @@ await Schema.create("notifications", (table: Blueprint) => {
 The composite index on `(notifiable_type, notifiable_id)` is the one
 query this table exists to serve: "everything for this recipient".
 
-`id` is a **string** primary key, not an autoincrementing integer — which
-is why assigning a Snowflake gives you chronological ordering for free
-and a UUID doesn't.
+`id` is a **string** primary key, not an autoincrementing integer. Which
+is why assigning a Snowflake gives you chronological ordering and a UUID
+doesn't.
 
-### Reading them back — `DatabaseNotification`
+### Reading them back: `DatabaseNotification`
 
 `@mahiframework/notifications` ships a read-model for this table so you don't have
 to hand-roll one:
@@ -629,7 +629,7 @@ await DatabaseNotification.markAllAsRead(User.morphAlias(), Auth.id());
 
 The `id` is a client-supplied string, so no key strategy is configured,
 and `timestamps` stays on so `markAsRead()`/`markAsUnread()` stamp
-`updated_at` — the column the migration carries for exactly this.
+`updated_at`, the column the migration carries for exactly this.
 
 If you'd rather resolve the recipient as a relation, declare your own
 model over the same table with a `notifiable` marker in its attributes:
@@ -670,7 +670,7 @@ marker in the attributes interface (which gives `notification.notifiable`
 its type) and the `morphTo()` definition in `static override
 relationships` (which tells the loader how to fetch it).
 
-The `types` keys must match what `DatabaseChannel` writes — i.e. each
+The `types` keys must match what `DatabaseChannel` writes, i.e. each
 model's `morphAlias()`. That's the agreement the alias chain exists to
 guarantee.
 
@@ -700,7 +700,7 @@ await Promise.all(followers.map((f) => notify(new UserNotifiable(f.id), notifica
 ```
 
 Prefer injecting `ChannelManager` via `NOTIFICATIONS_TOKEN` where you
-have `app` — same guidance as `app()` itself.
+have `app`, same guidance as `app()` itself.
 
 ### The `Notifications` facade
 
@@ -720,7 +720,7 @@ await Notifications.send(Notifications.route("mail", "ops@example.com"), new Ser
 ```
 
 `send()` accepts an array so a single `await` covers a whole fan-out.
-Recipients are processed sequentially and errors propagate — the same
+Recipients are processed sequentially and errors propagate, the same
 contract as `ChannelManager.send()`, one level up.
 
 It's `Notifications` (plural) because the package already exports
@@ -781,7 +781,7 @@ See [Queues](../queues/).
 
 A notification sent inside a `DB.transaction()` is delivered immediately by
 default. Override `afterCommit()` to return `true` and the whole fan-out is
-held until the transaction commits — and dropped if it rolls back:
+held until the transaction commits, and dropped if it rolls back:
 
 ```ts
 class InvoicePaid extends Notification {
@@ -844,8 +844,8 @@ export class SlackServiceProvider extends ServiceProvider {
 
 Two conventions worth following, because every built-in channel does:
 
-**Skip when the builder is absent.** `if (!notification.toSlack) return;`
-— a notifiable may list `"slack"` in `via()` only conditionally.
+**Skip when the builder is absent.** `if (!notification.toSlack) return;`.
+A notifiable may list `"slack"` in `via()` only conditionally.
 
 **Take dependencies through the constructor.** Resolve them once in the
 factory rather than calling `app().make()` inside `send()`. That keeps
@@ -854,7 +854,7 @@ the channel a plain testable object, which is what `MailChannel` and
 
 ## Testing
 
-Register a fake channel and assert it was called — `ChannelManager` is a
+Register a fake channel and assert it was called. `ChannelManager` is a
 plain `Manager`, constructible without any providers:
 
 ```ts
@@ -868,7 +868,7 @@ expect(calls).toHaveLength(1);
 ```
 
 For the mail channel specifically, point `mail.default` at `"array"` and
-assert against `ArrayTransport.messages` — see [Mail](../mail/#testing).
+assert against `ArrayTransport.messages`. See [Mail](../mail/#testing).
 
 For the database channel, assert on the table:
 
@@ -899,7 +899,7 @@ no-op, not an error. That's intentional (conditional channels) and is the
 one place where a typo goes unnoticed.
 
 **`DatabaseChannel` needs a static `table` on the notifiable's
-constructor.** Plain rows from `@mahiframework/database` don't have one — wrap
+constructor.** Plain rows from `@mahiframework/database` don't have one, wrap
 them, as `UserNotifiable` does.
 
 **`route("database", ...)` on an `AnonymousNotifiable` throws.** By
@@ -922,11 +922,11 @@ you returning something with no useful shape.
 
 ## Related
 
-- [Mail](../mail/) — `Mailable`, and why recipients live on it
-- [Broadcasting](../broadcasting/) — `ShouldBroadcast`, and the single-process caveat
-- [Events](../events/) — `NotificationBroadcast`, dispatching from listeners
-- [Queues](../queues/) — deferring delivery; there is no `ShouldQueue`
-- [Migrations](../migrations/) — the provider-contributed `notifications` table
-- [Models](../models/) — a read model over that table
-- [Pagination](../pagination/) — `cursorPaginate` over notification `id`s
-- [Providers](../providers/) — the `migrations()` hook and boot ordering
+- [Mail](../mail/): `Mailable`, and why recipients live on it
+- [Broadcasting](../broadcasting/): `ShouldBroadcast`, and the single-process caveat
+- [Events](../events/): `NotificationBroadcast`, dispatching from listeners
+- [Queues](../queues/): deferring delivery; there is no `ShouldQueue`
+- [Migrations](../migrations/): the provider-contributed `notifications` table
+- [Models](../models/): a read model over that table
+- [Pagination](../pagination/): `cursorPaginate` over notification `id`s
+- [Providers](../providers/): the `migrations()` hook and boot ordering

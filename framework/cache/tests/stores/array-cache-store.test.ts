@@ -104,8 +104,8 @@ describe("ArrayCacheStore", () => {
     /**
      * Expiry is otherwise evaluated only on read, so an entry nothing
      * reads again is never reclaimed. `RateLimiter` writes exactly that
-     * shape — `throttle:<name>:<ip>` plus a `:timer` sibling per distinct
-     * client, never read once the window has passed — which in a
+     * shape, `throttle:<name>:<ip>` plus a `:timer` sibling per distinct
+     * client, never read once the window has passed, which in a
      * long-running server is an unbounded leak paced by how many distinct
      * clients you see.
      */
@@ -119,7 +119,7 @@ describe("ArrayCacheStore", () => {
 
       await vi.advanceTimersByTimeAsync(61_000);
 
-      // No get()/has() ran — the sweep alone reclaimed them.
+      // No get()/has() ran, the sweep alone reclaimed them.
       expect(store.size()).toBe(1);
       expect(await store.get("kept")).toBe("forever");
     });
@@ -143,7 +143,7 @@ describe("ArrayCacheStore", () => {
 
       await vi.advanceTimersByTimeAsync(600_000);
 
-      // Still resident — nothing read it, and nothing swept.
+      // Still resident. Nothing read it, and nothing swept.
       expect(store.size()).toBe(1);
     });
 
@@ -155,7 +155,7 @@ describe("ArrayCacheStore", () => {
       await vi.advanceTimersByTimeAsync(600_000);
 
       expect(store.size()).toBe(1);
-      // Idempotent — shutdown runs it once, a test may run it again.
+      // Idempotent. Shutdown runs it once, a test may run it again.
       await expect(store.disconnect()).resolves.toBeUndefined();
     });
   });
@@ -174,10 +174,10 @@ describe("ArrayCacheStore", () => {
       expect(await store.get("key")).toBe("original");
     });
 
-    it("is atomic across concurrent callers racing on the same key — only one wins", async () => {
+    it("is atomic across concurrent callers racing on the same key: only one wins", async () => {
       // add()/increment() must not have an `await` between their
       // existence check and their write, or concurrent
-      // callers can all observe "absent" before any of them writes —
+      // callers can all observe "absent" before any of them writes,
       // exactly the bug that would make Lock.acquire() non-exclusive.
       const store = new ArrayCacheStore();
 

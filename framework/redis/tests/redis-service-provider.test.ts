@@ -15,8 +15,8 @@ afterEach(() => {
 /**
  * Boots a real Application with the cache + redis providers. The redis
  * config points at a port nothing listens on, so if `boot()` ever tries
- * to connect again this suite fails loudly (either by throwing, or — the
- * bug this guards — by leaving a socket open) rather than passing only on
+ * to connect again this suite fails loudly (either by throwing, or, the
+ * bug this guards, by leaving a socket open) rather than passing only on
  * machines that happen to run Redis.
  */
 async function bootApp(cacheDefault: string): Promise<Application> {
@@ -42,7 +42,7 @@ describe("RedisServiceProvider", () => {
    * switching to Redis is a config change, which makes "listed but
    * unused" the common case. Connecting unconditionally in `boot()` would
    * leave an ioredis socket open, and an open socket keeps Node's event
-   * loop alive — so every short-lived process that boots the app
+   * loop alive, so every short-lived process that boots the app
    * (`./artisan migrate`, `key:generate`, any CLI command, a test run)
    * would finish its work and then hang forever.
    */
@@ -52,7 +52,7 @@ describe("RedisServiceProvider", () => {
     const manager = app.make<RedisManager>(REDIS_TOKEN);
 
     // No connection was ever resolved, so nothing could have opened a
-    // socket — `Manager` caches by name, so an empty resolved list is
+    // socket, `Manager` caches by name, so an empty resolved list is
     // proof that `boot()` never touched it.
     expect(manager.resolvedDriverNames()).toEqual([]);
   });
@@ -79,7 +79,7 @@ describe("RedisServiceProvider.shutdown()", () => {
     const app = await bootApp("array");
 
     const manager = app.make<RedisManager>(REDIS_TOKEN);
-    // Resolve without connecting — `lazyConnect` means no socket opens,
+    // Resolve without connecting. `lazyConnect` means no socket opens,
     // so this works against the dead port the config points at.
     const connection = manager.connection();
     const disconnect = vi.spyOn(connection, "disconnect").mockResolvedValue();
@@ -92,7 +92,7 @@ describe("RedisServiceProvider.shutdown()", () => {
 
   /**
    * Resolving a connection in order to close it would CONSTRUCT an
-   * ioredis client — opening the very thing shutdown exists to avoid
+   * ioredis client, opening the very thing shutdown exists to avoid
    * leaving open.
    */
   it("does not resolve a connection that was never used", async () => {
@@ -142,8 +142,8 @@ describe("RedisServiceProvider.shutdown()", () => {
     });
 
     // Bound directly rather than via BroadcastServiceProvider, which
-    // would drag in the events and http providers for no benefit here —
-    // all this needs is a BroadcastManager for `extendBroadcast()` to
+    // would drag in the events and http providers for no benefit here.
+    // All this needs is a BroadcastManager for `extendBroadcast()` to
     // register the redis driver onto.
     app.instance(
       BROADCAST_TOKEN,
@@ -172,7 +172,7 @@ describe("RedisServiceProvider.shutdown()", () => {
 /**
  * The end-to-end claim: a process that boots an app pointed at Redis
  * exits after `terminate()`, because there is no live socket left holding
- * the event loop open. Needs a real server — a client that never
+ * the event loop open. Needs a real server, a client that never
  * connected has nothing to quit, which is the case the unit tests above
  * cover.
  */

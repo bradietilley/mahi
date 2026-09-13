@@ -10,7 +10,7 @@ import type { ContextRepository } from "./context.js";
  *   Log.info("cache warmed");          // ... cache warmed {"deploy":"abc123"}
  *   Context.forget("deploy");
  *
- * Unlike `Log`, there's no token/provider indirection at all — the
+ * Unlike `Log`, there's no token/provider indirection at all. The
  * repository is a plain readonly field on `Application` (like
  * `Application.logger`), so this facade needs no `LoggingServiceProvider`
  * or any other registration to work.
@@ -19,7 +19,7 @@ import type { ContextRepository } from "./context.js";
  * `@mahiframework/facades`' `Facade<T>(getFacadeKey)` mixin for the same
  * reason as the `Log` facade (see `log-facade.ts`): `@mahiframework/facades`
  * depends on `@mahiframework/core`, and `ContextRepository` lives in core,
- * so importing `Facade` here would create a circular package dependency —
+ * so importing `Facade` here would create a circular package dependency,
  * and the repository isn't container-bound anyway, so there's no facade
  * key to resolve.
  *
@@ -94,7 +94,7 @@ export class Context {
    * Run `fn` inside a fresh per-request context overlay (seeded from the
    * global context), isolating everything it adds/forgets from other
    * concurrent requests. The HTTP kernel calls this for you around each
-   * request; reach for it directly only in non-HTTP entry points (a queue
+   * request; use it directly only in non-HTTP entry points (a queue
    * job, a CLI command, a test) that want the same per-invocation
    * isolation. See `ContextRepository.runScoped()`.
    */

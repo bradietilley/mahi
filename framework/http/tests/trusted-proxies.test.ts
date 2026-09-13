@@ -60,7 +60,7 @@ describe("hostWithoutPort()", () => {
   });
 
   it("keeps an IPv6 literal intact", () => {
-    // Splitting on ":" — the obvious implementation — yields "[" here,
+    // Splitting on ":", the obvious implementation, yields "[" here,
     // so an IPv6 host could never match an allow-list and was 403'd.
     expect(hostWithoutPort("[::1]:3000")).toBe("[::1]");
     expect(hostWithoutPort("[2001:db8::1]")).toBe("[2001:db8::1]");
@@ -116,7 +116,7 @@ async function run(pipe: ReturnType<typeof trustProxies>, request: Request): Pro
   return seen!;
 }
 
-describe("trustProxies() — client IP resolution", () => {
+describe("trustProxies(): client IP resolution", () => {
   it("trusts X-Forwarded-For when the peer is a configured proxy", async () => {
     const req = requestWithPeer("10.0.0.5", { "x-forwarded-for": "203.0.113.7" });
     expect((await run(trustProxies(["10.0.0.0/8"]), req)).ip()).toBe("203.0.113.7");
@@ -134,8 +134,8 @@ describe("trustProxies() — client IP resolution", () => {
 
   it("takes the RIGHTMOST untrusted hop, not the leftmost", async () => {
     // The attacker sends `X-Forwarded-For: 1.2.3.4`; the trusted proxy
-    // APPENDS the real address. Taking the leftmost entry — as a naive
-    // implementation does — hands the attacker their own fiction back.
+    // APPENDS the real address. Taking the leftmost entry, as a naive
+    // implementation does, hands the attacker their own fiction back.
     const req = requestWithPeer("10.0.0.5", { "x-forwarded-for": "1.2.3.4, 203.0.113.7" });
     expect((await run(trustProxies(["10.0.0.0/8"]), req)).ip()).toBe("203.0.113.7");
   });
@@ -160,7 +160,7 @@ describe("trustProxies() — client IP resolution", () => {
   });
 });
 
-describe("trustProxies() — forwarded origin", () => {
+describe("trustProxies(): forwarded origin", () => {
   it("applies X-Forwarded-Proto so secure() and root() reflect the real scheme", async () => {
     const req = requestWithPeer("10.0.0.5", { "x-forwarded-proto": "https" });
     const resolved = await run(trustProxies(["10.0.0.0/8"]), req);
@@ -266,7 +266,7 @@ describe("trustHosts() middleware", () => {
   it("checks the host a trusted proxy forwarded, not the raw socket Host", async () => {
     // The value that matters is the one the URL generator will use for
     // links. Checking the raw `Host` header instead would let a
-    // forwarded host through unvalidated — which is the exact link
+    // forwarded host through unvalidated. Which is the exact link
     // poisoning this middleware exists to stop.
     const req = requestWithPeer("10.0.0.5", { "x-forwarded-host": "evil.example" });
     const resolved = await run(trustProxies(["10.0.0.0/8"]), req);

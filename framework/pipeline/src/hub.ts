@@ -15,12 +15,12 @@ export type PipelineFactory<TPassable, TResult = TPassable> = (
 ) => Promise<TResult> | TResult;
 
 /**
- * Named-pipeline registry — Laravel's `Illuminate\Pipeline\Hub`.
+ * Named-pipeline registry, Laravel's `Illuminate\Pipeline\Hub`.
  *
  * Lets independently-named pipelines ("http middleware", "notification
  * formatting") be registered once and looked up by name, rather than
  * every call site constructing a `Pipeline` from scratch. No `__call`
- * magic — pipelines are registered with `pipeline(name, callback)` and
+ * magic. Pipelines are registered with `pipeline(name, callback)` and
  * invoked with `pipe(passable, name)`.
  */
 export class Hub {

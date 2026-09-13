@@ -11,7 +11,7 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Local-dev convenience: a foreground loop that evaluates the schedule
- * once per minute — an alternative to needing a real crontab entry while
+ * once per minute, an alternative to needing a real crontab entry while
  * developing. Runs until interrupted (Ctrl+C / SIGTERM). Unlike Laravel's
  * `schedule:work` there's no per-tick child process: Node has no
  * per-invocation state-isolation need, so tasks run directly in-process
@@ -48,14 +48,14 @@ export class ScheduleWorkCommand extends Command {
     );
 
     // Every minute this loop has already dispatched, keyed by the minute's
-    // start timestamp — so a run fires at most once per wall-clock minute
+    // start timestamp, so a run fires at most once per wall-clock minute
     // even though the poll ticks far more often, and (unlike keying off
     // `getMinutes()`) an hour-long stall can't make minute 30 look "new"
     // again and fire a second time.
     const dispatched = new Set<number>();
     // Every tick still in flight. The loop does NOT await these: a tick
     // whose tasks take 90 seconds must not swallow the minute after it,
-    // which is exactly what awaiting `runDueTasks()` inline would do —
+    // which is exactly what awaiting `runDueTasks()` inline would do,
     // 60 tasks a minute silently become 40.
     const inFlight = new Set<Promise<void>>();
 
@@ -93,7 +93,7 @@ export class ScheduleWorkCommand extends Command {
         }
 
         // Poll frequently so shutdown is responsive and we don't miss a
-        // minute boundary — mirrors Laravel's ~100ms tick.
+        // minute boundary, mirrors Laravel's ~100ms tick.
         await sleep(1000);
       }
     } finally {

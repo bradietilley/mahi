@@ -59,7 +59,7 @@ export function parseEpochToMicroseconds(epochStart: string): number {
 
 /**
  * Format a Unix timestamp (seconds) as `'YYYY-MM-DD HH:MM:SS'` in the
- * host local timezone — PHP `date('Y-m-d H:i:s', ...)`.
+ * host local timezone, PHP `date('Y-m-d H:i:s', ...)`.
  */
 export function formatLocalDateTime(epochSeconds: number): string {
   const date = new Date(epochSeconds * 1000);

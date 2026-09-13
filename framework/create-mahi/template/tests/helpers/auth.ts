@@ -16,15 +16,15 @@ export interface AuthenticatedUser {
 /**
  * Clear rate-limiter state between tests.
  *
- * Tests dispatch in-process, so every request shares one client identity
- * — there is no socket, so `request.ip()` is `undefined` and the
+ * Tests dispatch in-process, so every request shares one client identity.
+ * There is no socket, so `request.ip()` is `undefined` and the
  * limiters bucket everything together. One test file's login attempts
  * would otherwise eat another's budget and produce a 429 that has
  * nothing to do with the behaviour under test.
  *
  * Sending a unique `x-forwarded-for` per request so each test looks like
  * a different client is not an option: that only works if `request.ip()`
- * trusts the header — which is precisely the vulnerability that lets an
+ * trusts the header. Which is precisely the vulnerability that lets an
  * attacker rotate it to bypass the login limiter entirely. The header is
  * not trusted, so tests reset the limiter rather than impersonating
  * clients.

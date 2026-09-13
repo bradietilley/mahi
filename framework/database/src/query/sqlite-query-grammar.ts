@@ -10,13 +10,13 @@ const STRFTIME_FORMAT: Record<DatePart, string> = {
   year: "%Y",
 };
 
-/** `{ field: "meta", segments: ["a", "b"] }` → `"$.a.b"` — the JSONPath SQLite's `json_*` functions take. */
+/** `{ field: "meta", segments: ["a", "b"] }` → `"$.a.b"`, the JSONPath SQLite's `json_*` functions take. */
 function jsonPath(column: JsonColumn): string {
   return column.segments.length > 0 ? `$.${column.segments.join(".")}` : "$";
 }
 
 /**
- * SQLite query grammar — the framework's default engine.
+ * SQLite query grammar, the framework's default engine.
  *
  * Date components come from `strftime()`, JSON from the `json_each()`/
  * `json_type()`/`json_array_length()` family (the JSON1 extension,
@@ -27,7 +27,7 @@ function jsonPath(column: JsonColumn): string {
  * is a single file with one writer, there is no row-level lock to take,
  * and Kysely's SQLite dialect emits `for update` verbatim into SQL that
  * then fails to parse. `supportsRowLocks: false` makes `lockForUpdate()`
- * a documented no-op here rather than a runtime syntax error — matching
+ * a documented no-op here rather than a runtime syntax error, matching
  * Laravel's own `SQLiteGrammar::compileLock()`, which returns an empty
  * string unconditionally.
  */
