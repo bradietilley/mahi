@@ -1,5 +1,8 @@
 # Mahi
 
+> **Work in progress.** Mahi is still being built. Things will change,
+> break, and get renamed without warning. Don't use it in production yet.
+
 A TypeScript application framework for building APIs and services on
 Node.js, service providers with a two-stage `register()`/`boot()`
 lifecycle, a service container, Manager-based driver resolution, an
