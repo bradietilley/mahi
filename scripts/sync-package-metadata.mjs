@@ -18,8 +18,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const frameworkDir = join(root, "framework");
 const rootLicense = readFileSync(join(root, "LICENSE"), "utf8");
 
-const REPO_URL = "https://github.com/bradietilley/mahi";
-const HOMEPAGE = "https://github.com/bradietilley/mahi#readme";
+const REPO_URL = "https://github.com/mahiframework/mahi";
+const HOMEPAGE = "https://github.com/mahiframework/mahi#readme";
 const LICENSE = "MIT";
 const AUTHOR = "Bradie Tilley";
 const ENGINES = { node: ">=26" };
@@ -180,13 +180,15 @@ for (const entry of readdirSync(frameworkDir, { withFileTypes: true })) {
   // Fields shared by every publishable package.
   pkg.license ??= LICENSE;
   pkg.author ??= AUTHOR;
-  pkg.homepage ??= HOMEPAGE;
-  pkg.repository ??= {
+  // Owned outright, not defaulted: npm validates `repository.url` against the
+  // provenance claim, so a stale URL (an org transfer, say) fails the publish.
+  pkg.homepage = HOMEPAGE;
+  pkg.repository = {
     type: "git",
     url: `git+${REPO_URL}.git`,
     directory: `framework/${entry.name}`,
   };
-  pkg.bugs ??= { url: `${REPO_URL}/issues` };
+  pkg.bugs = { url: `${REPO_URL}/issues` };
   pkg.engines = { ...ENGINES, ...pkg.engines };
   pkg.engines.node = ENGINES.node;
   pkg.sideEffects ??= false;

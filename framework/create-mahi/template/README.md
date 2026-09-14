@@ -1,6 +1,6 @@
 # Mahi application
 
-A [Mahi](https://github.com/bradietilley/mahi) application.
+A [Mahi](https://github.com/mahiframework/mahi) application.
 
 ## Getting started
 
@@ -51,4 +51,4 @@ collects is documented there.
 
 ## Documentation
 
-See the [Mahi documentation](https://github.com/bradietilley/mahi/tree/main/docs).
+See the [Mahi documentation](https://github.com/mahiframework/mahi/tree/main/docs).

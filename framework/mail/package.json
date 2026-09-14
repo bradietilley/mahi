@@ -31,14 +31,14 @@
   },
   "license": "MIT",
   "author": "Bradie Tilley",
-  "homepage": "https://github.com/bradietilley/mahi#readme",
+  "homepage": "https://github.com/mahiframework/mahi#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bradietilley/mahi.git",
+    "url": "git+https://github.com/mahiframework/mahi.git",
     "directory": "framework/mail"
   },
   "bugs": {
-    "url": "https://github.com/bradietilley/mahi/issues"
+    "url": "https://github.com/mahiframework/mahi/issues"
   },
   "engines": {
     "node": ">=26"
