@@ -117,8 +117,9 @@ git push origin main v0.2.0
 The `Release` workflow builds, lints, typechecks, tests, verifies the tag
 matches the lockstep version, and runs `pnpm -r publish`, which only
 publishes packages whose version is not already on npm, so re-running a
-release is safe. It needs an `NPM_TOKEN` repository secret with publish
-rights to the `@mahiframework` scope.
+release is safe. It authenticates to npm with trusted publishing (OIDC), so
+there is no token to rotate: each package lists this repository and
+`release.yml` as its trusted publisher.
 
 ## Documentation
 

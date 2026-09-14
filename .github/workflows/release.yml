@@ -5,8 +5,9 @@ name: Release
 # version (`node scripts/set-version.mjs --print`); `@mahiframework/datetime` is
 # versioned independently and is published whenever its own version is new.
 #
-# Requires an `NPM_TOKEN` repository secret with publish rights to the
-# `@mahiframework` scope (an automation token, so 2FA does not block CI).
+# Authentication is npm trusted publishing (OIDC): every package names this
+# repository and `release.yml` as its trusted publisher, so the runner mints a
+# short-lived credential from the `id-token` below. There is no npm token.
 
 on:
   push:
@@ -15,7 +16,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance
+  id-token: write # mints the OIDC token npm publishes with, and signs provenance
 
 # No `CI_STRICT_MODE` here: this job starts no services, so the database and
 # Redis integration suites self-skip, exactly like the service-free CI job.
@@ -81,5 +82,3 @@ jobs:
       # registry, so re-running a release (or a datetime-only bump) is safe.
       - name: Publish
         run: pnpm -r publish --access public --no-git-checks --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
